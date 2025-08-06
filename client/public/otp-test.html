@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Firebase OTP Test</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</head>
+
+<body>
+  <h2>Firebase OTP Test</h2>
+
+  <input type="text" id="phoneNumber" placeholder="+91XXXXXXXXXX" />
+  <div id="recaptcha-container"></div>
+  <button onclick="sendOTP()">Send OTP</button>
+
+  <br><br>
+
+  <input type="text" id="otpCode" placeholder="Enter OTP" />
+  <button onclick="verifyOTP()">Verify OTP</button>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA75VeImhi3JCObbklTbTL10aWMuQZ3gWo",
+      authDomain: "bookmystay-94cdc.firebaseapp.com",
+      projectId: "bookmystay-94cdc",
+      storageBucket: "bookmystay-94cdc.appspot.com",
+      messagingSenderId: "286652503057",
+      appId: "1:286652503057:web:db277b998cfacb697e8db0",
+      measurementId: "G-K82SKSQHT4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    let confirmationResult;
+
+    window.onload = function () {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+          size: 'invisible',
+          callback: (response) => {
+            console.log("✅ reCAPTCHA solved:", response);
+          },
+          'expired-callback': () => {
+            console.warn("⚠️ reCAPTCHA expired");
+          }
+        });
+
+        window.recaptchaVerifier.render().then(widgetId => {
+          window.recaptchaWidgetId = widgetId;
+          console.log("✅ reCAPTCHA rendered with ID:", widgetId);
+        }).catch(err => {
+          console.error("❌ Failed to render reCAPTCHA:", err);
+        });
+      }
+    };
+
+    function sendOTP() {
+      const phoneNumber = document.getElementById("phoneNumber").value;
+
+      firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+        .then(result => {
+          confirmationResult = result;
+          alert("✅ OTP Sent!");
+        })
+        .catch(error => {
+          console.error("🚫 OTP error:", error);
+          alert("Error sending OTP: " + error.message);
+        });
+    }
+
+    function verifyOTP() {
+      const code = document.getElementById("otpCode").value;
+
+      confirmationResult.confirm(code)
+        .then(async (result) => {
+          const user = result.user;
+          const idToken = await user.getIdToken();
+
+          console.log("✅ OTP Verified");
+          console.log("ID Token:", idToken);
+
+          // Optional: send to backend
+          fetch("http://localhost:5000/api/traveller/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ idToken })
+          })
+            .then(res => res.json())
+            .then(data => console.log("Backend response:", data))
+            .catch(err => console.error("Backend error:", err));
+        })
+        .catch(error => {
+          console.error("❌ Invalid OTP:", error);
+          alert("Invalid OTP");
+        });
+    }
+  </script>
+</body>
+
+</html>
