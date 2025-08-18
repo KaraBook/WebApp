@@ -1,18 +1,30 @@
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 
-const storage = multer.diskStorage({});
+const uploadDir = path.join(process.cwd(), "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
 
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
   const allowedExts = [".jpg", ".jpeg", ".png", ".webp"];
 
   if (!allowedExts.includes(ext)) {
-    console.error(`❌ Rejected file: ${file.originalname}, Type: ${file.mimetype}`);
     return cb(new Error("Only images are allowed"));
   }
-
-  console.log(`✅ Accepted file: ${file.originalname}, Type: ${file.mimetype}`);
   cb(null, true);
 };
 

@@ -27,7 +27,7 @@ const CustomTimePicker = ({ label, value, onChange }) => {
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" className="w-full justify-between bg-transparent mt-2">
+          <Button variant="outline" className="w-full justify-between bg-white mt-2">
             {value || "Select time"}
           </Button>
         </PopoverTrigger>

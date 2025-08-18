@@ -1,16 +1,29 @@
-import Select from "react-select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-const SingleSelectDropdown = ({ label, value, options, onChange }) => {
+const SingleSelectDropdown = ({ label, value, options, onChange, placeholder = "Select..." }) => {
   return (
     <div className="w-full">
       {label && <label className="block font-medium mb-1">{label}</label>}
-      <Select
-        options={options}
-        value={options.find((opt) => opt.value === value) || null}
-        onChange={(selected) => onChange(selected?.value)}
-      />
+      <Select value={value?.toString()} onValueChange={(val) => onChange(val)}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt.value.toString()} value={opt.value.toString()}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };
 
-export default SingleSelectDropdown;
+export default SingleSelectDropdown

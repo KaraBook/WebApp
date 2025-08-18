@@ -44,3 +44,20 @@ export const publishNowOptions = [
   { label: "Yes", value: true },
   { label: "No", value: false },
 ];
+
+export const featuredOptions = [
+  { label: "Yes", value: true },
+  { label: "No", value: false },
+];
+
+
+export const formSteps = [
+  { id: 1, title: "Basic Info" },
+  { id: 2, title: "Location Details" },
+  { id: 3, title: "Accomodation Info" },
+  { id: 4, title: "Availability" },
+  { id: 5, title: "Food & Amenities" },
+  { id: 6, title: "Media Uploads" },
+  { id: 7, title: "Legal" },
+  { id: 8, title: "Admin-Only Controls" },  
+];

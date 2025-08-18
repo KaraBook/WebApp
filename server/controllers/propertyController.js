@@ -1,5 +1,7 @@
 import Property from "../models/Property.js";
 import cloudinary from "../utils/cloudinary.js";
+import fs from "fs/promises";
+
 
 
 // Create a new property
@@ -8,29 +10,56 @@ export const createProperty = async (req, res) => {
     const files = req.files;
     const coverImage = files.coverImage?.[0];
     const galleryPhotos = files.galleryPhotos || [];
+    const shopAct = files.shopAct?.[0];
 
-    const resortOwner = JSON.parse(req.body.resortOwner);
+    // Upload images
+    const coverResult = coverImage
+      ? await cloudinary.uploader.upload(coverImage.path, { folder: "properties" })
+      : null;
 
-    const coverResult = await cloudinary.uploader.upload(coverImage.path);
+    const shopActResult = shopAct
+      ? await cloudinary.uploader.upload(shopAct.path, { folder: "properties/shopAct" }) 
+      : null;
+
     const galleryResults = await Promise.all(
-      galleryPhotos.map((file) => cloudinary.uploader.upload(file.path))
+      galleryPhotos.map((file) =>
+        cloudinary.uploader.upload(file.path, { folder: "properties/gallery" })
+      )
     );
 
+    // Clean up temp files
+    const deletePromises = [];
+    if (coverImage) deletePromises.push(fs.unlink(coverImage.path));
+    if (shopAct) deletePromises.push(fs.unlink(shopAct.path));
+    galleryPhotos.forEach((file) => deletePromises.push(fs.unlink(file.path)));
+    await Promise.all(deletePromises);
+
+    // Save to DB
     const newProperty = new Property({
       ...req.body,
-      resortOwner, 
-      coverImage: coverResult.secure_url,
+      coverImage: coverResult?.secure_url || "",
+      shopAct: shopActResult?.secure_url || "",
       galleryPhotos: galleryResults.map((img) => img.secure_url),
     });
 
     await newProperty.save();
     res.status(201).json({ success: true, data: newProperty });
+
   } catch (err) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        success: false,
+        message: "Image size too large. Please upload images under 5MB.",
+      });
+    }
+
     console.error(err);
-    res.status(500).json({ success: false, message: "Server Error", error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again.",
+    });
   }
 };
-
 
 // Get all properties
 export const getAllProperties = async (req, res) => {
@@ -74,6 +103,7 @@ export const updateProperty = async (req, res) => {
 
     const files = req.files || {};
     const coverImage = files.coverImage?.[0];
+    const shopAct = files.shopAct?.[0];
     const galleryPhotos = files.galleryPhotos || [];
 
     let updatedData = { ...req.body };
@@ -87,6 +117,12 @@ export const updateProperty = async (req, res) => {
     if (coverImage) {
       const coverResult = await cloudinary.uploader.upload(coverImage.path);
       updatedData.coverImage = coverResult.secure_url;
+    }
+
+    // If new shop act is uploaded
+    if (shopAct) {
+      const shopActResult = await cloudinary.uploader.upload(shopAct.path, { folder: "properties/shopAct" });
+      updatedData.shopAct = shopActResult.secure_url;
     }
 
     // If new gallery images uploaded

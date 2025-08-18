@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post(
   "/",
-  upload.fields([{ name: "coverImage" }, { name: "galleryPhotos" }]),
+  upload.fields([{ name: "coverImage" }, { name: "galleryPhotos" }, { name: "shopAct" }]),
   validateProperty,
   createProperty
 );
@@ -18,7 +18,7 @@ router.get("/:id", getSingleProperty);
 
 router.put(
   "/:id",
-  upload.fields([{ name: "coverImage" }, { name: "galleryPhotos" }]),
+  upload.fields([{ name: "coverImage" }, { name: "galleryPhotos" }, { name: "shopAct" }]),
   validateProperty,
   updateProperty
 );

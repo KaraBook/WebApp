@@ -60,6 +60,17 @@
   }
 }
 
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide number input spinners in Firefox */
+.no-spinner[type="number"] {
+  -moz-appearance: textfield;
+}
+
 @layer base {
   * {
     @apply border-border;
