@@ -26,6 +26,8 @@ app.use(
 
 app.use(express.json());
 
+app.get("/", (_req, res) => res.send("API is up"));
+
 app.use("/api/auth", userRoutes);
 app.use("/api/properties", propertyRoutes);
 
