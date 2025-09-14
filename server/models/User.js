@@ -1,50 +1,30 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Name is required"],
-    trim: true,
-    minlength: [2, "Name must be at least 2 characters"],
-    maxlength: [50, "Name must be under 50 characters"],
-  },
+  name: { type: String, required: true, trim: true, minlength: 2, maxlength: 50 },
   email: {
-    type: String,
-    required: [true, "Email is required"],
-    unique: true,
-    lowercase: true,
-    trim: true,
-    match: [
-      /^\w+([\.+-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/,
-      "Please enter a valid email",
-    ],
+    type: String, required: true, unique: true, lowercase: true, trim: true,
+    match: [/^\w+([\.+-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,})+$/, "Please enter a valid email"],
   },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-    minlength: [6, "Password must be at least 6 characters"],
-    select: false, 
+  password: { type: String, minlength: 6, select: false, default: null },
+  role: { type: String, enum: ['admin', 'traveller', 'resortOwner'], default: 'traveller' },
+  mobile: { type: String, required: true, unique: true, match: [/^[6-9]\d{9}$/, "Please enter a valid mobile number"] },
+
+  firstName: { type: String, trim: true },
+  lastName:  { type: String, trim: true },
+
+  // Only travellers must have these
+  state: {
+    type: String, trim: true,
+    required: function () { return this.role === 'traveller'; }
   },
-  role: {
-    type: String,
-    enum: ['admin', 'traveller', 'resortOwner'],
-    default: 'traveller',
+  city: {
+    type: String, trim: true,
+    required: function () { return this.role === 'traveller'; }
   },
-  mobile: {
-  type: String,
-  required: true,
-  unique: true,
-  match: [/^[6-9]\d{9}$/, "Please enter a valid mobile number"],
-},
-firstName: String,
-lastName: String,
-state: String,
-district: String,
 
-}, {
-  timestamps: true,
-});
+  avatarUrl: { type: String, default: "" },
+  ownedProperties: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }],
+}, { timestamps: true });
 
-
-const User = mongoose.model("User", userSchema);
-export default User;
+export default mongoose.model("User", userSchema);

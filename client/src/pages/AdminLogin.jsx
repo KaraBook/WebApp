@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Axios from "../utils/Axios"
 import SummaryApi from "../common/SummaryApi"
-import { successToast, errorToast } from "../utils/toastHelper"
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,10 +26,10 @@ export default function AdminLogin() {
       localStorage.setItem("accessToken", accessToken)
       localStorage.setItem("refreshToken", refreshToken)
 
-      successToast("Logged in successfully!")
+      toast.success("Logged in successfully!");
       navigate("/admin/dashboard")
     } catch (err) {
-      errorToast(err.response?.data?.message || "Login failed")
+      toast.error(err.response?.data?.message || "Login failed");
     }
   }
 
@@ -37,7 +37,7 @@ export default function AdminLogin() {
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 gap-4">
      
       <div>
-        <h1 className="text-3xl text-bold">BOOK MY STAY</h1>
+        <h1 className="text-3xl text-bold">KaraBook</h1>
       </div>
 
      

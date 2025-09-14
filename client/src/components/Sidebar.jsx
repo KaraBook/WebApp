@@ -4,7 +4,7 @@ import { ChevronRight, ChevronLeft, LogOut } from "lucide-react";
 import sidebarMenu from "../config/sidebarMenu";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { successToast } from "../utils/toastHelper";
+import { toast } from "sonner";
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -16,7 +16,7 @@ function Sidebar() {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    successToast("Logged out successfully");
+    toast.success("Logged out successfully!");
     navigate("/admin/login");
   };
 

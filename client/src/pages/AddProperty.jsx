@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Axios from "../utils/Axios";
-import { successToast, errorToast } from "../utils/toastHelper";
+import { toast } from "sonner";
 import SummaryApi from "../common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "../utils/locationUtils";
 import FileUploadsSection from "../components/FileUploadsSection";
@@ -23,6 +23,7 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
 import { Button } from "../components/ui/button";
+
 
 const AddProperty = () => {
     const navigate = useNavigate();
@@ -108,6 +109,7 @@ const AddProperty = () => {
                     Object.entries(value).forEach(([ownerKey, ownerValue]) => {
                         data.append(`resortOwner[${ownerKey}]`, ownerValue);
                     });
+                    data.append("resortOwner", JSON.stringify(value));
                 }
                 else if (Array.isArray(value)) {
                     value.forEach((v) => data.append(`${key}[]`, v));
@@ -139,11 +141,11 @@ const AddProperty = () => {
             });
 
             console.log("Response:", response.data);
-            successToast("Property added successfully");
+            toast.success("Property added successfully!");
             navigate("/admin/properties");
 
         } catch (error) {
-            errorToast(error.response?.data?.message || "Something went wrong");
+            toast.error(error.response?.data?.message || "Failed to add property");
         }
         finally {
             setLoading(false);
@@ -161,7 +163,7 @@ const AddProperty = () => {
             <h2 className="text-2xl font-bold mb-4">Add New Property</h2>
 
             {/* Stepper */}
-            <TooltipProvider>
+            <TooltipProvider delayDuration={200}>
                 <div className="flex items-center space-x-0 overflow-x-auto w-full mt-20 mb-8">
                     <div className="w-[25%] text-xl font-semibold text-black">
                         {formSteps[currentStep - 1].title}
@@ -179,7 +181,7 @@ const AddProperty = () => {
                                                 type="button"
                                                 onClick={() => setCurrentStep(step.id)}
                                                 className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-colors duration-200
-                    ${completed
+                                                       ${completed
                                                         ? "bg-black text-white border-black hover:bg-gray-800"
                                                         : isCurrent
                                                             ? "border-black text-white bg-black hover:bg-gray-800"
@@ -410,7 +412,7 @@ const AddProperty = () => {
                             />
                         </div>
 
-                        <div className="w-[48%]">
+                       <div className="w-[48%]">
                             <Label htmlFor="state" className="text-sm">
                                 State <span className="text-red-500">*</span>
                             </Label>
@@ -436,6 +438,7 @@ const AddProperty = () => {
                             </Select>
                         </div>
 
+
                         <div className="w-[48%]">
                             <label className="block font-small mb-1">
                                 City <span className="text-red-500">*</span>
@@ -456,6 +459,7 @@ const AddProperty = () => {
                                 </SelectContent>
                             </Select>
                         </div>
+
 
                         <div className="w-[48%]">
                             <Label htmlFor="pinCode" className="text-sm">

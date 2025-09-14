@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
+import { Button  } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { IoEyeOutline } from "react-icons/io5";
 import { RiEditBoxLine } from "react-icons/ri";
@@ -107,12 +107,12 @@ const PropertiesPage = () => {
                 <TableRow key={property._id}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{property.propertyName}</TableCell>
-                  <TableCell>{property.resortOwner?.name || 'N/A'}</TableCell>
+                  <TableCell>{property.resortOwner?.firstName || 'N/A'}</TableCell>
                   <TableCell>{property.state}</TableCell>
                   <TableCell>{property.city}</TableCell>
-                  <TableCell>₹{property.pricingPerNight}</TableCell>
-                  <TableCell>{property.status}</TableCell>
-                  <TableCell>{property.featured}</TableCell>
+                  <TableCell>₹{property.pricingPerNightWeekdays}</TableCell>
+                  <TableCell>{property.approvalStatus}</TableCell>
+                  <TableCell>{property.featured ? "Yes" : "No"}</TableCell>
                   <TableCell>{formatDate(property.createdAt)}</TableCell>
                   <TableCell>{formatDate(property.updatedAt)}</TableCell>
                   <TableCell className="flex space-x-2">

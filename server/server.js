@@ -9,10 +9,17 @@ dotenv.config();
 const app = express();
 connectDB();
 
-const allowedOrigin = "http://localhost:5173";
+const allowedOrigin = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"];
 app.use(
   cors({
-    origin: allowedOrigin,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigin.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
 );

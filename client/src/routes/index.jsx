@@ -6,6 +6,7 @@ import PropertiesPage from "../pages/PropertiesPage";
 import ProtectedAdminRoute from "../ProtectedAdminRoute"; 
 import AddProperty from "../pages/AddProperty";
 import EditProperty from "../pages/EditProperty";
+import ViewProperty from "../pages/ViewProperty";
 
 function AppRoutes() {
   return (
@@ -21,6 +22,7 @@ function AppRoutes() {
             <Route path="properties/blocked" element={<div>Blocked Page</div>} />
             <Route path="add-property" element={<AddProperty />} />
             <Route path="edit-property/:id" element={<EditProperty />} />
+            <Route path="/admin/view-property/:id" element={<ViewProperty />} />
           </Route>
         </Route>
       </Routes>
