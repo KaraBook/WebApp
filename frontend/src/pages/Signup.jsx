@@ -94,8 +94,8 @@ export default function Signup() {
         </CardHeader>
 
         <CardContent className="grid gap-4">
-          <div className="flex gap-4">
-            <div className="w-1/2">
+          <div className="flex justify-between flex-wrap gap-2">
+            <div className="md:w-[48%] w-full">
               <Label htmlFor="firstName">First name</Label>
               <Input id="firstName" className="mt-1" placeholder="John" {...register("firstName")} />
               {errors.firstName && (
@@ -103,7 +103,7 @@ export default function Signup() {
               )}
             </div>
 
-            <div className="w-1/2">
+            <div className="md:w-[48%] w-full">
               <Label htmlFor="lastName">Last name</Label>
               <Input id="lastName" placeholder="Doe" className="mt-1" {...register("lastName")} />
               {errors.lastName && (
@@ -120,9 +120,9 @@ export default function Signup() {
             )}
           </div>
 
-        <div className="flex gap-4">
+        <div className="flex justify-between flex-wrap gap-2">
           {/* State Dropdown */}
-          <div className="w-1/2">
+          <div className="md:w-[48%] w-full">
             <Label htmlFor="state">State</Label>
             <Controller
               name="state"
@@ -151,7 +151,7 @@ export default function Signup() {
           </div>
 
           {/* City Dropdown */}
-          <div className="w-1/2">
+          <div className="md:w-[48%] w-full">
             <Label htmlFor="city">City</Label>
             <Controller
               name="city"
