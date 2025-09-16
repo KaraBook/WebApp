@@ -86,6 +86,7 @@ export const createProperty = async (req, res) => {
       addressLine1: req.body.addressLine1,
       pan: req.body.pan,
       locationLink: req.body.locationLink,
+      gstin: (req.body.gstin || "").toUpperCase(),
     });
     if (duplicateField) {
       return res.status(409).json({ success: false, message: `${duplicateField} already exists` });

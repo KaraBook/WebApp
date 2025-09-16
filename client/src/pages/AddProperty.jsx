@@ -1,4 +1,3 @@
-// src/pages/AddProperty.jsx
 import { useState, useEffect } from "react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +38,8 @@ const AddProperty = () => {
     const [isPublished, setIsPublished] = useState(true);
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
+    const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
 
 
     const [formData, setFormData] = useState({
@@ -64,6 +65,7 @@ const AddProperty = () => {
         foodAvailability: [],
         amenities: [],
         pan: "",
+        gstin: "",
         kycVerified: false,
         featured: false,
         approvalStatus: "pending",
@@ -412,7 +414,7 @@ const AddProperty = () => {
                             />
                         </div>
 
-                       <div className="w-[48%]">
+                        <div className="w-[48%]">
                             <Label htmlFor="state" className="text-sm">
                                 State <span className="text-red-500">*</span>
                             </Label>
@@ -739,6 +741,30 @@ const AddProperty = () => {
                                 }
                                 placeholder="Select KYC status"
                             />
+                        </div>
+
+                        <div className="w-[48%]">
+                            <Label htmlFor="gstin" className="text-sm">
+                                GSTIN <span className="text-gray-400 text-xs">(15 characters)</span> <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="gstin"
+                                name="gstin"
+                                type="text"
+                                className="mt-2 uppercase"
+                                value={formData.gstin}
+                                maxLength={15}
+                                onChange={(e) => {
+                                    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                                    if (val.length <= 15) {
+                                        setFormData((prev) => ({ ...prev, gstin: val }));
+                                    }
+                                }}
+                                required
+                            />
+                            {formData.gstin && !GSTIN_REGEX.test(formData.gstin) && (
+                                <p className="text-xs text-red-500 mt-1">Please enter a valid GSTIN.</p>
+                            )}
                         </div>
                     </>
                 )}

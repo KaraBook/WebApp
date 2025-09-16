@@ -1,5 +1,7 @@
 import Joi from "joi";
 
+const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+
 const baseFields = {
   propertyName: Joi.string().min(3).max(100).regex(/^[a-zA-Z0-9 ]+$/).required(),
   resortOwner: Joi.object({
@@ -30,6 +32,12 @@ const baseFields = {
   foodAvailability: Joi.array().items(Joi.string()),
   amenities: Joi.array().items(Joi.string()),
   pan: Joi.string().length(10).required(),
+  gstin: Joi.string().length(15).pattern(GSTIN_REGEX).required()
+    .messages({
+      "string.empty": "GSTIN is required",
+      "string.length": "GSTIN must be exactly 15 characters",
+      "string.pattern.base": "GSTIN format is invalid",
+    }),
   kycVerified: Joi.boolean().required(),
   publishNow: Joi.boolean().optional(),
   featured: Joi.boolean().optional(),
