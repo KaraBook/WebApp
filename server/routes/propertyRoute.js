@@ -1,6 +1,8 @@
+// routes/propertyRoute.js
 import express from "express";
 import {
-  createProperty,
+  createPropertyDraft,
+  attachPropertyMediaAndFinalize,
   getAllProperties,
   getSingleProperty,
   updateProperty,
@@ -10,23 +12,33 @@ import {
 import { requireAuth, requireAdmin } from "../middlewares/requireAuth.js";
 import upload from "../middlewares/multer.js";
 import {
-  validateCreateProperty,
-  validateUpdateProperty,
+  validatePropertyDraft,
+  validatePropertyUpdate,
+  ensureMediaFilesPresent, 
 } from "../middlewares/propertyValidator.js";
 
 const router = express.Router();
 
 router.post(
-  "/",
+  "/draft",
+  requireAuth,
+  requireAdmin,
+  upload.none(),
+  validatePropertyDraft,
+  createPropertyDraft
+);
+
+router.post(
+  "/:id/media",
   requireAuth,
   requireAdmin,
   upload.fields([
     { name: "coverImage", maxCount: 1 },
     { name: "shopAct", maxCount: 1 },
-    { name: "galleryPhotos", maxCount: 15 },
+    { name: "galleryPhotos", maxCount: 20 },
   ]),
-  validateCreateProperty,
-  createProperty
+  ensureMediaFilesPresent, 
+  attachPropertyMediaAndFinalize
 );
 
 router.get("/", getAllProperties);
@@ -34,9 +46,14 @@ router.get("/:id", getSingleProperty);
 
 router.put(
   "/:id",
-  requireAuth, requireAdmin,
-  upload.fields([{ name: "coverImage" }, { name: "galleryPhotos" }, { name: "shopAct" }]),
-  validateUpdateProperty,
+  requireAuth,
+  requireAdmin,
+  upload.fields([
+    { name: "coverImage", maxCount: 1 },
+    { name: "galleryPhotos", maxCount: 20 },
+    { name: "shopAct", maxCount: 1 },
+  ]),
+  validatePropertyUpdate,
   updateProperty
 );
 

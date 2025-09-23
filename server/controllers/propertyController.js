@@ -35,7 +35,6 @@ function parseResortOwner(body) {
     return "";
   };
 
-  // Accept bracket, dot, and your flat names
   return {
     firstName: first("resortOwner[firstName]", "resortOwner.firstName", "resortOwnerFirstName"),
     lastName: first("resortOwner[lastName]", "resortOwner.lastName", "resortOwnerLastName"),
@@ -63,11 +62,8 @@ export const checkDuplicateFields = async (raw) => {
 };
 
 
-export const createProperty = async (req, res) => {
-  const coverFile = req.files?.coverImage?.[0];
-  const shopActFile = req.files?.shopAct?.[0];
-  const gallery = req.files?.galleryPhotos || [];
-
+// controllers/propertyController.js
+export const createPropertyDraft = async (req, res) => {
   try {
     const owner = parseResortOwner(req.body);
     owner.mobile = normalizeMobile(owner.mobile);
@@ -84,31 +80,13 @@ export const createProperty = async (req, res) => {
       "resortOwner.email": owner.email,
       "resortOwner.mobile": owner.mobile,
       addressLine1: req.body.addressLine1,
-      pan: req.body.pan,
+      pan: (req.body.pan || "").toUpperCase(),
       locationLink: req.body.locationLink,
       gstin: (req.body.gstin || "").toUpperCase(),
     });
     if (duplicateField) {
       return res.status(409).json({ success: false, message: `${duplicateField} already exists` });
     }
-
-    const coverPromise = coverFile
-      ? prepareImage(coverFile.buffer).then((b) => uploadBuffer(b, { folder: "properties" }))
-      : Promise.resolve(null);
-
-    const shopActPromise = shopActFile
-      ? prepareImage(shopActFile.buffer).then((b) => uploadBuffer(b, { folder: "properties/shopAct" }))
-      : Promise.resolve(null);
-
-    const galleryPromise = Promise.all(
-      gallery.map(async (f) => {
-        const b = await prepareImage(f.buffer);
-        return uploadBuffer(b, { folder: "properties/gallery" });
-      })
-    );
-
-    const [coverResult, shopActResult, galleryResults] =
-      await Promise.all([coverPromise, shopActPromise, galleryPromise]);
 
     const session = await mongoose.startSession();
     let propertyDoc, tempPassword = null, createdNewUser = false;
@@ -134,7 +112,7 @@ export const createProperty = async (req, res) => {
       } else {
         user.name = `${owner.firstName} ${owner.lastName}`.trim() || user.name;
         user.firstName = owner.firstName || user.firstName;
-        user.lastName = owner.lastName || user.lastName;
+        user.lastName  = owner.lastName  || user.lastName;
         user.mobile = owner.mobile || user.mobile;
         if (user.role !== "admin") user.role = "resortOwner";
         if (!user.password) {
@@ -144,13 +122,15 @@ export const createProperty = async (req, res) => {
         await user.save({ session });
       }
 
+      // ✅ Create DRAFT (no media yet)
       propertyDoc = new Property({
-        ...req.body,                          
+        ...req.body,
         resortOwner: owner,
-        coverImage: coverResult?.secure_url || "",
-        shopAct: shopActResult?.secure_url || "",
-        galleryPhotos: (galleryResults || []).map(r => r.secure_url),
         ownerUserId: user._id,
+        isDraft: true,
+        coverImage: undefined,
+        shopAct: undefined,
+        galleryPhotos: undefined,
       });
 
       await propertyDoc.save({ session });
@@ -161,9 +141,10 @@ export const createProperty = async (req, res) => {
       }
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
-      data: propertyDoc,
+      message: "Draft created",
+      data: { _id: propertyDoc._id, isDraft: propertyDoc.isDraft },
       owner: {
         _id: propertyDoc.ownerUserId,
         email: owner.email.toLowerCase(),
@@ -171,36 +152,117 @@ export const createProperty = async (req, res) => {
         ...(tempPassword ? { tempPassword } : {}),
       },
     });
-
-  
   } catch (err) {
-    console.error("Create property error:", err);
-    if (err?.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({ success: false, message: "Image size too large. Please upload images under 5MB." });
-    }
+    console.error("Create draft error:", err);
     if (err?.code === 11000) {
-      return res.status(409).json({ success: false, message: "Email or mobile already exists for another user." });
+      return res.status(409).json({ success: false, message: "Duplicate value" });
     }
-    res.status(500).json({ success: false, message: "Something went wrong. Please try again." });
+    return res.status(500).json({ success: false, message: "Failed to create draft" });
   }
 };
 
 
 
-// -------- READ --------
+
+export const attachPropertyMediaAndFinalize = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const prop = await Property.findById(id);
+    if (!prop) return res.status(404).json({ success: false, message: "Property not found" });
+    if (prop.isBlocked) return res.status(403).json({ success: false, message: "Blocked property cannot be edited." });
+
+    const coverFile   = req.files?.coverImage?.[0];
+    const shopActFile = req.files?.shopAct?.[0];
+    const gallery     = req.files?.galleryPhotos || [];
+    const isImage = (m) => /^image\//.test(m || "");
+
+    // ✅ Cover
+    if (coverFile) {
+      const coverBuf = await prepareImage(coverFile.buffer);
+      const coverResult = await uploadBuffer(coverBuf, { folder: "properties", resourceType: "image" });
+      prop.coverImage = coverResult.secure_url;
+    } else if (!prop.coverImage) {
+      return res.status(400).json({ success: false, message: "coverImage is required" });
+    }
+
+    // ✅ Shop Act (optional)
+    if (shopActFile) {
+      let shopActResult;
+      if (isImage(shopActFile.mimetype)) {
+        const shopActBuf = await prepareImage(shopActFile.buffer);
+        shopActResult = await uploadBuffer(shopActBuf, {
+          folder: "properties/shopAct",
+          resourceType: "image",
+        });
+      } else {
+        shopActResult = await uploadBuffer(shopActFile.buffer, {
+          folder: "properties/shopAct",
+          resourceType: "raw",
+        });
+      }
+      prop.shopAct = shopActResult.secure_url;
+    }
+
+    // ✅ Gallery
+    if (gallery.length > 0) {
+      const galleryResults = await Promise.all(
+        gallery.map(async (f) => {
+          const b = await prepareImage(f.buffer);
+          return uploadBuffer(b, { folder: "properties/gallery", resourceType: "image" });
+        })
+      );
+      const newUrls = galleryResults.map((r) => r.secure_url);
+      prop.galleryPhotos = [...(prop.galleryPhotos || []), ...newUrls];
+    }
+
+    // ✅ Publish flag
+    if (typeof req.body.publishNow !== "undefined") {
+      prop.publishNow = ["true", "1", "yes", "on"].includes(String(req.body.publishNow).toLowerCase());
+    }
+
+    // 🔴 Important: mark draft as finalized
+    prop.isDraft = false;
+    prop.status = "published";
+
+    await prop.save();
+
+    return res.status(200).json({ success: true, message: "Media attached & published", data: prop });
+  } catch (err) {
+    console.error("Finalize error:", err);
+    if (err?.http_code === 400 && /Missing required parameter - file/i.test(err.message)) {
+      return res.status(400).json({ success: false, message: "Upload failed: missing file content" });
+    }
+    if (err?.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({ success: false, message: "Image too large. Max 5MB per file." });
+    }
+    return res.status(500).json({ success: false, message: "Failed to finalize property" });
+  }
+};
+
+
+
+
+
+
+
+// controllers/propertyController.js
 export const getAllProperties = async (req, res) => {
   try {
-    const { onlyBlocked, includeBlocked } = req.query;
+    const { isDraft, approvalStatus, featured, blocked, published } = req.query;
     const filter = {};
 
-    if (onlyBlocked === "true") filter.isBlocked = true;
-    else if (includeBlocked !== "true") filter.isBlocked = { $ne: true };
+    if (typeof isDraft !== "undefined") filter.isDraft = isDraft === "true";
+    if (typeof featured !== "undefined") filter.featured = featured === "true";
+    if (typeof blocked !== "undefined") filter.isBlocked = blocked === "true";
+    if (typeof published !== "undefined") filter.publishNow = published === "true";
+    if (approvalStatus) filter.approvalStatus = approvalStatus;
 
     const properties = await Property.find(filter).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: properties });
   } catch (error) {
     console.error("Error fetching properties:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch properties", error: error.message });
+    res.status(500).json({ success: false, message: "Failed to fetch properties" });
   }
 };
 

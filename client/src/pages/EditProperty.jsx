@@ -1,4 +1,3 @@
-// src/pages/EditProperty.jsx
 import { useState, useEffect, useMemo } from "react";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -34,6 +33,8 @@ import { Textarea } from "../components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
 import { Button } from "../components/ui/button";
 
+
+const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 const EditProperty = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -41,17 +42,14 @@ const EditProperty = () => {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
 
-  // images/files
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [shopActFile, setShopActFile] = useState(null);
   const [galleryImageFiles, setGalleryImageFiles] = useState([]);
 
-  // previews (can be URL strings)
   const [coverImagePreview, setCoverImagePreview] = useState(null);
   const [shopActPreview, setShopActPreview] = useState(null);
   const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
 
-  // gallery handling
   const [replaceGallery, setReplaceGallery] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -81,6 +79,7 @@ const EditProperty = () => {
     foodAvailability: [],
     amenities: [],
     pan: "",
+    gstin: "",
     kycVerified: false,
     featured: false,
     approvalStatus: "pending",
@@ -116,7 +115,6 @@ const EditProperty = () => {
     }
   };
 
-  // Fetch property and hydrate UI
   useEffect(() => {
     const init = async () => {
       try {
@@ -129,11 +127,9 @@ const EditProperty = () => {
 
         if (!prop) throw new Error("Property not found");
 
-        // Set state/city lists based on stored state code
         const cityList = prop.state ? getCitiesByState(prop.state) : [];
         setCities(cityList);
 
-        // hydrate form
         setFormData({
           propertyName: prop.propertyName || "",
           resortOwner: {
@@ -164,6 +160,7 @@ const EditProperty = () => {
           foodAvailability: prop.foodAvailability || [],
           amenities: prop.amenities || [],
           pan: prop.pan || "",
+          gstin: prop.gstin || "",
           kycVerified: !!prop.kycVerified,
           featured: !!prop.featured,
           approvalStatus: prop.approvalStatus || "pending",
@@ -216,9 +213,6 @@ const EditProperty = () => {
         data.append("shopAct", shopActFile);
       }
 
-      // Gallery strategy:
-      // - If replaceGallery=true and user selected files -> send those files to fully replace on backend
-      // - If replaceGallery=false -> do not send any gallery files, backend will keep existing galleryPhotos
       if (replaceGallery && galleryImageFiles.length > 0) {
         galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
       }
@@ -239,7 +233,6 @@ const EditProperty = () => {
     }
   };
 
-  // helpers to keep numeric-only inputs consistent (same as AddProperty)
   const setOwnerField = (field, value) =>
     setFormData((prev) => ({
       ...prev,
@@ -277,10 +270,9 @@ const EditProperty = () => {
                         type="button"
                         onClick={() => setCurrentStep(step.id)}
                         className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-colors duration-200
-                          ${
-                            completed
-                              ? "bg-black text-white border-black hover:bg-gray-800"
-                              : isCurrent
+                          ${completed
+                            ? "bg-black text-white border-black hover:bg-gray-800"
+                            : isCurrent
                               ? "border-black text-white bg-black hover:bg-gray-800"
                               : "border-gray-300 text-gray-400 hover:border-black hover:text-black"
                           }`}
@@ -291,7 +283,7 @@ const EditProperty = () => {
                     <TooltipContent side="top">{step.title}</TooltipContent>
                   </Tooltip>
                 </div>
-                {index !== formSteps.length - 1 && <div className="h-0.5 w-[8%] bg-gray-300 mx-2" />}
+                {index !== formSteps.length - 1 && <div className="h-0.5 w-[12%] bg-gray-300 mx-2" />}
               </React.Fragment>
             );
           })}
@@ -671,12 +663,7 @@ const EditProperty = () => {
                 }}
               />
             </div>
-          </>
-        )}
 
-        {/* STEP 4 */}
-        {currentStep === 4 && (
-          <>
             <CustomTimePicker
               label="Check-In Time"
               value={formData.checkInTime}
@@ -702,11 +689,12 @@ const EditProperty = () => {
                 />
               </div>
             </div>
+
           </>
         )}
 
-        {/* STEP 5 */}
-        {currentStep === 5 && (
+        {/* STEP 4 */}
+        {currentStep === 4 && (
           <>
             <div className="w-[48%]">
               <MultiSelectButtons
@@ -728,50 +716,9 @@ const EditProperty = () => {
           </>
         )}
 
-        {/* STEP 6: Cover + Gallery (with previews and replacement option) */}
-        {currentStep === 6 && (
+        {/* STEP 5 */}
+        {currentStep === 5 && (
           <>
-            <FileUploadsSection
-              // cover
-              setCoverImageFile={setCoverImageFile}
-              coverImageFile={coverImageFile}
-              coverImagePreview={coverImagePreview}
-              setCoverImagePreview={setCoverImagePreview}
-              // gallery
-              setGalleryImageFiles={setGalleryImageFiles}
-              galleryImageFiles={galleryImageFiles}
-              galleryImagePreviews={galleryImagePreviews}
-              setGalleryImagePreviews={setGalleryImagePreviews}
-              showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
-            />
-
-            <div className="w-full -mt-2 flex items-center gap-3">
-              <input
-                id="replaceGallery"
-                type="checkbox"
-                checked={replaceGallery}
-                onChange={(e) => setReplaceGallery(e.target.checked)}
-                className="h-4 w-4"
-              />
-              <Label htmlFor="replaceGallery" className="text-sm">
-                Replace gallery with newly selected images (leave unchecked to keep current gallery)
-              </Label>
-            </div>
-          </>
-        )}
-
-        {/* STEP 7: Shop Act + PAN/KYC */}
-        {currentStep === 7 && (
-          <>
-            <div className="w-[48%] -mt-2">
-              <FileUploadsSection
-                setShopActFile={setShopActFile}
-                shopActFile={shopActFile}
-                shopActPreview={shopActPreview}
-                setShopActPreview={setShopActPreview}
-                showFields={{ coverImage: false, galleryPhotos: false, shopAct: true }}
-              />
-            </div>
 
             <div className="w-[48%]">
               <Label htmlFor="pan" className="text-sm">
@@ -802,13 +749,32 @@ const EditProperty = () => {
                 placeholder="Select KYC status"
               />
             </div>
-          </>
-        )}
 
-        {/* STEP 8 */}
-        {currentStep === 8 && (
-          <>
-            <div className="w-[32%]">
+            <div className="w-[48%]">
+              <Label htmlFor="gstin" className="text-sm">
+                GSTIN <span className="text-gray-400 text-xs">(15 characters)</span> <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="gstin"
+                name="gstin"
+                type="text"
+                className="mt-2 uppercase"
+                value={formData.gstin || ""}
+                maxLength={15}
+                onChange={(e) => {
+                  const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                  if (val.length <= 15) {
+                    setFormData((prev) => ({ ...prev, gstin: val }));
+                  }
+                }}
+                required
+              />
+              {formData.gstin && !GSTIN_REGEX.test(formData.gstin) && (
+                <p className="text-xs text-red-500 mt-1">Please enter a valid GSTIN.</p>
+              )}
+            </div>
+
+             <div className="w-[48%]">
               <SingleSelectDropdown
                 label="Approval Status"
                 value={formData.approvalStatus}
@@ -818,17 +784,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[32%]">
-              <SingleSelectDropdown
-                label="Publish Now"
-                value={formData.publishNow}
-                options={publishNowOptions}
-                onChange={(val) => setFormData((prev) => ({ ...prev, publishNow: val }))}
-                placeholder="Select Publish Status"
-              />
-            </div>
-
-            <div className="w-[32%]">
+             <div className="w-[48%]">
               <SingleSelectDropdown
                 label="Featured Property"
                 value={formData.featured}
@@ -838,7 +794,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-full">
+            <div className="w-[48%]">
               <Label htmlFor="internalNotes" className="text-sm">
                 Internal Notes <span className="text-red-500">*</span>
               </Label>
@@ -854,6 +810,63 @@ const EditProperty = () => {
                 required
               />
             </div>
+
+
+
+
+          </>
+        )}
+
+        {currentStep === 6 && (
+          <>
+            <FileUploadsSection
+              // cover
+              setCoverImageFile={setCoverImageFile}
+              coverImageFile={coverImageFile}
+              coverImagePreview={coverImagePreview}
+              setCoverImagePreview={setCoverImagePreview}
+              // gallery
+              setGalleryImageFiles={setGalleryImageFiles}
+              galleryImageFiles={galleryImageFiles}
+              galleryImagePreviews={galleryImagePreviews}
+              setGalleryImagePreviews={setGalleryImagePreviews}
+              showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+            />
+
+              <div className="w-[48%] -mt-2">
+              <FileUploadsSection
+                setShopActFile={setShopActFile}
+                shopActFile={shopActFile}
+                shopActPreview={shopActPreview}
+                setShopActPreview={setShopActPreview}
+                showFields={{ coverImage: false, galleryPhotos: false, shopAct: true }}
+              />
+            </div>
+
+             <div className="w-[48%]">
+              <SingleSelectDropdown
+                label="Publish Now"
+                value={formData.publishNow}
+                options={publishNowOptions}
+                onChange={(val) => setFormData((prev) => ({ ...prev, publishNow: val }))}
+                placeholder="Select Publish Status"
+              />
+            </div>
+
+            <div className="w-full -mt-2 flex items-center gap-3">
+              <input
+                id="replaceGallery"
+                type="checkbox"
+                checked={replaceGallery}
+                onChange={(e) => setReplaceGallery(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <Label htmlFor="replaceGallery" className="text-sm">
+                Replace gallery with newly selected images (leave unchecked to keep current gallery)
+              </Label>
+            </div>
+
+
           </>
         )}
 

@@ -31,11 +31,11 @@ const PropertiesPage = () => {
     setSelectedFilter(e.target.value);
   };
 
-  const fetchProperties = async () => {
+ const fetchProperties = async () => {
     try {
       const response = await Axios({
         method: SummaryApi.getProperties.method,
-        url: SummaryApi.getProperties.url,
+        url: SummaryApi.getProperties.url, 
       });
       setProperties(response.data.data || []);
     } catch (error) {
@@ -45,7 +45,7 @@ const PropertiesPage = () => {
 
   useEffect(() => {
     fetchProperties();
-  }, []);
+}, []);
 
 
   const formatDate = (dateString) => {
@@ -58,7 +58,12 @@ const PropertiesPage = () => {
 
       <div className='flex justify-between items-center border-b pb-4'>
         <h1 className='text-xl font-bold'>Properties</h1>
+         <div className="flex gap-2">
+         <Button onClick={() => navigate('/admin/properties/drafts')}>
+            View Drafts
+          </Button>
         <Button onClick={handleAddProperty}>Add Property</Button>
+        </div>
       </div>
 
 
@@ -126,7 +131,7 @@ const PropertiesPage = () => {
                     />
                     <MdDeleteOutline
                       className="cursor-pointer text-gray-600 hover:text-red-500"
-                      onClick={() => console.log("Delete", property._id)} // Replace with delete logic
+                      onClick={() => console.log("Delete", property._id)} 
                     />
                   </TableCell>
                 </TableRow>

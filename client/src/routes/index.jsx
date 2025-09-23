@@ -7,6 +7,8 @@ import ProtectedAdminRoute from "../ProtectedAdminRoute";
 import AddProperty from "../pages/AddProperty";
 import EditProperty from "../pages/EditProperty";
 import ViewProperty from "../pages/ViewProperty";
+import DraftPropertiesPage from "@/pages/DraftPropertiesPage";
+import FinalizeMedia from "@/pages/FinalizeMedia";
 
 function AppRoutes() {
   return (
@@ -23,6 +25,8 @@ function AppRoutes() {
             <Route path="add-property" element={<AddProperty />} />
             <Route path="edit-property/:id" element={<EditProperty />} />
             <Route path="/admin/view-property/:id" element={<ViewProperty />} />
+            <Route path="properties/drafts" element={<DraftPropertiesPage />} />
+            <Route path="/admin/properties/:id/media" element={<FinalizeMedia />} />
           </Route>
         </Route>
       </Routes>

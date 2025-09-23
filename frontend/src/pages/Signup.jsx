@@ -6,16 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import {
-  Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter,
-} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 const nameRegex = /^[a-zA-Z][a-zA-Z\s'.-]{1,49}$/;
 

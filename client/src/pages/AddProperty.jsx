@@ -23,6 +23,7 @@ import { Textarea } from "../components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
 import { Button } from "../components/ui/button";
 
+const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
 const AddProperty = () => {
     const navigate = useNavigate();
@@ -34,17 +35,22 @@ const AddProperty = () => {
     const [coverImagePreview, setCoverImagePreview] = useState(null);
     const [shopActPreview, setShopActPreview] = useState(null);
     const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
-    const [isFeatured, setIsFeatured] = useState(false);
-    const [isPublished, setIsPublished] = useState(true);
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
-    const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
-
+    // NEW: keep the draft id we get after step 7
+    const [propertyId, setPropertyId] = useState(null);
 
     const [formData, setFormData] = useState({
         propertyName: "",
-        resortOwner: { firstName: "", lastName: "", email: "", mobile: "", resortEmail: "", resortMobile: "" },
+        resortOwner: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            mobile: "",
+            resortEmail: "",
+            resortMobile: ""
+        },
         propertyType: "",
         description: "",
         addressLine1: "",
@@ -74,10 +80,10 @@ const AddProperty = () => {
     });
 
     const nextStep = () => {
-        if (currentStep < formSteps.length) setCurrentStep((prev) => prev + 1);
+        if (currentStep < formSteps.length) setCurrentStep((p) => p + 1);
     };
     const prevStep = () => {
-        if (currentStep > 1) setCurrentStep((prev) => prev - 1);
+        if (currentStep > 1) setCurrentStep((p) => p - 1);
     };
     const isStepCompleted = (stepId) => stepId < currentStep;
 
@@ -100,60 +106,124 @@ const AddProperty = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const buildDraftPayload = () => {
+        const num = (v) => (v === "" || v === null || v === undefined ? undefined : Number(v));
+        const payload = {
+            propertyName: formData.propertyName?.trim(),
+            resortOwner: {
+                ...formData.resortOwner,
+                firstName: formData.resortOwner.firstName?.trim(),
+                lastName: formData.resortOwner.lastName?.trim(),
+                email: formData.resortOwner.email?.trim(),
+                mobile: formData.resortOwner.mobile?.trim(),
+                resortEmail: formData.resortOwner.resortEmail?.trim(),
+                resortMobile: formData.resortOwner.resortMobile?.trim(),
+            },
+            propertyType: formData.propertyType,
+            description: formData.description,
+            addressLine1: formData.addressLine1,
+            addressLine2: formData.addressLine2 || undefined,
+            state: formData.state,
+            city: formData.city,
+            pinCode: formData.pinCode,
+            locationLink: formData.locationLink,
+            totalRooms: num(formData.totalRooms),
+            maxGuests: num(formData.maxGuests),
+            roomTypes: formData.roomTypes,
+            pricingPerNightWeekdays: num(formData.pricingPerNightWeekdays),
+            pricingPerNightWeekend: num(formData.pricingPerNightWeekend),
+            extraGuestCharge: num(formData.extraGuestCharge),
+            checkInTime: formData.checkInTime,
+            checkOutTime: formData.checkOutTime,
+            minStayNights: num(formData.minStayNights),
+            foodAvailability: formData.foodAvailability,
+            amenities: formData.amenities,
+            pan: formData.pan?.toUpperCase().trim(),
+            gstin: formData.gstin ? formData.gstin.toUpperCase().trim() : "",
+            kycVerified: !!formData.kycVerified,
+            publishNow: !!formData.publishNow,
+            featured: !!formData.featured,
+            approvalStatus: formData.approvalStatus,
+            internalNotes: formData.internalNotes,
+        };
+        return payload;
+    };
+
+    const createDraft = async () => {
+        if (formData.gstin && !GSTIN_REGEX.test(formData.gstin.toUpperCase())) {
+            toast.error("Invalid GSTIN format");
+            return;
+        }
+
         setLoading(true);
         try {
-            const data = new FormData();
-
-            Object.entries(formData).forEach(([key, value]) => {
-                if (key === "resortOwner") {
-                    Object.entries(value).forEach(([ownerKey, ownerValue]) => {
-                        data.append(`resortOwner[${ownerKey}]`, ownerValue);
-                    });
-                    data.append("resortOwner", JSON.stringify(value));
-                }
-                else if (Array.isArray(value)) {
-                    value.forEach((v) => data.append(`${key}[]`, v));
-                }
-                else if (typeof value === "object" && value !== null) {
-                    data.append(key, JSON.stringify(value));
-                }
-                else {
-                    data.append(key, value);
-                }
+            const payload = buildDraftPayload();
+            const resp = await Axios.post(SummaryApi.createPropertyDraft.url, payload, {
+                headers: { "Content-Type": "application/json" },
             });
 
-            if (coverImageFile) {
-                data.append("coverImage", coverImageFile);
+            const created = resp?.data?.data || resp?.data;
+            if (!created?._id) {
+                toast.error("Draft saved but no ID in response");
+                return;
             }
 
-            if (shopActFile) {
-                data.append("shopAct", shopActFile);
-            }
-
-            if (galleryImageFiles.length > 0) {
-                galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
-            }
-
-            const response = await Axios.post(SummaryApi.addProperty.url, data, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-
-            console.log("Response:", response.data);
-            toast.success("Property added successfully!");
-            navigate("/admin/properties");
-
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to add property");
-        }
-        finally {
+            setPropertyId(created._id);
+            toast.success("Draft saved. Continue to upload media.");
+            setCurrentStep(6);
+        } catch (err) {
+            const msg = err?.response?.data?.message || "Failed to create draft";
+            toast.error(msg);
+        } finally {
             setLoading(false);
         }
     };
 
+    const finalizeMedia = async () => {
+        if (!propertyId) {
+            await createDraft();
+            toast.error("Draft not created yet. Please complete previous step.");
+            return;
+        }
+        if (!coverImageFile || !shopActFile || galleryImageFiles.length === 0) {
+            toast.error("Please add cover image, shop act and at least 1 gallery photo.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const fd = new FormData();
+            fd.append("publishNow", String(!!formData.publishNow));
+
+            fd.append("coverImage", coverImageFile);
+            fd.append("shopAct", shopActFile);
+            galleryImageFiles.forEach((file) => fd.append("galleryPhotos", file));
+
+            const { url, method } = SummaryApi.finalizeProperty(propertyId);
+            const resp = await Axios({
+                url,
+                method,
+                data: fd,
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            toast.success("Property created successfully!");
+            navigate("/admin/properties");
+        } catch (err) {
+            const msg = err?.response?.data?.message || "Failed to upload media";
+            toast.error(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleNext = async () => {
+        if (currentStep === 5) {
+            await createDraft();
+        } else {
+            nextStep();
+        }
+    };
 
     useEffect(() => {
         const allStates = getIndianStates();
@@ -179,27 +249,34 @@ const AddProperty = () => {
                                 <div className="flex flex-col items-center">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <button
-                                                type="button"
-                                                onClick={() => setCurrentStep(step.id)}
-                                                className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-colors duration-200
-                                                       ${completed
-                                                        ? "bg-black text-white border-black hover:bg-gray-800"
-                                                        : isCurrent
-                                                            ? "border-black text-white bg-black hover:bg-gray-800"
-                                                            : "border-gray-300 text-gray-400 hover:border-black hover:text-black"
-                                                    }`}
-                                            >
-                                                {completed ? <Check size={16} /> : step.id}
-                                            </button>
+                                            <div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (step.id <= currentStep || (step.id === 6 && propertyId)) {
+                                                            setCurrentStep(step.id);
+                                                        } else {
+                                                            toast.error("Please complete previous steps first");
+                                                        }
+                                                    }}
+                                                    className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-colors duration-200
+                                                           ${completed
+                                                            ? "bg-black text-white border-black hover:bg-gray-800"
+                                                            : isCurrent
+                                                                ? "border-black text-white bg-black hover:bg-gray-800"
+                                                                : "border-gray-300 text-gray-400 hover:border-black hover:text-black"
+                                                        }`}
+                                                >
+                                                    {completed ? <Check size={16} /> : step.id}
+                                                </button>
+                                            </div>
                                         </TooltipTrigger>
-                                        <TooltipContent side="top">
-                                            {step.title}
-                                        </TooltipContent>
+                                        <TooltipContent side="top">{step.title}</TooltipContent>
                                     </Tooltip>
+
                                 </div>
                                 {index !== formSteps.length - 1 && (
-                                    <div className="h-0.5 w-[8%] bg-gray-300 mx-2" />
+                                    <div className="h-0.5 w-[12%] bg-gray-300 mx-2" />
                                 )}
                             </React.Fragment>
                         );
@@ -208,7 +285,7 @@ const AddProperty = () => {
             </TooltipProvider>
 
 
-            <form onSubmit={handleSubmit} className="flex w-full flex-wrap justify-between gap-4">
+            <form onSubmit={(e) => e.preventDefault()} className="flex w-full flex-wrap justify-between gap-4">
                 {currentStep === 1 && (
                     <>
                         <div className="w-[48%]">
@@ -611,17 +688,11 @@ const AddProperty = () => {
                         </div>
 
 
-
-                    </>
-                )}
-
-
-                {currentStep === 4 && (
-                    <>
                         <CustomTimePicker
                             label="Check-In Time"
                             value={formData.checkInTime}
                             onChange={(val) => setFormData({ ...formData, checkInTime: val })}
+                            className="w-full"
                         />
 
                         <CustomTimePicker
@@ -646,11 +717,13 @@ const AddProperty = () => {
                             </div>
                         </div>
 
+
+
                     </>
                 )}
 
 
-                {currentStep === 5 && (
+                {currentStep === 4 && (
                     <>
                         <div className="w-[48%]">
                             <MultiSelectButtons label="Food Availability"
@@ -675,38 +748,8 @@ const AddProperty = () => {
                 )}
 
 
-                {currentStep === 6 && (
+                {currentStep === 5 && (
                     <>
-                        <FileUploadsSection
-                            // cover
-                            setCoverImageFile={setCoverImageFile}
-                            coverImageFile={coverImageFile}
-                            coverImagePreview={coverImagePreview}
-                            setCoverImagePreview={setCoverImagePreview}
-
-                            // gallery
-                            setGalleryImageFiles={setGalleryImageFiles}
-                            galleryImageFiles={galleryImageFiles}            // ✅ pass this!
-                            galleryImagePreviews={galleryImagePreviews}
-                            setGalleryImagePreviews={setGalleryImagePreviews}
-
-                            showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
-                        />
-                    </>
-                )}
-
-                {currentStep === 7 && (
-                    <>
-                        <div className="w-[48%] -mt-2">
-                            <FileUploadsSection
-                                setShopActFile={setShopActFile}
-                                shopActFile={shopActFile}
-                                shopActPreview={shopActPreview}
-                                setShopActPreview={setShopActPreview}
-                                showFields={{ coverImage: false, galleryPhotos: false, shopAct: true }}
-                            />
-                        </div>
-
                         <div className="w-[48%]">
                             <Label htmlFor="pan" className="text-sm">
                                 Property PAN <span className="text-gray-400 text-xs">(10 characters)</span>
@@ -766,13 +809,8 @@ const AddProperty = () => {
                                 <p className="text-xs text-red-500 mt-1">Please enter a valid GSTIN.</p>
                             )}
                         </div>
-                    </>
-                )}
 
-                {currentStep === 8 && (
-                    <>
-
-                        <div className="w-[32%]">
+                        <div className="w-[48%]">
                             <SingleSelectDropdown
                                 label="Approval Status"
                                 value={formData.approvalStatus}
@@ -784,6 +822,50 @@ const AddProperty = () => {
                                     }))
                                 }
                                 placeholder="Select Approval Status"
+                            />
+                        </div>
+
+                        <div className="w-[48%]">
+                            <SingleSelectDropdown
+                                label="Featured Property"
+                                value={formData.featured}
+                                options={featuredOptions}
+                                onChange={(val) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        featured: val,
+                                    }))
+                                }
+                                placeholder="Select Featured Status"
+                            />
+                        </div>
+
+                        <div className="w-[48%]">
+                            <Label htmlFor="internaNotes" className="text-sm">
+                                Internal Notes <span className="text-red-500">*</span>
+                            </Label>
+                            <Textarea id="internalNotes" name="internalNotes"
+                                className="mt-2"
+                                rows={4}
+                                value={formData.internalNotes}
+                                onChange={handleChange}
+                                minLength={3}
+                                maxLength={500}
+                                required
+                            />
+                        </div>
+                    </>
+                )}
+
+                {currentStep === 6 && (
+                    <>
+                        <div className="w-[48%] -mt-2">
+                            <FileUploadsSection
+                                setShopActFile={setShopActFile}
+                                shopActFile={shopActFile}
+                                shopActPreview={shopActPreview}
+                                setShopActPreview={setShopActPreview}
+                                showFields={{ coverImage: false, galleryPhotos: false, shopAct: true }}
                             />
                         </div>
 
@@ -802,47 +884,31 @@ const AddProperty = () => {
                             />
                         </div>
 
-                        <div className="w-[32%]">
-                            <SingleSelectDropdown
-                                label="Featured Property"
-                                value={formData.featured}
-                                options={featuredOptions}
-                                onChange={(val) =>
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        featured: val,
-                                    }))
-                                }
-                                placeholder="Select Featured Status"
-                            />
-                        </div>
+                        <FileUploadsSection
+                            // cover
+                            setCoverImageFile={setCoverImageFile}
+                            coverImageFile={coverImageFile}
+                            coverImagePreview={coverImagePreview}
+                            setCoverImagePreview={setCoverImagePreview}
 
-                        <div className="w-full">
-                            <Label htmlFor="internaNotes" className="text-sm">
-                                Internal Notes <span className="text-red-500">*</span>
-                            </Label>
-                            <Textarea id="internalNotes" name="internalNotes"
-                                className="mt-2"
-                                rows={4}
-                                value={formData.internalNotes}
-                                onChange={handleChange}
-                                minLength={3}
-                                maxLength={500}
-                                required
-                            />
-                        </div>
+                            // gallery
+                            setGalleryImageFiles={setGalleryImageFiles}
+                            galleryImageFiles={galleryImageFiles}
+                            galleryImagePreviews={galleryImagePreviews}
+                            setGalleryImagePreviews={setGalleryImagePreviews}
+
+                            showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+                        />
+
+
                     </>
                 )}
-
-
-
-                {/* Add other form fields similarly using shadcn/ui components */}
 
                 <div className="w-full border mt-6"></div>
                 {currentStep > 1 && (
                     <button
                         type="button"
-                        onClick={() => setCurrentStep((prev) => prev - 1)}
+                        onClick={prevStep}
                         className="px-4 py-2 border rounded-md bg-gray-200 text-black hover:bg-gray-300"
                     >
                         Back
@@ -852,18 +918,25 @@ const AddProperty = () => {
                 {currentStep < formSteps.length ? (
                     <button
                         type="button"
-                        onClick={() => setCurrentStep((prev) => prev + 1)}
+                        onClick={handleNext}
                         className="ml-auto px-4 py-2 border rounded-md bg-black text-white hover:bg-gray-900"
                     >
-                        Next
+                        {currentStep === 5 ? "Save & Continue" : "Next"}
                     </button>
                 ) : (
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={async () => {
+                            if (!propertyId) {
+                                await createDraft();
+                            }
+                            finalizeMedia();
+                        }}
                         className="ml-auto px-4 py-2 border rounded-md bg-black text-white hover:bg-gray-900"
                     >
                         Submit
                     </button>
+
                 )}
             </form>
         </div>

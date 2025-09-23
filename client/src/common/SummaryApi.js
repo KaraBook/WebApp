@@ -13,14 +13,27 @@ const SummaryApi = {
     url: '/api/admin/details',
     method: 'get',
   },
-  addProperty: {
-    url: '/api/properties',
+
+  createPropertyDraft: { 
+    url: '/api/properties/draft', 
+    method: 'post' 
+  }, 
+
+  finalizeProperty: (id) => ({
+    url: `/api/properties/${id}/media`,
     method: 'post',
+  }),
+
+  getProperties:{ 
+    url: '/api/properties?isDraft=false', 
+    method: 'get' 
   },
-   getProperties: {
-    url: '/api/properties',
-    method: 'get',
+
+  getDraftProperties:{ 
+    url: '/api/properties?isDraft=true', 
+    method: 'get' 
   },
+
   getSingleProperty: (id) => ({
     url: `/api/properties/${id}`,
     method: 'get',

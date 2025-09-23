@@ -52,12 +52,10 @@ export const featuredOptions = [
 
 
 export const formSteps = [
-  { id: 1, title: "Basic Info" },
+  { id: 1, title: "Owner & Property" },
   { id: 2, title: "Location Details" },
-  { id: 3, title: "Accomodation Info" },
-  { id: 4, title: "Availability" },
-  { id: 5, title: "Food & Amenities" },
-  { id: 6, title: "Media Uploads" },
-  { id: 7, title: "Legal" },
-  { id: 8, title: "Admin-Only Controls" },  
+  { id: 3, title: "Accomodation & Pricing" },
+  { id: 4, title: "Features" },
+  { id: 5, title: "Legal & Admin" },
+  { id: 6, title: "Media Uploads" }
 ];
