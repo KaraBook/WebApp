@@ -252,12 +252,7 @@ const AddProperty = () => {
                                             <div>
                                                 <button
                                                     type="button"
-                                                    onClick={() => {
-                                                        if (step.id <= currentStep || (step.id === 6 && propertyId)) {
-                                                            setCurrentStep(step.id);
-                                                        } else {
-                                                            toast.error("Please complete previous steps first");
-                                                        }
+                                                    onClick={() =>{ setCurrentStep(step.id);
                                                     }}
                                                     className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-colors duration-200
                                                            ${completed

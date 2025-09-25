@@ -44,18 +44,27 @@ router.post(
 router.get("/", getAllProperties);
 router.get("/:id", getSingleProperty);
 
+function conditionalUpload(req, res, next) {
+  const contentType = req.headers['content-type'] || '';
+  if (contentType.startsWith('multipart/form-data')) {
+    return upload.fields([
+      { name: "coverImage", maxCount: 1 },
+      { name: "galleryPhotos", maxCount: 20 },
+      { name: "shopAct", maxCount: 1 },
+    ])(req, res, next);
+  }
+  next();
+}
+
 router.put(
   "/:id",
   requireAuth,
   requireAdmin,
-  upload.fields([
-    { name: "coverImage", maxCount: 1 },
-    { name: "galleryPhotos", maxCount: 20 },
-    { name: "shopAct", maxCount: 1 },
-  ]),
+  conditionalUpload,
   validatePropertyUpdate,
   updateProperty
 );
+
 
 router.put("/:id/block", requireAuth, requireAdmin, blockProperty);
 router.put("/:id/unblock", requireAuth, requireAdmin, unblockProperty);

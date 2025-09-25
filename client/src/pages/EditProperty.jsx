@@ -55,6 +55,7 @@ const EditProperty = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  
 
   const [formData, setFormData] = useState({
     propertyName: "",

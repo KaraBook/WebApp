@@ -168,7 +168,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const prop = await Property.findById(id);
+    const prop = await Property.findById(id).populate("ownerUserId", "email firstName");
     if (!prop) return res.status(404).json({ success: false, message: "Property not found" });
     if (prop.isBlocked) return res.status(403).json({ success: false, message: "Blocked property cannot be edited." });
 
@@ -227,6 +227,29 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     await prop.save();
 
+    // ✅ Send confirmation email to resort owner
+    try {
+      const mailData = propertyCreatedTemplate({
+        ownerFirstName: prop.resortOwner?.firstName,
+        propertyName: prop.propertyName,
+        createdNewUser: false, // here it’s always finalizing, not creating new owner
+        tempPassword: null,    // only relevant at draft creation
+        portalUrl: `${process.env.PORTAL_URL}/owner/properties/${prop._id}`,
+      });
+
+      if (prop.resortOwner?.email) {
+        await sendMail({
+          to: prop.resortOwner.email,
+          subject: mailData.subject,
+          text: mailData.text,
+          html: mailData.html,
+        });
+        console.log(`📩 Property finalized email sent to ${prop.resortOwner.email}`);
+      }
+    } catch (mailErr) {
+      console.error("Failed to send property created mail:", mailErr);
+    }
+
     return res.status(200).json({ success: true, message: "Media attached & published", data: prop });
   } catch (err) {
     console.error("Finalize error:", err);
@@ -239,7 +262,6 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     return res.status(500).json({ success: false, message: "Failed to finalize property" });
   }
 };
-
 
 
 
@@ -278,72 +300,130 @@ export const getSingleProperty = async (req, res) => {
   }
 };
 
+
+
+
 // -------- UPDATE --------
 export const updateProperty = async (req, res) => {
   const session = await mongoose.startSession();
   try {
     const propertyId = req.params.id;
     const existingProperty = await Property.findById(propertyId);
-    if (!existingProperty) return res.status(404).json({ success: false, message: "Property not found" });
+    if (!existingProperty)
+      return res.status(404).json({ success: false, message: "Property not found" });
 
-    if (existingProperty.isBlocked /* && !req.user?.isAdmin */) {
+    if (existingProperty.isBlocked) {
       return res.status(403).json({
         success: false,
         message: "Blocked property cannot be edited.",
       });
     }
 
+    const updatedData = {};
     const files = req.files || {};
-    const coverImage = files.coverImage?.[0];
-    const shopAct = files.shopAct?.[0];
-    const galleryPhotos = files.galleryPhotos || [];
 
-    const updatedData = { ...req.body };
-    const incomingOwner = parseResortOwner(req.body);
-    if (incomingOwner?.mobile) incomingOwner.mobile = normalizeMobile(incomingOwner.mobile);
-    if (incomingOwner?.resortMobile) incomingOwner.resortMobile = normalizeMobile(incomingOwner.resortMobile);
-    if (incomingOwner?.email) updatedData.resortOwner = incomingOwner;
+    // --- 🟢 If JSON only (raw) ---
+    if (req.is("application/json")) {
+      Object.assign(updatedData, req.body);
 
-    if (coverImage) {
-      const coverResult = await cloudinary.uploader.upload(coverImage.path, { folder: "properties" });
-      updatedData.coverImage = coverResult.secure_url;
-      await fs.unlink(coverImage.path);
-    }
-    if (shopAct) {
-      const shopActResult = await cloudinary.uploader.upload(shopAct.path, { folder: "properties/shopAct" });
-      updatedData.shopAct = shopActResult.secure_url;
-      await fs.unlink(shopAct.path);
-    }
-    if (galleryPhotos.length > 0) {
-      const galleryResults = await Promise.all(
-        galleryPhotos.map((f) => cloudinary.uploader.upload(f.path, { folder: "properties/gallery" }))
-      );
-      updatedData.galleryPhotos = galleryResults.map((img) => img.secure_url);
-      await Promise.all(galleryPhotos.map((f) => fs.unlink(f.path)));
+      // Parse resort owner if passed
+      const incomingOwner = parseResortOwner(req.body);
+      if (incomingOwner?.email) updatedData.resortOwner = incomingOwner;
     }
 
+    // --- 🟢 If multipart (frontend form-data) ---
+    if (req.is("multipart/form-data")) {
+      Object.assign(updatedData, req.body);
+
+      // resort owner parsing
+      const incomingOwner = parseResortOwner(req.body);
+      if (incomingOwner?.mobile) incomingOwner.mobile = normalizeMobile(incomingOwner.mobile);
+      if (incomingOwner?.resortMobile)
+        incomingOwner.resortMobile = normalizeMobile(incomingOwner.resortMobile);
+      if (incomingOwner?.email) updatedData.resortOwner = incomingOwner;
+
+      // handle files
+      const coverImageFile = files.coverImage?.[0];
+      const shopActFile = files.shopAct?.[0];
+      const galleryFiles = files.galleryPhotos || [];
+
+      if (coverImageFile) {
+        const processed = await prepareImage(coverImageFile.buffer);
+        const result = await uploadBuffer(processed, { folder: "properties" });
+        updatedData.coverImage = result.secure_url;
+      }
+
+      if (shopActFile) {
+        const processed = await prepareImage(shopActFile.buffer);
+        const result = await uploadBuffer(processed, { folder: "properties/shopAct" });
+        updatedData.shopAct = result.secure_url;
+      }
+
+      if (galleryFiles.length > 0) {
+        const galleryResults = await Promise.all(
+          galleryFiles.map(async (f) => {
+            const processed = await prepareImage(f.buffer);
+            return uploadBuffer(processed, { folder: "properties/gallery" });
+          })
+        );
+        updatedData.galleryPhotos = galleryResults.map((r) => r.secure_url);
+      }
+    }
+
+    // --- Validation: cover required, at least 3 gallery ---
+    const effectiveCover = updatedData.coverImage || existingProperty.coverImage;
+    const effectiveGallery =
+      updatedData.galleryPhotos || existingProperty.galleryPhotos || [];
+
+    if (!effectiveCover) {
+      return res.status(400).json({
+        success: false,
+        message: "Cover image is required.",
+      });
+    }
+    if (!Array.isArray(effectiveGallery) || effectiveGallery.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "At least 3 gallery photos are required.",
+      });
+    }
+
+    // --- Transaction: update property + link owner user ---
     let updatedProperty;
     await session.withTransaction(async () => {
-      // sync/attach owner user
-      if (incomingOwner?.email && incomingOwner?.mobile) {
-        if (incomingOwner?.email && incomingOwner?.mobile && incomingOwner.mobile.length === 10) {
+      if (updatedData.resortOwner?.email && updatedData.resortOwner?.mobile) {
+        const incomingOwner = updatedData.resortOwner;
+
+        if (incomingOwner.mobile.length === 10) {
           let user = existingProperty.ownerUserId
-            ? await User.findById(existingProperty.ownerUserId).select("+password").session(session)
+            ? await User.findById(existingProperty.ownerUserId)
+                .select("+password")
+                .session(session)
             : await User.findOne({
-              $or: [{ email: incomingOwner.email.toLowerCase() }, { mobile: incomingOwner.mobile }],
-            }).select("+password").session(session);
+                $or: [
+                  { email: incomingOwner.email.toLowerCase() },
+                  { mobile: incomingOwner.mobile },
+                ],
+              })
+                .select("+password")
+                .session(session);
 
           if (!user) {
             const hash = await bcrypt.hash(genTempPassword(), 10);
-            user = await User.create([{
-              name: `${incomingOwner.firstName} ${incomingOwner.lastName}`.trim(),
-              firstName: incomingOwner.firstName,
-              lastName: incomingOwner.lastName,
-              email: incomingOwner.email.toLowerCase(),
-              mobile: incomingOwner.mobile,
-              role: "resortOwner",
-              password: hash,
-            }], { session });
+            user = await User.create(
+              [
+                {
+                  name: `${incomingOwner.firstName} ${incomingOwner.lastName}`.trim(),
+                  firstName: incomingOwner.firstName,
+                  lastName: incomingOwner.lastName,
+                  email: incomingOwner.email.toLowerCase(),
+                  mobile: incomingOwner.mobile,
+                  role: "resortOwner",
+                  password: hash,
+                },
+              ],
+              { session }
+            );
             user = user[0];
           } else {
             user.name = `${incomingOwner.firstName} ${incomingOwner.lastName}`.trim() || user.name;
@@ -351,7 +431,10 @@ export const updateProperty = async (req, res) => {
             user.lastName = incomingOwner.lastName || user.lastName;
             if (incomingOwner.mobile) user.mobile = incomingOwner.mobile;
             if (incomingOwner.email && incomingOwner.email.toLowerCase() !== user.email) {
-              const exists = await User.findOne({ email: incomingOwner.email.toLowerCase(), _id: { $ne: user._id } }).session(session);
+              const exists = await User.findOne({
+                email: incomingOwner.email.toLowerCase(),
+                _id: { $ne: user._id },
+              }).session(session);
               if (!exists) user.email = incomingOwner.email.toLowerCase();
             }
             if (user.role !== "admin") user.role = "resortOwner";
@@ -359,19 +442,22 @@ export const updateProperty = async (req, res) => {
           }
           updatedData.ownerUserId = user._id;
         }
+      }
 
-        updatedProperty = await Property.findByIdAndUpdate(
-          propertyId,
-          { $set: updatedData },
-          { new: true, runValidators: true, session }
-        );
+      updatedProperty = await Property.findByIdAndUpdate(
+        propertyId,
+        { $set: updatedData },
+        { new: true, runValidators: true, session }
+      );
 
-        if (updatedData.ownerUserId) {
-          const owner = await User.findById(updatedData.ownerUserId).session(session);
-          if (owner && !owner.ownedProperties?.some((id) => String(id) === String(updatedProperty._id))) {
-            owner.ownedProperties.push(updatedProperty._id);
-            await owner.save({ session });
-          }
+      if (updatedData.ownerUserId) {
+        const owner = await User.findById(updatedData.ownerUserId).session(session);
+        if (
+          owner &&
+          !owner.ownedProperties?.some((id) => String(id) === String(updatedProperty._id))
+        ) {
+          owner.ownedProperties.push(updatedProperty._id);
+          await owner.save({ session });
         }
       }
     });
@@ -380,7 +466,9 @@ export const updateProperty = async (req, res) => {
   } catch (err) {
     console.error("Update Error:", err);
     if (err?.code === 11000) {
-      return res.status(409).json({ success: false, message: "Email or mobile already exists for another user." });
+      return res
+        .status(409)
+        .json({ success: false, message: "Email or mobile already exists for another user." });
     }
     res.status(500).json({ success: false, message: "Server Error", error: err.message });
   } finally {
