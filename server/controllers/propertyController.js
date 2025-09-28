@@ -62,7 +62,7 @@ export const checkDuplicateFields = async (raw) => {
 };
 
 
-// controllers/propertyController.js
+
 export const createPropertyDraft = async (req, res) => {
   try {
     const owner = parseResortOwner(req.body);
@@ -122,7 +122,6 @@ export const createPropertyDraft = async (req, res) => {
         await user.save({ session });
       }
 
-      // ✅ Create DRAFT (no media yet)
       propertyDoc = new Property({
         ...req.body,
         resortOwner: owner,
@@ -177,7 +176,6 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     const gallery     = req.files?.galleryPhotos || [];
     const isImage = (m) => /^image\//.test(m || "");
 
-    // ✅ Cover
     if (coverFile) {
       const coverBuf = await prepareImage(coverFile.buffer);
       const coverResult = await uploadBuffer(coverBuf, { folder: "properties", resourceType: "image" });
@@ -186,7 +184,6 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
       return res.status(400).json({ success: false, message: "coverImage is required" });
     }
 
-    // ✅ Shop Act (optional)
     if (shopActFile) {
       let shopActResult;
       if (isImage(shopActFile.mimetype)) {
@@ -204,7 +201,6 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
       prop.shopAct = shopActResult.secure_url;
     }
 
-    // ✅ Gallery
     if (gallery.length > 0) {
       const galleryResults = await Promise.all(
         gallery.map(async (f) => {
@@ -216,24 +212,21 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
       prop.galleryPhotos = [...(prop.galleryPhotos || []), ...newUrls];
     }
 
-    // ✅ Publish flag
     if (typeof req.body.publishNow !== "undefined") {
       prop.publishNow = ["true", "1", "yes", "on"].includes(String(req.body.publishNow).toLowerCase());
     }
 
-    // 🔴 Important: mark draft as finalized
     prop.isDraft = false;
     prop.status = "published";
 
     await prop.save();
 
-    // ✅ Send confirmation email to resort owner
     try {
       const mailData = propertyCreatedTemplate({
         ownerFirstName: prop.resortOwner?.firstName,
         propertyName: prop.propertyName,
-        createdNewUser: false, // here it’s always finalizing, not creating new owner
-        tempPassword: null,    // only relevant at draft creation
+        createdNewUser: false, 
+        tempPassword: null,    
         portalUrl: `${process.env.PORTAL_URL}/owner/properties/${prop._id}`,
       });
 
@@ -268,7 +261,6 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
 
 
-// controllers/propertyController.js
 export const getAllProperties = async (req, res) => {
   try {
     const { isDraft, approvalStatus, featured, blocked, published } = req.query;
@@ -303,7 +295,6 @@ export const getSingleProperty = async (req, res) => {
 
 
 
-// -------- UPDATE --------
 export const updateProperty = async (req, res) => {
   const session = await mongoose.startSession();
   try {
@@ -322,27 +313,22 @@ export const updateProperty = async (req, res) => {
     const updatedData = {};
     const files = req.files || {};
 
-    // --- 🟢 If JSON only (raw) ---
     if (req.is("application/json")) {
       Object.assign(updatedData, req.body);
 
-      // Parse resort owner if passed
       const incomingOwner = parseResortOwner(req.body);
       if (incomingOwner?.email) updatedData.resortOwner = incomingOwner;
     }
 
-    // --- 🟢 If multipart (frontend form-data) ---
     if (req.is("multipart/form-data")) {
       Object.assign(updatedData, req.body);
 
-      // resort owner parsing
       const incomingOwner = parseResortOwner(req.body);
       if (incomingOwner?.mobile) incomingOwner.mobile = normalizeMobile(incomingOwner.mobile);
       if (incomingOwner?.resortMobile)
         incomingOwner.resortMobile = normalizeMobile(incomingOwner.resortMobile);
       if (incomingOwner?.email) updatedData.resortOwner = incomingOwner;
 
-      // handle files
       const coverImageFile = files.coverImage?.[0];
       const shopActFile = files.shopAct?.[0];
       const galleryFiles = files.galleryPhotos || [];
@@ -370,7 +356,6 @@ export const updateProperty = async (req, res) => {
       }
     }
 
-    // --- Validation: cover required, at least 3 gallery ---
     const effectiveCover = updatedData.coverImage || existingProperty.coverImage;
     const effectiveGallery =
       updatedData.galleryPhotos || existingProperty.galleryPhotos || [];
@@ -388,7 +373,6 @@ export const updateProperty = async (req, res) => {
       });
     }
 
-    // --- Transaction: update property + link owner user ---
     let updatedProperty;
     await session.withTransaction(async () => {
       if (updatedData.resortOwner?.email && updatedData.resortOwner?.mobile) {
@@ -482,7 +466,7 @@ export const blockProperty = async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
-    const adminId = req.user?.id || null; // if you attach admin auth, otherwise keep null
+    const adminId = req.user?.id || null; 
 
     const property = await Property.findById(id);
     if (!property) return res.status(404).json({ success: false, message: "Property not found" });
@@ -491,7 +475,7 @@ export const blockProperty = async (req, res) => {
     }
 
     property.isBlocked = true;
-    property.publishNow = false;            // make sure it disappears from public views
+    property.publishNow = false;            
     property.blocked = { by: adminId, reason: reason?.trim() || "", at: new Date() };
 
     await property.save();
@@ -502,7 +486,7 @@ export const blockProperty = async (req, res) => {
   }
 };
 
-// UNBLOCK
+
 export const unblockProperty = async (req, res) => {
   try {
     const { id } = req.params;
@@ -513,12 +497,45 @@ export const unblockProperty = async (req, res) => {
     }
 
     property.isBlocked = false;
-    property.blocked = undefined; // or: property.blocked = { by:null, reason:"", at:null }
+    property.blocked = undefined;
     await property.save();
 
     res.json({ success: true, data: property });
   } catch (err) {
     console.error("Unblock property error:", err);
     res.status(500).json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
+
+export const toggleFeaturedProperty = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const property = await Property.findById(id);
+    if (!property) return res.status(404).json({ success: false, message: "Property not found" });
+
+    property.featured = !property.featured;
+    await property.save();
+
+    res.json({ success: true, data: property, message: property.featured ? "Property featured" : "Property unfeatured" });
+  } catch (err) {
+    console.error("Toggle feature error:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+export const togglePublishProperty = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const property = await Property.findById(id);
+    if (!property) return res.status(404).json({ success: false, message: "Property not found" });
+
+    property.publishNow = !property.publishNow;
+    await property.save();
+
+    res.json({ success: true, data: property, message: property.publishNow ? "Property published" : "Property unpublished" });
+  } catch (err) {
+    console.error("Toggle publish error:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };

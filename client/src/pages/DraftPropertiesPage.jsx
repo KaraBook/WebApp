@@ -33,7 +33,7 @@ export default function DraftPropertiesPage() {
       <div className="flex justify-between items-center border-b pb-4">
         <h1 className="text-xl font-bold">Draft Properties</h1>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/admin/properties")}>
+          <Button  onClick={() => navigate("/admin/properties")}>
             Back to Properties
           </Button>
         </div>
@@ -63,7 +63,7 @@ export default function DraftPropertiesPage() {
                   <TableCell>{p.city}</TableCell>
                   <TableCell>{formatDate(p.createdAt)}</TableCell>
                   <TableCell className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => navigate(`/admin/properties/${p._id}/media`)}>
+                    <Button className="bg-transparent" size="sm" variant="outline" onClick={() => navigate(`/admin/properties/${p._id}/media`)}>
                       Continue
                     </Button>
                   </TableCell>
