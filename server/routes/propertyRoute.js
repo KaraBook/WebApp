@@ -9,7 +9,8 @@ import {
   blockProperty,
   unblockProperty,
   toggleFeaturedProperty,
-  togglePublishProperty
+  togglePublishProperty,
+  getPublishedProperties
 } from "../controllers/propertyController.js";
 import { requireAuth, requireAdmin } from "../middlewares/requireAuth.js";
 import upload from "../middlewares/multer.js";
@@ -44,6 +45,7 @@ router.post(
 );
 
 router.get("/", getAllProperties);
+router.get("/published", getPublishedProperties);
 router.get("/:id", getSingleProperty);
 
 function conditionalUpload(req, res, next) {

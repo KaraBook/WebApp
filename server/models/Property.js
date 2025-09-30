@@ -1,13 +1,18 @@
-// models/Property.js
 import mongoose from "mongoose";
 
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
 const propertySchema = new mongoose.Schema({
-  // NEW
   isDraft: { type: Boolean, default: true, index: true },
 
-  propertyName: { type: String, required: true, minlength: 3, maxlength: 100, match: /^[a-zA-Z0-9 ]+$/ },
+propertyName: { 
+  type: String, 
+  required: true, 
+  minlength: 10, 
+  maxlength: 100, 
+  match: [/^(?!\d+$)[^\s][a-zA-Z0-9\s]*$/, "Property name must not be only digits and cannot start with space"]
+},
+
 
   resortOwner: {
     firstName: { type: String, required: true, minlength: 2, maxlength: 50, match: /^[a-zA-Z ]+$/ },
@@ -58,7 +63,6 @@ const propertySchema = new mongoose.Schema({
   },
   internalNotes: String,
 
-  // ✅ Conditionally required when !isDraft
   coverImage: {
     type: String,
     required: [function () { return !this.isDraft; }, "Cover image is required"],

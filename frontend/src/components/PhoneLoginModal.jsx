@@ -16,6 +16,7 @@ export default function PhoneLoginModal({ open, onOpenChange, onClose  }) {
   const [otp, setOtp] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [confirmResult, setConfirmResult] = useState(null);
+  
 
   const setAuth = useAuthStore((s) => s.setAuth);
   const navigate = useNavigate();
@@ -70,14 +71,15 @@ export default function PhoneLoginModal({ open, onOpenChange, onClose  }) {
         {},
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
+
       setAuth({
         user: resp.data.user,
         accessToken: resp.data.accessToken,
         refreshToken: resp.data.refreshToken,
       });
-      onOpenChange(false); 
+      onOpenChange(false);
     } else {
-      onOpenChange(false); 
+      onOpenChange(false);
       navigate("/signup", { state: { idToken } });
     }
   } catch (err) {
@@ -86,6 +88,7 @@ export default function PhoneLoginModal({ open, onOpenChange, onClose  }) {
     setVerifying(false);
   }
 };
+
 
 
   return (

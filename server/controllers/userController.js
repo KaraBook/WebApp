@@ -4,27 +4,22 @@ import jwt from "jsonwebtoken";
 import { normalizeMobile } from "../utils/phone.js";
 import { prepareImage, uploadBuffer } from "../utils/cloudinary.js";
 
-
-/* ----------------------------- helpers ----------------------------- */
-
-// Single place to mint both tokens
 const issueTokens = (user) => {
   const accessToken = jwt.sign(
     { id: user._id, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "30m" }
   );
 
   const refreshToken = jwt.sign(
-    { id: user._id }, // keep refresh token minimal
+    { id: user._id },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "7d" }
+    { expiresIn: "1d" }
   );
 
   return { accessToken, refreshToken };
 };
 
-// Minimal user object to send back to clients
 const publicUser = (u) => ({
   id: u._id,
   name: u.name,
@@ -38,8 +33,7 @@ const publicUser = (u) => ({
   avatarUrl: u.avatarUrl,
 });
 
-/* ------------------ admin/resortOwner email+password ------------------ */
-
+/* ---------------------------- LOGIN --------------------------- */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body ?? {};
@@ -48,10 +42,9 @@ export const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
-    if (!user) return res.status(401).json({ message: "Invalid credentials" });
-
-    // If the account was created as OTP-only, there may be no password stored
-    if (!user.password) return res.status(401).json({ message: "Invalid credentials" });
+    if (!user || !user.password) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
 
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
@@ -69,8 +62,7 @@ export const login = async (req, res) => {
   }
 };
 
-/* ---------------------------- refresh token --------------------------- */
-/** Expects: Authorization: Bearer <refreshToken> */
+/* ---------------------------- REFRESH TOKEN --------------------------- */
 export const refreshToken = async (req, res) => {
   try {
     const authHeader = req.headers.authorization || "";
@@ -95,8 +87,7 @@ export const refreshToken = async (req, res) => {
   }
 };
 
-/* ----------------------------- traveller OTP ----------------------------- */
-
+/* ---------------------------- TRAVELLER LOGIN --------------------------- */
 export const travellerLogin = async (req, res) => {
   try {
     const { firebaseUser } = req;
@@ -110,7 +101,6 @@ export const travellerLogin = async (req, res) => {
       return res.status(404).json({ message: "User not found. Please sign up." });
     }
 
-    // Make sure the role is at least traveller
     if (user.role !== "admin" && user.role !== "resortOwner" && user.role !== "traveller") {
       user.role = "traveller";
       await user.save();
@@ -130,9 +120,7 @@ export const travellerLogin = async (req, res) => {
   }
 };
 
-
-
-
+/* ---------------------------- TRAVELLER CHECK --------------------------- */
 export const travellerCheck = async (req, res) => {
   const mobile = normalizeMobile(req.firebaseUser?.phone_number);
   if (!mobile || mobile.length !== 10) {
@@ -143,17 +131,11 @@ export const travellerCheck = async (req, res) => {
 };
 
 
-/**
- * travellerSignup
- * - Requires verifyFirebaseToken middleware
- * - Accepts name, email, state, district (and optional avatar file)
- * - Locks in the mobile from Firebase token; do not allow changing it here
- * - Email is required and must be unique
- */
 export const travellerSignup = async (req, res) => {
   try {
     const mobile = normalizeMobile(req.firebaseUser?.phone_number);
-    if (!mobile || mobile.length !== 10) return res.status(400).json({ message: "Invalid phone token" });
+    if (!mobile || mobile.length !== 10)
+      return res.status(400).json({ message: "Invalid phone token" });
 
     const { firstName, lastName, email, state, city } = req.body ?? {};
     if (!firstName || !lastName || !email || !state || !city) {
@@ -161,19 +143,12 @@ export const travellerSignup = async (req, res) => {
     }
 
     const existsMobile = await User.findOne({ mobile });
-    if (existsMobile) return res.status(409).json({ message: "User already exists. Please login." });
+    if (existsMobile)
+      return res.status(409).json({ message: "User already exists. Please login." });
 
     const existsEmail = await User.findOne({ email: email.toLowerCase() });
-    if (existsEmail) return res.status(409).json({ message: "Email already in use." });
-
-    // optional image -> avatarUrl
-    let avatarUrl = "";
-    const file = req.file || null; // using uploadMemory.single("image")
-    if (file?.buffer) {
-      const processed = await prepareImage(file.buffer);
-      const cloud = await uploadBuffer(processed, { folder: "users/avatars" });
-      avatarUrl = cloud.secure_url;
-    }
+    if (existsEmail)
+      return res.status(409).json({ message: "Email already in use." });
 
     const user = await User.create({
       firstName,
@@ -184,7 +159,6 @@ export const travellerSignup = async (req, res) => {
       city,
       mobile,
       role: "traveller",
-      avatarUrl,
     });
 
     const { accessToken, refreshToken } = issueTokens(user);
@@ -204,10 +178,34 @@ export const travellerSignup = async (req, res) => {
   }
 };
 
+// Upload Avatar separately
+export const uploadTravellerAvatar = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const file = req.file;
+    if (!file?.buffer) return res.status(400).json({ message: "No file uploaded" });
+
+    const processed = await prepareImage(file.buffer);
+    const cloud = await uploadBuffer(processed, { folder: "users/avatars" });
+
+    user.avatarUrl = cloud.secure_url;
+    await user.save();
+
+    return res.status(200).json({
+      message: "Avatar uploaded successfully",
+      avatarUrl: user.avatarUrl,
+    });
+  } catch (err) {
+    console.error("Upload avatar error:", err);
+    return res.status(500).json({ message: "Upload failed", error: err.message });
+  }
+};
 
 
-
-
+/* ---------------------------- UPDATE MOBILE --------------------------- */
 export const updateTravellerMobile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -241,8 +239,7 @@ export const updateTravellerMobile = async (req, res) => {
   }
 };
 
-/* ---------------------------- resort owner OTP --------------------------- */
-
+/* ---------------------------- RESORT OWNER LOGIN --------------------------- */
 export const resortOwnerLogin = async (req, res) => {
   try {
     const { firebaseUser } = req;
@@ -258,7 +255,6 @@ export const resortOwnerLogin = async (req, res) => {
       });
     }
 
-    // Ensure role is appropriate
     if (user.role !== "admin" && user.role !== "resortOwner") {
       user.role = "resortOwner";
       await user.save();
@@ -278,20 +274,9 @@ export const resortOwnerLogin = async (req, res) => {
   }
 };
 
-
+/* ---------------------------- ME --------------------------- */
 export const me = async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) return res.status(404).json({ message: "Not found" });
-  res.json({
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      mobile: user.mobile,
-      role: user.role,
-      state: user.state,
-      district: user.district,
-      avatarUrl: user.avatarUrl || "", 
-    },
-  });
+  res.json({ user: publicUser(user) });
 };

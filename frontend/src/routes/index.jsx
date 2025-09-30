@@ -10,12 +10,14 @@ import Wishlist from "@/components/accounts/Wishlist";
 import Profile from "@/components/accounts/Profile";
 import Ratings from "@/components/accounts/Ratings";
 import Support from "@/components/accounts/Support";
+import Properties from "@/pages/Properties";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="properties" element={<Properties />} />
 
       {/* Dashboard-only area */}
       <Route element={<ProtectedRoute />}>

@@ -3,10 +3,18 @@ import Joi from "joi";
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
 const baseFields = {
-  propertyName: Joi.string().min(3).max(100).regex(/^[a-zA-Z0-9 ]+$/).required(),
+  propertyName: Joi.string()
+  .min(10)
+  .max(100)
+  .pattern(/^(?!\d+$)[^\s][a-zA-Z0-9\s]*$/)
+  .required()
+  .messages({
+    "string.pattern.base": "Property name cannot be only digits and must not start with spaces"
+  }),
+
   resortOwner: Joi.object({
     firstName: Joi.string().min(2).max(50).regex(/^[a-zA-Z ]+$/).required(),
-    lastName:  Joi.string().min(2).max(50).regex(/^[a-zA-Z ]+$/).required(),
+    lastName: Joi.string().min(2).max(50).regex(/^[a-zA-Z ]+$/).required(),
     email: Joi.string().email().required(),
     resortEmail: Joi.string().email().required(),
     mobile: Joi.string().pattern(/^[6-9]\d{9}$/).required(),
@@ -69,12 +77,12 @@ function parseResortOwnerFromBody(body) {
     return "";
   };
   return {
-    firstName:    first("resortOwner[firstName]","resortOwner.firstName","resortOwnerFirstName"),
-    lastName:     first("resortOwner[lastName]","resortOwner.lastName","resortOwnerLastName"),
-    email:        first("resortOwner[email]","resortOwner.email","resortOwnerEmail","ownerEmail"),
-    resortEmail:  first("resortOwner[resortEmail]","resortOwner.resortEmail","resortOwnerResortEmail","resortEmail"),
-    mobile:       first("resortOwner[mobile]","resortOwner.mobile","resortOwnerMobile","mobile"),
-    resortMobile: first("resortOwner[resortMobile]","resortOwner.resortMobile","resortOwnerResortMobile","resortMobile"),
+    firstName: first("resortOwner[firstName]", "resortOwner.firstName", "resortOwnerFirstName"),
+    lastName: first("resortOwner[lastName]", "resortOwner.lastName", "resortOwnerLastName"),
+    email: first("resortOwner[email]", "resortOwner.email", "resortOwnerEmail", "ownerEmail"),
+    resortEmail: first("resortOwner[resortEmail]", "resortOwner.resortEmail", "resortOwnerResortEmail", "resortEmail"),
+    mobile: first("resortOwner[mobile]", "resortOwner.mobile", "resortOwnerMobile", "mobile"),
+    resortMobile: first("resortOwner[resortMobile]", "resortOwner.resortMobile", "resortOwnerResortMobile", "resortMobile"),
   };
 }
 
@@ -90,7 +98,7 @@ function normalizeArraysAndTypes(body) {
   ["roomTypes", "foodAvailability", "amenities"].forEach(normalizeArray);
 
   [
-    "totalRooms","maxGuests","pricingPerNightWeekdays","pricingPerNightWeekend","extraGuestCharge","minStayNights",
+    "totalRooms", "maxGuests", "pricingPerNightWeekdays", "pricingPerNightWeekend", "extraGuestCharge", "minStayNights",
   ].forEach((n) => {
     if (body[n] !== undefined && body[n] !== "") body[n] = Number(body[n]);
   });
@@ -123,8 +131,8 @@ export const validatePropertyUpdate = (req, res, next) => {
 
 export const ensureMediaFilesPresent = (req, res, next) => {
   const cover = req.files?.coverImage?.[0];
-  const shop  = req.files?.shopAct?.[0];
-  const gal   = req.files?.galleryPhotos || [];
+  const shop = req.files?.shopAct?.[0];
+  const gal = req.files?.galleryPhotos || [];
   if (!cover || !shop || gal.length === 0) {
     return res.status(400).json({ success: false, message: "coverImage, shopAct and galleryPhotos are required" });
   }

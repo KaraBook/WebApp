@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoute.js";
 import propertyRoutes from "./routes/propertyRoute.js";
+import wishlistRoute from "./routes/wishlistRoute.js";
 
 dotenv.config();
 const app = express();
@@ -30,6 +31,8 @@ app.get("/", (_req, res) => res.send("API is up"));
 
 app.use("/api/auth", userRoutes);
 app.use("/api/properties", propertyRoutes);
+app.use("/api/wishlist", wishlistRoute);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

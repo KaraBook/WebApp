@@ -539,3 +539,18 @@ export const togglePublishProperty = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+
+export const getPublishedProperties = async (req, res) => {
+  try {
+    const properties = await Property.find({
+      isDraft: false,
+      publishNow: true,
+    }).sort({ createdAt: -1 });
+
+    res.json({ success: true, data: properties });
+  } catch (err) {
+    console.error("getPublishedProperties error:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch published properties" });
+  }
+};

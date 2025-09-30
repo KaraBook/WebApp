@@ -13,7 +13,6 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String, trim: true },
   lastName:  { type: String, trim: true },
 
-  // Only travellers must have these
   state: {
     type: String, trim: true,
     required: function () { return this.role === 'traveller'; }

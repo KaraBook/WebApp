@@ -6,12 +6,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import {Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter} from "@/components/ui/card";
+import {
+  Card, CardContent, CardHeader, CardTitle,
+  CardDescription, CardFooter
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {
+  Select, SelectContent, SelectItem,
+  SelectTrigger, SelectValue
+} from "@/components/ui/select";
 
 const nameRegex = /^[a-zA-Z][a-zA-Z\s'.-]{1,49}$/;
 
@@ -53,31 +59,49 @@ export default function Signup() {
   };
 
   const onSubmit = async (values) => {
-    try {
-      const fd = new FormData();
-      fd.append("firstName", values.firstName);
-      fd.append("lastName", values.lastName);
-      fd.append("email", values.email);
-      fd.append("state", values.state);
-      fd.append("city", values.city);
-      if (values.image?.length) fd.append("image", values.image[0]);
+  try {
+    // 1. Signup (text only)
+    const signupResp = await axios.post(
+      baseURL + SummaryApi.travellerSignup.url,
+      {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        state: values.state,
+        city: values.city,
+      },
+      { headers: { Authorization: `Bearer ${state.idToken}` } }
+    );
 
-      const resp = await axios.post(
-        baseURL + SummaryApi.travellerSignup.url,
+    let { user, accessToken, refreshToken } = signupResp.data;
+
+    // 2. Upload avatar if provided
+    if (values.image?.length) {
+      const fd = new FormData();
+      fd.append("image", values.image[0]);
+
+      const uploadResp = await axios.post(
+        baseURL + SummaryApi.uploadTravellerAvatar.url,
         fd,
-        { headers: { Authorization: `Bearer ${state.idToken}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
-      setAuth({
-        user: resp.data.user,
-        accessToken: resp.data.accessToken,
-        refreshToken: resp.data.refreshToken,
-      });
-      navigate("/");
-    } catch (err) {
-      alert(err?.response?.data?.message || "Signup failed");
+      user = { ...user, avatarUrl: uploadResp.data.avatarUrl };
     }
-  };
+
+    // 3. Save in store & redirect
+    setAuth({ user, accessToken, refreshToken });
+    navigate("/");
+  } catch (err) {
+    alert(err?.response?.data?.message || "Signup failed");
+  }
+};
+
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
@@ -94,84 +118,74 @@ export default function Signup() {
             <div className="md:w-[48%] w-full">
               <Label htmlFor="firstName">First name</Label>
               <Input id="firstName" className="mt-1" placeholder="John" {...register("firstName")} />
-              {errors.firstName && (
-                <p className="text-sm text-destructive">{errors.firstName.message}</p>
-              )}
+              {errors.firstName && <p className="text-sm text-destructive">{errors.firstName.message}</p>}
             </div>
 
             <div className="md:w-[48%] w-full">
               <Label htmlFor="lastName">Last name</Label>
               <Input id="lastName" placeholder="Doe" className="mt-1" {...register("lastName")} />
-              {errors.lastName && (
-                <p className="text-sm text-destructive">{errors.lastName.message}</p>
-              )}
+              {errors.lastName && <p className="text-sm text-destructive">{errors.lastName.message}</p>}
             </div>
           </div>
 
           <div className="grid gap-1">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" className="mt-1" placeholder="john@example.com" {...register("email")} />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
           </div>
 
-        <div className="flex justify-between flex-wrap gap-2">
-          {/* State Dropdown */}
-          <div className="md:w-[48%] w-full">
-            <Label htmlFor="state">State</Label>
-            <Controller
-              name="state"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  onValueChange={(val) => handleStateChange(val, onChange)}
-                  value={states.find((s) => s.name === value)?.isoCode || ""}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select State" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {states.map((st) => (
-                      <SelectItem key={st.isoCode} value={st.isoCode}>
-                        {st.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.state && (
-              <p className="text-sm text-destructive">{errors.state.message}</p>
-            )}
-          </div>
+          <div className="flex justify-between flex-wrap gap-2">
+            {/* State Dropdown */}
+            <div className="md:w-[48%] w-full">
+              <Label htmlFor="state">State</Label>
+              <Controller
+                name="state"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Select
+                    onValueChange={(val) => handleStateChange(val, onChange)}
+                    value={states.find((s) => s.name === value)?.isoCode || ""}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select State" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {states.map((st) => (
+                        <SelectItem key={st.isoCode} value={st.isoCode}>
+                          {st.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.state && <p className="text-sm text-destructive">{errors.state.message}</p>}
+            </div>
 
-          {/* City Dropdown */}
-          <div className="md:w-[48%] w-full">
-            <Label htmlFor="city">City</Label>
-            <Controller
-              name="city"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Select onValueChange={onChange} value={value || ""}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select City" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cities.map((city) => (
-                      <SelectItem key={city.name} value={city.name}>
-                        {city.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.city && (
-              <p className="text-sm text-destructive">{errors.city.message}</p>
-            )}
+            {/* City Dropdown */}
+            <div className="md:w-[48%] w-full">
+              <Label htmlFor="city">City</Label>
+              <Controller
+                name="city"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Select onValueChange={onChange} value={value || ""}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select City" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cities.map((city) => (
+                        <SelectItem key={city.name} value={city.name}>
+                          {city.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+            </div>
           </div>
-        </div>
 
           <div className="grid gap-1">
             <Label htmlFor="image">Profile image (optional)</Label>
@@ -180,9 +194,7 @@ export default function Signup() {
         </CardContent>
 
         <CardFooter className="justify-end gap-2">
-          <Button variant="ghost" onClick={() => navigate("/")}>
-            Cancel
-          </Button>
+          <Button variant="ghost" onClick={() => navigate("/")}>Cancel</Button>
           <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
             {isSubmitting ? "Creating..." : "Create account"}
           </Button>

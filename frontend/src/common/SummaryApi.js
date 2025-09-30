@@ -1,27 +1,42 @@
 export const baseURL = import.meta.env.VITE_BASE_URL;
 
 const SummaryApi = {
-  
-  travellerCheck:  { 
+  travellerCheck: { 
     url: "/api/auth/traveller/check",  
     method: "post" 
-},
-  travellerLogin:  { 
+  },
+  travellerLogin: { 
     url: "/api/auth/traveller/login",  
     method: "post" 
-},
+  },
   travellerSignup: { 
     url: "/api/auth/traveller/signup", 
     method: "post" 
-},
+  },
+  uploadTravellerAvatar: {
+    url: "/api/auth/traveller/upload-avatar",
+    method: "post"
+  },
   refreshToken: { 
     url: "/api/auth/refresh-token",    
     method: "post" 
-},
+  },
   me: {
     url: "/api/auth/me",
     method: "get",
-  }
+  },
+  getPublishedProperties: {
+    url: "/api/properties/published",
+    method: "get",
+  },
+  getWishlist: {
+    url: "/api/wishlist",
+    method: "get",
+  },
+  toggleWishlist: {
+    url: "/api/wishlist/toggle",
+    method: "post",
+  },
 };
 
 export default SummaryApi;
