@@ -57,6 +57,22 @@ const SummaryApi = {
     url: "/api/bookings/user", 
     method: "get" 
   },
+  getUserReviews: { 
+    url: "/api/reviews/user", 
+    method: "get" 
+  },
+  getPropertyReviews: { 
+    url: (id) => `/api/reviews/property/${id}`, 
+    method: "get" },
+  addReview: { 
+    url: "/api/reviews", 
+    method: "post" 
+  },
+  getInvoice: {
+  url: (id) => `/api/bookings/invoice/${id}`,
+  method: "get",
+},
+
 };
 
 export default SummaryApi;

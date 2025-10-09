@@ -11,6 +11,7 @@ import Support from "@/components/accounts/Support";
 import Properties from "@/pages/Properties";
 import PropertyDetails from "@/pages/PropertyDetails";
 import Checkout from "@/pages/Checkout";
+import InvoicePage from "@/pages/InvoicePage";
 
 export default function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export default function AppRoutes() {
       <Route path="properties" element={<Properties />} />
       <Route path="/properties/:id" element={<PropertyDetails />} />
       <Route path="/checkout/:propertyId" element={<Checkout />} />
+      <Route path="/invoice/:id" element={<InvoicePage />} />
 
       {/* Dashboard-only area */}
       <Route element={<ProtectedRoute />}>

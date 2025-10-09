@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function PropertyDetails() {
   const { id } = useParams();
@@ -20,6 +21,9 @@ export default function PropertyDetails() {
   const { wishlist, setWishlist, user, showAuthModal, accessToken } = useAuthStore();
   const navigate = useNavigate();
   const [bookedDates, setBookedDates] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
 
   const [guestCount, setGuestCount] = useState(1);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -96,6 +100,25 @@ export default function PropertyDetails() {
   };
 
   const inWishlist = wishlist.includes(property._id);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!rating) return toast.error("Please give a rating");
+
+    try {
+      const res = await Axios.post(
+        SummaryApi.addReview.url,
+        { propertyId: property._id, rating, comment },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      toast.success("Review added!");
+      setReviews((prev) => [res.data.data, ...prev]);
+      setRating(0);
+      setComment("");
+    } catch {
+      toast.error("Failed to submit review");
+    }
+  };
 
   const handleReserve = () => {
     if (!user) {
@@ -220,6 +243,71 @@ export default function PropertyDetails() {
               View on Google Maps
             </a>
           </div>
+
+          {/* Reviews Section */}
+          <div className="border-t pt-6 mt-8">
+            <h2 className="text-xl font-semibold text-[#233b19] mb-3">Reviews</h2>
+
+            {/* Display existing reviews */}
+            {reviews.length ? (
+              reviews.map((r) => (
+                <div key={r._id} className="mb-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <img
+                      src={r.userId?.avatarUrl || "/placeholder-avatar.png"}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <p className="text-sm font-medium">{r.userId?.name}</p>
+                  </div>
+                  <div className="flex text-yellow-400 text-xs mb-1">
+                    {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}
+                  </div>
+                  <p className="text-gray-700 text-sm">{r.comment}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm">No reviews yet.</p>
+            )}
+
+            {/* Add new review */}
+            {user && (
+              <form
+                onSubmit={handleReviewSubmit}
+                className="mt-4 bg-gray-50 p-4 rounded-xl"
+              >
+                <label className="text-sm text-gray-600 mb-1 block">Your Rating</label>
+                <div className="flex mb-3">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setRating(s)}
+                      className={`text-2xl ${s <= rating ? "text-yellow-400" : "text-gray-300"
+                        }`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+
+                <textarea
+                  className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+                  rows="3"
+                  placeholder="Share your experience..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                ></textarea>
+
+                <button
+                  type="submit"
+                  className="mt-3 bg-[#233b19] text-white px-4 py-2 rounded-full text-sm"
+                >
+                  Submit Review
+                </button>
+              </form>
+            )}
+          </div>
+
         </div>
 
         {/* Right Sticky Box */}

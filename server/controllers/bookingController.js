@@ -1,6 +1,8 @@
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import Booking from "../models/Booking.js";
+import Property from "../models/Property.js";
+import User from "../models/User.js";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -85,5 +87,72 @@ export const getBookedDates = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Failed to fetch booked dates" });
+  }
+};
+
+
+export const getUserBookings = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const bookings = await Booking.find({ userId })
+      .populate("propertyId")  
+      .sort({ createdAt: -1 });
+
+    const formatted = bookings.map((b) => ({
+      ...b._doc,
+      property: b.propertyId,  
+    }));
+
+    res.json({ success: true, data: formatted });
+  } catch (err) {
+    console.error("getUserBookings error:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch user bookings" });
+  }
+};
+
+
+export const getBookingInvoice = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    const booking = await Booking.findById(bookingId)
+      .populate("userId", "firstName lastName email mobile")
+      .populate("propertyId", "propertyName address city state pricingPerNightWeekdays");
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    const invoiceData = {
+      invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
+      propertyName: booking.propertyId.propertyName,
+      propertyAddress: booking.propertyId.address,
+      propertyCity: booking.propertyId.city,
+      propertyState: booking.propertyId.state,
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+      nights: booking.nights,
+      guests: booking.guests,
+      totalAmount: booking.totalAmount,
+      paymentStatus: booking.paymentStatus,
+      bookingDate: booking.createdAt,
+      user: {
+        name: `${booking.userId.firstName} ${booking.userId.lastName}`,
+        mobile: booking.userId.mobile,
+        email: booking.userId.email,
+      },
+      priceBreakdown: [
+        {
+          description: "Room Charges",
+          rate: `₹${booking.propertyId.pricingPerNightWeekdays.toLocaleString()} × ${booking.nights} Nights`,
+          total: `₹${booking.totalAmount.toLocaleString()}`,
+        },
+      ],
+    };
+
+    res.json({ success: true, data: invoiceData });
+  } catch (err) {
+    console.error("Invoice error:", err);
+    res.status(500).json({ success: false, message: "Failed to generate invoice" });
   }
 };

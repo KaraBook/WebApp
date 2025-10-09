@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoute.js";
 import propertyRoutes from "./routes/propertyRoute.js";
 import wishlistRoute from "./routes/wishlistRoute.js";
 import bookingRoute from "./routes/bookingRoutes.js";
+import reviewRoute from "./routes/reviewRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -34,6 +35,7 @@ app.use("/api/auth", userRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/wishlist", wishlistRoute);
 app.use("/api/bookings", bookingRoute);
+app.use("/api/reviews", reviewRoute);
 
 
 const PORT = process.env.PORT || 5000;

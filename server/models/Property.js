@@ -91,6 +91,7 @@ const propertySchema = new mongoose.Schema({
     type: String,
     required: [function () { return !this.isDraft; }, "Shop Act is required"],
   },
+  averageRating: { type: Number, default: 0 },
   galleryPhotos: {
     type: [String],
     required: [function () { return !this.isDraft; }, "At least one gallery photo is required"],

@@ -31,6 +31,7 @@ const publicUser = (u) => ({
   state: u.state,
   city: u.city,
   avatarUrl: u.avatarUrl,
+  createdAt: u.createdAt,
 });
 
 /* ---------------------------- LOGIN --------------------------- */
