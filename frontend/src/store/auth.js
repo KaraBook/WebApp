@@ -9,26 +9,26 @@ export const useAuthStore = create(
       user: null,
       accessToken: null,
       refreshToken: null,
+      wishlist: [],   // 👈 store wishlist IDs here
+
+      loginModalOpen: false,
+      showAuthModal: () => set({ loginModalOpen: true }),
+      hideAuthModal: () => set({ loginModalOpen: false }),
 
       setAuth: ({ user, accessToken, refreshToken }) => {
-        set({ user, accessToken, refreshToken });
+        set({ user, accessToken, refreshToken, loginModalOpen: false });
       },
 
-      setTokens: ({ accessToken, refreshToken }) => {
-        if (accessToken) set({ accessToken });
-        if (refreshToken) set({ refreshToken });
-      },
+      setWishlist: (ids) => set({ wishlist: ids }),
 
       clearAuth: () => {
-        set({ user: null, accessToken: null, refreshToken: null });
+        set({ user: null, accessToken: null, refreshToken: null, wishlist: [] });
       },
 
       init: async () => {
-        const { user, accessToken, refreshToken } = get();
-
-        if (user && accessToken) return;
-
+        const { accessToken, refreshToken } = get();
         let token = accessToken;
+
         if (!token && refreshToken) {
           try {
             const resp = await axios({
@@ -39,7 +39,7 @@ export const useAuthStore = create(
             token = resp.data?.data?.accessToken || null;
             if (token) set({ accessToken: token });
           } catch {
-            set({ user: null, accessToken: null, refreshToken: null });
+            set({ user: null, accessToken: null, refreshToken: null, wishlist: [] });
             return;
           }
         }
@@ -50,19 +50,26 @@ export const useAuthStore = create(
               headers: { Authorization: `Bearer ${token}` },
             });
             set({ user: me.data.user });
+
+            // 👇 fetch wishlist
+            const wl = await axios.get(baseURL + SummaryApi.getWishlist.url, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            set({ wishlist: wl.data.data.map((p) => p._id) });
           } catch {
-            set({ user: null, accessToken: null, refreshToken: null });
+            set({ user: null, accessToken: null, refreshToken: null, wishlist: [] });
           }
         }
       },
     }),
     {
-      name: "auth", 
+      name: "auth",
       storage: createJSONStorage(() => localStorage),
       partialize: (s) => ({
         user: s.user,
         accessToken: s.accessToken,
         refreshToken: s.refreshToken,
+        wishlist: s.wishlist,
       }),
     }
   )

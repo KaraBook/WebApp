@@ -543,14 +543,27 @@ export const togglePublishProperty = async (req, res) => {
 
 export const getPublishedProperties = async (req, res) => {
   try {
-    const properties = await Property.find({
-      isDraft: false,
-      publishNow: true,
-    }).sort({ createdAt: -1 });
+    const { state, city, checkIn, checkOut, guests } = req.query;
+    const filter = { isDraft: false, publishNow: true };
 
+    if (state) filter.state = new RegExp(`^${state}$`, "i");
+    if (city) filter.city = new RegExp(`^${city}$`, "i");
+
+    // optional: if you store maxGuests or capacity field
+    if (guests) filter.maxGuests = { $gte: Number(guests) };
+
+    // optional: date range availability filter (only if you store bookedDates array)
+    // if (checkIn && checkOut) {
+    //   filter.bookedDates = {
+    //     $not: { $elemMatch: { $gte: new Date(checkIn), $lt: new Date(checkOut) } },
+    //   };
+    // }
+
+    const properties = await Property.find(filter).sort({ createdAt: -1 });
     res.json({ success: true, data: properties });
   } catch (err) {
     console.error("getPublishedProperties error:", err);
     res.status(500).json({ success: false, message: "Failed to fetch published properties" });
   }
 };
+

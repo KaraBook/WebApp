@@ -17,7 +17,7 @@ export default function Header({ onLoginClick }) {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2" aria-label="Go to home">
-          <img src="/KarabookLogo.png" alt="BookMyStay" className="h-10 w-auto md:h-14" />
+          <img src="/KarabookLogo.png" alt="BookMyStay" className="h-6 w-auto md:h-10" />
         </Link>
 
         {/* Right */}

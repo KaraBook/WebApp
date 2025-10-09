@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuthStore } from "@/store/auth";
 import Header from "@/components/Header";
 import PhoneLoginModal from "@/components/PhoneLoginModal";
 import AppRoutes from "@/routes";
 
 export default function App() {
-  const { init } = useAuthStore();
-  const [showLogin, setShowLogin] = useState(null); 
+  const { init, loginModalOpen, showAuthModal, hideAuthModal, user } = useAuthStore();
 
   useEffect(() => {
     const run = () => {
       init().finally(() => {
-        const u = useAuthStore.getState().user;
-        setShowLogin(!u); 
+        if (!useAuthStore.getState().user) {
+          showAuthModal();
+        }
       });
     };
 
@@ -22,17 +22,15 @@ export default function App() {
     run();
 
     return () => unsub?.();
-  }, [init]);
+  }, [init, showAuthModal]);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header onLoginClick={() => setShowLogin(true)} />
+      <Header onLoginClick={showAuthModal} />
       <main className="flex-1">
         <AppRoutes />
       </main>
-      {showLogin !== null && (
-        <PhoneLoginModal open={showLogin} onOpenChange={setShowLogin} />
-      )}
+      <PhoneLoginModal open={loginModalOpen} onOpenChange={(o) => (o ? showAuthModal() : hideAuthModal())} />
     </div>
   );
 }

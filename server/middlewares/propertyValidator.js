@@ -1,20 +1,27 @@
 import Joi from "joi";
 
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+const PROPERTY_NAME_REGEX = /^(?!^\d+$)(?!^\s)[a-zA-Z0-9\s@#&.,]+$/;
 
 const baseFields = {
   propertyName: Joi.string()
-  .min(10)
-  .max(100)
-  .pattern(/^(?!\d+$)[^\s][a-zA-Z0-9\s]*$/)
-  .required()
-  .messages({
-    "string.pattern.base": "Property name cannot be only digits and must not start with spaces"
-  }),
+    .min(10)
+    .max(100)
+    .pattern(/^(?!^\d+$)(?!^\s)[a-zA-Z0-9\s@#&.,]+$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Property name must be 10+ chars, not only digits, and can include @ # & . ,"
+    }),
 
   resortOwner: Joi.object({
-    firstName: Joi.string().min(2).max(50).regex(/^[a-zA-Z ]+$/).required(),
-    lastName: Joi.string().min(2).max(50).regex(/^[a-zA-Z ]+$/).required(),
+    firstName: Joi.string().min(2).max(50).pattern(/^[\p{L}\s.'-]+$/u).required()
+      .messages({
+        "string.pattern.base": "First name must contain only letters, spaces, and allowed special characters (.'-)"
+      }),
+    lastName: Joi.string().min(2).max(50).pattern(/^[\p{L}\s.'-]+$/u).required()
+      .messages({
+        "string.pattern.base": "Last name must contain only letters, spaces, and allowed special characters (.'-)"
+      }),
     email: Joi.string().email().required(),
     resortEmail: Joi.string().email().required(),
     mobile: Joi.string().pattern(/^[6-9]\d{9}$/).required(),
@@ -22,10 +29,27 @@ const baseFields = {
   }).required(),
   propertyType: Joi.string().valid("villa", "tent", "cottage", "hotel").required(),
   description: Joi.string().min(30).max(500).required(),
-  addressLine1: Joi.string().min(5).max(100).required(),
+  addressLine1: Joi.string()
+    .min(5)
+    .max(100)
+    .pattern(/^(?!^\d+$)[a-zA-Z0-9\s]+$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Address Line 1 must contain letters/numbers, cannot be only digits, and cannot include special characters"
+    }),
   addressLine2: Joi.string().max(100).allow(""),
-  state: Joi.string().required(),
-  city: Joi.string().required(),
+  state: Joi.string()
+    .pattern(/^[\p{L}]+(?:[\s][\p{L}]+)*$/u)
+    .required()
+    .messages({
+      "string.pattern.base": "State must contain only letters and spaces (no leading/trailing whitespace)"
+    }),
+  city: Joi.string()
+    .pattern(/^[\p{L}]+(?:[\s][\p{L}]+)*$/u)
+    .required()
+    .messages({
+      "string.pattern.base": "City must contain only letters and spaces (no leading/trailing whitespace)"
+    }),
   pinCode: Joi.string().length(6).pattern(/^[0-9]+$/).required(),
   locationLink: Joi.string().uri().required(),
   totalRooms: Joi.number().min(1).max(999).required(),
@@ -38,7 +62,7 @@ const baseFields = {
   checkOutTime: Joi.string().required(),
   minStayNights: Joi.number().min(1).max(999).required(),
   foodAvailability: Joi.array().items(Joi.string()),
-  amenities: Joi.array().items(Joi.string()),
+  amenities: Joi.array().items(Joi.string().trim().min(1).max(50)).default([]),
   pan: Joi.string().length(10).required(),
   gstin: Joi.string().length(15).pattern(GSTIN_REGEX).required()
     .messages({

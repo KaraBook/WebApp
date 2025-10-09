@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoute.js";
 import propertyRoutes from "./routes/propertyRoute.js";
 import wishlistRoute from "./routes/wishlistRoute.js";
+import bookingRoute from "./routes/bookingRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -32,6 +33,7 @@ app.get("/", (_req, res) => res.send("API is up"));
 app.use("/api/auth", userRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/wishlist", wishlistRoute);
+app.use("/api/bookings", bookingRoute);
 
 
 const PORT = process.env.PORT || 5000;

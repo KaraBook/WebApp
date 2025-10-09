@@ -1,59 +1,79 @@
 import mongoose from "mongoose";
 
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+const PROPERTY_NAME_REGEX = /^(?!^\d+$)(?!^\s)[a-zA-Z0-9\s@#&.,]+$/;
 
 const propertySchema = new mongoose.Schema({
   isDraft: { type: Boolean, default: true, index: true },
 
-propertyName: { 
-  type: String, 
-  required: true, 
-  minlength: 10, 
-  maxlength: 100, 
-  match: [/^(?!\d+$)[^\s][a-zA-Z0-9\s]*$/, "Property name must not be only digits and cannot start with space"]
-},
-
+  propertyName: {
+    type: String,
+    required: true,
+    minlength: 10,
+    maxlength: 100,
+    match: [PROPERTY_NAME_REGEX, "Property name must be 10+ chars, not only digits, and can include @ # & . ,"]
+  },
 
   resortOwner: {
-    firstName: { type: String, required: true, minlength: 2, maxlength: 50, match: /^[a-zA-Z ]+$/ },
-    lastName:  { type: String, required: true, minlength: 2, maxlength: 50, match: /^[a-zA-Z ]+$/ },
-    email:     { type: String, required: true, lowercase: true, match: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/, unique: true },
-    resortEmail:{ type: String, required: true, lowercase: true, match: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/ },
-    mobile:    { type: String, required: true, match: /^[6-9]\d{9}$/, unique: true },
-    resortMobile:{ type: String, required: true, match: /^[6-9]\d{9}$/ },
+    firstName: {
+      type: String, required: true, minlength: 2, maxlength: 50,
+      match: [/^[\p{L}\s.'-]+$/u, "First name must contain only letters, spaces, and allowed special characters (.'-)"]
+    },
+    lastName: {
+      type: String, required: true, minlength: 2, maxlength: 50,
+      match: [/^[\p{L}\s.'-]+$/u, "Last name must contain only letters, spaces, and allowed special characters (.'-)"]
+    },
+    email: { type: String, required: true, lowercase: true, match: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/, unique: true },
+    resortEmail: { type: String, required: true, lowercase: true, match: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/ },
+    mobile: { type: String, required: true, match: /^[6-9]\d{9}$/, unique: true },
+    resortMobile: { type: String, required: true, match: /^[6-9]\d{9}$/ },
   },
 
   ownerUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
   propertyType: { type: String, enum: ["villa", "tent", "cottage", "hotel"], required: true },
-  description:  { type: String, required: true, minlength: 30, maxlength: 500 },
-  addressLine1: { type: String, required: true, unique: true },
+  description: { type: String, required: true, minlength: 30, maxlength: 500 },
+  addressLine1: {
+    type: String,
+    required: true,
+    minlength: 5,
+    maxlength: 100,
+    match: [/^(?!^\d+$)[a-zA-Z0-9\s]+$/, "Address Line 1 must contain letters/numbers, cannot be only digits, and cannot include special characters"]
+  },
   addressLine2: { type: String },
-  state:        { type: String, required: true },
-  city:         { type: String, required: true },
-  pinCode:      { type: String, required: true },
+  state: {
+    type: String,
+    required: true,
+    match: [/^[\p{L}]+(?:[\s][\p{L}]+)*$/u, "State must contain only letters and spaces (no leading/trailing whitespace)"]
+  },
+  city: {
+    type: String,
+    required: true,
+    match: [/^[\p{L}]+(?:[\s][\p{L}]+)*$/u, "City must contain only letters and spaces (no leading/trailing whitespace)"]
+  },
+  pinCode: { type: String, required: true },
   locationLink: { type: String, required: true, unique: true },
-  totalRooms:   { type: Number, required: true },
-  maxGuests:    { type: Number, required: true },
-  roomTypes:    { type: [String], default: [] },
+  totalRooms: { type: Number, required: true },
+  maxGuests: { type: Number, required: true },
+  roomTypes: { type: [String], default: [] },
   pricingPerNightWeekdays: { type: Number, required: true },
-  pricingPerNightWeekend:  { type: Number, required: true },
-  extraGuestCharge:        { type: Number },
+  pricingPerNightWeekend: { type: Number, required: true },
+  extraGuestCharge: { type: Number },
 
-  checkInTime:   { type: String, required: true },
-  checkOutTime:  { type: String, required: true },
+  checkInTime: { type: String, required: true },
+  checkOutTime: { type: String, required: true },
   minStayNights: { type: Number, required: true },
 
   foodAvailability: { type: [String], default: [] },
-  amenities:       { type: [String], default: [] },
+  amenities: { type: [String], default: [] },
 
-  pan:   { type: String, required: true, unique: true },
+  pan: { type: String, required: true, unique: true },
   gstin: { type: String, required: true, uppercase: true, trim: true, match: [GSTIN_REGEX, "Invalid GSTIN format"] },
 
-  kycVerified:   { type: Boolean, required: true },
-  publishNow:    { type: Boolean },
-  featured:      { type: Boolean, default: false },
-  approvalStatus:{ type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+  kycVerified: { type: Boolean, required: true },
+  publishNow: { type: Boolean },
+  featured: { type: Boolean, default: false },
+  approvalStatus: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
 
   isBlocked: { type: Boolean, default: false },
   blocked: {

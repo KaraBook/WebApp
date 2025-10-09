@@ -1,47 +1,107 @@
-import { useAuthStore } from "../store/auth"; 
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Heart, MapPin, Home } from "lucide-react";
+import { useAuthStore } from "../store/auth";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
-import { Heart } from "lucide-react";
-import { useState } from "react";
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
 
 export default function PropertyCard({ property }) {
-  const { user, showAuthModal } = useAuthStore();
-  const [inWishlist, setInWishlist] = useState(false);
+  const { user, showAuthModal, wishlist, setWishlist, accessToken } = useAuthStore();
+
+  const inWishlist = useMemo(
+    () => wishlist.includes(property._id),
+    [wishlist, property._id]
+  );
 
   const toggleWishlist = async () => {
     if (!user) {
-      showAuthModal(); // 🔑 show login popup
+      showAuthModal();
       return;
     }
     try {
-      await Axios.post(SummaryApi.toggleWishlist.url, { propertyId: property._id });
-      setInWishlist((prev) => !prev);
-      toast.success(inWishlist ? "Removed from wishlist" : "Added to wishlist");
+      const res = await Axios.post(
+        SummaryApi.toggleWishlist.url,
+        { propertyId: property._id },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      const updated = res.data.data.properties.map((id) => id.toString());
+      setWishlist(updated);
+      toast.success(res.data.message);
     } catch (err) {
       toast.error("Failed to update wishlist");
     }
   };
 
   return (
-    <div className="border rounded-lg overflow-hidden shadow-sm relative">
-      <img
-        src={property.coverImage}
-        alt={property.propertyName}
-        className="h-48 w-full object-cover"
-      />
-      <button
-        onClick={toggleWishlist}
-        className={`absolute top-2 right-2 p-2 rounded-full ${
-          inWishlist ? "bg-red-500 text-white" : "bg-white text-gray-500"
-        }`}
-      >
-        <Heart className="w-5 h-5" fill={inWishlist ? "currentColor" : "none"} />
-      </button>
-      <div className="p-3">
-        <h3 className="font-semibold text-lg">{property.propertyName}</h3>
-        <p className="text-sm text-gray-600">{property.city}, {property.state}</p>
+    <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
+      {/* Outer padding to create space around image */}
+      <div className="p-2">
+        <div className="relative overflow-hidden rounded-xl">
+          {/* Property image */}
+          <img
+            src={property.coverImage}
+            alt={property.propertyName}
+            className="w-full z-[9] max-h-[200px] object-cover transition-transform duration-500 hover:scale-105"
+          />
+
+          {/* Wishlist heart */}
+          <button
+            onClick={toggleWishlist}
+            className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 shadow-sm ${
+              inWishlist
+                ? "bg-red-500 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <Heart
+              className="w-4 h-4"
+              fill={inWishlist ? "currentColor" : "none"}
+            />
+          </button>
+
+          {/* Property type badge */}
+          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-gray-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
+            <Home className="w-3 h-3 text-gray-500" />
+            {property.propertyType || "Club Double Room"}
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Details */}
+      <CardContent className="px-4 pb-0">
+        <div className="flex items-center space-x-1 text-yellow-400 text-sm mt-1">
+          <span>★ ★ ★ ★</span>
+        </div>
+
+        <h3 className="text-base font-semibold text-gray-900 mt-1">
+          {property.propertyName || "Property Name"}
+        </h3>
+
+        <div className="flex items-center text-sm text-gray-500 mt-1 mb-2">
+          <MapPin className="w-4 h-4 mr-1 text-gray-400" />
+          <span>{property.city}, {property.state}</span>
+        </div>
+      </CardContent>
+
+      {/* Footer */}
+      <CardFooter className="px-4 pb-4 pt-0 flex items-center justify-between border-t border-gray-100">
+        <div className="text-gray-900 font-semibold text-lg mt-2">
+          ₹ {property.pricingPerNightWeekdays?.toLocaleString() || "N/A"}
+          <span className="text-sm text-gray-500 font-normal ml-1">/ night</span>
+        </div>
+
+        <Link to={`/properties/${property._id}`}>
+          <Button
+            variant="outline"
+            className="rounded-full text-sm font-medium border-gray-300 text-gray-700 hover:bg-gray-100 mt-4"
+          >
+            Reserve Now
+          </Button>
+        </Link>
+      </CardFooter>
+    </Card>
   );
 }

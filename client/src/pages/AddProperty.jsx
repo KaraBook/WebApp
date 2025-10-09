@@ -22,6 +22,7 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
 import { Button } from "../components/ui/button";
+import TagInput from "@/components/TagInput";
 
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
@@ -252,7 +253,8 @@ const AddProperty = () => {
                                             <div>
                                                 <button
                                                     type="button"
-                                                    onClick={() =>{ setCurrentStep(step.id);
+                                                    onClick={() => {
+                                                        setCurrentStep(step.id);
                                                     }}
                                                     className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-colors duration-200
                                                            ${completed
@@ -731,12 +733,11 @@ const AddProperty = () => {
                         </div>
 
                         <div className="w-[48%]">
-                            <MultiSelectButtons label="Amenities"
-                                options={amenitiesOptions}
-                                selected={formData.amenities}
-                                onChange={(selected) =>
-                                    setFormData((prev) => ({ ...prev, amenities: selected }))
-                                }
+                            <TagInput
+                                label="Amenities"
+                                values={formData.amenities}
+                                onChange={(vals) => setFormData((prev) => ({ ...prev, amenities: vals }))}
+                                placeholder="Type and press Enter to add amenities"
                             />
                         </div>
                     </>
