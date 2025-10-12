@@ -33,7 +33,7 @@ export default function DraftPropertiesPage() {
       <div className="flex justify-between items-center border-b pb-4">
         <h1 className="text-xl font-bold">Draft Properties</h1>
         <div className="flex gap-2">
-          <Button  onClick={() => navigate("/admin/properties")}>
+          <Button  onClick={() => navigate("/properties")}>
             Back to Properties
           </Button>
         </div>

@@ -156,7 +156,7 @@ const ViewProperty = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <Button onClick={() => navigate(`/admin/edit-property/${id}`)}>
+          <Button onClick={() => navigate(`/edit-property/${id}`)}>
             <Edit3 className="h-4 w-4 mr-2" />
             Edit Property
           </Button>

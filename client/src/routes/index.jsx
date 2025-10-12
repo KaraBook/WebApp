@@ -10,28 +10,28 @@ import ViewProperty from "../pages/ViewProperty";
 import DraftPropertiesPage from "@/pages/DraftPropertiesPage";
 import FinalizeMedia from "@/pages/FinalizeMedia";
 import BlockedProperties from "@/pages/BlockedProperties";
+import { BrowserRouter } from "react-router-dom";
 
 function AppRoutes() {
   return (
-    <Router>
+    <BrowserRouter basename="/admin">
       <Routes>
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/login" element={<AdminLogin />} />
 
-       
         <Route element={<ProtectedAdminRoute />}>
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="properties" element={<PropertiesPage />} />
-            <Route path="properties/blocked" element={<BlockedProperties/>}/>
+            <Route path="properties/blocked" element={<BlockedProperties />} />
             <Route path="add-property" element={<AddProperty />} />
             <Route path="edit-property/:id" element={<EditProperty />} />
-            <Route path="/admin/view-property/:id" element={<ViewProperty />} />
+            <Route path="view-property/:id" element={<ViewProperty />} />
             <Route path="properties/drafts" element={<DraftPropertiesPage />} />
-            <Route path="/admin/properties/:id/media" element={<FinalizeMedia />} />
+            <Route path="properties/:id/media" element={<FinalizeMedia />} />
           </Route>
         </Route>
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 

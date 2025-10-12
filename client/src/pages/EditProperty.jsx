@@ -225,7 +225,7 @@ const EditProperty = () => {
       });
 
       toast.success("Property updated successfully!");
-      navigate("/admin/properties");
+      navigate("/properties");
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || "Failed to update property");

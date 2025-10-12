@@ -209,7 +209,7 @@ const AddProperty = () => {
             });
 
             toast.success("Property created successfully!");
-            navigate("/admin/properties");
+            navigate("/properties");
         } catch (err) {
             const msg = err?.response?.data?.message || "Failed to upload media";
             toast.error(msg);

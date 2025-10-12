@@ -122,7 +122,7 @@ const BlockedProperties = () => {
       <div className="flex justify-between items-center border-b pb-4">
         <h1 className="text-xl font-bold">Blocked Properties</h1>
         <div className="flex gap-2">
-          <Button onClick={() => navigate("/admin/properties")}>
+          <Button onClick={() => navigate("/properties")}>
             Back to All Properties
           </Button>
         </div>
@@ -175,7 +175,7 @@ const BlockedProperties = () => {
                       <DropdownMenuContent>
                         <DropdownMenuItem
                           onSelect={() =>
-                            navigate(`/admin/view-property/${property._id}`)
+                            navigate(`/view-property/${property._id}`)
                           }
                         >
                           View

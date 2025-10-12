@@ -4,27 +4,27 @@ const sidebarMenu = [
   {
     label: "Dashboard",
     icon: LayoutDashboard, 
-    path: "/admin/dashboard",
+    path: "/dashboard",
   },
   {
     label: "Properties",
     icon: Home,
-    path: "/admin/properties",
+    path: "/properties",
     children: [
-      { label: "All Properties", path: "/admin/properties" },
-      { label: "Blocked Properties", path: "/admin/properties/blocked" },
-      { label: "Add Property", path: "/admin/add-property" },
+      { label: "All Properties", path: "/properties" },
+      { label: "Blocked Properties", path: "/properties/blocked" },
+      { label: "Add Property", path: "/add-property" },
     ],
   },
   {
     label: "Bookings",
     icon: Calendar,
-    path: "/admin/bookings",
+    path: "/bookings",
   },
   {
     label: "Users",
     icon: Users,
-    path: "/admin/users",
+    path: "/users",
   },
 ];
 

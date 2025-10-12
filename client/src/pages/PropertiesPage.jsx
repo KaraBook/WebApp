@@ -217,10 +217,10 @@ const PropertiesPage = () => {
       <div className="flex justify-between items-center border-b pb-4">
         <h1 className="text-xl font-bold">Properties</h1>
         <div className="flex gap-2">
-          <Button onClick={() => navigate("/admin/properties/drafts")}>
+          <Button onClick={() => navigate("/properties/drafts")}>
             View Drafts
           </Button>
-          <Button onClick={() => navigate("/admin/add-property")}>
+          <Button onClick={() => navigate("/add-property")}>
             Add Property
           </Button>
         </div>
@@ -318,7 +318,7 @@ const PropertiesPage = () => {
                       <DropdownMenuContent>
                         <DropdownMenuItem
                           onSelect={() =>
-                            navigate(`/admin/view-property/${property._id}`)
+                            navigate(`/view-property/${property._id}`)
                           }
                         >
                           View
@@ -327,7 +327,7 @@ const PropertiesPage = () => {
                         <DropdownMenuItem
                           disabled={property.isBlocked}
                           onSelect={() =>
-                            navigate(`/admin/edit-property/${property._id}`)
+                            navigate(`/edit-property/${property._id}`)
                           }
                         >
                           Edit

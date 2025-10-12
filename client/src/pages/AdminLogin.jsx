@@ -27,7 +27,7 @@ export default function AdminLogin() {
       localStorage.setItem("refreshToken", refreshToken)
 
       toast.success("Logged in successfully!");
-      navigate("/admin/dashboard")
+      navigate("/dashboard")
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
     }

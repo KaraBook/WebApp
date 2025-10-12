@@ -4,7 +4,7 @@ function ProtectedAdminRoute() {
   const token = localStorage.getItem("accessToken");
 
 
-  return token ? <Outlet /> : <Navigate to="/admin/login" replace />;
+  return token ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 export default ProtectedAdminRoute;
