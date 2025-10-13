@@ -3,6 +3,12 @@ import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Heart, MapPin, Users, Home, Calendar } from "lucide-react";
 import AmenitiesList from "../components/AmenitiesList";
 import { Button } from "@/components/ui/button";
@@ -13,6 +19,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { ChevronDown } from "lucide-react"
 
 export default function PropertyDetails() {
   const { id } = useParams();
@@ -365,17 +372,39 @@ export default function PropertyDetails() {
             {/* Guests */}
             <div className="mt-3">
               <label className="text-sm text-gray-600">Guests</label>
-              <select
-                value={guestCount}
-                onChange={(e) => setGuestCount(Number(e.target.value))}
-                className="mt-1 w-full border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-              >
-                {[...Array(property.maxGuests || 10)].map((_, i) => (
-                  <option key={i} value={i + 1}>
-                    {i + 1} {i === 0 ? "guest" : "guests"}
-                  </option>
-                ))}
-              </select>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="mt-1 w-full justify-between rounded-full border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-normal"
+                  >
+                    {guestCount} {guestCount === 1 ? "guest" : "guests"}
+                    <ChevronDown className="w-4 h-4 opacity-70 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent
+                  className="w-[180px] rounded-xl border border-gray-200 shadow-lg"
+                  align="start"
+                >
+                  {[...Array(property.maxGuests || 10)].map((_, i) => {
+                    const count = i + 1;
+                    return (
+                      <DropdownMenuItem
+                        key={count}
+                        onSelect={() => setGuestCount(count)}
+                        className={`text-sm ${guestCount === count
+                            ? "bg-[#efcc61]/30 text-gray-900 font-medium"
+                            : "text-gray-700"
+                          }`}
+                      >
+                        {count} {count === 1 ? "guest" : "guests"}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <Button
