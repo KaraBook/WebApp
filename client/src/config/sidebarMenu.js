@@ -13,6 +13,7 @@ const sidebarMenu = [
     children: [
       { label: "All Properties", path: "/properties" },
       { label: "Blocked Properties", path: "/properties/blocked" },
+      { label: "Draft Properties", path: "/properties/drafts" },
       { label: "Add Property", path: "/add-property" },
     ],
   },

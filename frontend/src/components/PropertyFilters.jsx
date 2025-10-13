@@ -185,7 +185,7 @@ export default function PropertyFilters({ onFilter }) {
                             showDateDisplay={false}
                             months={1}
                             direction="horizontal"
-                            className="z-[100]"
+                            className="z-10"
                         />
                     </div>
                 )}

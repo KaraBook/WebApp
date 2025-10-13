@@ -61,7 +61,7 @@ export default function Support() {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto py-0 px-4">
+    <div className="max-w-5xl mx-auto py-0 px-2">
       <h1 className="text-3xl font-semibold text-[#233b19] mb-8">Support & Help</h1>
 
       <Tabs defaultValue="contact" className="w-full">

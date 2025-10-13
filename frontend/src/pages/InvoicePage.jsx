@@ -8,6 +8,8 @@ import { useReactToPrint } from "react-to-print";
 import { format } from "date-fns";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 export default function InvoicePage() {
   const { id } = useParams();
@@ -33,36 +35,49 @@ export default function InvoicePage() {
   });
 
   const handleDownloadPDF = async () => {
-  if (!invoice || !componentRef.current) return;
+    if (!invoice || !componentRef.current) return;
 
-  const element = componentRef.current;
-  const canvas = await html2canvas(element, { scale: 2 });
-  const imgData = canvas.toDataURL("image/png");
+    const element = componentRef.current;
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
 
-  const pdf = new jsPDF("p", "mm", "a4");
-  const imgWidth = 210; // A4 width
-  const pageHeight = 297;
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  let heightLeft = imgHeight;
-  let position = 0;
+    const pdf = new jsPDF("p", "mm", "a4");
+    const imgWidth = 210; // A4 width
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 0;
 
-  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;
-
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
     pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
-  }
 
-  pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
-};
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
+  };
 
   if (!invoice) return <p className="text-center py-20 text-gray-500">Loading...</p>;
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col items-center py-10 px-4">
+    <div className="bg-gray-50 min-h-screen flex flex-col items-center py-4 px-4">
+      <div className="max-w-3xl w-full py-4 flex items-start justify-between">
+        <Link to="/account/bookings" className="bg-gray-200 text-black px-3 py-1 rounded ">
+          Back
+        </Link>
+        <Button
+          onClick={handleDownloadPDF}
+          disabled={!invoice}
+          className="flex items-center gap-2 bg-[#efcc61] disabled:opacity-50"
+        >
+          <FileDown className="w-4 h-4" />
+          Download Invoice
+        </Button>
+      </div>
       <div className="bg-white rounded-xl shadow-md p-8 max-w-3xl w-full" ref={componentRef}>
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -133,15 +148,6 @@ export default function InvoicePage() {
           <p>Terms & Conditions: Use of this website constitutes agreement with our policies.</p>
         </div>
       </div>
-
-      <Button
-  onClick={handleDownloadPDF}
-  disabled={!invoice}
-  className="mt-6 flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-50"
->
-  <FileDown className="w-4 h-4" />
-  Download Invoice
-</Button>
 
     </div>
   );

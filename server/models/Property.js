@@ -11,7 +11,11 @@ const propertySchema = new mongoose.Schema({
     required: true,
     minlength: 10,
     maxlength: 100,
-    match: [PROPERTY_NAME_REGEX, "Property name must be 10+ chars, not only digits, and can include @ # & . ,"]
+    match: [
+      /^(?!\d+$)[A-Za-z0-9 @#&.,]+$/,
+      "Property name must be 10+ chars, not only digits, and can include @ # & . ,"
+    ],
+    trim: true,
   },
 
   resortOwner: {
@@ -38,7 +42,11 @@ const propertySchema = new mongoose.Schema({
     required: true,
     minlength: 5,
     maxlength: 100,
-    match: [/^(?!^\d+$)[a-zA-Z0-9\s]+$/, "Address Line 1 must contain letters/numbers, cannot be only digits, and cannot include special characters"]
+    trim: true,
+    match: [
+      /^(?!\d+$)[A-Za-z0-9\s,.\-#/&]+$/,
+      "Address Line 1 can include letters, numbers, spaces, and , . - # / &, but cannot be only digits or contain special symbols"
+    ]
   },
   addressLine2: { type: String },
   state: {

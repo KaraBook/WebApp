@@ -4,14 +4,15 @@ const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 const PROPERTY_NAME_REGEX = /^(?!^\d+$)(?!^\s)[a-zA-Z0-9\s@#&.,]+$/;
 
 const baseFields = {
-  propertyName: Joi.string()
-    .min(10)
-    .max(100)
-    .pattern(/^(?!^\d+$)(?!^\s)[a-zA-Z0-9\s@#&.,]+$/)
-    .required()
-    .messages({
-      "string.pattern.base": "Property name must be 10+ chars, not only digits, and can include @ # & . ,"
-    }),
+ propertyName: Joi.string()
+  .trim() 
+  .min(10)
+  .max(100)
+  .pattern(/^(?!\d+$)[A-Za-z0-9 @#&.,]+$/)
+  .required()
+  .messages({
+    "string.pattern.base": "Property name must be 10+ chars, not only digits, and can include @ # & . ,"
+  }),
 
   resortOwner: Joi.object({
     firstName: Joi.string().min(2).max(50).pattern(/^[\p{L}\s.'-]+$/u).required()
@@ -30,13 +31,15 @@ const baseFields = {
   propertyType: Joi.string().valid("villa", "tent", "cottage", "hotel").required(),
   description: Joi.string().min(30).max(500).required(),
   addressLine1: Joi.string()
-    .min(5)
-    .max(100)
-    .pattern(/^(?!^\d+$)[a-zA-Z0-9\s]+$/)
-    .required()
-    .messages({
-      "string.pattern.base": "Address Line 1 must contain letters/numbers, cannot be only digits, and cannot include special characters"
-    }),
+  .trim()
+  .min(5)
+  .max(100)
+  .pattern(/^(?!\d+$)[A-Za-z0-9\s,.\-#/&]+$/)
+  .required()
+  .messages({
+    "string.pattern.base":
+      "Address Line 1 can include letters, numbers, spaces, and , . - # / &, but cannot be only digits or contain special symbols"
+  }),
   addressLine2: Joi.string().max(100).allow(""),
   state: Joi.string()
     .pattern(/^[\p{L}]+(?:[\s][\p{L}]+)*$/u)

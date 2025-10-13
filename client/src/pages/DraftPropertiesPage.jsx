@@ -6,8 +6,8 @@ import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 
 export default function DraftPropertiesPage() {
-  const navigate = useNavigate();
   const [drafts, setDrafts] = useState([]);
+   const navigate = useNavigate();
 
   const fetchDrafts = async () => {
     try {
@@ -63,7 +63,7 @@ export default function DraftPropertiesPage() {
                   <TableCell>{p.city}</TableCell>
                   <TableCell>{formatDate(p.createdAt)}</TableCell>
                   <TableCell className="flex gap-2">
-                    <Button className="bg-transparent" size="sm" variant="outline" onClick={() => navigate(`/admin/properties/${p._id}/media`)}>
+                    <Button className="bg-transparent" size="sm" variant="outline" onClick={() => navigate(`/properties/${p._id}/media`)}>
                       Continue
                     </Button>
                   </TableCell>

@@ -17,7 +17,7 @@ function Sidebar() {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     toast.success("Logged out successfully!");
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   return (

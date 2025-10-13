@@ -101,10 +101,10 @@ export default function Checkout() {
                 handler: async (response) => {
                     await Axios.post(SummaryApi.verifyBookingPayment.url, response);
                     toast.success("Payment successful!");
-                    navigate("/my-bookings");
+                    navigate("/account/bookings/");
                 },
                 prefill: { contact },
-                theme: { color: "#233b19" },
+                theme: { color: "#efcc61" },
             };
 
             const rzp = new window.Razorpay(options);
@@ -219,7 +219,7 @@ export default function Checkout() {
                 <Button
                     onClick={handlePayment}
                     disabled={contact.length !== 10}
-                    className="w-full bg-[#233b19] text-white rounded-full py-3 text-lg hover:bg-[#1b2d15]"
+                    className="w-full bg-[#efcc61] text-black rounded-full py-3 text-lg hover:bg-[#efcc61]"
                 >
                     Pay Now
                 </Button>

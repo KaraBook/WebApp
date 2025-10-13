@@ -32,10 +32,12 @@ import {
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 
+// ✅ Added “Featured Properties” option
 const filterOptions = [
   { label: "All Properties", value: "all" },
   { label: "Blocked Properties", value: "blocked" },
   { label: "Published Properties", value: "published" },
+  { label: "Featured Properties", value: "featured" },
 ];
 
 const PropertiesPage = () => {
@@ -87,27 +89,26 @@ const PropertiesPage = () => {
   };
 
   const toggleBlock = async (property) => {
-  const id = property._id;
-  const current = properties.find((p) => String(p._id) === String(id));
-  const isCurrentlyBlocked = current?.isBlocked;
+    const id = property._id;
+    const current = properties.find((p) => String(p._id) === String(id));
+    const isCurrentlyBlocked = current?.isBlocked;
 
-  try {
-    const res = await Axios({
-      method: "put",
-      url: isCurrentlyBlocked
-        ? SummaryApi.toggleUnblock(id).url
-        : SummaryApi.toggleBlock(id).url,
-      data: { reason: isCurrentlyBlocked ? "" : "Admin blocked property" },
-    });
+    try {
+      const res = await Axios({
+        method: "put",
+        url: isCurrentlyBlocked
+          ? SummaryApi.toggleUnblock(id).url
+          : SummaryApi.toggleBlock(id).url,
+        data: { reason: isCurrentlyBlocked ? "" : "Admin blocked property" },
+      });
 
-    if (res.data?.data) {
-      updatePropertyInState(id, res.data.data);
+      if (res.data?.data) {
+        updatePropertyInState(id, res.data.data);
+      }
+    } catch (err) {
+      console.error("Toggle block error:", err);
     }
-  } catch (err) {
-    console.error("Toggle block error:", err);
-  }
-};
-
+  };
 
   const toggleFeatured = async (property) => {
     const id = property._id;
@@ -193,23 +194,34 @@ const PropertiesPage = () => {
   };
 
   const renderStatusDot = (property) => {
-    let color = "bg-gray-400"; 
+    let color = "bg-gray-400";
 
     if (property.isBlocked) {
-      color = "bg-red-300"; 
-    
+      color = "bg-red-300";
     } else if (property.publishNow) {
-      color = "bg-green-300"; 
+      color = "bg-green-300";
     }
 
     return (
       <div className="flex items-center gap-2">
-        <span
-          className={`inline-block w-4 h-4 rounded-full ${color}`}
-        ></span>
+        <span className={`inline-block w-4 h-4 rounded-full ${color}`}></span>
       </div>
     );
   };
+
+  // ✅ Filter logic (keeps UI identical)
+  const filteredProperties = useMemo(() => {
+    switch (selectedFilter) {
+      case "blocked":
+        return properties.filter((p) => p.isBlocked);
+      case "published":
+        return properties.filter((p) => p.publishNow && !p.isBlocked);
+      case "featured":
+        return properties.filter((p) => p.featured && !p.isBlocked);
+      default:
+        return properties;
+    }
+  }, [properties, selectedFilter]);
 
   return (
     <>
@@ -228,7 +240,12 @@ const PropertiesPage = () => {
 
       {/* Filter */}
       <div className="mt-4 flex justify-between items-center">
-        <h2>All Properties</h2>
+        <h2>
+          {
+            filterOptions.find((o) => o.value === selectedFilter)?.label ||
+            "All Properties"
+          }
+        </h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -274,7 +291,7 @@ const PropertiesPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {properties.map((property, index) => (
+              {filteredProperties.map((property, index) => (
                 <TableRow key={property._id}>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>{property.propertyName}</TableCell>
@@ -285,12 +302,9 @@ const PropertiesPage = () => {
                   <TableCell>{property.city}</TableCell>
                   <TableCell>₹{property.pricingPerNightWeekdays}</TableCell>
 
-                  {/* Status with dot */}
                   <TableCell>{renderStatusDot(property)}</TableCell>
-
                   <TableCell>{property.featured ? "Yes" : "No"}</TableCell>
 
-                  {/* Publish toggle */}
                   <TableCell>
                     <Switch
                       checked={property.publishNow}
@@ -302,7 +316,6 @@ const PropertiesPage = () => {
                   <TableCell>{formatDate(property.createdAt)}</TableCell>
                   <TableCell>{formatDate(property.updatedAt)}</TableCell>
 
-                  {/* Dropdown Actions */}
                   <TableCell>
                     <DropdownMenu
                       open={openDropdownId === property._id}
@@ -366,6 +379,13 @@ const PropertiesPage = () => {
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredProperties.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={12} className="text-center py-8">
+                    No properties found
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
@@ -386,7 +406,10 @@ const PropertiesPage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent" onClick={closeConfirm}>
+            <AlertDialogCancel
+              className="bg-transparent"
+              onClick={closeConfirm}
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={onConfirmAction}>

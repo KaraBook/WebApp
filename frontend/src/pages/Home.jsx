@@ -10,7 +10,6 @@ export default function Home() {
   const [properties, setProperties] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch featured properties for the scrolling section
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
@@ -37,9 +36,8 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* ---------- HERO BANNER ---------- */}
-      <section className="relative w-full h-[90vh] flex items-center justify-center overflow-hidden">
+    <div className="flex flex-col min-h-screen relative">
+      <section className="relative w-full h-[90vh] flex items-center justify-center">
         <img
           src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=80"
           alt="Banner"
@@ -60,17 +58,17 @@ export default function Home() {
           </p>
         </motion.div>
 
-        {/* Filter Box (overlapping bottom) */}
-        <div className="absolute bottom-[20px] w-full flex justify-center px-4">
+        
+        <div className="absolute bottom-[20px] w-full flex justify-center px-4 z-10">
           <div className="max-w-6xl w-full">
             <PropertyFilters onFilter={handleFilter} />
           </div>
         </div>
       </section>
 
-      {/* ---------- DISCOVER SECTION ---------- */}
+      
       <section className="bg-white py-32 px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-10 max-w-7xl mx-auto">
-        {/* Left Text */}
+        
         <div className="lg:w-1/3 text-center lg:text-left">
           <h2 className="text-3xl md:text-4xl font-bold text-[#233b19] mb-3">
             Explore Handpicked Resorts
@@ -86,7 +84,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Right Scroll Section */}
         <div className="lg:w-2/3 relative overflow-hidden">
           <div className="flex gap-4 animate-scroll">
             {[...properties, ...properties].map((property, i) => (

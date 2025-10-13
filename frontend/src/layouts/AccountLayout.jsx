@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import Header from "@/components/Header";
 import Sidebar from "@/components/accounts/Sidebar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ export default function AccountLayout() {
 
   return (
     <div className="min-h-screen flex flex-col">
-    
+
       <div className="md:hidden flex items-center gap-2 px-4 py-2 border-b bg-background">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
@@ -32,8 +31,9 @@ export default function AccountLayout() {
       </div>
 
       <div className="flex flex-1">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto ">
+        <Sidebar className="sticky top-0 h-screen" />
+
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto bg-white">
           <Outlet />
         </main>
       </div>
