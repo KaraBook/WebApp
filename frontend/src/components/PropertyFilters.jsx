@@ -104,7 +104,7 @@ export default function PropertyFilters({ onFilter }) {
     };
 
     return (
-        <div className="w-full bg-white shadow-xl rounded-full px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[50] border border-gray-100">
+        <div className="w-full bg-white shadow-xl rounded-full px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[999999] border border-gray-100">
             {/* State */}
             <div className="flex-1 min-w-[180px] z-10">
                 <label className="text-xs text-gray-500 uppercase ml-4">State</label>
@@ -174,7 +174,7 @@ export default function PropertyFilters({ onFilter }) {
                     <Calendar className="w-4 h-4 text-gray-500" />
                 </div>
                 {showCalendar && (
-                    <div className="absolute top-[71px] left-0 bg-white p-3 rounded-2xl shadow-2xl border border-gray-100 z-50">
+                    <div className="absolute top-[71px] left-0 bg-white p-3 rounded-2xl shadow-2xl border border-gray-100 z-[999999]">
                         <DateRange
                             ranges={dateRange}
                             onChange={(item) => setDateRange([item.selection])}

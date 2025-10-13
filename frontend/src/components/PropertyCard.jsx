@@ -38,21 +38,21 @@ export default function PropertyCard({ property }) {
   return (
     <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
       {/* Outer padding to create space around image */}
-      <div className="p-2">
-        <div className="relative overflow-hidden rounded-xl">
+      <div className="p-2 relative">
+        <div className="relative rounded-xl">
           {/* Property image */}
           <img
             src={property.coverImage}
             alt={property.propertyName}
-            className="w-full z-[9] max-h-[200px] object-cover transition-transform duration-500 hover:scale-105"
+            className="w-full max-h-[200px] object-cover transition-transform duration-500 hover:scale-105 rounded-xl"
           />
 
           {/* Wishlist heart */}
           <button
             onClick={toggleWishlist}
             className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 shadow-sm ${inWishlist
-                ? "bg-red-500 text-white"
-                : "bg-white text-gray-700 hover:bg-gray-100"
+              ? "bg-red-500 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
           >
             <Heart
@@ -72,21 +72,22 @@ export default function PropertyCard({ property }) {
       {/* Details */}
       <CardContent className="px-4 pb-0">
         {/* Ratings */}
-        <div className="flex items-center text-yellow-400 text-sm mt-1">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <span key={i}>
-              {i < Math.round(property.averageRating || 0) ? "★" : "☆"}
+        <div className="flex justify-between items-center">
+          <h3 className="text-base font-semibold text-gray-900 mt-1">
+            {property.propertyName || "Property Name"}
+          </h3>
+
+          <div className="flex items-center text-yellow-400 text-sm mt-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i}>
+                {i < Math.round(property.averageRating || 0) ? "★" : "☆"}
+              </span>
+            ))}
+            <span className="text-gray-500 text-xs ml-1">
+              {property.averageRating ? property.averageRating.toFixed(1) : " 0.0"}
             </span>
-          ))}
-          <span className="text-gray-500 text-xs ml-1">
-            {property.averageRating ? property.averageRating.toFixed(1) : "—"}
-          </span>
+          </div>
         </div>
-
-
-        <h3 className="text-base font-semibold text-gray-900 mt-1">
-          {property.propertyName || "Property Name"}
-        </h3>
 
         <div className="flex items-center text-sm text-gray-500 mt-1 mb-2">
           <MapPin className="w-4 h-4 mr-1 text-gray-400" />

@@ -37,7 +37,7 @@ export default function Properties() {
           alt="Properties Banner"
           className="w-full h-72 object-cover"
         />
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-12 w-full max-w-5xl px-4">
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-12 w-full max-w-5xl px-4 z-[99999]">
           <PropertyFilters onFilter={fetchProperties} />
         </div>
       </div>
