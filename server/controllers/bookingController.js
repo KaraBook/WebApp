@@ -1,8 +1,11 @@
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import Booking from "../models/Booking.js";
+import { sendMail } from "../utils/mailer.js";
+import { bookingConfirmationTemplate } from "../utils/emailTemplates.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
+import { sendWhatsAppText } from "../utils/whatsapp.js";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -58,16 +61,62 @@ export const verifyPayment = async (req, res) => {
         { orderId: razorpay_order_id },
         { paymentStatus: "paid", paymentId: razorpay_payment_id },
         { new: true }
-      );
+      )
+        .populate("userId", "firstName lastName email mobile") // 👈 include mobile here
+        .populate("propertyId", "propertyName city state");
+
+      if (booking && booking.userId?.email) {
+        const mailData = bookingConfirmationTemplate({
+          travellerName: `${booking.userId.firstName} ${booking.userId.lastName}`,
+          propertyName: booking.propertyId.propertyName,
+          checkIn: booking.checkIn,
+          checkOut: booking.checkOut,
+          totalAmount: booking.totalAmount,
+          bookingId: booking._id,
+          nights: booking.totalNights,
+          guests: booking.guests,
+          portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
+        });
+
+        try {
+          await sendMail({
+            to: booking.userId.email,
+            subject: mailData.subject,
+            html: mailData.html,
+          });
+          console.log(`📩 Booking confirmation mail sent to ${booking.userId.email}`);
+        } catch (mailErr) {
+          console.error("Failed to send booking confirmation mail:", mailErr);
+        }
+      }
+
+      try {
+        if (booking?.userId?.mobile) {
+          const msg = `🎉 *Booking Confirmed!*\n\nDear ${booking.userId.firstName}, your stay at *${booking.propertyId.propertyName}* is confirmed!\n\n📅 *Check-in:* ${new Date(
+            booking.checkIn
+          ).toLocaleDateString("en-IN")}\n📅 *Check-out:* ${new Date(
+            booking.checkOut
+          ).toLocaleDateString("en-IN")}\n👥 *Guests:* ${booking.guests}\n📍 *Location:* ${booking.propertyId.city}, ${booking.propertyId.state}\n💰 *Total:* ₹${booking.totalAmount.toLocaleString(
+            "en-IN"
+          )}\n\nYou can view your booking here:\n${process.env.PORTAL_URL}/traveller/bookings/${booking._id}\n\nThank you for booking with *${booking.propertyId.propertyName}*! 🏡`;
+
+          await sendWhatsAppText(booking.userId.mobile, msg);
+          console.log(`📱 WhatsApp confirmation sent to ${booking.userId.mobile}`);
+        }
+      } catch (waErr) {
+        console.error("Failed to send WhatsApp message:", waErr);
+      }
+
       return res.json({ success: true, message: "Payment verified", booking });
     } else {
-      res.status(400).json({ success: false, message: "Invalid signature" });
+      return res.status(400).json({ success: false, message: "Invalid signature" });
     }
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Verification failed" });
   }
 };
+
 
 
 export const getBookedDates = async (req, res) => {
@@ -95,12 +144,12 @@ export const getUserBookings = async (req, res) => {
   try {
     const userId = req.user.id;
     const bookings = await Booking.find({ userId })
-      .populate("propertyId")  
+      .populate("propertyId")
       .sort({ createdAt: -1 });
 
     const formatted = bookings.map((b) => ({
       ...b._doc,
-      property: b.propertyId,  
+      property: b.propertyId,
     }));
 
     res.json({ success: true, data: formatted });
