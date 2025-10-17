@@ -16,7 +16,7 @@ import MultiSelectButtons from "../components/MultiSelectButtons";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { QuantityBox } from "@/components/QuantityBox";
 import { Check } from "lucide-react";
-import { propertyTypeOptions, roomTypeOptions, foodOptions, amenitiesOptions, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions } from "../constants/dropdownOptions";
+import { propertyTypeOptions, roomTypeOptions, foodOptions, amenitiesOptions, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions, petFriendlyOptions } from "../constants/dropdownOptions";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
@@ -75,6 +75,7 @@ const AddProperty = () => {
         gstin: "",
         kycVerified: false,
         featured: false,
+        petFriendly: false,
         approvalStatus: "pending",
         publishNow: false,
         internalNotes: "",
@@ -143,6 +144,7 @@ const AddProperty = () => {
             gstin: formData.gstin ? formData.gstin.toUpperCase().trim() : "",
             kycVerified: !!formData.kycVerified,
             publishNow: !!formData.publishNow,
+            petFriendly: !!formData.petFriendly,
             featured: !!formData.featured,
             approvalStatus: formData.approvalStatus,
             internalNotes: formData.internalNotes,
@@ -712,6 +714,21 @@ const AddProperty = () => {
                                     max={999}
                                 />
                             </div>
+                        </div>
+
+                         <div className="w-[48%]">
+                            <SingleSelectDropdown
+                                label="Is this proprty Pet Friendly?"
+                                value={formData.petFriendly}
+                                options={petFriendlyOptions}
+                                onChange={(val) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        petFriendly: val,
+                                    }))
+                                }
+                                placeholder="Select Option"
+                            />
                         </div>
 
 

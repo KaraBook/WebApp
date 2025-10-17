@@ -62,6 +62,7 @@ const propertySchema = new mongoose.Schema({
   pinCode: { type: String, required: true },
   locationLink: { type: String, required: true, unique: true },
   totalRooms: { type: Number, required: true },
+  petFriendly: { type: Boolean, required: true, default: false },
   maxGuests: { type: Number, required: true },
   roomTypes: { type: [String], default: [] },
   pricingPerNightWeekdays: { type: Number, required: true },

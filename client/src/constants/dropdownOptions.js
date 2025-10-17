@@ -59,3 +59,8 @@ export const formSteps = [
   { id: 5, title: "Legal & Admin" },
   { id: 6, title: "Media Uploads" }
 ];
+
+export const petFriendlyOptions = [
+  { label: "Yes", value: true },
+  { label: "No", value: false },
+];

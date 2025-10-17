@@ -58,6 +58,7 @@ const baseFields = {
   totalRooms: Joi.number().min(1).max(999).required(),
   maxGuests: Joi.number().min(1).max(999).required(),
   roomTypes: Joi.array().items(Joi.string()),
+  petFriendly: Joi.boolean().required(),
   pricingPerNightWeekdays: Joi.number().min(10).max(999999).required(),
   pricingPerNightWeekend: Joi.number().min(10).max(999999).required(),
   extraGuestCharge: Joi.number().min(0).max(9999).optional(),
