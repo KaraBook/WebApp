@@ -47,17 +47,16 @@ export default function PropertyCard({ property }) {
 
   return (
     <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-      {/* Outer padding to create space around image */}
+
       <div className="p-2 relative">
         <div className="relative rounded-xl">
-          {/* Property image */}
+
           <img
             src={property.coverImage}
             alt={property.propertyName}
             className="w-full max-h-[200px] object-cover transition-transform duration-500 hover:scale-105 rounded-xl"
           />
 
-          {/* Wishlist heart */}
           <button
             onClick={toggleWishlist}
             className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 shadow-sm ${inWishlist
@@ -71,7 +70,6 @@ export default function PropertyCard({ property }) {
             />
           </button>
 
-          {/* Property type badge */}
           <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-gray-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
             <Home className="w-3 h-3 text-gray-500" />
             {property.propertyType || "Club Double Room"}
@@ -79,9 +77,7 @@ export default function PropertyCard({ property }) {
         </div>
       </div>
 
-      {/* Details */}
       <CardContent className="px-4 pb-0">
-        {/* Ratings */}
         <div className="flex justify-between items-center">
           <h3 className="text-base font-semibold text-gray-900 mt-1">
             {property.propertyName || "Property Name"}
@@ -105,7 +101,6 @@ export default function PropertyCard({ property }) {
         </div>
       </CardContent>
 
-      {/* Footer */}
       <CardFooter className="px-4 pb-4 pt-0 flex items-center justify-between border-t border-gray-100">
         <div className="text-gray-900 font-semibold text-lg mt-2">
           ₹ {property.pricingPerNightWeekdays?.toLocaleString() || "N/A"}

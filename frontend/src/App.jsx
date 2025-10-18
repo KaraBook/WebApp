@@ -3,6 +3,7 @@ import { useAuthStore } from "@/store/auth";
 import Header from "@/components/Header";
 import PhoneLoginModal from "@/components/PhoneLoginModal";
 import AppRoutes from "@/routes";
+import { Toaster } from "sonner";
 
 export default function App() {
   const { init, loginModalOpen, showAuthModal, hideAuthModal, user } = useAuthStore();
@@ -31,6 +32,7 @@ export default function App() {
         <AppRoutes />
       </main>
       <PhoneLoginModal open={loginModalOpen} onOpenChange={(o) => (o ? showAuthModal() : hideAuthModal())} />
+      <Toaster richColors position="top-center" />
     </div>
   );
 }
