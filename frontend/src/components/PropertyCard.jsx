@@ -17,32 +17,46 @@ export default function PropertyCard({ property }) {
   );
 
   const toggleWishlist = async () => {
-  if (!user) {
-    showAuthModal();
-    return;
-  }
-
-  try {
-    const res = await Axios.post(
-      SummaryApi.toggleWishlist.url,
-      { propertyId: property._id },
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-
-    const updated = res.data.data.properties.map((id) => id.toString());
-    setWishlist(updated);
-
-    const isAdded = updated.includes(property._id);
-
-    if (isAdded) {
-      toast.success("Added to wishlist ❤️");
-    } else {
-      toast.success("Removed from wishlist 🗑️");
+    if (!user) {
+      showAuthModal();
+      return;
     }
-  } catch (err) {
-    toast.error("Failed to update wishlist");
-  }
-};
+
+    try {
+      const res = await Axios.post(
+        SummaryApi.toggleWishlist.url,
+        { propertyId: property._id },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+
+      const updated = res.data.data.properties.map((id) => id.toString());
+      setWishlist(updated);
+
+      const isAdded = updated.includes(property._id);
+
+      if (isAdded) {
+        toast.success("Added to wishlist ❤️", {
+          icon: "💛",
+          style: {
+            background: "#fffbea",
+            color: "#1f2937",
+            border: "1px solid #f8e08e",
+          },
+        });
+      } else {
+        toast.success("Removed from wishlist 🗑️", {
+          icon: "🗑️",
+          style: {
+            background: "#fff5f5",
+            color: "#1f2937",
+            border: "1px solid #f5b5b5",
+          },
+        });
+      }
+    } catch (err) {
+      toast.error("Failed to update wishlist");
+    }
+  };
 
 
   return (
