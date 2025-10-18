@@ -39,7 +39,6 @@ const AddProperty = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
-    // NEW: keep the draft id we get after step 7
     const [propertyId, setPropertyId] = useState(null);
 
     const [formData, setFormData] = useState({

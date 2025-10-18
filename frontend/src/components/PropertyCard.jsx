@@ -17,23 +17,33 @@ export default function PropertyCard({ property }) {
   );
 
   const toggleWishlist = async () => {
-    if (!user) {
-      showAuthModal();
-      return;
+  if (!user) {
+    showAuthModal();
+    return;
+  }
+
+  try {
+    const res = await Axios.post(
+      SummaryApi.toggleWishlist.url,
+      { propertyId: property._id },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    const updated = res.data.data.properties.map((id) => id.toString());
+    setWishlist(updated);
+
+    const isAdded = updated.includes(property._id);
+
+    if (isAdded) {
+      toast.success("Added to wishlist ❤️");
+    } else {
+      toast.success("Removed from wishlist 🗑️");
     }
-    try {
-      const res = await Axios.post(
-        SummaryApi.toggleWishlist.url,
-        { propertyId: property._id },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      const updated = res.data.data.properties.map((id) => id.toString());
-      setWishlist(updated);
-      toast.success(res.data.message);
-    } catch (err) {
-      toast.error("Failed to update wishlist");
-    }
-  };
+  } catch (err) {
+    toast.error("Failed to update wishlist");
+  }
+};
+
 
   return (
     <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
