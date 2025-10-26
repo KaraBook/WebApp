@@ -35,9 +35,9 @@ export default function PropertyCard({ property }) {
     const isAdded = updated.includes(property._id);
 
     if (isAdded) {
-      toast.success("Added to wishlist ❤️");
+      toast.success("Added to wishlist");
     } else {
-      toast.success("Removed from wishlist 🗑️");
+      toast.success("Removed from wishlist");
     }
   } catch (err) {
     toast.error("Failed to update wishlist");

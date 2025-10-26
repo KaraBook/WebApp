@@ -20,37 +20,37 @@ export default function PropertyGallery({ images = [] }) {
           <img
             src={main}
             alt="Main"
-            className="w-full h-[300px] object-cover rounded-3xl"
+            className="w-full h-[300px] object-cover rounded-[15px]"
           />
         )}
 
         {count === 2 && (
           <div className="grid grid-cols-2 gap-2">
-            <img src={main} className="h-[300px] w-full object-cover rounded-l-3xl" />
-            <img src={second} className="h-[300px] w-full object-cover rounded-r-3xl" />
+            <img src={main} className="h-[300px] w-full object-cover rounded-l-[15px]" />
+            <img src={second} className="h-[300px] w-full object-cover rounded-r-[15px]" />
           </div>
         )}
 
         {count === 3 && (
           <div className="grid grid-cols-2 gap-2">
-            <img src={main} className="h-[300px] w-full object-cover rounded-l-3xl" />
+            <img src={main} className="h-[300px] w-full object-cover rounded-l-[15px]" />
             <div className="grid gap-2">
               <img src={second} className="h-[145px] w-full object-cover" />
-              <img src={third} className="h-[145px] w-full object-cover rounded-r-3xl" />
+              <img src={third} className="h-[145px] w-full object-cover rounded-r-[15px]" />
             </div>
           </div>
         )}
 
         {count > 3 && (
           <div className="grid grid-cols-2 gap-2">
-            <img src={main} className="h-[300px] w-full object-cover rounded-l-3xl" />
+            <img src={main} className="h-[300px] w-full object-cover rounded-l-[15px]" />
             <div className="grid grid-cols-2 gap-2 relative">
               {images.slice(1, 5).map((img, i) => (
                 <img
                   key={i}
                   src={img}
                   className={`object-cover h-[145px] w-full ${
-                    i === 3 ? "rounded-r-3xl" : ""
+                    i === 3 ? "rounded-r-[15px]" : ""
                   }`}
                 />
               ))}
