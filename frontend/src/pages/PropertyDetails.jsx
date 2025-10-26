@@ -193,7 +193,6 @@ export default function PropertyDetails() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Title Row */}
       <div className="flex items-center justify-between mb-2 pr-6">
         <h1 className="text-3xl font-bold text-[#233b19]">{property.propertyName}</h1>
         <button
@@ -207,23 +206,17 @@ export default function PropertyDetails() {
         </button>
       </div>
 
-      {/* Sub-info */}
       <div className="text-gray-600 text-sm mb-6">
         {property.maxGuests} guests · {property.totalRooms} rooms ·{" "}
         {property.roomTypes?.join(", ")}
       </div>
 
-      {/* Gallery */}
       {renderGallery()}
 
-      {/* Main Grid */}
       <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left column */}
         <div className="lg:col-span-2">
-          {/* Description */}
           <p className="text-gray-700 leading-relaxed mb-6">{property.description}</p>
 
-          {/* Amenities */}
           <div className="border-t pt-6 mt-6">
             <h2 className="text-xl font-semibold text-[#233b19] flex items-center gap-2 mb-3">
               <Home className="w-5 h-5" /> Amenities

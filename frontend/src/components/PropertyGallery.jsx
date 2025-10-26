@@ -6,12 +6,12 @@ export default function PropertyGallery({ images = [] }) {
   const [showModal, setShowModal] = useState(false);
   if (!images.length) return null;
 
-  // Layout logic based on image count
   const count = images.length;
   const main = images[0];
   const second = images[1];
   const third = images[2];
   const rest = images.slice(3, 5);
+
 
   return (
     <>
@@ -49,13 +49,13 @@ export default function PropertyGallery({ images = [] }) {
                 <img
                   key={i}
                   src={img}
-                  className={`object-cover h-[145px] w-full ${
+                  className={`object-cover h-[145px] w-full pointer-events-none ${
                     i === 3 ? "rounded-r-[15px]" : ""
                   }`}
                 />
               ))}
               <button
-                onClick={() => setShowModal(true)}
+                onClick={() => alert("Clicked!")}
                 className="absolute bottom-4 right-4 bg-white text-gray-800 font-medium px-4 py-2 rounded-full shadow hover:bg-gray-100 transition"
               >
                 Show all photos
@@ -64,7 +64,7 @@ export default function PropertyGallery({ images = [] }) {
           </div>
         )}
       </div>
-
+      
       {showModal && (
         <PropertyGalleryModal images={images} onClose={() => setShowModal(false)} />
       )}

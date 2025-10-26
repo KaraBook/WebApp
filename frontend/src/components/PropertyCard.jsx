@@ -50,12 +50,13 @@ export default function PropertyCard({ property }) {
 
       <div className="p-2 relative">
         <div className="relative rounded-xl">
-
+         <Link to={`/properties/${property._id}`}>
           <img
             src={property.coverImage}
             alt={property.propertyName}
             className="w-full max-h-[200px] object-cover transition-transform duration-500 hover:scale-105 rounded-xl"
           />
+          </Link>
 
           <button
             onClick={toggleWishlist}
@@ -79,9 +80,11 @@ export default function PropertyCard({ property }) {
 
       <CardContent className="px-4 pb-0">
         <div className="flex justify-between items-center">
+          <Link to={`/properties/${property._id}`}>
           <h3 className="text-base font-semibold text-gray-900 mt-1">
             {property.propertyName || "Property Name"}
           </h3>
+          </Link>
 
           <div className="flex items-center text-yellow-400 text-sm mt-1">
             {Array.from({ length: 5 }).map((_, i) => (
