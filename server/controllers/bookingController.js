@@ -180,7 +180,7 @@ export const getBookingInvoice = async (req, res) => {
       propertyState: booking.propertyId.state,
       checkIn: booking.checkIn,
       checkOut: booking.checkOut,
-      nights: booking.nights,
+      nights: booking.totalNights,
       guests: booking.guests,
       totalAmount: booking.totalAmount,
       paymentStatus: booking.paymentStatus,
@@ -193,7 +193,7 @@ export const getBookingInvoice = async (req, res) => {
       priceBreakdown: [
         {
           description: "Room Charges",
-          rate: `₹${booking.propertyId.pricingPerNightWeekdays.toLocaleString()} × ${booking.nights} Nights`,
+          rate: `₹${booking.propertyId.pricingPerNightWeekdays.toLocaleString()} × ${booking.totalNights} Nights`,
           total: `₹${booking.totalAmount.toLocaleString()}`,
         },
       ],
