@@ -104,10 +104,13 @@ const BookingsPage = () => {
     const shortId = (id = "") => `#${String(id).slice(-6).toUpperCase()}`;
 
     const statusBadge = (status) => {
-        const common = "rounded-full";
-        if (status === "paid") return <Badge className={`${common} bg-green-100 text-green-700`}>Paid</Badge>;
-        if (status === "failed") return <Badge className={`${common} bg-red-100 text-red-700`}>Failed</Badge>;
-        return <Badge className={`${common} bg-yellow-100 text-yellow-800`}>Pending</Badge>;
+        const common = "rounded-full px-3 py-0.5 text-xs font-medium";
+
+        if (status === "paid")
+            return <Badge className={`${common} !bg-green-100 !text-green-700`}>Paid</Badge>;
+        if (status === "failed")
+            return <Badge className={`${common} !bg-red-100 !text-red-700`}>Failed</Badge>;
+        return <Badge className={`${common} !bg-yellow-100 !text-yellow-800`}>Pending</Badge>;
     };
 
     const statusDot = (status) => {
