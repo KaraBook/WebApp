@@ -62,7 +62,7 @@ export const verifyPayment = async (req, res) => {
         { paymentStatus: "paid", paymentId: razorpay_payment_id },
         { new: true }
       )
-        .populate("userId", "firstName lastName email mobile") // 👈 include mobile here
+        .populate("userId", "firstName lastName email mobile") 
         .populate("propertyId", "propertyName city state");
 
       if (booking && booking.userId?.email) {

@@ -32,7 +32,6 @@ import {
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 
-// ✅ Added “Featured Properties” option
 const filterOptions = [
   { label: "All Properties", value: "all" },
   { label: "Blocked Properties", value: "blocked" },
@@ -44,22 +43,18 @@ const PropertiesPage = () => {
   const navigate = useNavigate();
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [properties, setProperties] = useState([]);
-
-  const [confirm, setConfirm] = useState({
-    open: false,
-    type: null,
-    property: null,
-  });
-
+  const [confirm, setConfirm] = useState({ open: false, type: null, property: null });
   const [openDropdownId, setOpenDropdownId] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const openConfirm = (type, property) => {
     setOpenDropdownId(null);
     setConfirm({ open: true, type, property });
   };
 
-  const closeConfirm = () =>
-    setConfirm({ open: false, type: null, property: null });
+  const closeConfirm = () => setConfirm({ open: false, type: null, property: null });
 
   const fetchProperties = async () => {
     try {
@@ -83,9 +78,7 @@ const PropertiesPage = () => {
   };
 
   const updatePropertyInState = (id, updated) => {
-    setProperties((prev) =>
-      prev.map((p) => (String(p._id) === String(id) ? updated : p))
-    );
+    setProperties((prev) => prev.map((p) => (String(p._id) === String(id) ? updated : p)));
   };
 
   const toggleBlock = async (property) => {
@@ -101,10 +94,7 @@ const PropertiesPage = () => {
           : SummaryApi.toggleBlock(id).url,
         data: { reason: isCurrentlyBlocked ? "" : "Admin blocked property" },
       });
-
-      if (res.data?.data) {
-        updatePropertyInState(id, res.data.data);
-      }
+      if (res.data?.data) updatePropertyInState(id, res.data.data);
     } catch (err) {
       console.error("Toggle block error:", err);
     }
@@ -114,9 +104,7 @@ const PropertiesPage = () => {
     const id = property._id;
     try {
       const res = await Axios.put(SummaryApi.toggleFeatured(id).url);
-      if (res.data?.data) {
-        updatePropertyInState(id, res.data.data);
-      }
+      if (res.data?.data) updatePropertyInState(id, res.data.data);
     } catch (err) {
       console.error("Toggle feature error:", err);
     }
@@ -126,9 +114,7 @@ const PropertiesPage = () => {
     const id = property._id;
     try {
       const res = await Axios.put(SummaryApi.togglePublish(id).url);
-      if (res.data?.data) {
-        updatePropertyInState(id, res.data.data);
-      }
+      if (res.data?.data) updatePropertyInState(id, res.data.data);
     } catch (err) {
       console.error("Toggle publish error:", err);
     }
@@ -136,54 +122,40 @@ const PropertiesPage = () => {
 
   const confirmTitle = useMemo(() => {
     if (!confirm.property) return "";
-    const current = properties.find(
-      (p) => String(p._id) === String(confirm.property?._id)
-    );
+    const current = properties.find((p) => String(p._id) === String(confirm.property?._id));
     if (!current) return "";
-
-    if (confirm.type === "block") {
+    if (confirm.type === "block")
       return current.isBlocked ? "Unblock Property" : "Block Property";
-    }
-    if (confirm.type === "feature") {
+    if (confirm.type === "feature")
       return current.featured ? "Unfeature Property" : "Feature Property";
-    }
-    if (confirm.type === "publish") {
+    if (confirm.type === "publish")
       return current.publishNow ? "Unpublish Property" : "Publish Property";
-    }
     return "";
   }, [confirm, properties]);
 
   const confirmDescription = useMemo(() => {
     if (!confirm.property) return "";
-    const current = properties.find(
-      (p) => String(p._id) === String(confirm.property?._id)
-    );
+    const current = properties.find((p) => String(p._id) === String(confirm.property?._id));
     if (!current) return "";
-
-    if (confirm.type === "block") {
+    if (confirm.type === "block")
       return current.isBlocked
         ? "This will make the property available to edit and publish again."
         : "This will block the property. It will not be visible or editable by the owner.";
-    }
-    if (confirm.type === "feature") {
+    if (confirm.type === "feature")
       return current.featured
         ? "This will remove the property from featured listings."
         : "This will add the property to featured listings.";
-    }
-    if (confirm.type === "publish") {
+    if (confirm.type === "publish")
       return current.publishNow
         ? "This will unpublish the property. It will be hidden from public listings."
         : "This will publish the property and make it visible publicly.";
-    }
     return "";
   }, [confirm, properties]);
 
   const onConfirmAction = async () => {
     if (!confirm.property) return;
     const p = properties.find((x) => x._id === confirm.property._id);
-
     closeConfirm();
-
     try {
       if (confirm.type === "block") await toggleBlock(p);
       if (confirm.type === "feature") await toggleFeatured(p);
@@ -195,13 +167,8 @@ const PropertiesPage = () => {
 
   const renderStatusDot = (property) => {
     let color = "bg-gray-400";
-
-    if (property.isBlocked) {
-      color = "bg-red-300";
-    } else if (property.publishNow) {
-      color = "bg-green-300";
-    }
-
+    if (property.isBlocked) color = "bg-red-300";
+    else if (property.publishNow) color = "bg-green-300";
     return (
       <div className="flex items-center gap-2">
         <span className={`inline-block w-4 h-4 rounded-full ${color}`}></span>
@@ -209,7 +176,6 @@ const PropertiesPage = () => {
     );
   };
 
-  // ✅ Filter logic (keeps UI identical)
   const filteredProperties = useMemo(() => {
     switch (selectedFilter) {
       case "blocked":
@@ -223,28 +189,27 @@ const PropertiesPage = () => {
     }
   }, [properties, selectedFilter]);
 
+  const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+  const paginatedProperties = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredProperties.slice(startIndex, endIndex);
+  }, [filteredProperties, currentPage]);
+
   return (
     <>
-      {/* Header */}
       <div className="flex justify-between items-center border-b pb-4">
         <h1 className="text-xl font-bold">Properties</h1>
         <div className="flex gap-2">
-          <Button onClick={() => navigate("/properties/drafts")}>
-            View Drafts
-          </Button>
-          <Button onClick={() => navigate("/add-property")}>
-            Add Property
-          </Button>
+          <Button onClick={() => navigate("/properties/drafts")}>View Drafts</Button>
+          <Button onClick={() => navigate("/add-property")}>Add Property</Button>
         </div>
       </div>
 
-      {/* Filter */}
       <div className="mt-4 flex justify-between items-center">
         <h2>
-          {
-            filterOptions.find((o) => o.value === selectedFilter)?.label ||
-            "All Properties"
-          }
+          {filterOptions.find((o) => o.value === selectedFilter)?.label ||
+            "All Properties"}
         </h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -252,8 +217,7 @@ const PropertiesPage = () => {
               variant="outline"
               className="w-64 justify-between bg-white text-primary"
             >
-              {filterOptions.find((o) => o.value === selectedFilter)?.label ||
-                "Select"}
+              {filterOptions.find((o) => o.value === selectedFilter)?.label || "Select"}
               <IoIosArrowDropdown className="ml-2" />
             </Button>
           </DropdownMenuTrigger>
@@ -270,7 +234,6 @@ const PropertiesPage = () => {
         </DropdownMenu>
       </div>
 
-      {/* Table */}
       <div className="mt-6">
         <div className="overflow-x-auto">
           <Table>
@@ -290,21 +253,18 @@ const PropertiesPage = () => {
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
-              {filteredProperties.map((property, index) => (
+              {paginatedProperties.map((property, index) => (
                 <TableRow key={property._id}>
-                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                   <TableCell>{property.propertyName}</TableCell>
-                  <TableCell>
-                    {property.resortOwner?.firstName || "N/A"}
-                  </TableCell>
+                  <TableCell>{property.resortOwner?.firstName || "N/A"}</TableCell>
                   <TableCell>{property.state}</TableCell>
                   <TableCell>{property.city}</TableCell>
                   <TableCell>₹{property.pricingPerNightWeekdays}</TableCell>
-
                   <TableCell>{renderStatusDot(property)}</TableCell>
                   <TableCell>{property.featured ? "Yes" : "No"}</TableCell>
-
                   <TableCell>
                     <Switch
                       checked={property.publishNow}
@@ -312,16 +272,12 @@ const PropertiesPage = () => {
                       onCheckedChange={() => openConfirm("publish", property)}
                     />
                   </TableCell>
-
                   <TableCell>{formatDate(property.createdAt)}</TableCell>
                   <TableCell>{formatDate(property.updatedAt)}</TableCell>
-
                   <TableCell>
                     <DropdownMenu
                       open={openDropdownId === property._id}
-                      onOpenChange={(o) =>
-                        setOpenDropdownId(o ? property._id : null)
-                      }
+                      onOpenChange={(o) => setOpenDropdownId(o ? property._id : null)}
                     >
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -330,28 +286,18 @@ const PropertiesPage = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem
-                          onSelect={() =>
-                            navigate(`/view-property/${property._id}`)
-                          }
+                          onSelect={() => navigate(`/view-property/${property._id}`)}
                         >
                           View
                         </DropdownMenuItem>
-
                         <DropdownMenuItem
                           disabled={property.isBlocked}
-                          onSelect={() =>
-                            navigate(`/edit-property/${property._id}`)
-                          }
+                          onSelect={() => navigate(`/edit-property/${property._id}`)}
                         >
                           Edit
                         </DropdownMenuItem>
-
                         <DropdownMenuItem
-                          className={
-                            property.isBlocked
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }
+                          className={property.isBlocked ? "text-green-600" : "text-red-600"}
                           onSelect={(e) => {
                             e.preventDefault();
                             openConfirm("block", property);
@@ -359,13 +305,10 @@ const PropertiesPage = () => {
                         >
                           {property.isBlocked ? "Unblock" : "Block"}
                         </DropdownMenuItem>
-
                         <DropdownMenuItem
                           disabled={property.isBlocked}
                           className={
-                            property.featured
-                              ? "text-yellow-600"
-                              : "text-gray-700"
+                            property.featured ? "text-yellow-600" : "text-gray-700"
                           }
                           onSelect={(e) => {
                             e.preventDefault();
@@ -379,7 +322,8 @@ const PropertiesPage = () => {
                   </TableCell>
                 </TableRow>
               ))}
-              {filteredProperties.length === 0 && (
+
+              {paginatedProperties.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={12} className="text-center py-8">
                     No properties found
@@ -389,9 +333,48 @@ const PropertiesPage = () => {
             </TableBody>
           </Table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex justify-end items-center mt-6 gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              className="border bg-transparent text-black"
+            >
+              Previous
+            </Button>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <Button
+                key={i}
+                size="sm"
+                variant={currentPage === i + 1 ? "default bg-transparent" : "bg-transparent"}
+                className={`${
+                  currentPage === i + 1
+                    ? "bg-transparent border text-black"
+                    : "border"
+                }`}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              className="border bg-transparent text-black"
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Global Confirmation Modal */}
       <AlertDialog
         open={confirm.open}
         onOpenChange={(open) => {
@@ -401,15 +384,10 @@ const PropertiesPage = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{confirmTitle}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {confirmDescription}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{confirmDescription}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              className="bg-transparent"
-              onClick={closeConfirm}
-            >
+            <AlertDialogCancel className="bg-transparent" onClick={closeConfirm}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={onConfirmAction}>

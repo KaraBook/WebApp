@@ -11,6 +11,7 @@ import DraftPropertiesPage from "@/pages/DraftPropertiesPage";
 import FinalizeMedia from "@/pages/FinalizeMedia";
 import BlockedProperties from "@/pages/BlockedProperties";
 import { BrowserRouter } from "react-router-dom";
+import BookingsPage from "@/pages/BookingsPage";
 
 function AppRoutes() {
   return (
@@ -28,6 +29,7 @@ function AppRoutes() {
             <Route path="view-property/:id" element={<ViewProperty />} />
             <Route path="properties/drafts" element={<DraftPropertiesPage />} />
             <Route path="properties/:id/media" element={<FinalizeMedia />} />
+            <Route path="bookings" element={<BookingsPage />} />
           </Route>
         </Route>
       </Routes>

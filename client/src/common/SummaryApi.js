@@ -64,6 +64,16 @@ const SummaryApi = {
     method: "put" 
   }),
 
+   getAllBookings: {
+    url: '/api/admin/bookings',
+    method: 'get',
+  },
+
+  getBookingInvoice: (id) => ({
+    url: `/api/bookings/${id}/invoice`,
+    method: 'get',
+  }),
+
 
 
 };
