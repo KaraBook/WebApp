@@ -29,4 +29,19 @@ router.get("/bookings", requireAuth, requireAdmin, async (_req, res) => {
   }
 });
 
+
+router.get("/users", requireAuth, requireAdmin, async (_req, res) => {
+  try {
+    const users = await User.find({ role: "traveller" })
+      .select("firstName lastName email mobile city state createdAt avatarUrl")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({ message: "OK", data: users });
+  } catch (err) {
+    console.error("Admin users error:", err);
+    return res.status(500).json({ message: "Failed to fetch users" });
+  }
+});
+
+
 export default router;

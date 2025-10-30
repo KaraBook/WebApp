@@ -881,7 +881,7 @@ const AddProperty = () => {
                             />
                         </div>
 
-                        <div className="w-[32%]">
+                        <div className="w-[48%]">
                             <SingleSelectDropdown
                                 label="Publish Now"
                                 value={formData.publishNow}
@@ -897,13 +897,11 @@ const AddProperty = () => {
                         </div>
 
                         <FileUploadsSection
-                            // cover
                             setCoverImageFile={setCoverImageFile}
                             coverImageFile={coverImageFile}
                             coverImagePreview={coverImagePreview}
                             setCoverImagePreview={setCoverImagePreview}
 
-                            // gallery
                             setGalleryImageFiles={setGalleryImageFiles}
                             galleryImageFiles={galleryImageFiles}
                             galleryImagePreviews={galleryImagePreviews}

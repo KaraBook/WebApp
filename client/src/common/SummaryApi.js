@@ -74,6 +74,11 @@ const SummaryApi = {
     method: 'get',
   }),
 
+  getAllUsers: {
+  url: '/api/admin/users',
+  method: 'get',
+},
+
 
 
 };

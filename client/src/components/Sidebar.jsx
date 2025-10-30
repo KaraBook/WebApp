@@ -22,10 +22,10 @@ function Sidebar() {
 
   return (
     <aside
-      className={`h-screen bg-[#f9f9f9] border-r border-zinc-800 transition-all sticky top-0 ${collapsed ? "w-16" : "w-64"} overflow-hidden flex flex-col`}
+      className={`h-screen bg-[#f9f9f9] border-r border-[#a7a7a7] transition-all sticky top-0 ${collapsed ? "w-16" : "w-64"} overflow-hidden flex flex-col`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+      <div className="flex items-center justify-between p-4 border-b border-[#a7a7a7]">
         {!collapsed && <span className="text-xl font-semibold text-primary">Logo</span>}
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-primary hover:bg-hoverbg/80">
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
@@ -58,7 +58,7 @@ function Sidebar() {
         })}
       </nav>
 
-      <Separator className="my-2 bg-zinc-800" />
+      <Separator className="my-2 bg-[#a7a7a7]" />
 
       {/* Logout */}
       <div className={`p-2 ${collapsed ? "w-16" : "w-64"}`}>

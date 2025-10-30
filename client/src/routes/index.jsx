@@ -12,6 +12,7 @@ import FinalizeMedia from "@/pages/FinalizeMedia";
 import BlockedProperties from "@/pages/BlockedProperties";
 import { BrowserRouter } from "react-router-dom";
 import BookingsPage from "@/pages/BookingsPage";
+import UsersPage from "@/pages/UsersPage";
 
 function AppRoutes() {
   return (
@@ -30,6 +31,7 @@ function AppRoutes() {
             <Route path="properties/drafts" element={<DraftPropertiesPage />} />
             <Route path="properties/:id/media" element={<FinalizeMedia />} />
             <Route path="bookings" element={<BookingsPage />} />
+            <Route path="users" element={<UsersPage />} />
           </Route>
         </Route>
       </Routes>

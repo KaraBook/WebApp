@@ -37,8 +37,7 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white text-black p-6">
-      {/* Logo + Title */}
-      <div className="text-center mb-8">
+       <div className="text-center mb-8">
         <img
             src="\admin\KarabookLogo.png"
             alt="BookMyStay"
@@ -47,7 +46,6 @@ export default function AdminLogin() {
         <p className="text-sm text-neutral-500 mt-1">Admin Portal</p>
       </div>
 
-      {/* Login Card */}
       <Card className="w-full max-w-md border border-neutral-200 bg-white shadow-lg">
         <CardHeader>
           <CardTitle className="text-xl font-semibold text-center text-neutral-800">

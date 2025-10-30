@@ -31,6 +31,7 @@ import { IoIosArrowDropdown } from "react-icons/io";
 import { HiDotsVertical } from "react-icons/hi";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
+import { toast } from "sonner";
 
 const filterOptions = [
     { label: "All Bookings", value: "all" },
@@ -168,14 +169,6 @@ const BookingsPage = () => {
     }, [selectedFilter, search]);
 
 
-    const copyToClipboard = async (text) => {
-        try {
-            await navigator.clipboard.writeText(text || "");
-        } catch (e) {
-            console.error("Clipboard error", e);
-        }
-    };
-
     const openWhatsApp = (phone, text) => {
         if (!phone) return;
         const url = `https://wa.me/${encodeURIComponent(String(phone))}?text=${encodeURIComponent(text || "")}`;
@@ -218,6 +211,17 @@ const BookingsPage = () => {
         return "";
     }, [confirm]);
 
+
+     const handleCopy = async (text, label) => {
+        try {
+            await navigator.clipboard.writeText(text || "");
+            toast.success(`${label} copied successfully!`);
+        } catch (err) {
+            toast.error("Failed to copy.");
+            console.error("Clipboard error:", err);
+        }
+    };
+
     const onConfirmAction = async () => {
         const b = confirm.booking;
         closeConfirm();
@@ -253,7 +257,7 @@ const BookingsPage = () => {
             <div className="flex justify-between items-center border-b pb-4">
                 <h1 className="text-xl font-bold">Bookings</h1>
                 <div className="flex gap-2">
-                    <Button className="bg-transparent text-black" onClick={fetchBookings}>
+                    <Button className="bg-transparent text-black hover:bg-transparent" onClick={fetchBookings}>
                         Refresh
                     </Button>
                 </div>
@@ -390,12 +394,12 @@ const BookingsPage = () => {
                                                         )}
 
                                                         <DropdownMenuItem
-                                                            onSelect={() => copyToClipboard(email || "")}
+                                                            onSelect={() => handleCopy(b?.userId?.email, "Email")}
                                                         >
                                                             Copy Email
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
-                                                            onSelect={() => copyToClipboard(phone || "")}
+                                                            onSelect={() => handleCopy(b?.userId?.mobile || b?.contactNumber, "Mobile")}
                                                         >
                                                             Copy Phone
                                                         </DropdownMenuItem>

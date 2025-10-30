@@ -112,7 +112,7 @@ const FileUploadsSection = ({
             Cover Image <span className="text-red-500">*</span>
           </Label>
 
-          <div className="mt-2 flex items-center gap-2 bg-white p-4 rounded-[10px] ">
+          <div className="mt-2 border flex items-center gap-2 bg-white p-4 rounded-[10px] ">
             <Input
               id="coverImage"
               type="file"
@@ -157,7 +157,7 @@ const FileUploadsSection = ({
             Shop Act (Optional)
           </Label>
 
-          <div className="mt-2 flex items-center gap-2 bg-white p-4 rounded-[10px]">
+          <div className="mt-2 flex items-center gap-2 bg-white p-4 rounded-[10px] border">
             <Input
               id="shopAct"
               type="file"
@@ -202,7 +202,7 @@ const FileUploadsSection = ({
             Gallery Photos (Min {minGallery}, Max {maxGallery})
           </Label>
 
-          <div className="mt-2 flex items-center gap-2 bg-white p-4 rounded-[10px]">
+          <div className="mt-2 flex items-center gap-2 bg-white p-4 rounded-[10px] border">
             <Input
               id="galleryPhotos"
               type="file"
