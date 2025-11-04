@@ -1,5 +1,5 @@
 import express from "express";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { requireAuth } from "../middlewares/requireAuth.js";
 import {
   getOwnerDashboard,
   getOwnerProperties,
@@ -8,10 +8,10 @@ import {
 
 const router = express.Router();
 
-router.get("/dashboard", authMiddleware, getOwnerDashboard);
+router.get("/dashboard", requireAuth, getOwnerDashboard);
 
-router.get("/my-properties", authMiddleware, getOwnerProperties);
+router.get("/my-properties", requireAuth, getOwnerProperties);
 
-router.get("/bookings", authMiddleware, getOwnerBookings);
+router.get("/bookings", requireAuth, getOwnerBookings);
 
 export default router;
