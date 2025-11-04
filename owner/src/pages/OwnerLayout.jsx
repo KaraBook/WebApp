@@ -33,7 +33,7 @@ export default function OwnerLayout() {
       >
         <div>
           {/* Logo / Title */}
-          <div className="p-5 border-b flex items-center justify-between">
+          <div className="p-4 border-b flex items-center justify-between">
             <h1 className="text-lg font-semibold text-emerald-700 tracking-tight">
               KaraBook Owner
             </h1>
@@ -70,7 +70,7 @@ export default function OwnerLayout() {
           <Button
             onClick={logout}
             variant="outline"
-            className="w-full flex items-center justify-center gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+            className="w-full flex items-center justify-center gap-2 text-red-600 text-gray-700 hover:bg-gray-100"
           >
             <LogOut className="w-4 h-4" /> Logout
           </Button>
