@@ -55,7 +55,7 @@ export default function OwnerLayout() {
                   `flex items-center gap-3 px-6 py-2.5 text-sm transition-colors rounded-md mx-2 my-1 ${
                     isActive
                       ? "bg-emerald-50 text-emerald-700 font-medium border-l-4 border-emerald-600"
-                      : "text-gray-700 bg-gray-100 hover:bg-gray-100"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`
                 }
               >

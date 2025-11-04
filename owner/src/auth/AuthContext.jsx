@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("owner_access");
     localStorage.removeItem("owner_refresh");
     setUser(null);
-    window.location.href = "/login";
+    window.location.href = "/owner/login";
   };
 
   const value = useMemo(() => ({ user, ready, loginWithTokens, logout }), [user, ready]);
