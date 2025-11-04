@@ -157,6 +157,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Recent Bookings Table */}
+      <h1 className="font-bold text-xl p-0 m-0 h-2">Recent Bookings</h1>
       <div className="border rounded-lg overflow-hidden shadow-sm">
         <Table className="text-sm">
           <TableHeader>

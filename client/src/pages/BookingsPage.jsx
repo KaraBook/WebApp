@@ -1,37 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import { IoIosArrowDropdown } from "react-icons/io";
 import { HiDotsVertical } from "react-icons/hi";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import InvoicePreview from "@/components/InvoicePreview";
+import { useRef } from "react";
 
 const filterOptions = [
     { label: "All Bookings", value: "all" },
@@ -51,11 +38,14 @@ const BookingsPage = () => {
     const [search, setSearch] = useState("");
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [confirm, setConfirm] = useState({ open: false, type: null, booking: null });
-
+    const [viewBooking, setViewBooking] = useState({ open: false, data: null });
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const [currentPage, setCurrentPage] = useState(1);
+    const [invoiceData, setInvoiceData] = useState(null);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const invoiceRef = useRef(null);
+
     const itemsPerPage = itemsPerPageDefault;
 
     const closeConfirm = () => setConfirm({ open: false, type: null, booking: null });
@@ -63,6 +53,12 @@ const BookingsPage = () => {
         setOpenDropdownId(null);
         setConfirm({ open: true, type, booking });
     };
+
+    const openView = (booking) => {
+        setOpenDropdownId(null);
+        setViewBooking({ open: true, data: booking });
+    };
+    const closeView = () => setViewBooking({ open: false, data: null });
 
     const fetchBookings = async () => {
         try {
@@ -122,10 +118,9 @@ const BookingsPage = () => {
         return <span className={`inline-block w-3 h-3 rounded-full ${color}`} />;
     };
 
-    const isUpcoming = (b) => b?.checkIn ? new Date(b.checkIn) >= startOfDay(new Date()) : false;
-    const isPast = (b) => b?.checkOut ? new Date(b.checkOut) < startOfDay(new Date()) : false;
-
     const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const isUpcoming = (b) => (b?.checkIn ? new Date(b.checkIn) >= startOfDay(new Date()) : false);
+    const isPast = (b) => (b?.checkOut ? new Date(b.checkOut) < startOfDay(new Date()) : false);
 
     const filtered = useMemo(() => {
         const base = bookings.filter((b) => {
@@ -168,34 +163,80 @@ const BookingsPage = () => {
         setCurrentPage(1);
     }, [selectedFilter, search]);
 
-
     const openWhatsApp = (phone, text) => {
         if (!phone) return;
-        const url = `https://wa.me/${encodeURIComponent(String(phone))}?text=${encodeURIComponent(text || "")}`;
+        const url = `https://wa.me/${encodeURIComponent(String(phone))}?text=${encodeURIComponent(
+            text || ""
+        )}`;
         window.open(url, "_blank");
     };
 
     const mailTo = (email, subject, body) => {
         if (!email) return;
-        const url = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject || "")}&body=${encodeURIComponent(body || "")}`;
+        const url = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(
+            subject || ""
+        )}&body=${encodeURIComponent(body || "")}`;
         window.location.href = url;
     };
 
-    const downloadInvoiceJson = async (bookingId) => {
+    const downloadInvoicePDF = async (bookingId) => {
         try {
-            const res = await Axios.get(SummaryApi.getBookingInvoice(bookingId).url);
-            const data = res?.data?.data || res?.data || {};
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `invoice_${String(bookingId).slice(-6)}.json`;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            toast.info("Generating PDF… please wait");
+
+            const res = await Axios.get(`/api/admin/invoice/${bookingId}`);
+
+            console.log("Invoice API response:", res.data);
+
+            if (!res.data?.success || !res.data.data) {
+                toast.error("Invoice not found or invalid.");
+                return;
+            }
+
+            setInvoiceData(res.data.data);
+
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+
+            const element = invoiceRef.current;
+            if (!element) throw new Error("Invoice DOM element not found");
+
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+            });
+
+            const imgData = canvas.toDataURL("image/jpeg", 1.0);
+            const pdf = new jsPDF("p", "mm", "a4");
+
+            const imgWidth = 210;
+            const pageHeight = 297;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            const fileName = `Invoice_${res.data.data.invoiceNumber || bookingId}.pdf`;
+            pdf.save(fileName);
+
+            toast.success("Invoice downloaded successfully!");
         } catch (err) {
-            console.error("Invoice download failed:", err);
+            console.error("PDF generation error:", err);
+            toast.error("Failed to generate or download invoice PDF");
+        } finally {
+            setTimeout(() => setInvoiceData(null), 500);
         }
     };
+
 
     const confirmTitle = useMemo(() => {
         if (!confirm.booking) return "";
@@ -206,13 +247,14 @@ const BookingsPage = () => {
 
     const confirmDescription = useMemo(() => {
         if (!confirm.booking) return "";
-        if (confirm.type === "invoice") return "This will download a JSON invoice for this booking.";
-        if (confirm.type === "resend") return "Open WhatsApp and email with prefilled confirmation message.";
+        if (confirm.type === "invoice")
+            return "This will download a JSON invoice for this booking.";
+        if (confirm.type === "resend")
+            return "Open WhatsApp and email with prefilled confirmation message.";
         return "";
     }, [confirm]);
 
-
-     const handleCopy = async (text, label) => {
+    const handleCopy = async (text, label) => {
         try {
             await navigator.clipboard.writeText(text || "");
             toast.success(`${label} copied successfully!`);
@@ -228,7 +270,7 @@ const BookingsPage = () => {
         if (!b) return;
 
         if (confirm.type === "invoice") {
-            await downloadInvoiceJson(b._id);
+            await downloadInvoicePDF(b._id);
         }
 
         if (confirm.type === "resend") {
@@ -254,17 +296,20 @@ const BookingsPage = () => {
 
     return (
         <>
+            {/* Header */}
             <div className="flex justify-between items-center border-b pb-4">
                 <h1 className="text-xl font-bold">Bookings</h1>
-                <div className="flex gap-2">
-                    <Button className="bg-transparent text-black hover:bg-transparent" onClick={fetchBookings}>
-                        Refresh
-                    </Button>
-                </div>
+                <Button
+                    className="bg-transparent text-black hover:bg-transparent"
+                    onClick={fetchBookings}
+                >
+                    Refresh
+                </Button>
             </div>
 
+            {/* Filter + Search */}
             <div className="mt-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-                <h2>
+                <h2 className="text-base font-medium">
                     {filterOptions.find((o) => o.value === selectedFilter)?.label || "All Bookings"}
                 </h2>
 
@@ -297,7 +342,7 @@ const BookingsPage = () => {
                 </div>
             </div>
 
-
+            {/* Table */}
             <div className="mt-6 w-full">
                 <div className="overflow-x-auto border rounded-lg">
                     <div className="min-w-[1200px]">
@@ -328,108 +373,108 @@ const BookingsPage = () => {
                                     </TableRow>
                                 )}
 
-                                {!loading && paginated.map((b, index) => {
-                                    const traveller = `${b?.userId?.firstName || ""} ${b?.userId?.lastName || ""}`.trim() || "N/A";
-                                    const phone = b?.userId?.mobile || b?.contactNumber || "";
-                                    const email = b?.userId?.email || "";
-                                    const property = b?.propertyId?.propertyName || "—";
-                                    return (
-                                        <TableRow key={b._id}>
-                                            <TableCell className="text-center">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
+                                {!loading &&
+                                    paginated.map((b, index) => {
+                                        const traveller = `${b?.userId?.firstName || ""} ${b?.userId?.lastName || ""
+                                            }`.trim() || "N/A";
+                                        const phone = b?.userId?.mobile || b?.contactNumber || "";
+                                        const property = b?.propertyId?.propertyName || "—";
+                                        return (
+                                            <TableRow key={b._id}>
+                                                <TableCell className="text-center">
+                                                    {(currentPage - 1) * itemsPerPage + index + 1}
+                                                </TableCell>
 
-                                            <TableCell>
-                                                <div className="flex items-center gap-2">
-                                                    {statusDot(b.paymentStatus)}
-                                                    <div className="flex flex-col">
+                                                <TableCell>
+                                                    <div className="flex items-center gap-2">
+                                                        {statusDot(b.paymentStatus)}
                                                         <span className="font-medium">{shortId(b._id)}</span>
-                                                        <span className="text-xs text-muted-foreground">Order: {b.orderId || "—"}</span>
                                                     </div>
-                                                </div>
-                                            </TableCell>
+                                                </TableCell>
 
-                                            <TableCell>
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium">{traveller}</span>
-                                                    <span className="text-xs text-muted-foreground">{phone || "—"}</span>
-                                                </div>
-                                            </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium">{traveller}</span>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            {phone || "—"}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
 
-                                            <TableCell className="max-w-[220px] truncate">
-                                                {property}
-                                            </TableCell>
+                                                <TableCell className="max-w-[220px] truncate">{property}</TableCell>
+                                                <TableCell>{formatDate(b.checkIn)}</TableCell>
+                                                <TableCell>{formatDate(b.checkOut)}</TableCell>
+                                                <TableCell>{b.totalNights || "—"}</TableCell>
+                                                <TableCell>{b.guests || 1}</TableCell>
+                                                <TableCell>{formatCurrency(b.totalAmount)}</TableCell>
 
-                                            <TableCell>{formatDate(b.checkIn)}</TableCell>
-                                            <TableCell>{formatDate(b.checkOut)}</TableCell>
-                                            <TableCell>{b.totalNights || "—"}</TableCell>
-                                            <TableCell>{b.guests || 1}</TableCell>
-                                            <TableCell>{formatCurrency(b.totalAmount)}</TableCell>
-
-                                            <TableCell>
-                                                <div className="flex flex-col gap-1">
+                                                <TableCell>
                                                     {statusBadge(b.paymentStatus)}
-                                                    <span className="text-[11px] text-muted-foreground">
-                                                        {b.paymentId ? `PID: ${String(b.paymentId).slice(-8)}` : ""}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
+                                                </TableCell>
 
-                                            <TableCell>{formatDate(b.createdAt)}</TableCell>
+                                                <TableCell>{formatDate(b.createdAt)}</TableCell>
 
-                                            <TableCell>
-                                                <DropdownMenu
-                                                    open={openDropdownId === b._id}
-                                                    onOpenChange={(o) => setOpenDropdownId(o ? b._id : null)}
-                                                >
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon">
-                                                            <HiDotsVertical className="w-5 h-5" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
+                                                <TableCell>
+                                                    <DropdownMenu
+                                                        open={openDropdownId === b._id}
+                                                        onOpenChange={(o) => setOpenDropdownId(o ? b._id : null)}
+                                                    >
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon">
+                                                                <HiDotsVertical className="w-5 h-5" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
 
-                                                    <DropdownMenuContent className="w-56">
-                                                        {b?.propertyId?._id && (
-                                                            <DropdownMenuItem onSelect={() => navigate(`/view-property/${b.propertyId._id}`)}>
-                                                                View Property
+                                                        <DropdownMenuContent className="w-56">
+                                                            <DropdownMenuItem onSelect={() => navigate(`/invoice/${b._id}`)}>
+                                                                View Invoice
                                                             </DropdownMenuItem>
-                                                        )}
 
-                                                        <DropdownMenuItem
-                                                            onSelect={() => handleCopy(b?.userId?.email, "Email")}
-                                                        >
-                                                            Copy Email
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            onSelect={() => handleCopy(b?.userId?.mobile || b?.contactNumber, "Mobile")}
-                                                        >
-                                                            Copy Phone
-                                                        </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onSelect={() => handleCopy(b?.userId?.email, "Email")}
+                                                            >
+                                                                Copy Email
+                                                            </DropdownMenuItem>
 
-                                                        <DropdownMenuItem
-                                                            onSelect={() => openWhatsApp(
-                                                                phone,
-                                                                `Hello ${traveller.split(" ")[0] || ""}, your booking ${shortId(b._id)} for ${property}.\nCheck-in: ${formatDateLong(b.checkIn)}`
-                                                            )}
-                                                        >
-                                                            WhatsApp Chat
-                                                        </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onSelect={() =>
+                                                                    handleCopy(b?.userId?.mobile || b?.contactNumber, "Mobile")
+                                                                }
+                                                            >
+                                                                Copy Phone
+                                                            </DropdownMenuItem>
 
-                                                        <DropdownMenuItem
-                                                            onSelect={() => openConfirm("invoice", b)}
-                                                        >
-                                                            Download Invoice
-                                                        </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onSelect={() =>
+                                                                    openWhatsApp(
+                                                                        phone,
+                                                                        `Hello ${traveller.split(" ")[0] || ""
+                                                                        }, your booking ${shortId(b._id)} for ${property}.\nCheck-in: ${formatDateLong(
+                                                                            b.checkIn
+                                                                        )}`
+                                                                    )
+                                                                }
+                                                            >
+                                                                WhatsApp Chat
+                                                            </DropdownMenuItem>
 
-                                                        <DropdownMenuItem
-                                                            onSelect={() => openConfirm("resend", b)}
-                                                        >
-                                                            Resend Links (WA + Email)
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
+                                                            <DropdownMenuItem
+                                                                onSelect={() => openConfirm("invoice", b)}
+                                                            >
+                                                                Download Invoice
+                                                            </DropdownMenuItem>
+
+                                                            <DropdownMenuItem
+                                                                onSelect={() => openConfirm("resend", b)}
+                                                            >
+                                                                Resend Links (WA + Email)
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
 
                                 {!loading && paginated.length === 0 && (
                                     <TableRow>
@@ -444,7 +489,7 @@ const BookingsPage = () => {
                 </div>
 
                 {/* Pagination */}
-                {(!loading && totalPages > 1) && (
+                {!loading && totalPages > 1 && (
                     <div className="flex justify-end items-center mt-6 gap-2">
                         <Button
                             variant="outline"
@@ -461,7 +506,8 @@ const BookingsPage = () => {
                                 key={i}
                                 size="sm"
                                 variant={currentPage === i + 1 ? "default bg-transparent" : "bg-transparent"}
-                                className={`${currentPage === i + 1 ? "bg-transparent border text-black" : "border"}`}
+                                className={`${currentPage === i + 1 ? "bg-transparent border text-black" : "border"
+                                    }`}
                                 onClick={() => setCurrentPage(i + 1)}
                             >
                                 {i + 1}
@@ -480,6 +526,9 @@ const BookingsPage = () => {
                     </div>
                 )}
             </div>
+
+            {/* Booking Details Dialog */}
+            <BookingDetailsDialog open={viewBooking.open} onClose={closeView} booking={viewBooking.data} />
 
             {/* Confirm Dialog */}
             <AlertDialog
@@ -504,6 +553,14 @@ const BookingsPage = () => {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {invoiceData && (
+                <div
+                    ref={invoiceRef}
+                    className="invisible absolute left-[-9999px] top-0 w-[794px] bg-white p-8">
+                    <InvoicePreview invoice={invoiceData} />
+                </div>
+            )}
         </>
     );
 };

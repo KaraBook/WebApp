@@ -44,40 +44,40 @@ const SummaryApi = {
     method: 'put',
   }),
 
-  toggleBlock: (id) => ({ 
-    url: `/api/properties/${id}/block`, 
-    method: "put" 
+  toggleBlock: (id) => ({
+    url: `/api/properties/${id}/block`,
+    method: "put"
   }),
 
-  toggleUnblock: (id) => ({ 
-    url: `/api/properties/${id}/unblock`, 
-    method: "put" 
+  toggleUnblock: (id) => ({
+    url: `/api/properties/${id}/unblock`,
+    method: "put"
   }),
 
-  toggleFeatured: (id) => ({ 
-    url: `/api/properties/${id}/toggle-featured`, 
-    method: "put" 
+  toggleFeatured: (id) => ({
+    url: `/api/properties/${id}/toggle-featured`,
+    method: "put"
   }),
 
-  togglePublish: (id) => ({ 
-    url: `/api/properties/${id}/toggle-publish`, 
-    method: "put" 
+  togglePublish: (id) => ({
+    url: `/api/properties/${id}/toggle-publish`,
+    method: "put"
   }),
 
-   getAllBookings: {
+  getAllBookings: {
     url: '/api/admin/bookings',
     method: 'get',
   },
 
   getBookingInvoice: (id) => ({
-    url: `/api/bookings/${id}/invoice`,
+    url: `/api/admin/invoice/${id}`,
     method: 'get',
   }),
 
   getAllUsers: {
-  url: '/api/admin/users',
-  method: 'get',
-},
+    url: '/api/admin/users',
+    method: 'get',
+  },
 
 
 

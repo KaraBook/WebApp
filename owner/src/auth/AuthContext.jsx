@@ -4,11 +4,10 @@ import api from "../api/axios";
 const AuthCtx = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // {id,name,email,mobile,role}
+  const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // restore from storage if you want — minimal: just mark ready
     setReady(true);
   }, []);
 

@@ -2,6 +2,7 @@ import express from "express";
 import Booking from "../models/Booking.js";
 import User from "../models/User.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
+import { getBookingInvoice } from "../controllers/bookingController.js";
 
 const router = express.Router();
 
@@ -32,8 +33,10 @@ router.get("/bookings", requireAuth, requireAdmin, async (_req, res) => {
 
 router.get("/users", requireAuth, requireAdmin, async (_req, res) => {
   try {
-    const users = await User.find({ role: "traveller" })
-      .select("firstName lastName email mobile city state createdAt avatarUrl")
+    const users = await User.find({
+      role: { $in: ["traveller", "resortOwner", "admin"] },
+    })
+      .select("firstName lastName email mobile city state createdAt avatarUrl role")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({ message: "OK", data: users });
@@ -43,5 +46,9 @@ router.get("/users", requireAuth, requireAdmin, async (_req, res) => {
   }
 });
 
+router.get('/invoice/:bookingId', requireAuth, requireAdmin, getBookingInvoice);
 
 export default router;
+
+
+
