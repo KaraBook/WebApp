@@ -6,13 +6,16 @@ export const getOwnerDashboard = async (req, res) => {
     const ownerId = req.user.id;
     const properties = await Property.find({ ownerUserId: ownerId });
     const propertyIds = properties.map((p) => p._id);
-    const bookings = await Booking.find({ propertyId: { $in: propertyIds } });
+    const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
+      .populate("userId", "firstName lastName mobile")
+      .populate("propertyId", "propertyName");
 
     const stats = {
       totalProperties: properties.length,
       totalBookings: bookings.length,
       confirmed: bookings.filter((b) => b.paymentStatus === "paid").length,
-      pending: bookings.filter((b) => b.paymentStatus !== "paid").length,
+      pending: bookings.filter((b) => b.paymentStatus === "pending").length,
+      failed: bookings.filter((b) => b.paymentStatus === "failed").length,
       totalRevenue: bookings
         .filter((b) => b.paymentStatus === "paid")
         .reduce((sum, b) => sum + b.totalAmount, 0),
@@ -20,6 +23,7 @@ export const getOwnerDashboard = async (req, res) => {
 
     res.json({ success: true, data: { stats, properties, bookings } });
   } catch (err) {
+    console.error("getOwnerDashboard error:", err);
     res.status(500).json({ success: false, message: "Failed to load dashboard" });
   }
 };
@@ -39,9 +43,11 @@ export const getOwnerBookings = async (req, res) => {
     const propertyIds = (
       await Property.find({ ownerUserId: ownerId }).select("_id")
     ).map((p) => p._id);
+
     const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
-      .populate("propertyId", "propertyName city state coverImage")
+      .populate("propertyId", "propertyName")
       .populate("userId", "firstName lastName mobile");
+
     res.json({ success: true, data: bookings });
   } catch (err) {
     res.status(500).json({ success: false, message: "Failed to load bookings" });

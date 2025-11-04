@@ -1,9 +1,6 @@
 import express from "express";
 import { requireAuth } from "../middlewares/requireAuth.js";
-import {
-  getOwnerDashboard,
-  getOwnerProperties,
-  getOwnerBookings,
+import { getOwnerDashboard, getOwnerProperties, getOwnerBookings,
 } from "../controllers/owner.controller.js";
 
 const router = express.Router();
