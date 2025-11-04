@@ -7,7 +7,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 
 
@@ -55,7 +54,7 @@ export default function Login() {
     try {
       const cred = await confirmRes.confirm(otp);
       const idToken = await cred.user.getIdToken();
-      const r = await api.post(SummaryApi.ownerLogin.url, null, {
+      const r = await api.post("/api/auth/resort-owner/login", null, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
       loginWithTokens(r.data);
