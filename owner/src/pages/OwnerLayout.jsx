@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { LogOut, LayoutDashboard, Home, Calendar, Building2, ClipboardList } from "lucide-react";
-import { useAuth } from "../../auth/AuthContext";
+import { useAuth } from "../auth/AuthContext";
 import { Button } from "@/components/ui/button";
 
 export default function OwnerLayout() {
