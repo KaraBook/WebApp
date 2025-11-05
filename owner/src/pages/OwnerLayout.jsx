@@ -10,11 +10,14 @@ import {
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../api/axios";
+import SummaryApi from "../common/SummaryApi";
 
 export default function OwnerLayout() {
   const { logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [ownerName, setOwnerName] = useState("");
 
   const navItems = [
     { name: "Dashboard", path: "dashboard", icon: LayoutDashboard },
@@ -22,6 +25,24 @@ export default function OwnerLayout() {
     { name: "Bookings", path: "bookings", icon: ClipboardList },
     { name: "Calendar", path: "calendar", icon: Calendar },
   ];
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get(SummaryApi.getOwnerProfile.url);
+        const { user } = res.data ?? {};
+        if (user?.firstName || user?.lastName) {
+          setOwnerName(`${user.firstName ?? ""} ${user.lastName ?? ""}`.trim());
+        } else if (user?.name) {
+          setOwnerName(user.name);
+        } else {
+          setOwnerName("Owner");
+        }
+      } catch (err) {
+        console.error("Failed to load owner profile:", err);
+      }
+    })();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -32,10 +53,10 @@ export default function OwnerLayout() {
         } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
       >
         <div>
-          {/* Logo */}
+          {/* Owner Name */}
           <div className="p-4 border-b flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-emerald-700 tracking-tight">
-              KaraBook Owner
+            <h1 className="text-lg font-semibold text-emerald-700 tracking-tight truncate">
+              {ownerName || "KaraBook Owner"}
             </h1>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -80,7 +101,7 @@ export default function OwnerLayout() {
         </div>
       </aside>
 
-      {/* Main */}
+      {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen">
         <header className="bg-white border-b p-4 flex items-center justify-between shadow-sm">
           <button
