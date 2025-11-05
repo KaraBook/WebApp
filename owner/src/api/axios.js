@@ -2,17 +2,15 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE,
-  withCredentials: false,
+  withCredentials: true,
 });
 
-// attach access token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("owner_access");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// simple refresh on 401
 let refreshing = false;
 let queue = [];
 function onRefreshed(newToken) {
@@ -24,41 +22,37 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
+
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
       const refresh = localStorage.getItem("owner_refresh");
-      if (!refresh) throw error;
+      if (!refresh) return Promise.reject(error);
 
-      if (!refreshing) {
-        refreshing = true;
-        try {
-          const r = await axios.post(
-            `${import.meta.env.VITE_API_BASE}/api/auth/refresh-token`,
-            null,
-            { headers: { Authorization: `Bearer ${refresh}` } }
-          );
-          const newAccess = r.data?.data?.accessToken;
-          localStorage.setItem("owner_access", newAccess);
-          refreshing = false;
-          onRefreshed(newAccess);
-        } catch (e) {
-          refreshing = false;
-          localStorage.removeItem("owner_access");
-          localStorage.removeItem("owner_refresh");
-          window.location.href = "/login";
-          throw e;
-        }
+      try {
+        const r = await axios.post(
+          `${import.meta.env.VITE_API_BASE}/api/auth/refresh-token`,
+          null,
+          { headers: { Authorization: `Bearer ${refresh}` } }
+        );
+
+        const newAccess = r.data?.data?.accessToken;
+        if (!newAccess) throw new Error("No access token returned");
+
+        localStorage.setItem("owner_access", newAccess);
+        original.headers.Authorization = `Bearer ${newAccess}`;
+        return api(original);
+
+      } catch (err) {
+        console.warn("Refresh token failed:", err);
+        localStorage.removeItem("owner_access");
+        localStorage.removeItem("owner_refresh");
+        window.location.href = "/owner/login";
       }
-
-      return new Promise((resolve) => {
-        queue.push((token) => {
-          original.headers.Authorization = `Bearer ${token}`;
-          resolve(api(original));
-        });
-      });
     }
-    throw error;
+
+    return Promise.reject(error);
   }
 );
+
 
 export default api;
