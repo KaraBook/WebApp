@@ -15,7 +15,7 @@ import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 
 export default function OwnerLayout() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ownerName, setOwnerName] = useState("");
 
@@ -27,36 +27,43 @@ export default function OwnerLayout() {
   ];
 
   useEffect(() => {
-    (async () => {
+    const fetchOwnerProfile = async () => {
       try {
-        const res = await api.get(SummaryApi.getOwnerProfile.url);
+        const res = await api.get(SummaryApi.getOwnerProfile.url, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+        });
         const { user } = res.data ?? {};
+
+        let fullName = "";
         if (user?.firstName || user?.lastName) {
-          setOwnerName(`${user.firstName ?? ""} ${user.lastName ?? ""}`.trim());
+          fullName = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
         } else if (user?.name && !/^owner$/i.test(user.name.trim())) {
-          setOwnerName(user.name.trim());
-        } else {
-          setOwnerName("KaraBook Owner");
+          fullName = user.name.trim();
         }
 
+        setOwnerName(fullName || "KaraBook Owner");
       } catch (err) {
         console.error("Failed to load owner profile:", err);
+        setOwnerName(user?.name || "KaraBook Owner");
       }
-    })();
-  }, []);
+    };
+
+    fetchOwnerProfile();
+  }, [user]);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside
-        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
+        className={`${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
       >
         <div>
-          {/* Owner Name */}
+          {/* Owner Name / Logo */}
           <div className="p-4 border-b flex items-center justify-between">
             <h1 className="text-lg font-semibold text-emerald-700 tracking-tight truncate">
-              {ownerName || "KaraBook Owner"}
+              {ownerName}
             </h1>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -66,7 +73,7 @@ export default function OwnerLayout() {
             </button>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation Links */}
           <nav className="mt-4">
             {navItems.map(({ name, path, icon: Icon }) => (
               <NavLink
@@ -74,9 +81,10 @@ export default function OwnerLayout() {
                 to={path}
                 end
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${isActive
-                    ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
-                    : "text-gray-700 hover:bg-gray-100"
+                  `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${
+                    isActive
+                      ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`
                 }
                 onClick={() => setSidebarOpen(false)}
@@ -88,7 +96,7 @@ export default function OwnerLayout() {
           </nav>
         </div>
 
-        {/* Logout */}
+        {/* Logout Button */}
         <div className="p-4 border-t mt-4">
           <Button
             onClick={logout}
@@ -102,6 +110,7 @@ export default function OwnerLayout() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen">
+        {/* Header */}
         <header className="bg-white border-b p-4 flex items-center justify-between shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -115,6 +124,7 @@ export default function OwnerLayout() {
           <div></div>
         </header>
 
+        {/* Dynamic Page Content */}
         <div className="flex-1 p-6 bg-gray-50 overflow-y-auto">
           <Outlet />
         </div>
