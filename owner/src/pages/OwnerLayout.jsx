@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   LogOut,
   LayoutDashboard,
@@ -15,12 +15,13 @@ import { useState } from "react";
 export default function OwnerLayout() {
   const { logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
 
   const navItems = [
-    { name: "Dashboard", path: "/owner/dashboard", icon: LayoutDashboard },
-    { name: "Properties", path: "/owner/properties", icon: Building2 },
-    { name: "Bookings", path: "/owner/bookings", icon: ClipboardList },
-    { name: "Calendar", path: "/owner/calendar", icon: Calendar },
+    { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+    { name: "Properties", path: "/properties", icon: Building2 },
+    { name: "Bookings", path: "/bookings", icon: ClipboardList },
+    { name: "Calendar", path: "/calendar", icon: Calendar },
   ];
 
   return (
@@ -47,23 +48,24 @@ export default function OwnerLayout() {
 
           {/* Navigation Links */}
           <nav className="mt-4">
-            {navItems.map(({ name, path, icon: Icon }) => (
-              <NavLink
-                key={name}
-                to={path}
-                end
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${
+            {navItems.map(({ name, path, icon: Icon }) => {
+              const isActive = location.pathname === `/owner${path}`;
+              return (
+                <NavLink
+                  key={name}
+                  to={path}
+                  className={`flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${
                     isActive
                       ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
                       : "text-gray-700 hover:bg-gray-100"
-                  }`
-                }
-              >
-                <Icon className="w-4 h-4 opacity-80" />
-                <span>{name}</span>
-              </NavLink>
-            ))}
+                  }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Icon className="w-4 h-4 opacity-80" />
+                  <span>{name}</span>
+                </NavLink>
+              );
+            })}
           </nav>
         </div>
 
