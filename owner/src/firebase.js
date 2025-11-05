@@ -1,8 +1,6 @@
-// src/firebase.js
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
-// ✅ Initialize once
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FB_API_KEY,
   authDomain: import.meta.env.VITE_FB_AUTH_DOMAIN,
@@ -18,7 +16,6 @@ try {
 }
 export const auth = getAuth(app);
 
-// ✅ Helper with explicit checks + diagnostics
 export const buildRecaptcha = async () => {
   if (typeof window === "undefined") throw new Error("No window object");
   if (!auth || !auth.app) throw new Error("Auth instance not ready");
@@ -31,7 +28,7 @@ export const buildRecaptcha = async () => {
   }
 
   const verifier = new RecaptchaVerifier(
-    auth, // ✅ auth FIRST argument here (Firebase v10 pattern)
+    auth, 
     "recaptcha-container",
     {
       size: "invisible",

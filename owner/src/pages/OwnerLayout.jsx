@@ -27,9 +27,8 @@ export default function OwnerLayout() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside
-        className={`${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
+        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
       >
         <div>
           {/* Logo / Title */}
@@ -52,15 +51,15 @@ export default function OwnerLayout() {
                 key={name}
                 to={path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-6 py-2.5 text-sm transition-colors rounded-md mx-2 my-1 ${
-                    isActive
-                      ? "bg-emerald-50 text-emerald-700 font-medium border-l-4 border-emerald-600"
-                      : "text-gray-700 hover:bg-gray-100"
+                  `flex items-center gap-3 px-6 py-2.5 text-sm transition-colors rounded-md mx-2 my-1 ${isActive
+                    ? "bg-gray-100 text-gray-900 font-medium border-l-4 border-emerald-600"
+                    : "text-gray-700 hover:bg-gray-100"
                   }`
                 }
               >
                 <Icon className="w-4 h-4" /> {name}
               </NavLink>
+
             ))}
           </nav>
         </div>
