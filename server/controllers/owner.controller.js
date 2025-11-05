@@ -1,11 +1,26 @@
 import Booking from "../models/Booking.js";
 import Property from "../models/Property.js";
+import User from "../models/User.js";
 
 export const getOwnerDashboard = async (req, res) => {
   try {
     const ownerId = req.user.id;
-    const properties = await Property.find({ ownerUserId: ownerId });
+
+    // Find the owner first (for fallback match on mobile/email)
+    const owner = await User.findById(ownerId).select("mobile email");
+
+    // Fetch properties linked either by ownerUserId or by resortOwner info
+    const properties = await Property.find({
+      $or: [
+        { ownerUserId: ownerId },
+        { "resortOwner.mobile": owner?.mobile },
+        { "resortOwner.email": owner?.email },
+      ],
+    });
+
     const propertyIds = properties.map((p) => p._id);
+
+    // Fetch bookings tied to those properties
     const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
       .populate("userId", "firstName lastName mobile")
       .populate("propertyId", "propertyName");
@@ -18,7 +33,7 @@ export const getOwnerDashboard = async (req, res) => {
       failed: bookings.filter((b) => b.paymentStatus === "failed").length,
       totalRevenue: bookings
         .filter((b) => b.paymentStatus === "paid")
-        .reduce((sum, b) => sum + b.totalAmount, 0),
+        .reduce((sum, b) => sum + (b.totalAmount || 0), 0),
     };
 
     res.json({ success: true, data: { stats, properties, bookings } });
@@ -28,11 +43,21 @@ export const getOwnerDashboard = async (req, res) => {
   }
 };
 
+// 🧩 Improved getOwnerProperties with fallback
 export const getOwnerProperties = async (req, res) => {
   try {
-    const properties = await Property.find({ ownerUserId: req.user.id });
+    const owner = await User.findById(req.user.id).select("mobile email");
+    const properties = await Property.find({
+      $or: [
+        { ownerUserId: req.user.id },
+        { "resortOwner.mobile": owner?.mobile },
+        { "resortOwner.email": owner?.email },
+      ],
+    });
+
     res.json({ success: true, data: properties });
   } catch (err) {
+    console.error("getOwnerProperties error:", err);
     res.status(500).json({ success: false, message: "Failed to load properties" });
   }
 };
