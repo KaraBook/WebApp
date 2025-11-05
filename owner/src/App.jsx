@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import OwnerLayout from "./pages/OwnerLayout"; 
+import Properties from "./pages/Properties";
 
 export default function App() {
   return (
@@ -20,8 +21,7 @@ export default function App() {
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
-        {/* You can add other routes here later */}
-        {/* <Route path="properties" element={<Properties />} /> */}
+        <Route path="properties" element={<Properties />} /> 
         {/* <Route path="bookings" element={<Bookings />} /> */}
         {/* <Route path="calendar" element={<Calendar />} /> */}
       </Route>
