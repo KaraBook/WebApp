@@ -33,7 +33,7 @@ export default function OwnerLayout() {
       >
         <div>
           {/* Logo / Title */}
-          <div className="p-5 border-b flex items-center justify-between">
+          <div className="p-4 border-b flex items-center justify-between">
             <h1 className="text-lg font-semibold text-emerald-700 tracking-tight">
               KaraBook Owner
             </h1>
