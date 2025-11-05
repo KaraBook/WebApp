@@ -6,7 +6,7 @@ import {
   ClipboardList,
   Calendar,
   Menu,
-  X
+  X,
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,13 @@ export default function OwnerLayout() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside
-        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
+        className={`${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
       >
         <div>
           {/* Logo / Title */}
-          <div className="p-4 border-b flex items-center justify-between">
+          <div className="p-5 border-b flex items-center justify-between">
             <h1 className="text-lg font-semibold text-emerald-700 tracking-tight">
               KaraBook Owner
             </h1>
@@ -45,31 +46,33 @@ export default function OwnerLayout() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="mt-3">
+          <nav className="mt-4">
             {navItems.map(({ name, path, icon: Icon }) => (
               <NavLink
                 key={name}
                 to={path}
+                end
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-6 py-2.5 text-sm transition-colors rounded-md mx-2 my-1 ${isActive
-                    ? "bg-gray-100 text-gray-900 font-medium border-l-4 border-emerald-600"
-                    : "text-gray-700 hover:bg-gray-100"
+                  `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${
+                    isActive
+                      ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`
                 }
               >
-                <Icon className="w-4 h-4" /> {name}
+                <Icon className="w-4 h-4 opacity-80" />
+                <span>{name}</span>
               </NavLink>
-
             ))}
           </nav>
         </div>
 
         {/* Logout Button */}
-        <div className="p-4 border-t mt-3">
+        <div className="p-4 border-t mt-4">
           <Button
             onClick={logout}
             variant="outline"
-            className="w-full flex items-center justify-center gap-2 text-red-600 text-gray-700 hover:bg-gray-100"
+            className="w-full flex items-center justify-center gap-2 text-red-600 hover:bg-gray-100 font-medium"
           >
             <LogOut className="w-4 h-4" /> Logout
           </Button>
