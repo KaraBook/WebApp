@@ -108,7 +108,13 @@ export default function Login() {
               <Label htmlFor="mobile">Mobile Number</Label>
               <div className="flex gap-2">
                 <div className="px-3 py-2 rounded-md border bg-muted text-sm text-gray-700 select-none">+91</div>
-                <Input id="mobile" placeholder="10-digit mobile" value={mobile} onChange={(e) => setMobile(e.target.value)} />
+                <Input id="mobile" placeholder="10-digit mobile" value={mobile}
+                  maxLength={10} 
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    if (value.length <= 10) setMobile(value);
+                  }}
+                />
               </div>
               <Button onClick={sendOtp} disabled={loading} className="w-full">
                 {loading ? "Sending OTP..." : "Send OTP"}
