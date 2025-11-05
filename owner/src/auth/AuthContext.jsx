@@ -8,9 +8,10 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
 
-  // ✅ Rehydrate user on app load if token exists
   useEffect(() => {
     const token = localStorage.getItem("owner_access");
+    const cached = localStorage.getItem("owner_user");
+    if (cached) setUser(JSON.parse(cached));
     if (!token) {
       setReady(true);
       return;
@@ -44,6 +45,7 @@ export function AuthProvider({ children }) {
   const loginWithTokens = (payload) => {
     localStorage.setItem("owner_access", payload.accessToken);
     localStorage.setItem("owner_refresh", payload.refreshToken);
+    localStorage.setItem("owner_user", JSON.stringify(payload.user));
     setUser(payload.user);
   };
 
