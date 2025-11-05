@@ -5,11 +5,8 @@ import User from "../models/User.js";
 export const getOwnerDashboard = async (req, res) => {
   try {
     const ownerId = req.user.id;
-
-    // Find the owner first (for fallback match on mobile/email)
     const owner = await User.findById(ownerId).select("mobile email");
 
-    // Fetch properties linked either by ownerUserId or by resortOwner info
     const properties = await Property.find({
       $or: [
         { ownerUserId: ownerId },
@@ -20,7 +17,6 @@ export const getOwnerDashboard = async (req, res) => {
 
     const propertyIds = properties.map((p) => p._id);
 
-    // Fetch bookings tied to those properties
     const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
       .populate("userId", "firstName lastName mobile")
       .populate("propertyId", "propertyName");
@@ -43,7 +39,6 @@ export const getOwnerDashboard = async (req, res) => {
   }
 };
 
-// 🧩 Improved getOwnerProperties with fallback
 export const getOwnerProperties = async (req, res) => {
   try {
     const owner = await User.findById(req.user.id).select("mobile email");
@@ -54,7 +49,6 @@ export const getOwnerProperties = async (req, res) => {
         { "resortOwner.email": owner?.email },
       ],
     });
-
     res.json({ success: true, data: properties });
   } catch (err) {
     console.error("getOwnerProperties error:", err);
@@ -64,10 +58,17 @@ export const getOwnerProperties = async (req, res) => {
 
 export const getOwnerBookings = async (req, res) => {
   try {
-    const ownerId = req.user.id;
-    const propertyIds = (
-      await Property.find({ ownerUserId: ownerId }).select("_id")
-    ).map((p) => p._id);
+    const owner = await User.findById(req.user.id).select("mobile email");
+
+    const properties = await Property.find({
+      $or: [
+        { ownerUserId: req.user.id },
+        { "resortOwner.mobile": owner?.mobile },
+        { "resortOwner.email": owner?.email },
+      ],
+    }).select("_id");
+
+    const propertyIds = properties.map((p) => p._id);
 
     const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
       .populate("propertyId", "propertyName")
@@ -75,6 +76,7 @@ export const getOwnerBookings = async (req, res) => {
 
     res.json({ success: true, data: bookings });
   } catch (err) {
+    console.error("getOwnerBookings error:", err);
     res.status(500).json({ success: false, message: "Failed to load bookings" });
   }
 };
