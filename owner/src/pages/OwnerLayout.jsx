@@ -33,11 +33,12 @@ export default function OwnerLayout() {
         const { user } = res.data ?? {};
         if (user?.firstName || user?.lastName) {
           setOwnerName(`${user.firstName ?? ""} ${user.lastName ?? ""}`.trim());
-        } else if (user?.name) {
-          setOwnerName(user.name);
+        } else if (user?.name && !/^owner$/i.test(user.name.trim())) {
+          setOwnerName(user.name.trim());
         } else {
-          setOwnerName("Owner");
+          setOwnerName("KaraBook Owner");
         }
+
       } catch (err) {
         console.error("Failed to load owner profile:", err);
       }
@@ -48,9 +49,8 @@ export default function OwnerLayout() {
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
       <aside
-        className={`${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
+        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
       >
         <div>
           {/* Owner Name */}
@@ -74,10 +74,9 @@ export default function OwnerLayout() {
                 to={path}
                 end
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${
-                    isActive
-                      ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
-                      : "text-gray-700 hover:bg-gray-100"
+                  `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${isActive
+                    ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
+                    : "text-gray-700 hover:bg-gray-100"
                   }`
                 }
                 onClick={() => setSidebarOpen(false)}
