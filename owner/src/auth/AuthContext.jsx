@@ -21,7 +21,6 @@ export function AuthProvider({ children }) {
       try {
         const res = await api.get(SummaryApi.getOwnerProfile.url);
 
-        // Normalize possible shapes of backend response
         const possibleUser =
           res.data?.user || res.data?.data?.user || res.data?.data || res.data;
 
