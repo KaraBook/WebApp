@@ -1,79 +1,40 @@
 import { NavLink, Outlet } from "react-router-dom";
 import {
-  LogOut,
-  LayoutDashboard,
-  Building2,
-  ClipboardList,
-  Calendar,
-  Menu,
-  X,
+  LogOut, LayoutDashboard, Building2, ClipboardList, Calendar, Menu, X,
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import api from "../api/axios";
-import SummaryApi from "../common/SummaryApi";
+import { useState } from "react";
 
 export default function OwnerLayout() {
-  const { logout, user } = useAuth();
+  const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [ownerName, setOwnerName] = useState("");
+
+  const fullName =
+    (user?.firstName || user?.lastName)
+      ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+      : user?.name || user?.mobile || "KaraBook Owner";
 
   const navItems = [
-    { name: "Dashboard", path: "dashboard", icon: LayoutDashboard },
+    { name: "Dashboard", path: "dashboard",  icon: LayoutDashboard },
     { name: "Properties", path: "properties", icon: Building2 },
-    { name: "Bookings", path: "bookings", icon: ClipboardList },
-    { name: "Calendar", path: "calendar", icon: Calendar },
+    { name: "Bookings", path: "bookings",    icon: ClipboardList },
+    { name: "Calendar", path: "calendar",    icon: Calendar },
   ];
-
-  useEffect(() => {
-    const fetchOwnerProfile = async () => {
-      try {
-        const res = await api.get(SummaryApi.getOwnerProfile.url, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
-        });
-        const { user } = res.data ?? {};
-
-        let fullName = "";
-        if (user?.firstName || user?.lastName) {
-          fullName = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
-        } else if (user?.name && !/^owner$/i.test(user.name.trim())) {
-          fullName = user.name.trim();
-        }
-
-        setOwnerName(fullName || "KaraBook Owner");
-      } catch (err) {
-        console.error("Failed to load owner profile:", err);
-        setOwnerName(user?.name || "KaraBook Owner");
-      }
-    };
-
-    fetchOwnerProfile();
-  }, [user]);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside
-        className={`${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}
-      >
+      <aside className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r shadow-sm flex flex-col justify-between transform transition-transform duration-200`}>
         <div>
-          {/* Owner Name / Logo */}
           <div className="p-4 border-b flex items-center justify-between">
             <h1 className="text-lg font-semibold text-emerald-700 tracking-tight truncate">
-              {ownerName}
+              {fullName}
             </h1>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="md:hidden text-gray-500 hover:text-gray-700"
-            >
+            <button onClick={() => setSidebarOpen(false)} className="md:hidden text-gray-500 hover:text-gray-700">
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Navigation Links */}
           <nav className="mt-4">
             {navItems.map(({ name, path, icon: Icon }) => (
               <NavLink
@@ -82,9 +43,7 @@ export default function OwnerLayout() {
                 end
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${
-                    isActive
-                      ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
-                      : "text-gray-700 hover:bg-gray-100"
+                    isActive ? "bg-gray-100 text-gray-900 font-medium shadow-sm" : "text-gray-700 hover:bg-gray-100"
                   }`
                 }
                 onClick={() => setSidebarOpen(false)}
@@ -96,35 +55,22 @@ export default function OwnerLayout() {
           </nav>
         </div>
 
-        {/* Logout Button */}
         <div className="p-4 border-t mt-4">
-          <Button
-            onClick={logout}
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2 text-red-600 hover:bg-gray-100 font-medium"
-          >
+          <Button onClick={logout} variant="outline" className="w-full flex items-center justify-center gap-2 text-red-600 hover:bg-gray-100 font-medium">
             <LogOut className="w-4 h-4" /> Logout
           </Button>
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col min-h-screen">
-        {/* Header */}
         <header className="bg-white border-b p-4 flex items-center justify-between shadow-sm">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="md:hidden text-gray-700 hover:text-emerald-700"
-          >
+          <button onClick={() => setSidebarOpen(true)} className="md:hidden text-gray-700 hover:text-emerald-700">
             <Menu className="w-5 h-5" />
           </button>
-          <h2 className="text-lg font-semibold text-gray-800">
-            Owner Dashboard
-          </h2>
-          <div></div>
+          <h2 className="text-lg font-semibold text-gray-800">Owner Dashboard</h2>
+          <div />
         </header>
 
-        {/* Dynamic Page Content */}
         <div className="flex-1 p-6 bg-gray-50 overflow-y-auto">
           <Outlet />
         </div>
