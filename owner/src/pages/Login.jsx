@@ -54,6 +54,7 @@ export default function Login() {
     try {
       const cred = await confirmRes.confirm(otp);
       const idToken = await cred.user.getIdToken();
+
       const r = await api.post("/api/auth/resort-owner/login", null, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
@@ -62,11 +63,20 @@ export default function Login() {
       navigate("/dashboard", { replace: true });
     } catch (e) {
       console.error("verifyOtp error:", e);
-      toast.error(e.response?.data?.message || e.message || "OTP verification failed");
+
+      if (e.code === "auth/invalid-verification-code") {
+        toast.error("Incorrect OTP. Please try again.");
+      } else if (e.code === "auth/session-expired") {
+        toast.error("OTP session expired. Please resend OTP.");
+        setPhase("enter");
+      } else {
+        toast.error(e.response?.data?.message || e.message || "OTP verification failed");
+      }
     } finally {
       setLoading(false);
     }
   };
+
 
   function mapFirebasePhoneError(e) {
     const c = e?.code || "";
