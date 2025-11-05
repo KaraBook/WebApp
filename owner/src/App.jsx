@@ -2,21 +2,19 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./auth/ProtectedRoute";
-import OwnerLayout from "./pages/OwnerLayout"; // Import your layout
-// You can later add Property, Booking, Calendar pages here too.
+import OwnerLayout from "./pages/OwnerLayout"; 
 
 export default function App() {
   return (
     <Routes>
-      {/* Public Routes */}
+
       <Route path="/login" element={<Login />} />
 
-      {/* Protected Owner Routes */}
       <Route
         path="/"
         element={
           <ProtectedRoute>
-            <OwnerLayout /> {/* ✅ Wrap all owner pages inside sidebar layout */}
+            <OwnerLayout /> 
           </ProtectedRoute>
         }
       >
