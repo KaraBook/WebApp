@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
 
-  // ✅ Rehydrate user when app loads (if token exists)
+  // ✅ Rehydrate user on app load if token exists
   useEffect(() => {
     const token = localStorage.getItem("owner_access");
     if (!token) {
@@ -19,15 +19,23 @@ export function AuthProvider({ children }) {
     (async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerProfile.url);
-        const data = res.data?.user || res.data?.data?.user || res.data?.data;
-        if (data) setUser(data);
+
+        // Normalize possible shapes of backend response
+        const possibleUser =
+          res.data?.user || res.data?.data?.user || res.data?.data || res.data;
+
+        if (possibleUser && (possibleUser.firstName || possibleUser.name)) {
+          setUser(possibleUser);
+        } else {
+          console.warn("⚠️ Unexpected user payload:", res.data);
+        }
       } catch (err) {
-        console.warn("Auto-login failed:", err.response?.status);
+        console.warn("Auto-login failed:", err.response?.status, err.message);
         if (err.response?.status === 401) {
           localStorage.removeItem("owner_access");
           localStorage.removeItem("owner_refresh");
         }
-      }finally {
+      } finally {
         setReady(true);
       }
     })();
@@ -46,7 +54,10 @@ export function AuthProvider({ children }) {
     window.location.href = "/owner/login";
   };
 
-  const value = useMemo(() => ({ user, ready, loginWithTokens, logout }), [user, ready]);
+  const value = useMemo(
+    () => ({ user, ready, loginWithTokens, logout }),
+    [user, ready]
+  );
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
