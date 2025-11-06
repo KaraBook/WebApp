@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Users, BedDouble, IndianRupee, CheckCircle2, XCircle, ShieldCheck, Image as ImageIcon,
-  FileText, ArrowLeft, Edit3, Link2, Check, Star, } from "lucide-react";
+import {
+  MapPin, Clock, Users, BedDouble, IndianRupee, CheckCircle2, XCircle, ShieldCheck, Image as ImageIcon,
+  FileText, ArrowLeft, Edit3, Link2, Check, Star,
+} from "lucide-react";
 
 const isImageUrl = (url = "") =>
   /\.(jpeg|jpg|png|gif|webp|bmp|svg)$/i.test(url.split("?")[0] || "");
@@ -90,9 +92,10 @@ const ViewProperty = () => {
     state,
     pinCode,
     locationLink,
+    roomBreakdown = { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
     totalRooms,
     maxGuests,
-    roomTypes = [],
+    petFriendly,
     pricingPerNightWeekdays,
     pricingPerNightWeekend,
     extraGuestCharge,
@@ -316,13 +319,12 @@ const ViewProperty = () => {
           </div>
 
           {/* Capacity & Pricing */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
             <Card>
               <CardHeader className="pb-2">
                 <SectionTitle icon={BedDouble}>Capacity</SectionTitle>
               </CardHeader>
               <CardContent>
-                <Field label="Total Rooms / Units">{totalRooms}</Field>
                 <Field label="Max Guests Allowed">
                   <div className="inline-flex items-center gap-2">
                     <Users className="h-4 w-4" />
@@ -330,14 +332,19 @@ const ViewProperty = () => {
                   </div>
                 </Field>
                 <Separator />
-                <Field label="Room Types">
-                  {roomTypes?.length ? (
-                    <div className="flex flex-wrap gap-2">
-                      {roomTypes.map((r, i) => (
-                        <Badge key={i} variant="secondary" className="capitalize">
-                          {r}
+                <Field label="Room Breakdown">
+                  {roomBreakdown ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
+                        <Badge key={key} variant="secondary" className="capitalize flex justify-between w-24">
+                          <span>{key === "nonAc" ? "Non AC" : key}</span>
+                          <span className="font-semibold ml-2">{roomBreakdown[key] ?? 0}</span>
                         </Badge>
                       ))}
+                      <Badge className="bg-black text-white flex justify-between w-full">
+                        <span>Total</span>
+                        <span className="font-semibold ml-2">{roomBreakdown.total ?? 0}</span>
+                      </Badge>
                     </div>
                   ) : (
                     "-"
@@ -441,6 +448,13 @@ const ViewProperty = () => {
                 </Field>
                 <Field label="Published">{publishNow ? "Yes" : "No"}</Field>
                 <Field label="Featured">{featured ? "Yes" : "No"}</Field>
+                <Field label="Pet Friendly">
+                  {typeof petFriendly === "boolean"
+                    ? petFriendly
+                      ? "Yes"
+                      : "No"
+                    : "-"}
+                </Field>
               </CardContent>
             </Card>
 

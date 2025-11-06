@@ -4,15 +4,15 @@ const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 const PROPERTY_NAME_REGEX = /^(?!^\d+$)(?!^\s)[a-zA-Z0-9\s@#&.,]+$/;
 
 const baseFields = {
- propertyName: Joi.string()
-  .trim() 
-  .min(10)
-  .max(100)
-  .pattern(/^(?!\d+$)[A-Za-z0-9 @#&.,]+$/)
-  .required()
-  .messages({
-    "string.pattern.base": "Property name must be 10+ chars, not only digits, and can include @ # & . ,"
-  }),
+  propertyName: Joi.string()
+    .trim()
+    .min(10)
+    .max(100)
+    .pattern(/^(?!\d+$)[A-Za-z0-9 @#&.,]+$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Property name must be 10+ chars, not only digits, and can include @ # & . ,"
+    }),
 
   resortOwner: Joi.object({
     firstName: Joi.string().min(2).max(50).pattern(/^[\p{L}\s.'-]+$/u).required()
@@ -31,15 +31,15 @@ const baseFields = {
   propertyType: Joi.string().valid("villa", "tent", "cottage", "hotel").required(),
   description: Joi.string().min(30).max(500).required(),
   addressLine1: Joi.string()
-  .trim()
-  .min(5)
-  .max(100)
-  .pattern(/^(?!\d+$)[A-Za-z0-9\s,.\-#/&]+$/)
-  .required()
-  .messages({
-    "string.pattern.base":
-      "Address Line 1 can include letters, numbers, spaces, and , . - # / &, but cannot be only digits or contain special symbols"
-  }),
+    .trim()
+    .min(5)
+    .max(100)
+    .pattern(/^(?!\d+$)[A-Za-z0-9\s,.\-#/&]+$/)
+    .required()
+    .messages({
+      "string.pattern.base":
+        "Address Line 1 can include letters, numbers, spaces, and , . - # / &, but cannot be only digits or contain special symbols"
+    }),
   addressLine2: Joi.string().max(100).allow(""),
   state: Joi.string()
     .pattern(/^[\p{L}]+(?:[\s][\p{L}]+)*$/u)
@@ -55,9 +55,14 @@ const baseFields = {
     }),
   pinCode: Joi.string().length(6).pattern(/^[0-9]+$/).required(),
   locationLink: Joi.string().uri().required(),
-  totalRooms: Joi.number().min(1).max(999).required(),
+  roomBreakdown: Joi.object({
+    ac: Joi.number().min(0).max(999).default(0),
+    nonAc: Joi.number().min(0).max(999).default(0),
+    deluxe: Joi.number().min(0).max(999).default(0),
+    luxury: Joi.number().min(0).max(999).default(0),
+    total: Joi.number().min(0).max(999).default(0),
+  }).required(),
   maxGuests: Joi.number().min(1).max(999).required(),
-  roomTypes: Joi.array().items(Joi.string()),
   petFriendly: Joi.boolean().required(),
   pricingPerNightWeekdays: Joi.number().min(10).max(999999).required(),
   pricingPerNightWeekend: Joi.number().min(10).max(999999).required(),
@@ -139,23 +144,52 @@ function normalizeArraysAndTypes(body) {
 
 export const validatePropertyDraft = (req, res, next) => {
   const payload = { ...req.body };
+
+  if (payload.roomBreakdown && typeof payload.roomBreakdown === "string") {
+    try {
+      payload.roomBreakdown = JSON.parse(payload.roomBreakdown);
+    } catch {
+      payload.roomBreakdown = {};
+    }
+  }
+
   payload.resortOwner = parseResortOwnerFromBody(payload);
   normalizeArraysAndTypes(payload);
 
   const { error } = draftSchema.validate(payload, { allowUnknown: true, stripUnknown: true });
-  if (error) return res.status(400).json({ success: false, message: error.details[0].message });
+  if (error)
+    return res
+      .status(400)
+      .json({ success: false, message: error.details[0].message });
+
   next();
 };
 
+
+
 export const validatePropertyUpdate = (req, res, next) => {
   const payload = { ...req.body };
+
+  if (payload.roomBreakdown && typeof payload.roomBreakdown === "string") {
+    try {
+      payload.roomBreakdown = JSON.parse(payload.roomBreakdown);
+    } catch {
+      payload.roomBreakdown = {};
+    }
+  }
+
   payload.resortOwner = parseResortOwnerFromBody(payload);
   normalizeArraysAndTypes(payload);
 
   const { error } = updateSchema.validate(payload, { allowUnknown: true, stripUnknown: true });
-  if (error) return res.status(400).json({ success: false, message: error.details[0].message });
+  if (error)
+    return res
+      .status(400)
+      .json({ success: false, message: error.details[0].message });
+
   next();
 };
+
 
 export const ensureMediaFilesPresent = (req, res, next) => {
   const cover = req.files?.coverImage?.[0];

@@ -18,7 +18,6 @@ import { QuantityBox } from "@/components/QuantityBox";
 import { Check } from "lucide-react";
 import {
   propertyTypeOptions,
-  roomTypeOptions,
   foodOptions,
   amenitiesOptions,
   kycVerifiedOptions,
@@ -55,7 +54,7 @@ const EditProperty = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-  
+
 
   const [formData, setFormData] = useState({
     propertyName: "",
@@ -65,12 +64,12 @@ const EditProperty = () => {
     addressLine1: "",
     addressLine2: "",
     state: "",
+    petFriendly: false,
     city: "",
     pinCode: "",
     locationLink: "",
-    totalRooms: "",
+    roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
     maxGuests: "",
-    roomTypes: [],
     pricingPerNightWeekdays: "",
     pricingPerNightWeekend: "",
     extraGuestCharge: "",
@@ -146,12 +145,12 @@ const EditProperty = () => {
           addressLine1: prop.addressLine1 || "",
           addressLine2: prop.addressLine2 || "",
           state: prop.state || "",
+          petFriendly: !!prop.petFriendly,
           city: prop.city || "",
           pinCode: prop.pinCode || "",
           locationLink: prop.locationLink || "",
-          totalRooms: prop.totalRooms || "",
+          roomBreakdown: prop.roomBreakdown || { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
           maxGuests: prop.maxGuests || "",
-          roomTypes: prop.roomTypes || [],
           pricingPerNightWeekdays: prop.pricingPerNightWeekdays?.toString?.() || "",
           pricingPerNightWeekend: prop.pricingPerNightWeekend?.toString?.() || "",
           extraGuestCharge: prop.extraGuestCharge?.toString?.() || "",
@@ -191,7 +190,15 @@ const EditProperty = () => {
     try {
       const data = new FormData();
 
-      // Append fields (same strategy as AddProperty)
+      const rb = formData.roomBreakdown;
+      const total =
+        Number(rb.ac || 0) +
+        Number(rb.nonAc || 0) +
+        Number(rb.deluxe || 0) +
+        Number(rb.luxury || 0);
+
+      formData.roomBreakdown = { ...rb, total };
+      formData.totalRooms = total;
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "resortOwner") {
           Object.entries(value).forEach(([ownerKey, ownerValue]) => {
@@ -206,7 +213,6 @@ const EditProperty = () => {
         }
       });
 
-      // Only append files when changed
       if (coverImageFile) {
         data.append("coverImage", coverImageFile);
       }
@@ -566,21 +572,52 @@ const EditProperty = () => {
         {/* STEP 3 */}
         {currentStep === 3 && (
           <>
-            <div className="w-[32%]">
-              <Label htmlFor="totalRooms" className="text-sm">
-                Total Rooms / Units <span className="text-red-500">*</span>
-              </Label>
-              <div className="mt-2">
-                <QuantityBox
-                  value={formData.totalRooms}
-                  onChange={(val) => setFormData((prev) => ({ ...prev, totalRooms: val }))}
-                  min={1}
-                  max={999}
-                />
+            <div className="w-full">
+              <Label className="text-sm font-semibold">Total Rooms / Units</Label>
+              <div className="flex flex-wrap items-center gap-3 mt-3">
+                {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
+                  <div key={key} className="flex items-center gap-2">
+                    <span className="px-3 py-1 bg-black text-white rounded-md text-sm capitalize">
+                      {key === "nonAc" ? "Non AC" : key}
+                    </span>
+                    <QuantityBox
+                      value={formData.roomBreakdown[key]}
+                      onChange={(val) => {
+                        setFormData((prev) => {
+                          const updated = {
+                            ...prev,
+                            roomBreakdown: {
+                              ...prev.roomBreakdown,
+                              [key]: val,
+                            },
+                          };
+                          const { ac, nonAc, deluxe, luxury } = updated.roomBreakdown;
+                          updated.roomBreakdown.total =
+                            Number(ac) + Number(nonAc) + Number(deluxe) + Number(luxury);
+                          return updated;
+                        });
+                      }}
+                      min={0}
+                      max={999}
+                    />
+                  </div>
+                ))}
+
+                <div className="flex items-center gap-2 ml-4">
+                  <span className="px-3 py-1 bg-black text-white rounded-md text-sm">
+                    Total
+                  </span>
+                  <input
+                    readOnly
+                    className="w-16 text-center border rounded-md py-1"
+                    value={formData.roomBreakdown.total}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="w-[32%]">
+
+            <div className="w-[15%]">
               <Label htmlFor="maxGuests" className="text-sm">
                 Max Guests Allowed <span className="text-red-500">*</span>
               </Label>
@@ -594,17 +631,8 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[32%]">
-              <MultiSelectButtons
-                label="Room Types"
-                options={roomTypeOptions}
-                selected={formData.roomTypes}
-                onChange={(selected) => setFormData((prev) => ({ ...prev, roomTypes: selected }))}
-              />
-            </div>
-
-            <div className="w-[32%]">
-              <Label htmlFor="pricingPerNightWeekdays" className="block font-medium">
+            <div className="w-[25%]">
+              <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
                 Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -624,8 +652,8 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[32%]">
-              <Label htmlFor="pricingPerNightWeekend" className="block font-medium">
+            <div className="w-[25%]">
+              <Label htmlFor="pricingPerNightWeekend" className="block font-medium mt-2">
                 Price Per Night (Weekend) (₹) <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -645,8 +673,8 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[32%]">
-              <Label htmlFor="extraGuestCharge" className="block font-medium">
+            <div className="w-[25%]">
+              <Label htmlFor="extraGuestCharge" className="block font-medium mt-2">
                 Extra Guest Charge (₹)
               </Label>
               <Input
@@ -690,6 +718,25 @@ const EditProperty = () => {
                 />
               </div>
             </div>
+
+            <div className="w-[48%]">
+              <SingleSelectDropdown
+                label="Is this property Pet Friendly?"
+                value={formData.petFriendly}
+                options={[
+                  { label: "Yes", value: true },
+                  { label: "No", value: false },
+                ]}
+                onChange={(val) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    petFriendly: val,
+                  }))
+                }
+                placeholder="Select Option"
+              />
+            </div>
+
 
           </>
         )}
@@ -775,7 +822,7 @@ const EditProperty = () => {
               )}
             </div>
 
-             <div className="w-[48%]">
+            <div className="w-[48%]">
               <SingleSelectDropdown
                 label="Approval Status"
                 value={formData.approvalStatus}
@@ -785,7 +832,7 @@ const EditProperty = () => {
               />
             </div>
 
-             <div className="w-[48%]">
+            <div className="w-[48%]">
               <SingleSelectDropdown
                 label="Featured Property"
                 value={formData.featured}
@@ -834,7 +881,7 @@ const EditProperty = () => {
               showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
             />
 
-              <div className="w-[48%] -mt-2">
+            <div className="w-[48%] -mt-2">
               <FileUploadsSection
                 setShopActFile={setShopActFile}
                 shopActFile={shopActFile}
@@ -844,7 +891,7 @@ const EditProperty = () => {
               />
             </div>
 
-             <div className="w-[48%]">
+            <div className="w-[48%]">
               <SingleSelectDropdown
                 label="Publish Now"
                 value={formData.publishNow}

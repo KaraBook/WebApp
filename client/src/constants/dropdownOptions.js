@@ -5,13 +5,6 @@ export const propertyTypeOptions = [
   { label: "Apartment", value: "apartment" },
 ];
 
-export const roomTypeOptions = [
-  { label: "AC", value: "AC" },
-  { label: "Non AC", value: "Non AC" },
-  { label: "Deluxe", value: "Deluxe" },
-  { label: "Luxury", value: "Luxury" },
-];
-
 export const foodOptions = [
   { label: "Breakfast", value: "breakfast" },
   { label: "Lunch", value: "lunch" },

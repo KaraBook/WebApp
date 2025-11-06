@@ -16,7 +16,7 @@ import MultiSelectButtons from "../components/MultiSelectButtons";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { QuantityBox } from "@/components/QuantityBox";
 import { Check } from "lucide-react";
-import { propertyTypeOptions, roomTypeOptions, foodOptions, amenitiesOptions, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions, petFriendlyOptions } from "../constants/dropdownOptions";
+import { propertyTypeOptions, foodOptions, amenitiesOptions, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions, petFriendlyOptions } from "../constants/dropdownOptions";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
@@ -59,9 +59,8 @@ const AddProperty = () => {
         city: "",
         pinCode: "",
         locationLink: "",
-        totalRooms: "",
+        roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
         maxGuests: "",
-        roomTypes: [],
         pricingPerNightWeekdays: "",
         pricingPerNightWeekend: "",
         extraGuestCharge: "",
@@ -128,9 +127,23 @@ const AddProperty = () => {
             city: formData.city,
             pinCode: formData.pinCode,
             locationLink: formData.locationLink,
-            totalRooms: num(formData.totalRooms),
+            roomBreakdown: {
+                ac: Number(formData.roomBreakdown.ac || 0),
+                nonAc: Number(formData.roomBreakdown.nonAc || 0),
+                deluxe: Number(formData.roomBreakdown.deluxe || 0),
+                luxury: Number(formData.roomBreakdown.luxury || 0),
+                total:
+                    Number(formData.roomBreakdown.ac || 0) +
+                    Number(formData.roomBreakdown.nonAc || 0) +
+                    Number(formData.roomBreakdown.deluxe || 0) +
+                    Number(formData.roomBreakdown.luxury || 0),
+            },
+            totalRooms:
+                Number(formData.roomBreakdown.ac || 0) +
+                Number(formData.roomBreakdown.nonAc || 0) +
+                Number(formData.roomBreakdown.deluxe || 0) +
+                Number(formData.roomBreakdown.luxury || 0),
             maxGuests: num(formData.maxGuests),
-            roomTypes: formData.roomTypes,
             pricingPerNightWeekdays: num(formData.pricingPerNightWeekdays),
             pricingPerNightWeekend: num(formData.pricingPerNightWeekend),
             extraGuestCharge: num(formData.extraGuestCharge),
@@ -584,23 +597,52 @@ const AddProperty = () => {
 
                 {currentStep === 3 && (
                     <>
-                        <div className="w-[32%]">
-                            <Label htmlFor="totalRooms" className="text-sm">
-                                Total Rooms / Units <span className="text-red-500">*</span>
-                            </Label>
-                            <div className="mt-2">
-                                <QuantityBox
-                                    value={formData.totalRooms}
-                                    onChange={(val) =>
-                                        setFormData((prev) => ({ ...prev, totalRooms: val }))
-                                    }
-                                    min={1}
-                                    max={999}
-                                />
+                        <div className="w-full">
+                            <Label className="text-sm font-semibold">Total Rooms / Units</Label>
+                            <div className="flex flex-wrap items-center gap-3 mt-3">
+                                {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
+                                    <div key={key} className="flex items-center gap-2">
+                                        <span className="px-3 py-1 bg-black text-white rounded-md text-sm capitalize">
+                                            {key === "nonAc" ? "Non AC" : key}
+                                        </span>
+                                        <QuantityBox
+                                            value={formData.roomBreakdown[key]}
+                                            onChange={(val) => {
+                                                setFormData((prev) => {
+                                                    const updated = {
+                                                        ...prev,
+                                                        roomBreakdown: {
+                                                            ...prev.roomBreakdown,
+                                                            [key]: val,
+                                                        },
+                                                    };
+                                                    const { ac, nonAc, deluxe, luxury } = updated.roomBreakdown;
+                                                    updated.roomBreakdown.total =
+                                                        Number(ac) + Number(nonAc) + Number(deluxe) + Number(luxury);
+                                                    return updated;
+                                                });
+                                            }}
+                                            min={0}
+                                            max={999}
+                                        />
+                                    </div>
+                                ))}
+
+                                <div className="flex items-center gap-2 ml-4">
+                                    <span className="px-3 py-1 bg-black text-white rounded-md text-sm">
+                                        Total
+                                    </span>
+                                    <input
+                                        readOnly
+                                        className="w-16 text-center border rounded-md py-1"
+                                        value={formData.roomBreakdown.total}
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <div className="w-[32%]">
+
+                        <div className="w-[15%]">
                             <Label htmlFor="maxGuests" className="text-sm">
                                 Max Guests Allowed <span className="text-red-500">*</span>
                             </Label>
@@ -616,18 +658,8 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                        <div className="w-[32%]">
-                            <MultiSelectButtons label="Room Types"
-                                options={roomTypeOptions}
-                                selected={formData.roomTypes}
-                                onChange={(selected) =>
-                                    setFormData((prev) => ({ ...prev, roomTypes: selected }))
-                                }
-                            />
-                        </div>
-
-                        <div className="w-[32%]">
-                            <Label htmlFor="pricingPerNightWeekdays" className="block font-medium">
+                        <div className="w-[26%]">
+                            <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
                                 Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -646,8 +678,8 @@ const AddProperty = () => {
                             />
                         </div>
 
-                        <div className="w-[32%]">
-                            <Label htmlFor="pricingPerNightWeekend" className="block font-medium">
+                        <div className="w-[26%]">
+                            <Label htmlFor="pricingPerNightWeekend" className="block font-medium mt-2">
                                 Price Per Night (Weekend) (₹) <span className="text-red-500">*</span>
                             </Label>
                             <Input
@@ -666,8 +698,8 @@ const AddProperty = () => {
                             />
                         </div>
 
-                        <div className="w-[32%]">
-                            <Label htmlFor="extraGuestCharge" className="block font-medium">
+                        <div className="w-[26%]">
+                            <Label htmlFor="extraGuestCharge" className="block font-medium mt-2">
                                 Extra Guest Charge (₹)
                             </Label>
                             <Input
@@ -715,7 +747,7 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                         <div className="w-[48%]">
+                        <div className="w-[48%]">
                             <SingleSelectDropdown
                                 label="Is this proprty Pet Friendly?"
                                 value={formData.petFriendly}

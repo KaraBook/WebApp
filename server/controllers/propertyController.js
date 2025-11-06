@@ -112,7 +112,7 @@ export const createPropertyDraft = async (req, res) => {
       } else {
         user.name = `${owner.firstName} ${owner.lastName}`.trim() || user.name;
         user.firstName = owner.firstName || user.firstName;
-        user.lastName  = owner.lastName  || user.lastName;
+        user.lastName = owner.lastName || user.lastName;
         user.mobile = owner.mobile || user.mobile;
         if (user.role !== "admin") user.role = "resortOwner";
         if (!user.password) {
@@ -121,6 +121,18 @@ export const createPropertyDraft = async (req, res) => {
         }
         await user.save({ session });
       }
+
+      // 🧩 Normalize room breakdown before saving
+      let roomBreakdown = req.body.roomBreakdown || {};
+      const ac = Number(roomBreakdown.ac || 0);
+      const nonAc = Number(roomBreakdown.nonAc || 0);
+      const deluxe = Number(roomBreakdown.deluxe || 0);
+      const luxury = Number(roomBreakdown.luxury || 0);
+      const total = ac + nonAc + deluxe + luxury;
+      roomBreakdown = { ac, nonAc, deluxe, luxury, total };
+
+      req.body.totalRooms = total;
+      req.body.roomBreakdown = roomBreakdown;
 
       propertyDoc = new Property({
         ...req.body,
@@ -171,9 +183,9 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     if (!prop) return res.status(404).json({ success: false, message: "Property not found" });
     if (prop.isBlocked) return res.status(403).json({ success: false, message: "Blocked property cannot be edited." });
 
-    const coverFile   = req.files?.coverImage?.[0];
+    const coverFile = req.files?.coverImage?.[0];
     const shopActFile = req.files?.shopAct?.[0];
-    const gallery     = req.files?.galleryPhotos || [];
+    const gallery = req.files?.galleryPhotos || [];
     const isImage = (m) => /^image\//.test(m || "");
 
     if (coverFile) {
@@ -225,8 +237,8 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
       const mailData = propertyCreatedTemplate({
         ownerFirstName: prop.resortOwner?.firstName,
         propertyName: prop.propertyName,
-        createdNewUser: false, 
-        tempPassword: null,    
+        createdNewUser: false,
+        tempPassword: null,
         portalUrl: `${process.env.PORTAL_URL}/owner/properties/${prop._id}`,
       });
 
@@ -316,12 +328,41 @@ export const updateProperty = async (req, res) => {
     if (req.is("application/json")) {
       Object.assign(updatedData, req.body);
 
+      if (req.body.roomBreakdown) {
+        let rb = req.body.roomBreakdown;
+        if (typeof rb === "string") {
+          try { rb = JSON.parse(rb); } catch (_) { }
+        }
+        const ac = Number(rb.ac || 0);
+        const nonAc = Number(rb.nonAc || 0);
+        const deluxe = Number(rb.deluxe || 0);
+        const luxury = Number(rb.luxury || 0);
+        const total = ac + nonAc + deluxe + luxury;
+        updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, total };
+        updatedData.totalRooms = total;
+      }
+
       const incomingOwner = parseResortOwner(req.body);
       if (incomingOwner?.email) updatedData.resortOwner = incomingOwner;
     }
 
     if (req.is("multipart/form-data")) {
       Object.assign(updatedData, req.body);
+
+      if (req.body.roomBreakdown) {
+        let rb = req.body.roomBreakdown;
+        if (typeof rb === "string") {
+          try { rb = JSON.parse(rb); } catch (_) { }
+        }
+        const ac = Number(rb.ac || 0);
+        const nonAc = Number(rb.nonAc || 0);
+        const deluxe = Number(rb.deluxe || 0);
+        const luxury = Number(rb.luxury || 0);
+        const total = ac + nonAc + deluxe + luxury;
+        updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, total };
+        updatedData.totalRooms = total;
+      }
+
 
       const incomingOwner = parseResortOwner(req.body);
       if (incomingOwner?.mobile) incomingOwner.mobile = normalizeMobile(incomingOwner.mobile);
@@ -381,16 +422,16 @@ export const updateProperty = async (req, res) => {
         if (incomingOwner.mobile.length === 10) {
           let user = existingProperty.ownerUserId
             ? await User.findById(existingProperty.ownerUserId)
-                .select("+password")
-                .session(session)
+              .select("+password")
+              .session(session)
             : await User.findOne({
-                $or: [
-                  { email: incomingOwner.email.toLowerCase() },
-                  { mobile: incomingOwner.mobile },
-                ],
-              })
-                .select("+password")
-                .session(session);
+              $or: [
+                { email: incomingOwner.email.toLowerCase() },
+                { mobile: incomingOwner.mobile },
+              ],
+            })
+              .select("+password")
+              .session(session);
 
           if (!user) {
             const hash = await bcrypt.hash(genTempPassword(), 10);
@@ -466,7 +507,7 @@ export const blockProperty = async (req, res) => {
   try {
     const { id } = req.params;
     const { reason } = req.body;
-    const adminId = req.user?.id || null; 
+    const adminId = req.user?.id || null;
 
     const property = await Property.findById(id);
     if (!property) return res.status(404).json({ success: false, message: "Property not found" });
@@ -475,7 +516,7 @@ export const blockProperty = async (req, res) => {
     }
 
     property.isBlocked = true;
-    property.publishNow = false;            
+    property.publishNow = false;
     property.blocked = { by: adminId, reason: reason?.trim() || "", at: new Date() };
 
     await property.save();
