@@ -100,9 +100,9 @@ export default function Login() {
         <CardHeader className="text-center space-y-1">
           <CardTitle className="text-xl font-semibold tracking-tight">
             <img
-            src="\admin\KarabookLogo.png"
+            src="\owner\KarabookLogo.png"
             alt="BookMyStay"
-            className="h-6 w-auto md:h-14"
+            className="h-3 w-auto md:h-14 m-auto"
           />
             Resort Owner Login
           </CardTitle>
