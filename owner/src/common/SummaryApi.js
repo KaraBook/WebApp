@@ -25,6 +25,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/bookings`,
         method: "GET",
     },
+    getSingleProperty: (id) => ({
+        url: `${BASE_URL}/api/owner/property/${id}`,
+        method: "GET",
+    }),
 
 };
 

@@ -80,3 +80,29 @@ export const getOwnerBookings = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to load bookings" });
   }
 };
+
+
+export const getSingleOwnerProperty = async (req, res) => {
+  try {
+    const owner = await User.findById(req.user.id).select("mobile email");
+
+    const property = await Property.findOne({
+      _id: req.params.id,
+      $or: [
+        { ownerUserId: req.user.id },
+        { "resortOwner.mobile": owner?.mobile },
+        { "resortOwner.email": owner?.email },
+      ],
+    });
+
+    if (!property) {
+      return res.status(404).json({ success: false, message: "Property not found" });
+    }
+
+    res.json({ success: true, data: property });
+  } catch (err) {
+    console.error("getSingleOwnerProperty error:", err);
+    res.status(500).json({ success: false, message: "Failed to load property" });
+  }
+};
+
