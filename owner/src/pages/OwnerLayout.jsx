@@ -17,7 +17,7 @@ export default function OwnerLayout() {
 
   const navItems = [
     { name: "Dashboard", path: "dashboard",  icon: LayoutDashboard },
-    { name: "Properties", path: "properties", icon: Building2 },
+    { name: "My Property", path: "properties", icon: Building2 },
     { name: "Bookings", path: "bookings",    icon: ClipboardList },
     { name: "Calendar", path: "calendar",    icon: Calendar },
   ];
