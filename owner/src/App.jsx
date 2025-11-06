@@ -27,7 +27,7 @@ export default function App() {
         <Route path="properties" element={<Properties />} />
         <Route path="view-property/:id" element={<ViewProperty />} /> 
         <Route path="edit-property/:id" element={<EditProperty />} />
-        <Route path="/offline-booking/:id" element={<OfflineBooking />} />
+        <Route path="offline-booking/:id" element={<OfflineBooking />} />
         {/* <Route path="bookings" element={<Bookings />} /> */}
         {/* <Route path="calendar" element={<Calendar />} /> */}
       </Route>
