@@ -19,7 +19,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
+import  jsPDF  from "jspdf";
 import Axios from "../utils/Axios";
 
 
