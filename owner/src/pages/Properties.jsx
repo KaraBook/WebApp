@@ -56,6 +56,10 @@ function PropertyCard({ property }) {
       ? "bg-yellow-100 text-yellow-600"
       : "bg-green-100 text-green-700";
 
+       const handleEditClick = () => {
+    alert(`Edit button clicked for: ${property.propertyName}`);
+  };
+
   return (
     <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
       <div className="relative h-48 bg-gray-100">
@@ -101,8 +105,12 @@ function PropertyCard({ property }) {
           </Link>
         </Button>
         <div className="flex gap-2">
-          <Button asChild variant="secondary" size="sm">
-            <Link to={`/edit-property-two/${property._id}`}>Edit</Link>
+           <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleEditClick}
+          >
+            Edit
           </Button>
         </div>
       </CardFooter>
