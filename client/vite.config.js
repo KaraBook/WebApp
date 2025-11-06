@@ -5,6 +5,9 @@ import path from 'path'
 export default defineConfig({
   base: '/admin/',
   plugins: [react()],
+  optimizeDeps: {
+    include: ["html2canvas"],
+  },
   server: {
     host: true, 
     port: 5173, 
