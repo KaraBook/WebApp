@@ -74,7 +74,7 @@ const EditProperty = () => {
         const allStates = getIndianStates();
         setStates(allStates);
 
-        const res = await api.get(SummaryApi.getSingleOwnerProperty(id).url);
+        const res = await api.get(SummaryApi.getSingleProperty(id).url);
         const prop = res.data?.data;
         if (!prop) throw new Error("Property not found");
 
