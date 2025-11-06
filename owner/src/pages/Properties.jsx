@@ -53,22 +53,19 @@ function PropertyCard({ property }) {
   const statusColor = property.isBlocked
     ? "bg-red-100 text-red-600"
     : property.isDraft
-      ? "bg-yellow-100 text-yellow-600"
-      : "bg-green-100 text-green-700";
-
-       const handleEditClick = () => {
-    alert(`Edit button clicked for: ${property.propertyName}`);
-  };
+    ? "bg-yellow-100 text-yellow-600"
+    : "bg-green-100 text-green-700";
 
   return (
-    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
-      <div className="relative h-48 bg-gray-100">
+    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 relative">
+      {/* 🧩 Image container fixed to avoid overlay blocking clicks */}
+      <div className="relative h-48 bg-gray-100 overflow-hidden">
         <img
           src={cover}
           alt={property.propertyName}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover pointer-events-none"
         />
-        <Badge className={`absolute top-2 right-2 ${statusColor}`}>
+        <Badge className={`absolute top-2 right-2 z-10 ${statusColor}`}>
           {property.isBlocked ? "Blocked" : property.isDraft ? "Draft" : "Published"}
         </Badge>
       </div>
@@ -94,25 +91,19 @@ function PropertyCard({ property }) {
         </p>
       </CardContent>
 
-      <CardFooter className="flex justify-between items-center border-t pt-3">
+      <CardFooter className="flex justify-between items-center border-t pt-3 relative z-20">
+        <Button asChild variant="outline" size="sm">
+          <Link to={`/view-property/${property._id}`}>View</Link>
+        </Button>
+
         <Button
           asChild
-          variant="outline"
+          variant="secondary"
           size="sm"
+          onClick={() => alert(`Edit clicked for: ${property.propertyName}`)}
         >
-          <Link to={`/view-property/${property._id}`}>
-            View
-          </Link>
+          <Link to={`/edit-property/${property._id}`}>Edit</Link>
         </Button>
-        <div className="flex gap-2">
-           <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleEditClick}
-          >
-            Edit
-          </Button>
-        </div>
       </CardFooter>
     </Card>
   );
