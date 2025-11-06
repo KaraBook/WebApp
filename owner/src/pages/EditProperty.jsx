@@ -176,15 +176,14 @@ const EditProperty = () => {
             <h2 className="text-2xl font-bold mb-4">Edit Property</h2>
 
             {/* Stepper */}
-            {/* Stepper */}
-            <div className="flex flex-col sm:flex-row items-center justify-between w-full mt-10 mb-8 gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between w-full mt-10 mb-8">
                 {/* Left title */}
                 <div className="text-xl font-semibold text-black w-full sm:w-auto">
                     {formSteps[currentStep - 1].title}
                 </div>
 
                 {/* Right step circles */}
-                <div className="flex items-center justify-center gap-3">
+                <div className="flex items-center justify-center gap-4">
                     {formSteps.map((step, index) => {
                         const isCompleted = step.id < currentStep;
                         const isActive = currentStep === step.id;
@@ -204,14 +203,20 @@ const EditProperty = () => {
                                 >
                                     {isCompleted ? <Check size={14} /> : step.id}
                                 </button>
+
+                                {/* Connector line */}
                                 {index !== formSteps.length - 1 && (
-                                    <div className="h-0.5 w-8 bg-gray-300 mx-1 sm:mx-2" />
+                                    <div
+                                        className={`h-[2px] w-10 mx-2 rounded-full transition-all duration-300 ${step.id < currentStep ? "bg-black" : "bg-gray-300"
+                                            }`}
+                                    />
                                 )}
                             </div>
                         );
                     })}
                 </div>
             </div>
+
 
 
             <form onSubmit={handleSubmit} className="flex flex-wrap justify-between gap-4">
