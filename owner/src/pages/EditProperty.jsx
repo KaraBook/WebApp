@@ -182,38 +182,40 @@ const EditProperty = () => {
                     {formSteps[currentStep - 1].title}
                 </div>
 
-                {/* Right step circles */}
-                <div className="flex items-center justify-center gap-4">
-                    {formSteps.map((step, index) => {
-                        const isCompleted = step.id < currentStep;
-                        const isActive = currentStep === step.id;
+                {/* Right steps */}
+                <div className="flex items-center justify-end flex-1">
+                    <div className="flex items-center w-full max-w-md justify-between">
+                        {formSteps.map((step, index) => {
+                            const isCompleted = step.id < currentStep;
+                            const isActive = currentStep === step.id;
 
-                        return (
-                            <div key={step.id} className="flex items-center">
-                                <button
-                                    type="button"
-                                    onClick={() => setCurrentStep(step.id)}
-                                    className={`w-8 h-8 flex items-center justify-center rounded-full border-2 font-medium text-sm transition-all duration-200
-              ${isCompleted
-                                            ? "bg-black border-black text-white"
-                                            : isActive
+                            return (
+                                <div key={step.id} className="flex items-center w-full">
+                                    <button
+                                        type="button"
+                                        onClick={() => setCurrentStep(step.id)}
+                                        className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-sm font-medium transition-all duration-200
+                ${isCompleted
                                                 ? "bg-black border-black text-white"
-                                                : "border-gray-300 text-gray-500 bg-white"
-                                        }`}
-                                >
-                                    {isCompleted ? <Check size={14} /> : step.id}
-                                </button>
-
-                                {/* Connector line */}
-                                {index !== formSteps.length - 1 && (
-                                    <div
-                                        className={`h-[2px] w-10 mx-2 rounded-full transition-all duration-300 ${step.id < currentStep ? "bg-black" : "bg-gray-300"
+                                                : isActive
+                                                    ? "bg-black border-black text-white"
+                                                    : "border-gray-300 text-gray-500 bg-white"
                                             }`}
-                                    />
-                                )}
-                            </div>
-                        );
-                    })}
+                                    >
+                                        {isCompleted ? <Check size={14} /> : step.id}
+                                    </button>
+
+                                    {/* Connector line (fills remaining width) */}
+                                    {index !== formSteps.length - 1 && (
+                                        <div
+                                            className={`flex-1 h-[2px] transition-all duration-300 ${step.id < currentStep ? "bg-black" : "bg-gray-300"
+                                                }`}
+                                        ></div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
