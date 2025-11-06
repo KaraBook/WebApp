@@ -99,7 +99,6 @@ function PropertyCard({ property }) {
         </Button>
         <div className="flex gap-2">
           <Button variant="secondary" size="sm">Edit</Button>
-          <Button variant="destructive" size="sm">Delete</Button>
         </div>
       </CardFooter>
     </Card>
