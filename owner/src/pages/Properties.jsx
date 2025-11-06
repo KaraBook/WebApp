@@ -101,7 +101,9 @@ function PropertyCard({ property }) {
           </Link>
         </Button>
         <div className="flex gap-2">
-          <Button variant="secondary" size="sm">Edit</Button>
+          <Button asChild variant="secondary" size="sm">
+            <Link to={`/edit-property/${property._id}`}>Edit</Link>
+          </Button>
         </div>
       </CardFooter>
     </Card>

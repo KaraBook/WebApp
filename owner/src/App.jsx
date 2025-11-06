@@ -5,6 +5,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import OwnerLayout from "./pages/OwnerLayout"; 
 import Properties from "./pages/Properties";
 import ViewProperty from "./pages/ViewProperty";
+import EditProperty from "./pages/EditProperty";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="properties" element={<Properties />} />
         <Route path="view-property/:id" element={<ViewProperty />} /> 
+        <Route path="edit-property/:id" element={<EditProperty />} />
         {/* <Route path="bookings" element={<Bookings />} /> */}
         {/* <Route path="calendar" element={<Calendar />} /> */}
       </Route>
