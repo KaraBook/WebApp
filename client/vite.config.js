@@ -6,17 +6,11 @@ export default defineConfig({
   base: '/admin/',
   plugins: [react()],
   optimizeDeps: {
-    include: ['html2canvas'],
-  },
-  build: {
-    rollupOptions: {
-      external: ['html2canvas'],
-    },
+    include: ['html2canvas', 'jspdf'],
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-});
-
+})
