@@ -4,12 +4,15 @@ import {
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "../api/axios";
+import SummaryApi from "../common/SummaryApi";
 
 
 export default function OwnerLayout() {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [ownerPropertyId, setOwnerPropertyId] = useState(null);
   const location = useLocation();
 
   const fullName =
@@ -22,8 +25,26 @@ export default function OwnerLayout() {
     { name: "My Property", path: "properties", icon: Building2 },
     { name: "Bookings", path: "bookings", icon: ClipboardList },
     { name: "Calendar", path: "calendar", icon: Calendar },
-    { name: "Customize Booking", path: "offline-booking", icon: ClipboardList }
-  ];
+    ownerPropertyId && {
+      name: "Customize Booking",
+      path: `offline-booking/${ownerPropertyId}`,
+      icon: ClipboardList
+    }
+  ].filter(Boolean);
+
+  useEffect(() => {
+    const fetchOwnerProperty = async () => {
+      try {
+        const res = await api.get(SummaryApi.getOwnerProperties.url);
+        if (res.data?.data?.length > 0) {
+          setOwnerPropertyId(res.data.data[0]._id);
+        }
+      } catch (err) {
+        console.error("Error fetching property:", err);
+      }
+    };
+    fetchOwnerProperty();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -54,8 +75,8 @@ export default function OwnerLayout() {
                         location.pathname.includes("/edit-property")));
 
                   return `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${active
-                      ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
-                      : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
+                    : "text-gray-700 hover:bg-gray-100"
                     }`;
                 }}
                 onClick={() => setSidebarOpen(false)}
@@ -65,7 +86,7 @@ export default function OwnerLayout() {
               </NavLink>
             );
           })}
-        
+
 
 
         </div>
