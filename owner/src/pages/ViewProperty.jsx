@@ -88,7 +88,9 @@ export default function ViewProperty() {
           <Button variant="outline" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
-          <Button>Edit Property</Button>
+          <Button>
+            <Link to={`/edit-property/${property._id}`}>Edit Property</Link>
+          </Button>
         </div>
       </div>
 
