@@ -5,10 +5,13 @@ import {
 import { useAuth } from "../auth/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
+
 
 export default function OwnerLayout() {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
 
   const fullName =
     (user?.firstName || user?.lastName)
@@ -42,9 +45,8 @@ export default function OwnerLayout() {
                 <NavLink
                   key={name}
                   to={path}
-                  end={!isPropertiesNav} // ✅ important change
+                  end={!isPropertiesNav} 
                   className={({ isActive, location }) => {
-                    // ✅ Custom logic to handle subroutes like /view-property/:id
                     const active =
                       isActive ||
                       (isPropertiesNav &&
