@@ -98,7 +98,14 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
       <Card className="w-full max-w-md border border-border shadow-sm">
         <CardHeader className="text-center space-y-1">
-          <CardTitle className="text-xl font-semibold tracking-tight">Resort Owner Login</CardTitle>
+          <CardTitle className="text-xl font-semibold tracking-tight">
+            <img
+            src="\admin\KarabookLogo.png"
+            alt="BookMyStay"
+            className="h-6 w-auto md:h-14"
+          />
+            Resort Owner Login
+          </CardTitle>
           <CardDescription>Sign in securely using your registered mobile number</CardDescription>
         </CardHeader>
 
