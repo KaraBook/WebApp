@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, MapPin, Home, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Properties() {
   const [properties, setProperties] = useState([]);
@@ -52,8 +53,8 @@ function PropertyCard({ property }) {
   const statusColor = property.isBlocked
     ? "bg-red-100 text-red-600"
     : property.isDraft
-    ? "bg-yellow-100 text-yellow-600"
-    : "bg-green-100 text-green-700";
+      ? "bg-yellow-100 text-yellow-600"
+      : "bg-green-100 text-green-700";
 
   return (
     <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
@@ -91,11 +92,13 @@ function PropertyCard({ property }) {
 
       <CardFooter className="flex justify-between items-center border-t pt-3">
         <Button
+          asChild
           variant="outline"
           size="sm"
-          onClick={() => window.open(`/owner/properties/${property._id}`, "_blank")}
         >
-          View
+          <Link to={`/view-property/${property._id}`}>
+            View
+          </Link>
         </Button>
         <div className="flex gap-2">
           <Button variant="secondary" size="sm">Edit</Button>
