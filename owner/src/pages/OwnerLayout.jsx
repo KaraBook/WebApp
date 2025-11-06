@@ -37,33 +37,35 @@ export default function OwnerLayout() {
             </button>
           </div>
 
-          <nav className="mt-4">
-            {navItems.map(({ name, path, icon: Icon }) => {
-              const isPropertiesNav = path === "properties";
-              return (
-                <NavLink
-                  key={name}
-                  to={path}
-                  end={!isPropertiesNav} 
-                  className={({ isActive, location }) => {
-                    const active =
-                      isActive ||
-                      (isPropertiesNav &&
-                        location.pathname.includes("/view-property"));
+          {navItems.map(({ name, path, icon: Icon }) => {
+            const isPropertiesNav = path === "properties";
 
-                    return `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${active
-                        ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
-                        : "text-gray-700 hover:bg-gray-100"
-                      }`;
-                  }}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <Icon className="w-4 h-4 opacity-80" />
-                  <span>{name}</span>
-                </NavLink>
-              );
-            })}
-          </nav>
+            return (
+              <NavLink
+                key={name}
+                to={path}
+                end={!isPropertiesNav}
+                className={({ isActive }) => {
+                  const active =
+                    isActive ||
+                    (isPropertiesNav &&
+                      (location.pathname.includes("/view-property") ||
+                        location.pathname.includes("/edit-property")));
+
+                  return `flex items-center gap-3 px-4 py-2.5 mx-3 my-1.5 text-sm rounded-lg transition-all duration-150 ${active
+                      ? "bg-gray-100 text-gray-900 font-medium shadow-sm"
+                      : "text-gray-700 hover:bg-gray-100"
+                    }`;
+                }}
+                onClick={() => setSidebarOpen(false)}
+              >
+                <Icon className="w-4 h-4 opacity-80" />
+                <span>{name}</span>
+              </NavLink>
+            );
+          })}
+        
+
 
         </div>
 
