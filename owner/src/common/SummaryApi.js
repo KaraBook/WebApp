@@ -10,9 +10,10 @@ const SummaryApi = {
         method: "POST",
     },
     getOwnerProfile: {
-        url: `${BASE_URL}/api/auth/resort-owner/profile`,
+        url: `${BASE_URL}/api/auth/me`,
         method: "GET",
     },
+
     getOwnerDashboard: {
         url: `${BASE_URL}/api/owner/dashboard`,
         method: "GET",
