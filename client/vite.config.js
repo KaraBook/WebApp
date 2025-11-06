@@ -6,15 +6,17 @@ export default defineConfig({
   base: '/admin/',
   plugins: [react()],
   optimizeDeps: {
-    include: ["html2canvas"],
+    include: ['html2canvas'],
   },
-  server: {
-    host: true, 
-    port: 5173, 
+  build: {
+    rollupOptions: {
+      external: ['html2canvas'],
+    },
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-})
+});
+
