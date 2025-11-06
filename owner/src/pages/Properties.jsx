@@ -100,7 +100,6 @@ function PropertyCard({ property }) {
           asChild
           variant="secondary"
           size="sm"
-          onClick={() => alert(`Edit clicked for: ${property.propertyName}`)}
         >
           <Link to={`/edit-property/${property._id}`}>Edit</Link>
         </Button>

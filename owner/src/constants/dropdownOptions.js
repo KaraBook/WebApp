@@ -45,7 +45,7 @@ export const featuredOptions = [
 
 
 export const formSteps = [
-  { id: 1, title: "Owner & Propertyi" },
+  { id: 1, title: "Owner & Property" },
   { id: 2, title: "Location Details" },
   { id: 3, title: "Accomodation & Pricing" },
   { id: 4, title: "Features" },
