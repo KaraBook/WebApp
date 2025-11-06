@@ -195,7 +195,7 @@ const EditProperty = () => {
                                         type="button"
                                         onClick={() => setCurrentStep(step.id)}
                                         className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-sm font-medium transition-all duration-200
-                ${isCompleted
+                                            ${isCompleted
                                                 ? "bg-black border-black text-white"
                                                 : isActive
                                                     ? "bg-black border-black text-white"

@@ -22,6 +22,7 @@ export default function OwnerLayout() {
     { name: "My Property", path: "properties", icon: Building2 },
     { name: "Bookings", path: "bookings", icon: ClipboardList },
     { name: "Calendar", path: "calendar", icon: Calendar },
+    { name: "Customize Booking", path: "offline-booking", icon: ClipboardList }
   ];
 
   return (
