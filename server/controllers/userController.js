@@ -99,18 +99,31 @@ export const travellerLogin = async (req, res) => {
 
     const user = await User.findOne({ mobile: normalized });
     if (!user) {
-      return res.status(404).json({ message: "User not found. Please sign up." });
+      return res.status(404).json({ message: "User not found. Please sign up first." });
     }
 
-    if (user.role !== "admin" && user.role !== "resortOwner" && user.role !== "traveller") {
-      user.role = "traveller";
-      await user.save();
+    // 🚫 Block resortOwner/admin
+    if (user.role === "resortOwner") {
+      return res.status(403).json({
+        message: "This number belongs to a Resort Owner account. Please log in through the Owner Portal.",
+      });
+    }
+    if (user.role === "admin") {
+      return res.status(403).json({
+        message: "Admins cannot log in via traveller portal.",
+      });
+    }
+
+    // ✅ Only traveller can pass
+    if (user.role !== "traveller") {
+      return res.status(403).json({
+        message: "Access restricted. Traveller login allowed only for traveller accounts.",
+      });
     }
 
     const { accessToken, refreshToken } = issueTokens(user);
-
     return res.status(200).json({
-      message: "Login successful",
+      message: "Traveller login successful",
       accessToken,
       refreshToken,
       user: publicUser(user),
@@ -120,6 +133,7 @@ export const travellerLogin = async (req, res) => {
     return res.status(500).json({ message: "Login failed", error: err.message });
   }
 };
+
 
 /* ---------------------------- TRAVELLER CHECK --------------------------- */
 export const travellerCheck = async (req, res) => {
@@ -249,35 +263,45 @@ export const resortOwnerLogin = async (req, res) => {
       return res.status(400).json({ message: "Invalid phone token" });
     }
 
-    let user = await User.findOne({ mobile }).select("+password");
+    const user = await User.findOne({ mobile });
     if (!user) {
       return res.status(404).json({
-        message: "Resort owner account not found. Please contact admin.",
+        message: "Resort owner account not found. Please contact admin to register your property.",
       });
     }
 
+    // 🚫 Block travellers
+    if (user.role === "traveller") {
+      return res.status(403).json({
+        message: "This mobile number is registered as a Traveller. You cannot access the Owner Portal.",
+      });
+    }
+
+    // ✅ Allow only admin/resortOwner
     if (user.role !== "admin" && user.role !== "resortOwner") {
-      user.role = "resortOwner";
-      await user.save();
+      return res.status(403).json({
+        message: "Access restricted. Only Resort Owners and Admins can log in here.",
+      });
     }
 
     const { accessToken, refreshToken } = issueTokens(user);
-
     return res.status(200).json({
-      message: "Login successful",
+      message: "Resort Owner login successful",
       accessToken,
       refreshToken,
       user: publicUser(user),
     });
   } catch (err) {
-    console.error("Resort owner login error:", err);
+    console.error("Resort Owner login error:", err);
     return res.status(500).json({ message: "Login failed", error: err.message });
   }
 };
 
+
 /* ---------------------------- ME --------------------------- */
 export const me = async (req, res) => {
   const user = await User.findById(req.user.id);
-  if (!user) return res.status(404).json({ message: "Not found" });
-  res.json({ user: publicUser(user) });
+  if (!user) return res.status(404).json({ message: "User not found" });
+  res.json({ user: publicUser(user), roleNotice: `Logged in as ${user.role}` });
 };
+
