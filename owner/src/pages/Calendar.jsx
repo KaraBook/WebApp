@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { DateRange } from "react-date-range";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import Axios from "../utils/Axios";
+import api from "../api/axios"; 
 import SummaryApi from "../common/SummaryApi";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -24,7 +24,7 @@ export default function OwnerCalendar() {
   useEffect(() => {
     const fetchOwnerProperties = async () => {
       try {
-        const res = await Axios.get(SummaryApi.getOwnerProperties.url);
+        const res = await api.get(SummaryApi.getOwnerProperties.url);
         const list = res.data.data || [];
         if (list.length > 0) {
           setPropertyId(list[0]._id);
@@ -44,9 +44,7 @@ export default function OwnerCalendar() {
     if (!propertyId) return;
     const fetchBlockedDates = async () => {
       try {
-        const res = await Axios.get(
-          SummaryApi.getPropertyBlockedDates.url(propertyId)
-        );
+        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
         setBlockedDates(res.data.dates || []);
       } catch (err) {
         console.error("Failed to load blocked dates:", err);
@@ -61,14 +59,11 @@ export default function OwnerCalendar() {
     const { startDate, endDate } = dateRange[0];
     try {
       setLoading(true);
-      const res = await Axios.post(
-        SummaryApi.addBlockedDates.url(propertyId),
-        {
-          start: startDate,
-          end: endDate,
-          reason: "Owner blocked these dates",
-        }
-      );
+      const res = await api.post(SummaryApi.addBlockedDates.url(propertyId), {
+        start: startDate,
+        end: endDate,
+        reason: "Owner blocked these dates",
+      });
       toast.success("Dates blocked successfully!");
       setBlockedDates(res.data.data || []);
     } catch (err) {
@@ -85,10 +80,9 @@ export default function OwnerCalendar() {
     const { startDate, endDate } = dateRange[0];
     try {
       setLoading(true);
-      const res = await Axios.delete(
-        SummaryApi.removeBlockedDates.url(propertyId),
-        { data: { start: startDate, end: endDate } }
-      );
+      const res = await api.delete(SummaryApi.removeBlockedDates.url(propertyId), {
+        data: { start: startDate, end: endDate },
+      });
       toast.success("Dates unblocked successfully!");
       setBlockedDates(res.data.data || []);
     } catch (err) {
