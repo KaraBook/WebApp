@@ -79,10 +79,12 @@ export default function ViewProperty() {
     : "bg-green-100 text-green-700";
 
   const handleEditClick = (e) => {
-    if (property.isDraft || property.isBlocked) {
+    if (property.isDraft || property.isBlocked || !property.publishNow) {
       e.preventDefault();
       setShowDialog(true);
+      return;
     }
+    navigate(`/edit-property/${property._id}`);
   };
 
   return (
@@ -111,16 +113,14 @@ export default function ViewProperty() {
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
 
-          <Button variant="secondary" asChild onClick={handleEditClick}>
-            <Link
-              to={
-                property.isDraft || property.isBlocked
-                  ? "#"
-                  : `/edit-property/${property._id}`
-              }
-            >
-              Edit Property
-            </Link>
+          {/* ✅ Fixed edit button — now triggers popup correctly */}
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleEditClick}
+            className="bg-black text-white hover:bg-gray-800"
+          >
+            Edit Property
           </Button>
         </div>
       </div>
@@ -235,21 +235,20 @@ export default function ViewProperty() {
         </Card>
       )}
 
-      {/* 🧩 Edit Restriction Modal */}
+      {/* Popup Alert */}
       <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
             <div className="flex items-center gap-3">
               <AlertTriangle className="text-yellow-500 w-6 h-6" />
-              <AlertDialogTitle className="text-lg font-semibold">Edit Restricted</AlertDialogTitle>
+              <AlertDialogTitle>Edit Restricted</AlertDialogTitle>
             </div>
             <AlertDialogDescription className="text-gray-600 mt-2">
               {property.isBlocked
-                ? "This property has been blocked by Admin and cannot be edited."
-                : "Your property is currently in Draft mode. Please contact the Admin to make it live before editing."}
+                ? "This property has been blocked by the admin and cannot be edited."
+                : "Your property is currently in Draft mode. Please contact the admin to make it live before editing."}
             </AlertDialogDescription>
           </AlertDialogHeader>
-
           <AlertDialogFooter className="flex justify-end space-x-2">
             <AlertDialogCancel>Close</AlertDialogCancel>
             <AlertDialogAction

@@ -78,6 +78,12 @@ const EditProperty = () => {
                 const prop = res.data?.data;
                 if (!prop) throw new Error("Property not found");
 
+                if (prop.isDraft || prop.isBlocked || !prop.publishNow) {
+                    toast.error("You cannot edit this property while it’s in draft or blocked mode.");
+                    navigate(`/view-property/${id}`);
+                    return;
+                }
+
                 const cityList = prop.state ? getCitiesByState(prop.state) : [];
                 setCities(cityList);
 
