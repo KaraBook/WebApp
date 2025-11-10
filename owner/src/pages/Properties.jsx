@@ -4,9 +4,19 @@ import SummaryApi from "../common/SummaryApi";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, MapPin, Home, Users } from "lucide-react";
+import { Loader2, MapPin, Home, Users, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner"; 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function Properties() {
   const [properties, setProperties] = useState([]);
@@ -57,74 +67,109 @@ function PropertyCard({ property }) {
     ? "bg-yellow-100 text-yellow-600"
     : "bg-green-100 text-green-700";
 
+  const [showDialog, setShowDialog] = useState(false);
+
   const handleEditClick = (e) => {
-    if (property.isDraft) {
+    if (property.isDraft || property.isBlocked) {
       e.preventDefault();
-      toast.warning("This property is in Draft mode. Please contact the Admin to make it live before editing.");
-    } else if (property.isBlocked) {
-      e.preventDefault();
-      toast.error("This property is blocked by the Admin. Editing is not allowed.");
+      setShowDialog(true);
     }
   };
 
   return (
-    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 relative">
-      {/* Image */}
-      <div className="relative h-48 bg-gray-100 overflow-hidden">
-        <img
-          src={cover}
-          alt={property.propertyName}
-          className="h-full w-full object-cover pointer-events-none"
-        />
-        <Badge className={`absolute top-2 right-2 z-10 ${statusColor}`}>
-          {property.isBlocked ? "Blocked" : property.isDraft ? "Draft" : "Published"}
-        </Badge>
-      </div>
+    <>
+      <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 relative">
+        {/* Image */}
+        <div className="relative h-48 bg-gray-100 overflow-hidden">
+          <img
+            src={cover}
+            alt={property.propertyName}
+            className="h-full w-full object-cover pointer-events-none"
+          />
+          <Badge className={`absolute top-2 right-2 z-10 ${statusColor}`}>
+            {property.isBlocked ? "Blocked" : property.isDraft ? "Draft" : "Published"}
+          </Badge>
+        </div>
 
-      <CardHeader className="pb-1">
-        <CardTitle className="text-lg font-semibold line-clamp-1">
-          {property.propertyName}
-        </CardTitle>
-      </CardHeader>
+        <CardHeader className="pb-1">
+          <CardTitle className="text-lg font-semibold line-clamp-1">
+            {property.propertyName}
+          </CardTitle>
+        </CardHeader>
 
-      <CardContent className="text-sm text-gray-600 space-y-1">
-        <p className="flex items-center gap-2">
-          <Home className="w-4 h-4 text-emerald-600" />
-          {property.propertyType || "Villa"}
-        </p>
-        <p className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-emerald-600" />
-          {property.city}, {property.state}
-        </p>
-        <p className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-emerald-600" />
-          {property.totalRooms} rooms, {property.maxGuests} guests
-        </p>
-      </CardContent>
+        <CardContent className="text-sm text-gray-600 space-y-1">
+          <p className="flex items-center gap-2">
+            <Home className="w-4 h-4 text-emerald-600" />
+            {property.propertyType || "Villa"}
+          </p>
+          <p className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-emerald-600" />
+            {property.city}, {property.state}
+          </p>
+          <p className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-emerald-600" />
+            {property.totalRooms} rooms, {property.maxGuests} guests
+          </p>
+        </CardContent>
 
-      <CardFooter className="flex justify-between items-center border-t pt-3 relative z-20">
-        <Button asChild variant="outline" size="sm">
-          <Link to={`/view-property/${property._id}`}>View</Link>
-        </Button>
+        <CardFooter className="flex justify-between items-center border-t pt-3 relative z-20">
+          <Button asChild variant="outline" size="sm">
+            <Link to={`/view-property/${property._id}`}>View</Link>
+          </Button>
 
-        {/* Restrict Edit when Draft or Blocked */}
-        <Button
-          asChild
-          variant="secondary"
-          size="sm"
-          onClick={handleEditClick}
-        >
-          <Link
-            to={
-              property.isDraft || property.isBlocked
-                ? "#"
-                : `/edit-property/${property._id}`
-            }
+          <Button
+            asChild
+            variant="secondary"
+            size="sm"
+            onClick={handleEditClick}
           >
-            Edit
-          </Link>
-        </Button>
-      </CardFooter>
-    </Card>
+            <Link
+              to={
+                property.isDraft || property.isBlocked
+                  ? "#"
+                  : `/edit-property/${property._id}`
+              }
+            >
+              Edit
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
+
+      {/* 🧩 Restriction Dialog */}
+      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="text-yellow-500 w-6 h-6" />
+              <AlertDialogTitle className="text-lg font-semibold">
+                Edit Restricted
+              </AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-gray-600 mt-2">
+              {property.isBlocked
+                ? "This property has been blocked by the Admin and cannot be edited."
+                : "Your property is currently in Draft mode. Please contact the Admin to make it live before editing."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="flex justify-end space-x-2">
+            <AlertDialogCancel>Close</AlertDialogCancel>
+            <AlertDialogAction
+              asChild
+              className="bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              <a
+                href="mailto:support@karabook.com?subject=Property%20Approval%20Request"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Contact Admin
+              </a>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
