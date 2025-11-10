@@ -30,6 +30,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/property/${id}`,
         method: "GET",
     }),
+    updateOwnerProperty: (id) => ({
+        url: `${BASE_URL}/api/owner/property/${id}`,
+        method: "PUT",
+    }),
 
 };
 

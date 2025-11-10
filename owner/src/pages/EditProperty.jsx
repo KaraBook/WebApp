@@ -152,12 +152,15 @@ const EditProperty = () => {
             if (replaceGallery && galleryImageFiles.length > 0)
                 galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
 
-            const res = await api.put(`/api/owner/property/${id}`, data, {
-                headers: { "Content-Type": "multipart/form-data" }
+            const res = await api({
+                url: SummaryApi.updateOwnerProperty(id).url,
+                method: SummaryApi.updateOwnerProperty(id).method,
+                data,
+                headers: { "Content-Type": "multipart/form-data" },
             });
 
-            toast.success("Property updated successfully!");
-            navigate("/properties");
+            toast.success("Property updated successfully! Redirecting...");
+            setTimeout(() => navigate("/properties"), 1500);
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.message || "Failed to update property");

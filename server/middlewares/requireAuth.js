@@ -1,6 +1,10 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
+
+const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
+
+
 export const requireAuth = async (req, res, next) => {
   try {
     const auth = req.headers.authorization || "";
@@ -24,3 +28,6 @@ export const requireAdmin = (req, res, next) => {
   }
   next();
 };
+
+
+

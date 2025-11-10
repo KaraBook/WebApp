@@ -1,6 +1,13 @@
 import Booking from "../models/Booking.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
+import mongoose from "mongoose";
+import crypto from "crypto";
+import bcrypt from "bcryptjs";
+import { prepareImage, uploadBuffer } from "../utils/cloudinary.js";
+import { normalizeMobile } from "../utils/phone.js";
+
+const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
 export const getOwnerDashboard = async (req, res) => {
   try {
@@ -103,6 +110,135 @@ export const getSingleOwnerProperty = async (req, res) => {
   } catch (err) {
     console.error("getSingleOwnerProperty error:", err);
     res.status(500).json({ success: false, message: "Failed to load property" });
+  }
+};
+
+
+export const updateOwnerProperty = async (req, res) => {
+  const session = await mongoose.startSession();
+  try {
+    const ownerId = req.user.id;
+    const propertyId = req.params.id;
+
+    const existingProperty = await Property.findOne({
+      _id: propertyId,
+      ownerUserId: ownerId,
+    });
+    if (!existingProperty)
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to update this property",
+      });
+
+    if (existingProperty.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        message: "Blocked property cannot be edited",
+      });
+    }
+
+    const updatedData = {};
+    const files = req.files || {};
+
+    if (req.is("application/json")) Object.assign(updatedData, req.body);
+    if (req.is("multipart/form-data")) Object.assign(updatedData, req.body);
+
+    if (req.body.roomBreakdown) {
+      let rb = req.body.roomBreakdown;
+      if (typeof rb === "string") {
+        try { rb = JSON.parse(rb); } catch (_) {}
+      }
+      const ac = Number(rb.ac || 0);
+      const nonAc = Number(rb.nonAc || 0);
+      const deluxe = Number(rb.deluxe || 0);
+      const luxury = Number(rb.luxury || 0);
+      const total = ac + nonAc + deluxe + luxury;
+      updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, total };
+      updatedData.totalRooms = total;
+    }
+
+    const coverImageFile = files.coverImage?.[0];
+    const galleryFiles = files.galleryPhotos || [];
+    const shopActFile = files.shopAct?.[0];
+
+    if (coverImageFile) {
+      const processed = await prepareImage(coverImageFile.buffer);
+      const result = await uploadBuffer(processed, { folder: "properties" });
+      updatedData.coverImage = result.secure_url;
+    }
+
+    if (shopActFile) {
+      const processed = await prepareImage(shopActFile.buffer);
+      const result = await uploadBuffer(processed, {
+        folder: "properties/shopAct",
+      });
+      updatedData.shopAct = result.secure_url;
+    }
+
+    if (galleryFiles.length > 0) {
+      const galleryResults = await Promise.all(
+        galleryFiles.map(async (f) => {
+          const processed = await prepareImage(f.buffer);
+          return uploadBuffer(processed, { folder: "properties/gallery" });
+        })
+      );
+      updatedData.galleryPhotos = galleryResults.map((r) => r.secure_url);
+    }
+
+    const effectiveCover =
+      updatedData.coverImage || existingProperty.coverImage;
+    const effectiveGallery =
+      updatedData.galleryPhotos || existingProperty.galleryPhotos || [];
+
+    if (!effectiveCover) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Cover image is required" });
+    }
+
+    if (!Array.isArray(effectiveGallery) || effectiveGallery.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "At least 3 gallery photos are required",
+      });
+    }
+
+    let updatedProperty;
+    await session.withTransaction(async () => {
+      updatedProperty = await Property.findByIdAndUpdate(
+        propertyId,
+        { $set: updatedData },
+        { new: true, runValidators: true, session }
+      );
+
+      const owner = await User.findById(ownerId).session(session);
+      if (
+        owner &&
+        !owner.ownedProperties?.some((id) => String(id) === String(propertyId))
+      ) {
+        owner.ownedProperties.push(propertyId);
+        await owner.save({ session });
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: updatedProperty,
+      message: "Property updated successfully",
+    });
+  } catch (err) {
+    console.error("Owner Update Error:", err);
+    if (err?.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Duplicate value found (email, mobile, or GSTIN).",
+      });
+    }
+    res
+      .status(500)
+      .json({ success: false, message: "Update failed", error: err.message });
+  } finally {
+    session.endSession();
   }
 };
 
