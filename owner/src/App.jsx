@@ -30,7 +30,7 @@ export default function App() {
         <Route path="edit-property/:id" element={<EditProperty />} />
         <Route path="offline-booking/:id" element={<OfflineBooking />} />
         {/* <Route path="bookings" element={<Bookings />} /> */}
-        <Route path="calendar" element={<OwnerCalendar />} />
+        <Route path="calendar" element={<Calendar />} />
       </Route>
 
       {/* Fallback */}
