@@ -264,6 +264,10 @@ export const getPropertyBlockedDates = async (req, res) => {
 
 export const addBlockedDates = async (req, res) => {
   try {
+    console.log("🟢 addBlockedDates hit");
+    console.log("Body received:", req.body);
+    console.log("Params received:", req.params);
+
     const { id } = req.params;
     const { start, end, reason } = req.body;
 

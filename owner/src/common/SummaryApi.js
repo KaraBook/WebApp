@@ -46,7 +46,6 @@ const SummaryApi = {
         url: (id) => `${BASE_URL}/api/owner/property/${id}/block-dates`,
         method: "DELETE",
     },
-
 };
 
 export default SummaryApi;
