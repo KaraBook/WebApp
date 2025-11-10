@@ -144,7 +144,6 @@ export function AuthProvider({ children }) {
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }
 
-/* --------------------------- HOOK --------------------------- */
 export function useAuth() {
   return useContext(AuthCtx);
 }

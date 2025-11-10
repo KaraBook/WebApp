@@ -184,7 +184,7 @@ const EditProperty = () => {
 
                 {/* Right steps */}
                 <div className="flex items-center justify-end flex-1">
-                    <div className="flex items-center w-full max-w-md justify-between">
+                    <div className="flex items-center w-full max-w-md-[38rem] justify-between">
                         {formSteps.map((step, index) => {
                             const isCompleted = step.id < currentStep;
                             const isActive = currentStep === step.id;
