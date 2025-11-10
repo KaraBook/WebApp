@@ -106,7 +106,7 @@ export default function OwnerCalendar() {
 
   /* ---------------- UI RENDER ---------------- */
   return (
-    <div className="p-6 flex flex-col lg:flex-row gap-6 justify-center items-start">
+    <div className="p-2 flex flex-col lg:flex-row gap-6 justify-center items-start">
       {/* LEFT SIDE - CALENDAR */}
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full lg:w-1/2">
         <h2 className="text-2xl font-semibold text-center text-[#233b19] mb-4">

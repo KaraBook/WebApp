@@ -41,6 +41,7 @@ const EditProperty = () => {
     const [coverImagePreview, setCoverImagePreview] = useState(null);
     const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
     const [replaceGallery, setReplaceGallery] = useState(false);
+    const [shopActFile, setShopActFile] = useState(null);
 
     const [formData, setFormData] = useState({
         propertyName: "",
@@ -64,7 +65,8 @@ const EditProperty = () => {
         amenities: [],
         petFriendly: false,
         pan: "",
-        gstin: ""
+        gstin: "",
+        shopAct: "",
     });
 
     useEffect(() => {
@@ -110,11 +112,13 @@ const EditProperty = () => {
                     amenities: prop.amenities || [],
                     petFriendly: !!prop.petFriendly,
                     pan: prop.pan || "",
-                    gstin: prop.gstin || ""
+                    gstin: prop.gstin || "",
+                    shopAct: prop.shopAct || "",
                 });
 
                 setCoverImagePreview(prop.coverImage || null);
                 setGalleryImagePreviews(Array.isArray(prop.galleryPhotos) ? prop.galleryPhotos : []);
+                setShopActFile(prop.shopAct || null);
             } catch (err) {
                 console.error(err);
                 toast.error(err.response?.data?.message || "Failed to fetch property details");
@@ -157,6 +161,7 @@ const EditProperty = () => {
             if (coverImageFile) data.append("coverImage", coverImageFile);
             if (replaceGallery && galleryImageFiles.length > 0)
                 galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
+            if (shopActFile) data.append("shopAct", shopActFile);
 
             const res = await api({
                 url: SummaryApi.updateOwnerProperty(id).url,
@@ -431,6 +436,9 @@ const EditProperty = () => {
                             galleryImagePreviews={galleryImagePreviews}
                             setGalleryImagePreviews={setGalleryImagePreviews}
                             showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+                            shopActFile={shopActFile}
+                            setShopActFile={setShopActFile}
+
                         />
 
                         <div className="w-full flex items-center gap-3 mt-4">
