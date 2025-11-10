@@ -114,6 +114,15 @@ const propertySchema = new mongoose.Schema({
       message: "At least one gallery photo is required",
     },
   },
+  blockedDates: [
+  {
+    start: { type: Date, required: true },
+    end: { type: Date, required: true },
+    reason: { type: String, default: "" },
+    addedByOwner: { type: Boolean, default: true }
+  }
+],
+
 
 }, { timestamps: true });
 

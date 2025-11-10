@@ -72,6 +72,10 @@ const SummaryApi = {
   url: (id) => `/api/bookings/invoice/${id}`,
   method: "get",
 },
+  getPropertyBlockedDates: { 
+    url: (id) => `/api/owner/property/${id}/blocked-dates`,
+    method: "GET",
+   },
 
 };
 

@@ -34,6 +34,19 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/property/${id}`,
         method: "PUT",
     }),
+    getPropertyBlockedDates: { 
+        url: (id) => `/api/owner/property/${id}/blocked-dates`,
+        method: "GET",
+    },
+    addBlockedDates: { 
+        url: (id) => `/api/owner/property/${id}/block-dates`,
+        method: "POST",
+     },
+    removeBlockedDates: { 
+        url: (id) => `/api/owner/property/${id}/block-dates`,
+        method: "DELETE",
+     },
+
 
 };
 

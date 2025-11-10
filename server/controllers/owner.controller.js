@@ -243,3 +243,65 @@ export const updateOwnerProperty = async (req, res) => {
   }
 };
 
+
+
+export const getPropertyBlockedDates = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const property = await Property.findById(id)
+      .select("blockedDates propertyName")
+      .lean();
+
+    if (!property)
+      return res.status(404).json({ success: false, message: "Property not found" });
+
+    res.json({ success: true, dates: property.blockedDates || [] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error", error: err.message });
+  }
+};
+
+
+export const addBlockedDates = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { start, end, reason } = req.body;
+
+    const property = await Property.findById(id);
+    if (!property) return res.status(404).json({ success: false, message: "Property not found" });
+
+    property.blockedDates.push({
+      start: new Date(start),
+      end: new Date(end),
+      reason,
+      addedByOwner: true,
+    });
+    await property.save();
+
+    res.json({ success: true, message: "Dates blocked", data: property.blockedDates });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to block dates", error: err.message });
+  }
+};
+
+
+export const removeBlockedDates = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { start, end } = req.body;
+
+    const property = await Property.findById(id);
+    if (!property) return res.status(404).json({ success: false, message: "Property not found" });
+
+    property.blockedDates = property.blockedDates.filter(
+      (b) => !(new Date(b.start).getTime() === new Date(start).getTime() &&
+               new Date(b.end).getTime() === new Date(end).getTime())
+    );
+    await property.save();
+
+    res.json({ success: true, message: "Dates unblocked", data: property.blockedDates });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to unblock dates", error: err.message });
+  }
+};
+
