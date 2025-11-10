@@ -42,6 +42,7 @@ const EditProperty = () => {
     const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
     const [replaceGallery, setReplaceGallery] = useState(false);
     const [shopActFile, setShopActFile] = useState(null);
+    const [shopActPreview, setShopActPreview] = useState(null);
 
     const [formData, setFormData] = useState({
         propertyName: "",
@@ -118,7 +119,7 @@ const EditProperty = () => {
 
                 setCoverImagePreview(prop.coverImage || null);
                 setGalleryImagePreviews(Array.isArray(prop.galleryPhotos) ? prop.galleryPhotos : []);
-                setShopActFile(prop.shopAct || null);
+                setShopActPreview(prop.shopAct || null);
             } catch (err) {
                 console.error(err);
                 toast.error(err.response?.data?.message || "Failed to fetch property details");
@@ -438,6 +439,8 @@ const EditProperty = () => {
                             showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
                             shopActFile={shopActFile}
                             setShopActFile={setShopActFile}
+                            shopActPreview={shopActPreview}
+                            setShopActPreview={setShopActPreview}
 
                         />
 
