@@ -253,7 +253,7 @@ export default function ViewProperty() {
             <AlertDialogCancel>Close</AlertDialogCancel>
             <AlertDialogAction
               asChild
-              className="bg-emerald-600 text-white hover:bg-emerald-700"
+              className="bg-black text-white"
             >
               <a
                 href="mailto:support@karabook.com?subject=Property%20Approval%20Request"
