@@ -1,4 +1,3 @@
-// routes/propertyRoute.js
 import express from "express";
 import {
   createPropertyDraft,
@@ -10,7 +9,8 @@ import {
   unblockProperty,
   toggleFeaturedProperty,
   togglePublishProperty,
-  getPublishedProperties
+  getPublishedProperties,
+  getPropertyBlockedDatesPublic,
 } from "../controllers/propertyController.js";
 import { requireAuth, requireAdmin } from "../middlewares/requireAuth.js";
 import upload from "../middlewares/multer.js";
@@ -74,6 +74,7 @@ router.put("/:id/block", requireAuth, requireAdmin, blockProperty);
 router.put("/:id/unblock", requireAuth, requireAdmin, unblockProperty);
 router.put("/:id/toggle-featured", requireAuth, requireAdmin, toggleFeaturedProperty);
 router.put("/:id/toggle-publish", requireAuth, requireAdmin, togglePublishProperty);
+router.get("/:id/blocked-dates", getPropertyBlockedDatesPublic);
 
 
 export default router;

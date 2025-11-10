@@ -196,11 +196,10 @@ export default function PropertyDetails() {
         <h1 className="text-3xl font-bold text-[#233b19]">{property.propertyName}</h1>
         <button
           onClick={toggleWishlist}
-          className={`p-2 rounded-full border -mb-6 ${
-            wishlist.includes(property._id)
+          className={`p-2 rounded-full border -mb-6 ${wishlist.includes(property._id)
               ? "bg-red-500 text-white border-red-500"
               : "border-gray-300 text-gray-600 hover:bg-gray-100"
-          }`}
+            }`}
         >
           <Heart
             className="w-4 h-4"
@@ -273,7 +272,7 @@ export default function PropertyDetails() {
               </div>
 
               {showCalendar && (
-                <div className="absolute top-[70px] left-0 bg-white p-3 rounded-2xl shadow-2xl border border-gray-100 z-50">
+                <div className="absolute top-[70px] left-0 bg-white p-4 rounded-2xl shadow-2xl border border-gray-100 z-50">
                   <DateRange
                     ranges={dateRange}
                     onChange={(item) => setDateRange([item.selection])}
@@ -284,10 +283,24 @@ export default function PropertyDetails() {
                     showDateDisplay={false}
                     months={1}
                     direction="horizontal"
-                    disabledDay={isDateDisabled} // ✅ disables booked + blocked dates
+                    dayContentRenderer={(date) => {
+                      const disabled = isDateDisabled(date);
+                      return (
+                        <div
+                          className={`relative w-full h-full flex items-center justify-center rounded-full transition-all duration-200 ${disabled
+                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                              : "hover:bg-[#efcc61] hover:text-black"
+                            }`}
+                          title={disabled ? "Unavailable" : ""}
+                        >
+                          {date.getDate()}
+                        </div>
+                      );
+                    }}
                   />
                 </div>
               )}
+
             </div>
 
             <Button

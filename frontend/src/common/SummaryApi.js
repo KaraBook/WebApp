@@ -74,9 +74,9 @@ const SummaryApi = {
     method: "get",
   },
   getPropertyBlockedDates: {
-    url: (id) => `${BASE_URL}/api/owner/property/${id}/blocked-dates`,
-    method: "GET",
-  },
+  url: (id) => `/api/properties/${id}/blocked-dates`,
+  method: "GET",
+ },
 
 };
 

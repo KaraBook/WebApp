@@ -608,3 +608,18 @@ export const getPublishedProperties = async (req, res) => {
   }
 };
 
+
+export const getPropertyBlockedDatesPublic = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const property = await Property.findById(id).select("blockedDates propertyName");
+    if (!property)
+      return res.status(404).json({ success: false, message: "Property not found" });
+
+    res.json({ success: true, dates: property.blockedDates || [] });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to load blocked dates", error: err.message });
+  }
+};
+
+
