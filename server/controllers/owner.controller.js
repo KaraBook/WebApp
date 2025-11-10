@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { prepareImage, uploadBuffer } from "../utils/cloudinary.js";
 import { normalizeMobile } from "../utils/phone.js";
 
+
 const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
 export const getOwnerDashboard = async (req, res) => {
@@ -321,7 +322,7 @@ export const addBlockedDates = async (req, res) => {
       addedByOwner: true,
     });
 
-    await property.save();
+     await property.save({ validateBeforeSave: false });
 
     console.log("✅ Dates blocked successfully for property:", id);
 
