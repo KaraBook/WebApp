@@ -130,10 +130,10 @@ export const updateOwnerProperty = async (req, res) => {
         message: "Not authorized to update this property",
       });
 
-    if (existingProperty.isBlocked) {
+    if (existingProperty.isDraft || !existingProperty.publishNow) {
       return res.status(403).json({
         success: false,
-        message: "Blocked property cannot be edited",
+        message: "Draft properties cannot be edited. Contact admin to publish first."
       });
     }
 
@@ -146,7 +146,7 @@ export const updateOwnerProperty = async (req, res) => {
     if (req.body.roomBreakdown) {
       let rb = req.body.roomBreakdown;
       if (typeof rb === "string") {
-        try { rb = JSON.parse(rb); } catch (_) {}
+        try { rb = JSON.parse(rb); } catch (_) { }
       }
       const ac = Number(rb.ac || 0);
       const nonAc = Number(rb.nonAc || 0);
@@ -202,6 +202,7 @@ export const updateOwnerProperty = async (req, res) => {
         message: "At least 3 gallery photos are required",
       });
     }
+
 
     let updatedProperty;
     await session.withTransaction(async () => {

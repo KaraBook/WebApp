@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import {
   Loader2,
@@ -14,12 +13,21 @@ import {
   Users,
   CalendarClock,
   IndianRupee,
-  CheckCircle2,
-  XCircle,
   PawPrint,
   Image as ImageIcon,
   ArrowLeft,
+  AlertTriangle,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function ViewProperty() {
   const { id } = useParams();
@@ -27,6 +35,7 @@ export default function ViewProperty() {
 
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -60,13 +69,21 @@ export default function ViewProperty() {
       </div>
     );
 
-  const cover = property.coverImage || "https://via.placeholder.com/800x400?text=No+Cover+Image";
+  const cover =
+    property.coverImage || "https://via.placeholder.com/800x400?text=No+Cover+Image";
   const gallery = property.galleryPhotos || [];
   const statusColor = property.isBlocked
     ? "bg-red-100 text-red-600"
     : property.isDraft
     ? "bg-yellow-100 text-yellow-600"
     : "bg-green-100 text-green-700";
+
+  const handleEditClick = (e) => {
+    if (property.isDraft || property.isBlocked) {
+      e.preventDefault();
+      setShowDialog(true);
+    }
+  };
 
   return (
     <div className="space-y-8 p-3 w-full mx-auto">
@@ -76,7 +93,11 @@ export default function ViewProperty() {
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
             {property.propertyName}
             <Badge className={statusColor}>
-              {property.isBlocked ? "Blocked" : property.isDraft ? "Draft" : "Published"}
+              {property.isBlocked
+                ? "Blocked"
+                : property.isDraft
+                ? "Draft"
+                : "Published"}
             </Badge>
           </h1>
           <p className="flex items-center gap-2 text-sm text-gray-600 mt-1">
@@ -89,22 +110,27 @@ export default function ViewProperty() {
           <Button variant="outline" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
-          <Button>
-            <Link to={`/edit-property/${property._id}`}>Edit Property</Link>
+
+          <Button variant="secondary" asChild onClick={handleEditClick}>
+            <Link
+              to={
+                property.isDraft || property.isBlocked
+                  ? "#"
+                  : `/edit-property/${property._id}`
+              }
+            >
+              Edit Property
+            </Link>
           </Button>
         </div>
       </div>
 
       {/* Cover Image */}
       <Card className="overflow-hidden">
-        <img
-          src={cover}
-          alt="Cover"
-          className="w-full h-[400px] object-cover rounded-t-md"
-        />
+        <img src={cover} alt="Cover" className="w-full h-[400px] object-cover rounded-t-md" />
       </Card>
 
-      {/* Overview Section */}
+      {/* Overview */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -115,18 +141,10 @@ export default function ViewProperty() {
           <p>{property.description || "No description available."}</p>
           <Separator />
           <div className="grid sm:grid-cols-2 gap-4">
-            <p>
-              <strong>Type:</strong> {property.propertyType}
-            </p>
-            <p>
-              <strong>Address:</strong> {property.addressLine1}, {property.city}
-            </p>
-            <p>
-              <strong>Rooms:</strong> {property.totalRooms} total
-            </p>
-            <p>
-              <strong>Max Guests:</strong> {property.maxGuests}
-            </p>
+            <p><strong>Type:</strong> {property.propertyType}</p>
+            <p><strong>Address:</strong> {property.addressLine1}, {property.city}</p>
+            <p><strong>Rooms:</strong> {property.totalRooms} total</p>
+            <p><strong>Max Guests:</strong> {property.maxGuests}</p>
             <p className="flex items-center gap-2">
               <PawPrint className="w-4 h-4 text-emerald-600" />
               <strong>Pet Friendly:</strong> {property.petFriendly ? "Yes" : "No"}
@@ -135,7 +153,7 @@ export default function ViewProperty() {
         </CardContent>
       </Card>
 
-      {/* Pricing Section */}
+      {/* Pricing */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -143,30 +161,19 @@ export default function ViewProperty() {
           </CardTitle>
         </CardHeader>
         <CardContent className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
-          <p>
-            <strong>Weekdays:</strong> ₹{property.pricingPerNightWeekdays}
-          </p>
-          <p>
-            <strong>Weekend:</strong> ₹{property.pricingPerNightWeekend}
-          </p>
-          <p>
-            <strong>Extra Guest Charge:</strong>{" "}
-            {property.extraGuestCharge ? `₹${property.extraGuestCharge}` : "N/A"}
-          </p>
-          <p>
-            <strong>Min Stay Nights:</strong> {property.minStayNights}
-          </p>
+          <p><strong>Weekdays:</strong> ₹{property.pricingPerNightWeekdays}</p>
+          <p><strong>Weekend:</strong> ₹{property.pricingPerNightWeekend}</p>
+          <p><strong>Extra Guest Charge:</strong> {property.extraGuestCharge ? `₹${property.extraGuestCharge}` : "N/A"}</p>
+          <p><strong>Min Stay Nights:</strong> {property.minStayNights}</p>
           <p className="flex items-center gap-2">
             <CalendarClock className="w-4 h-4 text-emerald-600" />
             <strong>Check-In:</strong> {property.checkInTime}
           </p>
-          <p>
-            <strong>Check-Out:</strong> {property.checkOutTime}
-          </p>
+          <p><strong>Check-Out:</strong> {property.checkOutTime}</p>
         </CardContent>
       </Card>
 
-      {/* Amenities Section */}
+      {/* Amenities */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -205,7 +212,7 @@ export default function ViewProperty() {
         </CardContent>
       </Card>
 
-      {/* Gallery Section */}
+      {/* Gallery */}
       {gallery.length > 0 && (
         <Card>
           <CardHeader>
@@ -227,6 +234,39 @@ export default function ViewProperty() {
           </CardContent>
         </Card>
       )}
+
+      {/* 🧩 Edit Restriction Modal */}
+      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="text-yellow-500 w-6 h-6" />
+              <AlertDialogTitle className="text-lg font-semibold">Edit Restricted</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-gray-600 mt-2">
+              {property.isBlocked
+                ? "This property has been blocked by Admin and cannot be edited."
+                : "Your property is currently in Draft mode. Please contact the Admin to make it live before editing."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="flex justify-end space-x-2">
+            <AlertDialogCancel>Close</AlertDialogCancel>
+            <AlertDialogAction
+              asChild
+              className="bg-emerald-600 text-white hover:bg-emerald-700"
+            >
+              <a
+                href="mailto:support@karabook.com?subject=Property%20Approval%20Request"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Contact Admin
+              </a>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
