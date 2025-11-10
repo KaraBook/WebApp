@@ -267,22 +267,75 @@ export const addBlockedDates = async (req, res) => {
     const { id } = req.params;
     const { start, end, reason } = req.body;
 
+    console.log("🟢 addBlockedDates hit", { id, start, end, reason });
+
+    if (!start || !end) {
+      console.error("❌ Missing start or end date:", req.body);
+      return res
+        .status(400)
+        .json({ success: false, message: "Start and End dates are required" });
+    }
+
     const property = await Property.findById(id);
-    if (!property) return res.status(404).json({ success: false, message: "Property not found" });
+    if (!property) {
+      console.error("❌ Property not found for ID:", id);
+      return res
+        .status(404)
+        .json({ success: false, message: "Property not found" });
+    }
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    if (isNaN(startDate) || isNaN(endDate)) {
+      console.error("❌ Invalid date format:", { startDate, endDate });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid date format" });
+    }
+
+    const isOverlap = property.blockedDates.some((range) => {
+      const existingStart = new Date(range.start);
+      const existingEnd = new Date(range.end);
+      return (
+        (startDate >= existingStart && startDate <= existingEnd) ||
+        (endDate >= existingStart && endDate <= existingEnd)
+      );
+    });
+
+    if (isOverlap) {
+      console.warn("⚠️ Duplicate/overlapping date range blocked");
+      return res
+        .status(409)
+        .json({ success: false, message: "These dates are already blocked" });
+    }
 
     property.blockedDates.push({
-      start: new Date(start),
-      end: new Date(end),
-      reason,
+      start: startDate,
+      end: endDate,
+      reason: reason || "Owner blocked these dates",
       addedByOwner: true,
     });
+
     await property.save();
 
-    res.json({ success: true, message: "Dates blocked", data: property.blockedDates });
+    console.log("✅ Dates blocked successfully for property:", id);
+
+    res.json({
+      success: true,
+      message: "Dates blocked successfully",
+      data: property.blockedDates,
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to block dates", error: err.message });
+    console.error("🔥 addBlockedDates Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to block dates",
+      error: err.message,
+    });
   }
 };
+
 
 
 export const removeBlockedDates = async (req, res) => {
