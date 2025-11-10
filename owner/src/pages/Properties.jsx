@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, MapPin, Home, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner"; 
 
 export default function Properties() {
   const [properties, setProperties] = useState([]);
@@ -56,9 +57,19 @@ function PropertyCard({ property }) {
     ? "bg-yellow-100 text-yellow-600"
     : "bg-green-100 text-green-700";
 
+  const handleEditClick = (e) => {
+    if (property.isDraft) {
+      e.preventDefault();
+      toast.warning("This property is in Draft mode. Please contact the Admin to make it live before editing.");
+    } else if (property.isBlocked) {
+      e.preventDefault();
+      toast.error("This property is blocked by the Admin. Editing is not allowed.");
+    }
+  };
+
   return (
     <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 relative">
-      {/* 🧩 Image container fixed to avoid overlay blocking clicks */}
+      {/* Image */}
       <div className="relative h-48 bg-gray-100 overflow-hidden">
         <img
           src={cover}
@@ -96,12 +107,22 @@ function PropertyCard({ property }) {
           <Link to={`/view-property/${property._id}`}>View</Link>
         </Button>
 
+        {/* Restrict Edit when Draft or Blocked */}
         <Button
           asChild
           variant="secondary"
           size="sm"
+          onClick={handleEditClick}
         >
-          <Link to={`/edit-property/${property._id}`}>Edit</Link>
+          <Link
+            to={
+              property.isDraft || property.isBlocked
+                ? "#"
+                : `/edit-property/${property._id}`
+            }
+          >
+            Edit
+          </Link>
         </Button>
       </CardFooter>
     </Card>
