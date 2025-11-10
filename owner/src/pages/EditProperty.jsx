@@ -436,7 +436,7 @@ const EditProperty = () => {
                             galleryImageFiles={galleryImageFiles}
                             galleryImagePreviews={galleryImagePreviews}
                             setGalleryImagePreviews={setGalleryImagePreviews}
-                            showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+                            showFields={{ coverImage: true, galleryPhotos: true, shopAct: true }}
                             shopActFile={shopActFile}
                             setShopActFile={setShopActFile}
                             shopActPreview={shopActPreview}
