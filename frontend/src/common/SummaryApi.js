@@ -1,25 +1,25 @@
 export const baseURL = import.meta.env.VITE_BASE_URL;
 
 const SummaryApi = {
-  travellerCheck: { 
-    url: "/api/auth/traveller/check",  
-    method: "post" 
+  travellerCheck: {
+    url: "/api/auth/traveller/check",
+    method: "post"
   },
-  travellerLogin: { 
-    url: "/api/auth/traveller/login",  
-    method: "post" 
+  travellerLogin: {
+    url: "/api/auth/traveller/login",
+    method: "post"
   },
-  travellerSignup: { 
-    url: "/api/auth/traveller/signup", 
-    method: "post" 
+  travellerSignup: {
+    url: "/api/auth/traveller/signup",
+    method: "post"
   },
   uploadTravellerAvatar: {
     url: "/api/auth/traveller/upload-avatar",
     method: "post"
   },
-  refreshToken: { 
-    url: "/api/auth/refresh-token",    
-    method: "post" 
+  refreshToken: {
+    url: "/api/auth/refresh-token",
+    method: "post"
   },
   me: {
     url: "/api/auth/me",
@@ -37,45 +37,46 @@ const SummaryApi = {
     url: "/api/wishlist/toggle",
     method: "post",
   },
-  getSingleProperty: { 
-    url: (id) => `/api/properties/${id}`, 
-    method: "get" 
+  getSingleProperty: {
+    url: (id) => `/api/properties/${id}`,
+    method: "get"
   },
-  getBookedDates: { 
-    url: (propertyId) => `/api/bookings/booked-dates/${propertyId}`, 
-    method: "get" 
+  getBookedDates: {
+    url: (propertyId) => `/api/bookings/booked-dates/${propertyId}`,
+    method: "get"
   },
-  createBookingOrder: { 
-    url: "/api/bookings/create-order", 
-    method: "post" 
+  createBookingOrder: {
+    url: "/api/bookings/create-order",
+    method: "post"
   },
-  verifyBookingPayment: { 
-    url: "/api/bookings/verify-payment", 
-    method: "post" 
+  verifyBookingPayment: {
+    url: "/api/bookings/verify-payment",
+    method: "post"
   },
-  getUserBookings: { 
-    url: "/api/bookings/user", 
-    method: "get" 
+  getUserBookings: {
+    url: "/api/bookings/user",
+    method: "get"
   },
-  getUserReviews: { 
-    url: "/api/reviews/user", 
-    method: "get" 
+  getUserReviews: {
+    url: "/api/reviews/user",
+    method: "get"
   },
-  getPropertyReviews: { 
-    url: (id) => `/api/reviews/property/${id}`, 
-    method: "get" },
-  addReview: { 
-    url: "/api/reviews", 
-    method: "post" 
+  getPropertyReviews: {
+    url: (id) => `/api/reviews/property/${id}`,
+    method: "get"
+  },
+  addReview: {
+    url: "/api/reviews",
+    method: "post"
   },
   getInvoice: {
-  url: (id) => `/api/bookings/invoice/${id}`,
-  method: "get",
-},
-  getPropertyBlockedDates: { 
-    url: (id) => `/api/owner/property/${id}/blocked-dates`,
+    url: (id) => `/api/bookings/invoice/${id}`,
+    method: "get",
+  },
+  getPropertyBlockedDates: {
+    url: (id) => `${BASE_URL}/api/owner/property/${id}/blocked-dates`,
     method: "GET",
-   },
+  },
 
 };
 

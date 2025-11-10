@@ -1,94 +1,160 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { DateRange } from "react-date-range";
-import { format } from "date-fns";
-import api from "../api/axios";
-import SummaryApi from "../common/SummaryApi";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-
+import { toast } from "sonner";
+import Axios from "../utils/Axios";
+import SummaryApi from "../common/SummaryApi";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+import { format } from "date-fns";
 
 export default function OwnerCalendar() {
-  const [range, setRange] = useState([
-    { startDate: new Date(), endDate: new Date(), key: "selection" },
-  ]);
+  const [propertyId, setPropertyId] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const propertyId = localStorage.getItem("ownerPropertyId"); // (since owner has only one property)
+  const [loading, setLoading] = useState(false);
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      key: "selection",
+    },
+  ]);
 
+  /* ---------------- FETCH PROPERTY ID ON LOAD ---------------- */
   useEffect(() => {
-    (async () => {
+    const fetchOwnerProperties = async () => {
       try {
-        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
-        setBlockedDates(res.data.dates || []);
-      } catch {
-        toast.error("Failed to load calendar data");
-      } finally {
-        setLoading(false);
+        const res = await Axios.get(SummaryApi.getOwnerProperties.url);
+        const list = res.data.data || [];
+        if (list.length > 0) {
+          setPropertyId(list[0]._id);
+        } else {
+          toast.error("No property found for this owner.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch properties:", err);
+        toast.error("Unable to load properties");
       }
-    })();
+    };
+    fetchOwnerProperties();
+  }, []);
+
+  /* ---------------- FETCH BLOCKED DATES ---------------- */
+  useEffect(() => {
+    if (!propertyId) return;
+    const fetchBlockedDates = async () => {
+      try {
+        const res = await Axios.get(
+          SummaryApi.getPropertyBlockedDates.url(propertyId)
+        );
+        setBlockedDates(res.data.dates || []);
+      } catch (err) {
+        console.error("Failed to load blocked dates:", err);
+      }
+    };
+    fetchBlockedDates();
   }, [propertyId]);
 
-  const handleBlock = async () => {
-    const { startDate, endDate } = range[0];
+  /* ---------------- BLOCK SELECTED DATES ---------------- */
+  const handleBlockDates = async () => {
+    if (!propertyId) return toast.error("No property selected");
+    const { startDate, endDate } = dateRange[0];
     try {
-      await api.post(SummaryApi.addBlockedDates.url(propertyId), {
-        start: startDate,
-        end: endDate,
-        reason: "Owner manual block",
-      });
-      toast.success("Dates blocked");
-      setBlockedDates([...blockedDates, { start: startDate, end: endDate }]);
-    } catch {
-      toast.error("Failed to block dates");
+      setLoading(true);
+      const res = await Axios.post(
+        SummaryApi.addBlockedDates.url(propertyId),
+        {
+          start: startDate,
+          end: endDate,
+          reason: "Owner blocked these dates",
+        }
+      );
+      toast.success("Dates blocked successfully!");
+      setBlockedDates(res.data.data || []);
+    } catch (err) {
+      console.error("Failed to block dates:", err);
+      toast.error("Unable to block dates");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleUnblock = async () => {
-    const { startDate, endDate } = range[0];
+  /* ---------------- UNBLOCK SELECTED DATES ---------------- */
+  const handleUnblockDates = async () => {
+    if (!propertyId) return toast.error("No property selected");
+    const { startDate, endDate } = dateRange[0];
     try {
-      await api.delete(SummaryApi.removeBlockedDates.url(propertyId), {
-        data: { start: startDate, end: endDate },
-      });
-      toast.success("Dates unblocked");
-      setBlockedDates(blockedDates.filter(
-        b => !(new Date(b.start).getTime() === startDate.getTime() &&
-               new Date(b.end).getTime() === endDate.getTime())
-      ));
-    } catch {
-      toast.error("Failed to unblock");
+      setLoading(true);
+      const res = await Axios.delete(
+        SummaryApi.removeBlockedDates.url(propertyId),
+        { data: { start: startDate, end: endDate } }
+      );
+      toast.success("Dates unblocked successfully!");
+      setBlockedDates(res.data.data || []);
+    } catch (err) {
+      console.error("Failed to unblock dates:", err);
+      toast.error("Unable to unblock dates");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isDisabled = (date) =>
-    blockedDates.some(b => date >= new Date(b.start) && date <= new Date(b.end));
+  /* ---------------- DISABLED DATES FUNCTION ---------------- */
+  const isDateBlocked = (date) => {
+    return blockedDates.some((range) => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      return date >= start && date <= end;
+    });
+  };
 
+  /* ---------------- UI RENDER ---------------- */
   return (
-    <div className="p-6 bg-white rounded-xl shadow-md max-w-3xl mx-auto">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4">Manage Calendar</h1>
-      {loading ? (
-        <p>Loading calendar...</p>
-      ) : (
-        <>
-          <DateRange
-            ranges={range}
-            onChange={(item) => setRange([item.selection])}
-            rangeColors={["#efcc61"]}
-            minDate={new Date()}
-            disabledDay={isDisabled}
-          />
+    <div className="p-6 flex justify-center">
+      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg">
+        <h2 className="text-2xl font-semibold text-center text-[#233b19] mb-6">
+          Manage Calendar
+        </h2>
 
-          <div className="flex gap-4 mt-6">
-            <Button onClick={handleBlock} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-              Block Selected Dates
-            </Button>
-            <Button onClick={handleUnblock} variant="outline" className="text-red-600 border-red-300">
-              Unblock Selected Dates
-            </Button>
-          </div>
-        </>
-      )}
+        <div className="text-center mb-4">
+          <p className="text-gray-600 text-sm">
+            {format(dateRange[0].startDate, "MMM dd, yyyy")} -{" "}
+            {format(dateRange[0].endDate, "MMM dd, yyyy")}
+          </p>
+        </div>
+
+        <DateRange
+          ranges={dateRange}
+          onChange={(item) => setDateRange([item.selection])}
+          minDate={new Date()}
+          rangeColors={["#efcc61"]}
+          moveRangeOnFirstSelection={false}
+          showSelectionPreview={false}
+          showDateDisplay={false}
+          months={1}
+          direction="horizontal"
+          disabledDay={isDateBlocked}
+        />
+
+        <div className="mt-6 flex gap-3 justify-center">
+          <Button
+            onClick={handleBlockDates}
+            disabled={loading}
+            className="bg-[#233b19] text-white hover:bg-[#2f4d24]"
+          >
+            Block Selected Dates
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleUnblockDates}
+            disabled={loading}
+            className="border-red-500 text-red-600 hover:bg-red-50"
+          >
+            Unblock Selected Dates
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
