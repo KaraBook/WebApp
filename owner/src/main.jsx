@@ -5,7 +5,6 @@ import App from "./App.jsx";
 import "./index.css";
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import { Toaster } from "sonner"; 
-import "sonner/dist/sonner.css"; 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
