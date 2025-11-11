@@ -6,9 +6,14 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { prepareImage, uploadBuffer } from "../utils/cloudinary.js";
 import { normalizeMobile } from "../utils/phone.js";
-
+import Razorpay from "razorpay";
 
 const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 export const getOwnerDashboard = async (req, res) => {
   try {
@@ -372,7 +377,7 @@ export const createOfflineBooking = async (req, res) => {
     const { traveller, propertyId, checkIn, checkOut, guests, totalAmount } = req.body;
     const ownerId = req.user.id;
 
-    if (!propertyId || !traveller?.mobile) {
+    if (!propertyId || !traveller?.mobile || !totalAmount) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
@@ -392,8 +397,13 @@ export const createOfflineBooking = async (req, res) => {
       });
     }
 
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      console.error("❌ Missing Razorpay credentials in environment variables");
+      return res.status(500).json({ success: false, message: "Payment configuration error" });
+    }
+
     const order = await razorpay.orders.create({
-      amount: Math.round(totalAmount * 100),
+      amount: Math.round(Number(totalAmount) * 100),
       currency: "INR",
       receipt: `OFFLINE_${Date.now()}`,
       notes: { createdByOwner: ownerId },
@@ -406,15 +416,20 @@ export const createOfflineBooking = async (req, res) => {
       checkOut,
       guests,
       totalNights: Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)),
-      totalAmount,
+      totalAmount: Number(totalAmount),
       orderId: order.id,
-      bookedBy: ownerId, 
+      bookedBy: ownerId,
       paymentStatus: "initiated",
+      isOffline: true,
     });
 
-    return res.json({ success: true, order, booking, traveller: user });
+    console.log(`✅ Offline booking created for property ${propertyId}`);
+    res.json({ success: true, order, booking, traveller: user });
   } catch (err) {
-    console.error("Offline Booking Error:", err);
-    res.status(500).json({ success: false, message: "Offline booking failed" });
+    console.error("🔥 Offline Booking Error:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message || "Offline booking failed",
+    });
   }
 };
