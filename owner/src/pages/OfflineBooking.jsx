@@ -8,7 +8,7 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { loadRazorpay } from "../utils/Razorpay";
 import SummaryApi from "@/common/SummaryApi";
-import Axios from "@/api/axios";
+import api from "../api/axios";
 
 export default function OfflineBooking() {
   const [traveller, setTraveller] = useState({
