@@ -1,4 +1,3 @@
-// src/pages/OfflineBooking.jsx
 import { useState, useRef, useEffect } from "react";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
@@ -7,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { loadRazorpayScript } from "@/utils/loadRazorpay";
+import { loadRazorpay } from "@/utils/loadRazorpay";
 import SummaryApi from "@/common/SummaryApi";
 import Axios from "@/api/axios";
 
@@ -21,12 +20,12 @@ export default function OfflineBooking() {
     city: "",
   });
 
-  const [propertyId, setPropertyId] = useState(""); // optional: prefilled or dropdown later
+  const [propertyId, setPropertyId] = useState(""); 
   const [guestCount, setGuestCount] = useState(1);
   const [price, setPrice] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Calendar UI
+
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -62,7 +61,7 @@ export default function OfflineBooking() {
       const { startDate, endDate } = dateRange[0];
       const { data } = await Axios.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
-        propertyId, // Later auto-set from logged-in owner's property
+        propertyId,
         checkIn: startDate,
         checkOut: endDate,
         guests: guestCount,
@@ -70,7 +69,7 @@ export default function OfflineBooking() {
       });
 
       const { order } = data;
-      const loaded = await loadRazorpayScript();
+      const loaded = await loadRazorpay();
       if (!loaded) return toast.error("Razorpay failed to load");
 
       const options = {
