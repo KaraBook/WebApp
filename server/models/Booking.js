@@ -10,7 +10,7 @@ const bookingSchema = new mongoose.Schema({
   totalAmount: Number,
   paymentId: String,
   orderId: String,
-  paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
+  paymentStatus: { type: String, enum: ["pending", "initiated", "paid", "failed"], default: "pending" },
   contactNumber: String,
   bookedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   isOffline: { type: Boolean, default: true },
