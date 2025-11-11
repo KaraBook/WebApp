@@ -254,48 +254,55 @@ export const updateTravellerMobile = async (req, res) => {
   }
 };
 
+
 /* ---------------------------- RESORT OWNER LOGIN --------------------------- */
 export const resortOwnerLogin = async (req, res) => {
   try {
     const { firebaseUser } = req;
     const mobile = normalizeMobile(firebaseUser?.phone_number);
+
     if (!mobile || mobile.length !== 10) {
-      return res.status(400).json({ message: "Invalid phone token" });
+      return res.status(400).json({ message: "Invalid phone verification token" });
     }
 
     const user = await User.findOne({ mobile });
     if (!user) {
       return res.status(404).json({
-        message: "Resort owner account not found. Please contact admin to register your property.",
+        message:
+          "No account found for this mobile number. Please contact our support team to register your property.",
       });
     }
 
-    // 🚫 Block travellers
     if (user.role === "traveller") {
       return res.status(403).json({
-        message: "This mobile number is registered as a Traveller. You cannot access the Owner Portal.",
+        message:
+          "This mobile number is registered as a Traveller account. Please log in through the Traveller Portal instead.",
       });
     }
 
-    // ✅ Allow only admin/resortOwner
-    if (user.role !== "admin" && user.role !== "resortOwner") {
+    if (!["admin", "resortOwner"].includes(user.role)) {
       return res.status(403).json({
-        message: "Access restricted. Only Resort Owners and Admins can log in here.",
+        message:
+          "Access denied. Only verified Resort Owners or Admins can use this portal.",
       });
     }
 
     const { accessToken, refreshToken } = issueTokens(user);
     return res.status(200).json({
-      message: "Resort Owner login successful",
+      message: "Login successful",
       accessToken,
       refreshToken,
       user: publicUser(user),
     });
   } catch (err) {
     console.error("Resort Owner login error:", err);
-    return res.status(500).json({ message: "Login failed", error: err.message });
+    return res.status(500).json({
+      message: "Something went wrong while logging in. Please try again later.",
+      error: err.message,
+    });
   }
 };
+
 
 
 /* ---------------------------- ME --------------------------- */
