@@ -40,33 +40,39 @@ export default function Login() {
 
   /* ---------------- SEND OTP ---------------- */
   const sendOtp = async () => {
-    const ten = mobile.replace(/\D/g, "");
-    if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
+  const ten = mobile.replace(/\D/g, "");
+  if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
 
-    setLoading(true);
-    try {
-      // Step 1: Precheck if owner exists & authorized
-      const check = await api.post(SummaryApi.ownerPrecheck.url, { mobile: ten });
-      if (!check.data?.success) {
-        toast.error(check.data?.message || "Mobile not authorized for login");
-        setLoading(false);
-        return;
-      }
+  setLoading(true);
+  try {
+    const check = await api.post(SummaryApi.ownerPrecheck.url, { mobile: ten });
 
-      // Step 2: Build reCAPTCHA and send OTP
-      const verifier = window.recaptchaVerifier || (await buildRecaptcha());
-      const confirmation = await signInWithPhoneNumber(auth, `+91${ten}`, verifier);
-
-      setConfirmRes(confirmation);
-      setPhase("verify");
-      toast.success("OTP sent successfully to verified number");
-    } catch (e) {
-      console.error("sendOtp error:", e);
-      toast.error(e.response?.data?.message || mapFirebasePhoneError(e));
-    } finally {
+    if (!check.data?.success) {
+      toast.error(check.data?.message || "This number is not authorized to log in.");
       setLoading(false);
+      return;
     }
-  };
+
+    const verifier = window.recaptchaVerifier || (await buildRecaptcha());
+    const confirmation = await signInWithPhoneNumber(auth, `+91${ten}`, verifier);
+    setConfirmRes(confirmation);
+    setPhase("verify");
+    toast.success("OTP sent successfully to verified number");
+  } catch (e) {
+    console.error("sendOtp error:", e);
+    const status = e.response?.status;
+    if (status === 404) {
+      toast.error("This number is not registered. Please contact admin to register your property.");
+    } else if (status === 500) {
+      toast.error("Server error. Please try again later.");
+    } else {
+      toast.error(e.response?.data?.message || "Failed to send OTP. Please try again.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   /* ---------------- VERIFY OTP ---------------- */
   const verifyOtp = async () => {
