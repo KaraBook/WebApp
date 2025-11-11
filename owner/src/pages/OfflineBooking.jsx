@@ -59,7 +59,7 @@ export default function OfflineBooking() {
     setLoading(true);
     try {
       const { startDate, endDate } = dateRange[0];
-      const { data } = await Axios.post(SummaryApi.ownerOfflineBooking.url, {
+      const { data } = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
         checkIn: startDate,
@@ -80,7 +80,7 @@ export default function OfflineBooking() {
         description: "Owner created booking",
         order_id: order.id,
         handler: async (response) => {
-          await Axios.post(SummaryApi.verifyBookingPayment.url, response);
+          await api.post(SummaryApi.verifyBookingPayment.url, response);
           toast.success("Booking created successfully!");
         },
         prefill: { name: traveller.firstName, email: traveller.email, contact: traveller.mobile },
