@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import api from "../api/axios";
-import SummaryApi from "../common/SummaryApi";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+// src/pages/OfflineBooking.jsx
+import { useState, useRef, useEffect } from "react";
+import { DateRange } from "react-date-range";
+import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import Razorpay from "../utils/Razorpay"; // utility function for payment trigger
+import { loadRazorpayScript } from "@/utils/loadRazorpay";
+import SummaryApi from "@/common/SummaryApi";
+import Axios from "@/api/axios";
 
 export default function OfflineBooking() {
-  const navigate = useNavigate();
-  const [property, setProperty] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [traveller, setTraveller] = useState({
     firstName: "",
     lastName: "",
@@ -22,162 +21,217 @@ export default function OfflineBooking() {
     city: "",
   });
 
-  // fetch villa details (you can adjust to your current endpoint)
-  const propertyId = useParams().id || "YOUR_DEFAULT_PROPERTY_ID";
+  const [propertyId, setPropertyId] = useState(""); // optional: prefilled or dropdown later
+  const [guestCount, setGuestCount] = useState(1);
+  const [price, setPrice] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Calendar UI
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      key: "selection",
+    },
+  ]);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const calendarRef = useRef(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await api.get(SummaryApi.getSingleProperty(propertyId).url);
-        setProperty(res.data.data);
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to load villa details");
+    const handleClickOutside = (e) => {
+      if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+        setShowCalendar(false);
       }
-    })();
-  }, [propertyId]);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setTraveller((prev) => ({ ...prev, [name]: value }));
+  const handleChange = (key, val) => {
+    setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  const handlePayment = async () => {
-    if (!traveller.firstName || !traveller.email || !traveller.mobile) {
-      toast.error("Please fill in traveller details");
-      return;
+  const handleBooking = async () => {
+    if (!traveller.firstName || !traveller.lastName || !traveller.email || !traveller.mobile) {
+      return toast.error("Please fill all traveller details.");
     }
+    if (!price || Number(price) <= 0) return toast.error("Enter a valid price.");
 
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // Create order via backend
-      const res = await api.post(`/api/payments/create-order`, {
-        amount: property.pricingPerNightWeekdays * 100, // convert ₹ → paise
+      const { startDate, endDate } = dateRange[0];
+      const { data } = await Axios.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
-        propertyId,
-        mode: "offline",
+        propertyId, // Later auto-set from logged-in owner's property
+        checkIn: startDate,
+        checkOut: endDate,
+        guests: guestCount,
+        totalAmount: Number(price),
       });
 
-      const { order } = res.data;
+      const { order } = data;
+      const loaded = await loadRazorpayScript();
+      if (!loaded) return toast.error("Razorpay failed to load");
 
-      // Trigger Razorpay
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: "INR",
-        name: "KaraBook",
-        description: property.propertyName,
+        name: "Offline Villa Booking",
+        description: "Owner created booking",
         order_id: order.id,
-        prefill: {
-          name: `${traveller.firstName} ${traveller.lastName}`,
-          email: traveller.email,
-          contact: traveller.mobile,
-        },
         handler: async (response) => {
-          toast.success("Booking successful!");
-          await api.post(`/api/payments/verify`, {
-            ...response,
-            traveller,
-            propertyId,
-          });
-          navigate("/bookings");
+          await Axios.post(SummaryApi.verifyBookingPayment.url, response);
+          toast.success("Booking created successfully!");
         },
-        theme: { color: "#000" },
+        prefill: { name: traveller.firstName, email: traveller.email, contact: traveller.mobile },
+        theme: { color: "#233b19" },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
       console.error(err);
-      toast.error("Payment initiation failed");
+      toast.error(err?.response?.data?.message || "Booking failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Book Villa for Offline Traveller</h1>
-      </div>
+    <div className="max-w-5xl mx-auto p-6">
+      <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Traveller Details */}
-        <Card className="shadow-md border">
+        <Card>
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>First Name</Label>
-                <Input name="firstName" value={traveller.firstName} onChange={handleChange} />
+                <Input
+                  value={traveller.firstName}
+                  onChange={(e) => handleChange("firstName", e.target.value)}
+                  placeholder="Enter first name"
+                />
               </div>
               <div>
                 <Label>Last Name</Label>
-                <Input name="lastName" value={traveller.lastName} onChange={handleChange} />
+                <Input
+                  value={traveller.lastName}
+                  onChange={(e) => handleChange("lastName", e.target.value)}
+                  placeholder="Enter last name"
+                />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Email</Label>
-                <Input type="email" name="email" value={traveller.email} onChange={handleChange} />
-              </div>
-              <div>
-                <Label>Mobile</Label>
-                <Input name="mobile" value={traveller.mobile} onChange={handleChange} />
-              </div>
+
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={traveller.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                placeholder="example@mail.com"
+              />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            <div>
+              <Label>Mobile</Label>
+              <Input
+                value={traveller.mobile}
+                onChange={(e) =>
+                  handleChange("mobile", e.target.value.replace(/\D/g, ""))
+                }
+                placeholder="10-digit number"
+                maxLength={10}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>State</Label>
-                <Input name="state" value={traveller.state} onChange={handleChange} />
+                <Input
+                  value={traveller.state}
+                  onChange={(e) => handleChange("state", e.target.value)}
+                  placeholder="State"
+                />
               </div>
               <div>
                 <Label>City</Label>
-                <Input name="city" value={traveller.city} onChange={handleChange} />
+                <Input
+                  value={traveller.city}
+                  onChange={(e) => handleChange("city", e.target.value)}
+                  placeholder="City"
+                />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Villa Summary */}
-        <Card className="shadow-md border">
+        {/* Booking Details */}
+        <Card>
           <CardHeader>
-            <CardTitle>Villa Summary</CardTitle>
+            <CardTitle>Booking Details</CardTitle>
           </CardHeader>
-          {property ? (
-            <CardContent className="space-y-3">
-              <img
-                src={property.coverImage}
-                alt={property.propertyName}
-                className="rounded-lg h-48 w-full object-cover"
-              />
-              <h2 className="text-lg font-semibold">{property.propertyName}</h2>
-              <p className="text-gray-500">{property.city}, {property.state}</p>
-              <div className="flex justify-between mt-2">
-                <span className="text-gray-700">Base Price / Night</span>
-                <span className="font-medium">₹{property.pricingPerNightWeekdays}</span>
+          <CardContent className="space-y-3">
+            <div className="relative">
+              <Label>Dates</Label>
+              <div
+                className="border rounded-lg p-2 cursor-pointer"
+                onClick={() => setShowCalendar(!showCalendar)}
+              >
+                {format(dateRange[0].startDate, "dd MMM")} -{" "}
+                {format(dateRange[0].endDate, "dd MMM")}
               </div>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Max Guests</span>
-                <span>{property.maxGuests}</span>
-              </div>
-              <div className="pt-4 border-t mt-4 flex justify-between items-center">
-                <h3 className="font-semibold text-lg">Total: ₹{property.pricingPerNightWeekdays}</h3>
-                <Button
-                  onClick={handlePayment}
-                  disabled={loading}
-                  className="bg-black text-white hover:bg-gray-800"
+              {showCalendar && (
+                <div
+                  ref={calendarRef}
+                  className="absolute z-50 mt-2 border bg-white shadow-lg rounded-xl"
                 >
-                  {loading ? "Processing..." : "Book & Pay"}
-                </Button>
-              </div>
-            </CardContent>
-          ) : (
-            <CardContent>Loading property...</CardContent>
-          )}
+                  <DateRange
+                    ranges={dateRange}
+                    onChange={(item) => setDateRange([item.selection])}
+                    minDate={new Date()}
+                    rangeColors={["#efcc61"]}
+                    months={1}
+                    direction="horizontal"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label>Guests</Label>
+              <Input
+                type="number"
+                value={guestCount}
+                onChange={(e) => setGuestCount(Number(e.target.value))}
+                min={1}
+                max={20}
+              />
+            </div>
+
+            <div>
+              <Label>Custom Price (₹)</Label>
+              <Input
+                type="number"
+                placeholder="Enter total price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </div>
+
+            <Button
+              className="w-full mt-3 bg-[#efcc61] text-black hover:bg-[#f5d972]"
+              disabled={loading}
+              onClick={handleBooking}
+            >
+              {loading ? "Processing..." : "Proceed to Payment"}
+            </Button>
+          </CardContent>
         </Card>
       </div>
     </div>

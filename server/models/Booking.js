@@ -12,6 +12,8 @@ const bookingSchema = new mongoose.Schema({
   orderId: String,
   paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
   contactNumber: String,
+  bookedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  isOffline: { type: Boolean, default: true },
 }, { timestamps: true });
 
 export default mongoose.model("Booking", bookingSchema);

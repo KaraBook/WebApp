@@ -365,3 +365,56 @@ export const removeBlockedDates = async (req, res) => {
   }
 };
 
+
+
+export const createOfflineBooking = async (req, res) => {
+  try {
+    const { traveller, propertyId, checkIn, checkOut, guests, totalAmount } = req.body;
+    const ownerId = req.user.id;
+
+    if (!propertyId || !traveller?.mobile) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    const normalized = normalizeMobile(traveller.mobile);
+    let user = await User.findOne({ mobile: normalized });
+
+    if (!user) {
+      user = await User.create({
+        firstName: traveller.firstName,
+        lastName: traveller.lastName,
+        name: `${traveller.firstName} ${traveller.lastName}`,
+        email: traveller.email,
+        mobile: normalized,
+        state: traveller.state,
+        city: traveller.city,
+        role: "traveller",
+      });
+    }
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(totalAmount * 100),
+      currency: "INR",
+      receipt: `OFFLINE_${Date.now()}`,
+      notes: { createdByOwner: ownerId },
+    });
+
+    const booking = await Booking.create({
+      userId: user._id,
+      propertyId,
+      checkIn,
+      checkOut,
+      guests,
+      totalNights: Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)),
+      totalAmount,
+      orderId: order.id,
+      bookedBy: ownerId, 
+      paymentStatus: "initiated",
+    });
+
+    return res.json({ success: true, order, booking, traveller: user });
+  } catch (err) {
+    console.error("Offline Booking Error:", err);
+    res.status(500).json({ success: false, message: "Offline booking failed" });
+  }
+};

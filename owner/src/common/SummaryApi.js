@@ -50,6 +50,15 @@ const SummaryApi = {
         url: (id) => `${BASE_URL}/api/owner/property/${id}/block-dates`,
         method: "DELETE",
     },
+    ownerOfflineBooking: {
+        url: `${BASE_URL}/api/owner/offline-booking`,
+        method: "POST",
+    },
+    verifyBookingPayment: {
+        url: `${BASE_URL}/api/payments/verify`,
+        method: "POST",
+    },
+
 };
 
 export default SummaryApi;
