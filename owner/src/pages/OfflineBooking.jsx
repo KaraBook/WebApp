@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { loadRazorpay } from "../utils/Razorpay";
+import loadRazorpay from "../utils/Razorpay";
 import SummaryApi from "@/common/SummaryApi";
 import api from "../api/axios";
 
