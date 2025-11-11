@@ -187,7 +187,15 @@ export default function Login() {
 
           {phase === "verify" && (
             <div className="space-y-3">
-              <Label htmlFor="otp">Enter OTP</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="otp" className="text-sm font-medium">Enter OTP</Label>
+                {!canResend && (
+                  <span className="text-xs text-gray-500">
+                    Resend in {timer}s
+                  </span>
+                )}
+              </div>
+
               <Input
                 id="otp"
                 placeholder="6-digit OTP"
@@ -196,9 +204,25 @@ export default function Login() {
                 onChange={(e) => setOtp(e.target.value)}
                 className="text-center tracking-widest text-lg"
               />
+
               <Button onClick={verifyOtp} disabled={loading} className="w-full">
                 {loading ? "Verifying..." : "Verify & Continue"}
               </Button>
+
+              {canResend ? (
+                <Button
+                  variant="outline"
+                  onClick={sendOtp}
+                  className="w-full"
+                >
+                  Resend OTP
+                </Button>
+              ) : (
+                <Button variant="outline" disabled className="w-full opacity-50">
+                  Resend in {timer}s
+                </Button>
+              )}
+
               <Button
                 variant="outline"
                 onClick={() => setPhase("enter")}
@@ -208,6 +232,7 @@ export default function Login() {
               </Button>
             </div>
           )}
+
         </CardContent>
 
         <CardFooter className="flex justify-center flex-col items-center gap-1">
