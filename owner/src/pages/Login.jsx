@@ -24,6 +24,8 @@ export default function Login() {
   const [confirmRes, setConfirmRes] = useState(null);
   const [loading, setLoading] = useState(false);
   const { loginWithTokens } = useAuth();
+  const [timer, setTimer] = useState(0);
+  const [canResend, setCanResend] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,38 +42,48 @@ export default function Login() {
 
   /* ---------------- SEND OTP ---------------- */
   const sendOtp = async () => {
-  const ten = mobile.replace(/\D/g, "");
-  if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
+    const ten = mobile.replace(/\D/g, "");
+    if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
 
-  setLoading(true);
-  try {
-    const check = await api.post(SummaryApi.ownerPrecheck.url, { mobile: ten });
-
-    if (!check.data?.success) {
-      toast.error(check.data?.message || "This number is not authorized to log in.");
-      setLoading(false);
-      return;
+    if (!canResend) {
+      return toast.error(`Please wait ${timer}s before requesting a new OTP`);
     }
 
-    const verifier = window.recaptchaVerifier || (await buildRecaptcha());
-    const confirmation = await signInWithPhoneNumber(auth, `+91${ten}`, verifier);
-    setConfirmRes(confirmation);
-    setPhase("verify");
-    toast.success("OTP sent successfully to verified number");
-  } catch (e) {
-    console.error("sendOtp error:", e);
-    const status = e.response?.status;
-    if (status === 404) {
-      toast.error("This number is not registered. Please contact admin to register your property.");
-    } else if (status === 500) {
-      toast.error("Server error. Please try again later.");
-    } else {
+    setLoading(true);
+    try {
+      const check = await api.post(SummaryApi.ownerPrecheck.url, { mobile: ten });
+      if (!check.data?.success) {
+        toast.error(check.data?.message || "This number is not authorized to log in.");
+        setLoading(false);
+        return;
+      }
+
+      const verifier = window.recaptchaVerifier || (await buildRecaptcha());
+      const confirmation = await signInWithPhoneNumber(auth, `+91${ten}`, verifier);
+      setConfirmRes(confirmation);
+      setPhase("verify");
+      toast.success("OTP sent successfully");
+
+      setCanResend(false);
+      setTimer(30);
+
+    } catch (e) {
+      console.error("sendOtp error:", e);
       toast.error(e.response?.data?.message || "Failed to send OTP. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
+
+  useEffect(() => {
+    if (!canResend && timer > 0) {
+      const countdown = setTimeout(() => setTimer((t) => t - 1), 1000);
+      return () => clearTimeout(countdown);
+    } else if (timer === 0 && !canResend) {
+      setCanResend(true);
+    }
+  }, [timer, canResend]);
 
 
   /* ---------------- VERIFY OTP ---------------- */
@@ -159,9 +171,14 @@ export default function Login() {
                   }}
                 />
               </div>
-              <Button onClick={sendOtp} disabled={loading} className="w-full">
-                {loading ? "Sending OTP..." : "Send OTP"}
+              <Button
+                onClick={sendOtp}
+                disabled={loading || !canResend}
+                className="w-full"
+              >
+                {loading ? "Sending OTP..." : canResend ? "Send OTP" : `Resend in ${timer}s`}
               </Button>
+
               <p className="text-xs text-gray-500 text-center mt-1">
                 Use your registered mobile number associated with your property account.
               </p>
