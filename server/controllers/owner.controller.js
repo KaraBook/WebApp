@@ -144,18 +144,20 @@ export const updateOwnerProperty = async (req, res) => {
     if (req.is("application/json")) Object.assign(updatedData, req.body);
     if (req.is("multipart/form-data")) Object.assign(updatedData, req.body);
 
-    if (req.body.roomBreakdown) {
-      let rb = req.body.roomBreakdown;
-      if (typeof rb === "string") {
-        try { rb = JSON.parse(rb); } catch (_) { }
-      }
-      const ac = Number(rb.ac || 0);
-      const nonAc = Number(rb.nonAc || 0);
-      const deluxe = Number(rb.deluxe || 0);
-      const luxury = Number(rb.luxury || 0);
-      const total = ac + nonAc + deluxe + luxury;
-      updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, total };
-      updatedData.totalRooms = total;
+    if (
+      req.body.roomBreakdown ||
+      req.body["roomBreakdown[ac]"] ||
+      req.body["roomBreakdown.nonAc"]
+    ) {
+      const rb = {
+        ac: Number(req.body["roomBreakdown[ac]"] ?? req.body.roomBreakdown?.ac ?? 0),
+        nonAc: Number(req.body["roomBreakdown[nonAc]"] ?? req.body.roomBreakdown?.nonAc ?? 0),
+        deluxe: Number(req.body["roomBreakdown[deluxe]"] ?? req.body.roomBreakdown?.deluxe ?? 0),
+        luxury: Number(req.body["roomBreakdown[luxury]"] ?? req.body.roomBreakdown?.luxury ?? 0),
+      };
+      rb.total = rb.ac + rb.nonAc + rb.deluxe + rb.luxury;
+      updatedData.roomBreakdown = rb;
+      updatedData.totalRooms = rb.total;
     }
 
     const coverImageFile = files.coverImage?.[0];
@@ -322,7 +324,7 @@ export const addBlockedDates = async (req, res) => {
       addedByOwner: true,
     });
 
-     await property.save({ validateBeforeSave: false });
+    await property.save({ validateBeforeSave: false });
 
     console.log("✅ Dates blocked successfully for property:", id);
 
@@ -353,7 +355,7 @@ export const removeBlockedDates = async (req, res) => {
 
     property.blockedDates = property.blockedDates.filter(
       (b) => !(new Date(b.start).getTime() === new Date(start).getTime() &&
-               new Date(b.end).getTime() === new Date(end).getTime())
+        new Date(b.end).getTime() === new Date(end).getTime())
     );
     await property.save();
 

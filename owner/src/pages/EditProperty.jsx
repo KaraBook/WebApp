@@ -142,44 +142,53 @@ const EditProperty = () => {
         try {
             const data = new FormData();
 
-            // Total room calc
             const rb = formData.roomBreakdown;
             const total =
-                Number(rb.ac || 0) + Number(rb.nonAc || 0) + Number(rb.deluxe || 0) + Number(rb.luxury || 0);
+                Number(rb.ac || 0) +
+                Number(rb.nonAc || 0) +
+                Number(rb.deluxe || 0) +
+                Number(rb.luxury || 0);
             formData.roomBreakdown = { ...rb, total };
             formData.totalRooms = total;
 
             Object.entries(formData).forEach(([key, value]) => {
-                if (Array.isArray(value)) {
+                if (key === "roomBreakdown") {
+                    Object.entries(value).forEach(([subKey, subValue]) =>
+                        data.append(`roomBreakdown[${subKey}]`, subValue)
+                    );
+                } else if (Array.isArray(value)) {
                     value.forEach((v) => data.append(`${key}[]`, v));
                 } else if (typeof value === "object" && value !== null) {
                     data.append(key, JSON.stringify(value));
                 } else {
-                    data.append(key, value);
+                    data.append(key, value ?? "");
                 }
             });
 
             if (coverImageFile) data.append("coverImage", coverImageFile);
+            if (shopActFile) data.append("shopAct", shopActFile);
             if (replaceGallery && galleryImageFiles.length > 0)
                 galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
-            if (shopActFile) data.append("shopAct", shopActFile);
+
+            for (let pair of data.entries()) console.log(pair[0], "→", pair[1]);
 
             const res = await api({
                 url: SummaryApi.updateOwnerProperty(id).url,
-                method: SummaryApi.updateOwnerProperty(id).method,
+                method: "put",
                 data,
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
-            toast.success("Property updated successfully! Redirecting...");
+            toast.success("Property updated successfully!");
             setTimeout(() => navigate("/properties"), 1500);
         } catch (err) {
-            console.error(err);
+            console.error("Update Error:", err);
             toast.error(err.response?.data?.message || "Failed to update property");
         } finally {
             setLoading(false);
         }
     };
+
 
     if (fetching) return <FullPageLoader />;
 
