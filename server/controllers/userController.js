@@ -305,6 +305,56 @@ export const resortOwnerLogin = async (req, res) => {
 
 
 
+/* ---------------------------- RESORT OWNER PRECHECK --------------------------- */
+export const checkResortOwnerNumber = async (req, res) => {
+  try {
+    const { mobile } = req.body;
+    const normalized = normalizeMobile(mobile);
+
+    if (!normalized || normalized.length !== 10) {
+      return res.status(400).json({ message: "Please enter a valid 10-digit mobile number." });
+    }
+
+    const user = await User.findOne({ mobile: normalized });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "No account found for this number. Please contact admin to register your property.",
+      });
+    }
+
+    if (user.role === "traveller") {
+      return res.status(403).json({
+        success: false,
+        message:
+          "This number belongs to a Traveller account. Please log in via the Traveller Portal.",
+      });
+    }
+
+    if (!["resortOwner", "admin"].includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only verified Resort Owners or Admins can log in here.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Mobile verified. You can proceed with OTP verification.",
+    });
+  } catch (err) {
+    console.error("checkResortOwnerNumber error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong while checking number. Please try again later.",
+    });
+  }
+};
+
+
+
 /* ---------------------------- ME --------------------------- */
 export const me = async (req, res) => {
   const user = await User.findById(req.user.id);

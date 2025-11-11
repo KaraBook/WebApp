@@ -1,6 +1,10 @@
 const BASE_URL = import.meta.env.VITE_API_BASE;
 
 const SummaryApi = {
+    ownerPrecheck: {
+        url: `${BASE_URL}/api/auth/resort-owner/precheck`,
+        method: "POST",
+    },
     ownerLogin: {
         url: `${BASE_URL}/api/auth/resort-owner/login`,
         method: "POST",
