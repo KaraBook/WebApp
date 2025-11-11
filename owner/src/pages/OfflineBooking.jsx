@@ -1,16 +1,34 @@
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import loadRazorpay from "../utils/Razorpay";
-import SummaryApi from "@/common/SummaryApi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import api from "../api/axios";
+import SummaryApi from "@/common/SummaryApi";
+import loadRazorpay from "../utils/Razorpay";
+import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
+
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 
 export default function OfflineBooking() {
+  const { id } = useParams(); 
+  const [propertyId] = useState(id || "");
+  const [guestCount, setGuestCount] = useState(1);
+  const [price, setPrice] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [selectedStateCode, setSelectedStateCode] = useState("");
+
   const [traveller, setTraveller] = useState({
     firstName: "",
     lastName: "",
@@ -19,12 +37,6 @@ export default function OfflineBooking() {
     state: "",
     city: "",
   });
-
-  const [propertyId, setPropertyId] = useState(""); 
-  const [guestCount, setGuestCount] = useState(1);
-  const [price, setPrice] = useState("");
-  const [loading, setLoading] = useState(false);
-
 
   const [dateRange, setDateRange] = useState([
     {
@@ -35,6 +47,22 @@ export default function OfflineBooking() {
   ]);
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
+
+  /* ---------------- INIT STATE LIST ---------------- */
+  useEffect(() => {
+    const statesList = getIndianStates();
+    setStates(statesList);
+  }, []);
+
+  const handleStateChange = (code) => {
+    setSelectedStateCode(code);
+    const selected = states.find((s) => s.isoCode === code);
+    setTraveller((prev) => ({ ...prev, state: selected?.name || "" }));
+    const cityList = getCitiesByState(code);
+    setCities(cityList);
+    setTraveller((prev) => ({ ...prev, city: "" }));
+  };
+
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -50,9 +78,13 @@ export default function OfflineBooking() {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
+
   const handleBooking = async () => {
     if (!traveller.firstName || !traveller.lastName || !traveller.email || !traveller.mobile) {
       return toast.error("Please fill all traveller details.");
+    }
+    if (!traveller.state || !traveller.city) {
+      return toast.error("Please select state and city.");
     }
     if (!price || Number(price) <= 0) return toast.error("Enter a valid price.");
 
@@ -83,7 +115,11 @@ export default function OfflineBooking() {
           await api.post(SummaryApi.verifyBookingPayment.url, response);
           toast.success("Booking created successfully!");
         },
-        prefill: { name: traveller.firstName, email: traveller.email, contact: traveller.mobile },
+        prefill: {
+          name: `${traveller.firstName} ${traveller.lastName}`,
+          email: traveller.email,
+          contact: traveller.mobile,
+        },
         theme: { color: "#233b19" },
       };
 
@@ -97,12 +133,13 @@ export default function OfflineBooking() {
     }
   };
 
+
   return (
     <div className="max-w-5xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Traveller Details */}
+        {/* TRAVELLER DETAILS */}
         <Card>
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
@@ -141,55 +178,71 @@ export default function OfflineBooking() {
               <Label>Mobile</Label>
               <Input
                 value={traveller.mobile}
-                onChange={(e) =>
-                  handleChange("mobile", e.target.value.replace(/\D/g, ""))
-                }
+                onChange={(e) => handleChange("mobile", e.target.value.replace(/\D/g, ""))}
                 placeholder="10-digit number"
                 maxLength={10}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
+              {/* STATE */}
               <div>
                 <Label>State</Label>
-                <Input
-                  value={traveller.state}
-                  onChange={(e) => handleChange("state", e.target.value)}
-                  placeholder="State"
-                />
+                <Select value={selectedStateCode} onValueChange={handleStateChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select State" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {states.map((st) => (
+                      <SelectItem key={st.isoCode} value={st.isoCode}>
+                        {st.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* CITY */}
               <div>
                 <Label>City</Label>
-                <Input
+                <Select
                   value={traveller.city}
-                  onChange={(e) => handleChange("city", e.target.value)}
-                  placeholder="City"
-                />
+                  onValueChange={(val) => setTraveller((p) => ({ ...p, city: val }))}
+                  disabled={!cities.length}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={cities.length ? "Select City" : "Select State first"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cities.map((c) => (
+                      <SelectItem key={c.name} value={c.name}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Booking Details */}
+        {/* BOOKING DETAILS */}
         <Card>
           <CardHeader>
             <CardTitle>Booking Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            {/* DATE RANGE */}
             <div className="relative">
               <Label>Dates</Label>
               <div
                 className="border rounded-lg p-2 cursor-pointer"
                 onClick={() => setShowCalendar(!showCalendar)}
               >
-                {format(dateRange[0].startDate, "dd MMM")} -{" "}
-                {format(dateRange[0].endDate, "dd MMM")}
+                {format(dateRange[0].startDate, "dd MMM")} – {format(dateRange[0].endDate, "dd MMM")}
               </div>
               {showCalendar && (
-                <div
-                  ref={calendarRef}
-                  className="absolute z-50 mt-2 border bg-white shadow-lg rounded-xl"
-                >
+                <div ref={calendarRef} className="absolute z-50 mt-2 border bg-white shadow-lg rounded-xl">
                   <DateRange
                     ranges={dateRange}
                     onChange={(item) => setDateRange([item.selection])}
@@ -202,6 +255,7 @@ export default function OfflineBooking() {
               )}
             </div>
 
+            {/* GUESTS */}
             <div>
               <Label>Guests</Label>
               <Input
@@ -213,6 +267,7 @@ export default function OfflineBooking() {
               />
             </div>
 
+            {/* PRICE */}
             <div>
               <Label>Custom Price (₹)</Label>
               <Input
