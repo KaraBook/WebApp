@@ -27,8 +27,12 @@ const schema = z.object({
   email: z.string().email("Enter a valid email"),
   state: z.string().min(2, "State is required"),
   city: z.string().min(2, "City is required"),
+  dateOfBirth: z.string().min(1, "Date of Birth is required"),
+  address: z.string().min(10, "Address is too short").max(200),
+  pinCode: z.string().regex(/^[1-9][0-9]{5}$/, "Enter valid 6-digit pin code"),
   image: z.any().optional(),
 });
+
 
 export default function Signup() {
   const { state } = useLocation();
@@ -59,48 +63,48 @@ export default function Signup() {
   };
 
   const onSubmit = async (values) => {
-  try {
-    // 1. Signup (text only)
-    const signupResp = await axios.post(
-      baseURL + SummaryApi.travellerSignup.url,
-      {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        state: values.state,
-        city: values.city,
-      },
-      { headers: { Authorization: `Bearer ${state.idToken}` } }
-    );
-
-    let { user, accessToken, refreshToken } = signupResp.data;
-
-    // 2. Upload avatar if provided
-    if (values.image?.length) {
-      const fd = new FormData();
-      fd.append("image", values.image[0]);
-
-      const uploadResp = await axios.post(
-        baseURL + SummaryApi.uploadTravellerAvatar.url,
-        fd,
+    try {
+      const signupResp = await axios.post(
+        baseURL + SummaryApi.travellerSignup.url,
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          state: values.state,
+          city: values.city,
+          dateOfBirth: values.dateOfBirth,
+          address: values.address,
+          pinCode: values.pinCode,
+        },
+        { headers: { Authorization: `Bearer ${state.idToken}` } }
       );
 
-      user = { ...user, avatarUrl: uploadResp.data.avatarUrl };
-    }
+      let { user, accessToken, refreshToken } = signupResp.data;
 
-    // 3. Save in store & redirect
-    setAuth({ user, accessToken, refreshToken });
-    navigate("/");
-  } catch (err) {
-    alert(err?.response?.data?.message || "Signup failed");
-  }
-};
+      if (values.image?.length) {
+        const fd = new FormData();
+        fd.append("image", values.image[0]);
+
+        const uploadResp = await axios.post(
+          baseURL + SummaryApi.uploadTravellerAvatar.url,
+          fd,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        user = { ...user, avatarUrl: uploadResp.data.avatarUrl };
+      }
+
+      setAuth({ user, accessToken, refreshToken });
+      navigate("/");
+    } catch (err) {
+      alert(err?.response?.data?.message || "Signup failed");
+    }
+  };
 
 
   return (
@@ -185,6 +189,25 @@ export default function Signup() {
               />
               {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
             </div>
+
+            <div className="grid gap-1">
+              <Label htmlFor="dateOfBirth">Date of Birth</Label>
+              <Input id="dateOfBirth" type="date" className="mt-1" {...register("dateOfBirth")} />
+              {errors.dateOfBirth && <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>}
+            </div>
+
+            <div className="grid gap-1">
+              <Label htmlFor="address">Address</Label>
+              <Input id="address" placeholder="Full address" className="mt-1" {...register("address")} />
+              {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
+            </div>
+
+            <div className="grid gap-1">
+              <Label htmlFor="pinCode">Pin Code</Label>
+              <Input id="pinCode" placeholder="6-digit pin code" className="mt-1" maxLength={6} {...register("pinCode")} />
+              {errors.pinCode && <p className="text-sm text-destructive">{errors.pinCode.message}</p>}
+            </div>
+
           </div>
 
           <div className="grid gap-1">

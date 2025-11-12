@@ -152,8 +152,8 @@ export const travellerSignup = async (req, res) => {
     if (!mobile || mobile.length !== 10)
       return res.status(400).json({ message: "Invalid phone token" });
 
-    const { firstName, lastName, email, state, city } = req.body ?? {};
-    if (!firstName || !lastName || !email || !state || !city) {
+    const { firstName, lastName, email, state, city, dateOfBirth, address, pinCode } = req.body ?? {};
+    if (!firstName || !lastName || !email || !state || !city || !address || !pinCode || !dateOfBirth) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -174,6 +174,9 @@ export const travellerSignup = async (req, res) => {
       city,
       mobile,
       role: "traveller",
+      dateOfBirth,
+      address,
+      pinCode,
     });
 
     const { accessToken, refreshToken } = issueTokens(user);

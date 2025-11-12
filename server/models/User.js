@@ -21,6 +21,12 @@ const userSchema = new mongoose.Schema({
     type: String, trim: true,
     required: function () { return this.role === 'traveller'; }
   },
+  dateOfBirth: { type: Date },
+  address: { type: String, trim: true, maxlength: 200 },
+  pinCode: {
+    type: String,
+    match: [/^[1-9][0-9]{5}$/, "Please enter a valid 6-digit pin code"],
+  },
 
   avatarUrl: { type: String, default: "" },
   ownedProperties: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }],
