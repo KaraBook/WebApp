@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera, Mail, MapPin, Phone, LogOut } from "lucide-react";
+import { Camera, Mail, MapPin, Phone, Calendar, Home, MapPinHouse, LogOut } from "lucide-react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { toast } from "sonner";
@@ -12,27 +12,22 @@ export default function Profile() {
   const [bookingCount, setBookingCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [avatarPreview, setAvatarPreview] = useState("");
-  const fileRef = useRef(null);
   const [uploading, setUploading] = useState(false);
+  const fileRef = useRef(null);
 
-  // Fetch profile, bookings, and wishlist together
+  /* ---------------- FETCH USER DETAILS ---------------- */
   useEffect(() => {
     const fetchAll = async () => {
       try {
         const [userRes, bookingsRes, wishlistRes] = await Promise.all([
-          Axios.get(SummaryApi.me.url, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }),
-          Axios.get(SummaryApi.getUserBookings.url, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }),
-          Axios.get(SummaryApi.getWishlist.url, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }),
+          Axios.get(SummaryApi.me.url, { headers: { Authorization: `Bearer ${accessToken}` } }),
+          Axios.get(SummaryApi.getUserBookings.url, { headers: { Authorization: `Bearer ${accessToken}` } }),
+          Axios.get(SummaryApi.getWishlist.url, { headers: { Authorization: `Bearer ${accessToken}` } }),
         ]);
 
-        setProfile(userRes.data.user);
-        setAvatarPreview(userRes.data.user.avatarUrl);
+        const user = userRes.data.user;
+        setProfile(user);
+        setAvatarPreview(user.avatarUrl);
         setBookingCount(bookingsRes.data.data?.length || 0);
         setWishlistCount(wishlistRes.data.data?.length || 0);
       } catch (err) {
@@ -43,12 +38,14 @@ export default function Profile() {
     fetchAll();
   }, []);
 
+  /* ---------------- UPLOAD AVATAR ---------------- */
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const formData = new FormData();
     formData.append("image", file);
     setUploading(true);
+
     try {
       const res = await Axios.post(SummaryApi.uploadTravellerAvatar.url, formData, {
         headers: {
@@ -68,18 +65,24 @@ export default function Profile() {
   if (!profile)
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="w-10 h-10 border-4 border-gray-300 border-t-[#efcc61] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-gray-200 border-t-[#efcc61] rounded-full animate-spin"></div>
       </div>
     );
 
-  const memberSince = profile.createdAt
-    ? new Date(profile.createdAt).getFullYear()
+  const memberSince = profile.createdAt ? new Date(profile.createdAt).getFullYear() : "—";
+  const dob = profile.dateOfBirth
+    ? new Date(profile.dateOfBirth).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
     : "—";
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
-      <div className="bg-white border border-gray-100 rounded-3xl shadow-sm p-6 md:p-10 flex flex-col items-center relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-24 bg-[#233b19]/10"></div>
+    <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
+      {/* HEADER CARD */}
+      <div className="bg-white border rounded-2xl shadow-sm p-6 flex flex-col items-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-24 bg-[#233b19]/10" />
 
         <div className="relative mt-8 mb-4">
           <img
@@ -93,35 +96,19 @@ export default function Profile() {
           >
             <Camera className="w-4 h-4 text-gray-700" />
           </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={handleAvatarChange}
-          />
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={handleAvatarChange} />
         </div>
 
         <h2 className="text-2xl font-semibold text-gray-900">{profile.name}</h2>
-        <p className="text-sm text-gray-500 mt-1 capitalize">{profile.role}</p>
+        <p className="text-sm text-gray-500 capitalize mt-1">{profile.role}</p>
 
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
-          <InfoBox icon={<Phone />} label="Mobile" value={profile.mobile} />
-          <InfoBox icon={<Mail />} label="Email" value={profile.email} />
-          <InfoBox
-            icon={<MapPin />}
-            label="Location"
-            value={`${profile.city}, ${profile.state}`}
-          />
-        </div>
-
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+        <div className="flex flex-wrap justify-center gap-4 mt-6">
           <StatBox color="#233b19" label="Bookings" value={bookingCount} />
           <StatBox color="#efcc61" label="Wishlist" value={wishlistCount} textDark />
           <StatBox color="#111827" label="Member Since" value={memberSince} />
         </div>
 
-        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+        <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
           <Button
             onClick={() => fileRef.current.click()}
             disabled={uploading}
@@ -139,16 +126,33 @@ export default function Profile() {
           </Button>
         </div>
       </div>
+
+      {/* INFO SECTION */}
+      <div className="bg-white border rounded-2xl shadow-sm p-6 grid sm:grid-cols-2 gap-x-12 gap-y-5">
+        <InfoRow icon={<Phone />} label="Mobile" value={profile.mobile} />
+        <InfoRow icon={<Mail />} label="Email" value={profile.email} />
+        <InfoRow icon={<Calendar />} label="Date of Birth" value={dob} />
+        <InfoRow icon={<Home />} label="Address" value={profile.address || "—"} />
+        <InfoRow
+          icon={<MapPinHouse />}
+          label="Location"
+          value={`${profile.city || ""}, ${profile.state || ""}`}
+        />
+        <InfoRow icon={<MapPin />} label="Pin Code" value={profile.pinCode || "—"} />
+      </div>
     </div>
   );
 }
 
-function InfoBox({ icon, label, value }) {
+/* ---------------- COMPONENTS ---------------- */
+function InfoRow({ icon, label, value }) {
   return (
-    <div className="bg-gray-50 rounded-2xl py-4 px-5 text-center">
-      <div className="flex justify-center text-[#233b19] mb-1">{icon}</div>
-      <p className="text-gray-700 font-medium">{value || "—"}</p>
-      <p className="text-xs text-gray-500 mt-1">{label}</p>
+    <div className="flex items-center gap-3 border-b pb-3 last:border-none">
+      <div className="flex-shrink-0 text-[#233b19]">{icon}</div>
+      <div>
+        <p className="text-sm text-gray-500">{label}</p>
+        <p className="font-medium text-gray-800">{value}</p>
+      </div>
     </div>
   );
 }
@@ -156,23 +160,13 @@ function InfoBox({ icon, label, value }) {
 function StatBox({ color, label, value, textDark = false }) {
   return (
     <div
-      className="rounded-2xl py-5 text-center"
+      className="rounded-xl py-3 px-6 min-w-[110px] text-center"
       style={{ backgroundColor: color }}
     >
-      <h3
-        className={`text-xl font-semibold ${
-          textDark ? "text-gray-900" : "text-white"
-        }`}
-      >
+      <h3 className={`text-xl font-semibold ${textDark ? "text-gray-900" : "text-white"}`}>
         {value}
       </h3>
-      <p
-        className={`text-sm ${
-          textDark ? "text-gray-700" : "text-gray-300"
-        }`}
-      >
-        {label}
-      </p>
+      <p className={`text-sm ${textDark ? "text-gray-700" : "text-gray-300"}`}>{label}</p>
     </div>
   );
 }

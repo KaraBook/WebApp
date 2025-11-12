@@ -190,19 +190,19 @@ export default function Signup() {
               {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
             </div>
 
-            <div className="grid gap-1">
+            <div className="grid gap-1 mt-1">
               <Label htmlFor="dateOfBirth">Date of Birth</Label>
               <Input id="dateOfBirth" type="date" className="mt-1" {...register("dateOfBirth")} />
               {errors.dateOfBirth && <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>}
             </div>
 
-            <div className="grid gap-1">
+            <div className="grid gap-1 mt-1">
               <Label htmlFor="address">Address</Label>
               <Input id="address" placeholder="Full address" className="mt-1" {...register("address")} />
               {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
             </div>
 
-            <div className="grid gap-1">
+            <div className="grid gap-1 mt-1">
               <Label htmlFor="pinCode">Pin Code</Label>
               <Input id="pinCode" placeholder="6-digit pin code" className="mt-1" maxLength={6} {...register("pinCode")} />
               {errors.pinCode && <p className="text-sm text-destructive">{errors.pinCode.message}</p>}
