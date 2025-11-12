@@ -384,18 +384,35 @@ export const createOfflineBooking = async (req, res) => {
     const normalized = normalizeMobile(traveller.mobile);
     let user = await User.findOne({ mobile: normalized });
 
-    if (!user) {
+    if (user) {
+      let updated = false;
+
+      const updatableFields = ["firstName", "lastName", "email", "state", "city", "dateOfBirth", "address", "pinCode"];
+
+      updatableFields.forEach((field) => {
+        if (!user[field] && traveller[field]) {
+          user[field] = traveller[field];
+          updated = true;
+        }
+      });
+
+      if (updated) await user.save();
+    } else {
       user = await User.create({
         firstName: traveller.firstName,
         lastName: traveller.lastName,
         name: `${traveller.firstName} ${traveller.lastName}`,
         email: traveller.email,
         mobile: normalized,
+        dateOfBirth: traveller.dateOfBirth,
+        address: traveller.address,
+        pinCode: traveller.pinCode,
         state: traveller.state,
         city: traveller.city,
         role: "traveller",
       });
     }
+
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       console.error("❌ Missing Razorpay credentials in environment variables");

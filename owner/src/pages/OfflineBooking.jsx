@@ -19,7 +19,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 export default function OfflineBooking() {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const [propertyId] = useState(id || "");
   const [guestCount, setGuestCount] = useState(1);
   const [price, setPrice] = useState("");
@@ -34,6 +34,9 @@ export default function OfflineBooking() {
     lastName: "",
     email: "",
     mobile: "",
+    dateOfBirth: "",
+    address: "",
+    pinCode: "",
     state: "",
     city: "",
   });
@@ -80,8 +83,16 @@ export default function OfflineBooking() {
 
 
   const handleBooking = async () => {
-    if (!traveller.firstName || !traveller.lastName || !traveller.email || !traveller.mobile) {
-      return toast.error("Please fill all traveller details.");
+    if (
+      !traveller.firstName ||
+      !traveller.lastName ||
+      !traveller.email ||
+      !traveller.mobile ||
+      !traveller.dateOfBirth ||
+      !traveller.address ||
+      !traveller.pinCode
+    ) {
+      return toast.error("Please fill all traveller details completely.");
     }
     if (!traveller.state || !traveller.city) {
       return toast.error("Please select state and city.");
@@ -221,6 +232,36 @@ export default function OfflineBooking() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <Label>Date of Birth</Label>
+                <Input
+                  type="date"
+                  value={traveller.dateOfBirth}
+                  onChange={(e) => handleChange("dateOfBirth", e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label>Address</Label>
+                <Input
+                  type="text"
+                  placeholder="Full address"
+                  value={traveller.address}
+                  onChange={(e) => handleChange("address", e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label>Pin Code</Label>
+                <Input
+                  type="text"
+                  placeholder="6-digit pin"
+                  maxLength={6}
+                  value={traveller.pinCode}
+                  onChange={(e) => handleChange("pinCode", e.target.value.replace(/\D/g, ""))}
+                />
               </div>
             </div>
           </CardContent>
