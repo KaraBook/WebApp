@@ -135,7 +135,7 @@ export default function OfflineBooking() {
 
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-5xl p-2">
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
