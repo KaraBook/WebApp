@@ -65,7 +65,7 @@ export default function Login() {
       toast.success("OTP sent successfully");
 
       setCanResend(false);
-      setTimer(30);
+      setTimer(90);
 
     } catch (e) {
       console.error("sendOtp error:", e);
