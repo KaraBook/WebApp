@@ -30,6 +30,9 @@ const publicUser = (u) => ({
   role: u.role,
   state: u.state,
   city: u.city,
+  dateOfBirth: u.dateOfBirth,
+  address: u.address,
+  pinCode: u.pinCode,
   avatarUrl: u.avatarUrl,
   createdAt: u.createdAt,
 });
