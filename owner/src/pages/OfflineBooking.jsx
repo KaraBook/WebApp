@@ -29,14 +29,14 @@ import SummaryApi from "@/common/SummaryApi";
 import loadRazorpay from "../utils/Razorpay";
 
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
-import { useAuth } from "../auth/AuthContext"; // 🔥 Needed for owner email/mobile
+import { useAuth } from "../auth/AuthContext";
 
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 export default function OfflineBooking() {
   const { id } = useParams();
-  const { user } = useAuth(); // 🔥 Logged in owner user  
+  const { user } = useAuth();
   const ownerMobile = user?.mobile;
 
   const [propertyId] = useState(id || "");
@@ -78,12 +78,11 @@ export default function OfflineBooking() {
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
 
-  /* ---------------- Load States ---------------- */
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  /* ---------------- DateRange Outside Click -------------- */
+
   useEffect(() => {
     const handleOutside = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -105,6 +104,32 @@ export default function OfflineBooking() {
     return;
   }
 
+  if (traveller.mobile === ownerMobile) {
+    setAllowForm(false);
+
+    setPopupTitle("Owner Number Not Allowed");
+    setPopupMsg(
+      "This mobile number belongs to a Property Owner account. You cannot create a traveller booking using this number."
+    );
+
+    setTraveller({
+      firstName: "",
+      lastName: "",
+      email: "",
+      mobile: traveller.mobile,
+      dateOfBirth: "",
+      address: "",
+      pinCode: "",
+      state: "",
+      city: "",
+    });
+
+    setSelectedStateCode("");
+    setCities([]);
+    setShowPopup(true);
+    return;
+  }
+
   setChecking(true);
 
   try {
@@ -114,10 +139,9 @@ export default function OfflineBooking() {
 
     const data = res.data;
 
-    setAllowForm(true); 
+    setAllowForm(true);
 
     if (data.exists) {
-
       const t = data.traveller;
 
       const dobFormatted = t.dateOfBirth
@@ -144,17 +168,15 @@ export default function OfflineBooking() {
       });
 
       setPopupTitle("Traveller Found");
-      setPopupMsg(
-        "This number is already registered. Traveller details are auto-filled."
-      );
-    } 
-    
+      setPopupMsg("This number is already registered. Traveller details are auto-filled.");
+    }
+
     else {
       setTraveller({
         firstName: "",
         lastName: "",
         email: "",
-        mobile: traveller.mobile, 
+        mobile: traveller.mobile,
         dateOfBirth: "",
         address: "",
         pinCode: "",
@@ -166,19 +188,17 @@ export default function OfflineBooking() {
       setCities([]);
 
       setPopupTitle("New Traveller");
-      setPopupMsg(
-        "This mobile number is not registered. Please fill the traveller details."
-      );
+      setPopupMsg("This mobile number is not registered. Please fill the traveller details.");
     }
 
     setShowPopup(true);
-
   } catch (err) {
     toast.error("Error checking mobile number");
   } finally {
     setChecking(false);
   }
 };
+
 
 
   const handleStateChange = (code) => {
