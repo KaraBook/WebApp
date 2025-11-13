@@ -58,6 +58,11 @@ const SummaryApi = {
         url: `${BASE_URL}/api/payments/verify`,
         method: "POST",
     },
+    checkTravellerByMobile: {
+        url: `${BASE_URL}/api/owner/check-traveller`,
+        method: "POST",
+    },
+
 
 };
 

@@ -450,3 +450,39 @@ export const createOfflineBooking = async (req, res) => {
     });
   }
 };
+
+
+export const checkTravellerByMobile = async (req, res) => {
+  try {
+    const { mobile } = req.body;
+    const normalized = normalizeMobile(mobile);
+
+    if (!normalized || normalized.length !== 10)
+      return res.status(400).json({ success: false, message: "Invalid mobile number" });
+
+    const traveller = await User.findOne({ mobile: normalized, role: "traveller" });
+
+    if (traveller) {
+      return res.json({
+        success: true,
+        exists: true,
+        traveller: {
+          firstName: traveller.firstName,
+          lastName: traveller.lastName,
+          email: traveller.email,
+          mobile: traveller.mobile,
+          dateOfBirth: traveller.dateOfBirth,
+          address: traveller.address,
+          pinCode: traveller.pinCode,
+          state: traveller.state,
+          city: traveller.city,
+        },
+      });
+    }
+
+    return res.json({ success: true, exists: false });
+  } catch (err) {
+    console.error("checkTravellerByMobile error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
