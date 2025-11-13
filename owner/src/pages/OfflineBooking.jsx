@@ -214,7 +214,6 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  /* ------------------- CREATE BOOKING ------------------- */
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -289,7 +288,6 @@ export default function OfflineBooking() {
           </CardHeader>
           <CardContent className="space-y-3">
 
-            {/* MOBILE FIRST */}
             <div className="flex items-end gap-2">
               <div className="flex-1">
                 <Label>Mobile</Label>
@@ -300,6 +298,7 @@ export default function OfflineBooking() {
                   }
                   placeholder="10-digit number"
                   maxLength={10}
+                  className="mt-1"
                 />
               </div>
 
@@ -321,6 +320,7 @@ export default function OfflineBooking() {
                     <Input
                       value={traveller.firstName}
                       onChange={(e) => handleChange("firstName", e.target.value)}
+                      className="mt-1"
                     />
                   </div>
                   <div>
@@ -328,6 +328,7 @@ export default function OfflineBooking() {
                     <Input
                       value={traveller.lastName}
                       onChange={(e) => handleChange("lastName", e.target.value)}
+                      className="mt-1"
                     />
                   </div>
                 </div>
@@ -338,6 +339,7 @@ export default function OfflineBooking() {
                     type="email"
                     value={traveller.email}
                     onChange={(e) => handleChange("email", e.target.value)}
+                    className="mt-1"
                   />
                 </div>
 
@@ -348,6 +350,7 @@ export default function OfflineBooking() {
                       type="date"
                       value={traveller.dateOfBirth}
                       onChange={(e) => handleChange("dateOfBirth", e.target.value)}
+                      className="mt-1"
                     />
                   </div>
 
@@ -356,6 +359,7 @@ export default function OfflineBooking() {
                     <Input
                       value={traveller.pinCode}
                       maxLength={6}
+                      className="mt-1"
                       onChange={(e) =>
                         handleChange(
                           "pinCode",
@@ -370,6 +374,7 @@ export default function OfflineBooking() {
                   <Label>Address</Label>
                   <Input
                     value={traveller.address}
+                    className="mt-1"
                     onChange={(e) => handleChange("address", e.target.value)}
                   />
                 </div>
@@ -380,6 +385,7 @@ export default function OfflineBooking() {
                     <Select
                       value={selectedStateCode}
                       onValueChange={handleStateChange}
+                      className="mt-1"
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select State" />
@@ -398,6 +404,7 @@ export default function OfflineBooking() {
                     <Label>City</Label>
                     <Select
                       value={traveller.city}
+                      className="mt-1"
                       onValueChange={(v) =>
                         setTraveller((p) => ({ ...p, city: v }))
                       }
@@ -433,7 +440,7 @@ export default function OfflineBooking() {
             <div className="relative">
               <Label>Dates</Label>
               <div
-                className="border rounded-lg p-2 cursor-pointer"
+                className="border rounded-lg p-2 cursor-pointer mt-1"
                 onClick={() => setShowCalendar(!showCalendar)}
               >
                 {format(dateRange[0].startDate, "dd MMM")} –{" "}
@@ -459,6 +466,7 @@ export default function OfflineBooking() {
               <Label>Guests</Label>
               <Input
                 type="number"
+                className="mt-1"
                 value={guestCount}
                 onChange={(e) => setGuestCount(Number(e.target.value))}
                 min={1}
@@ -470,6 +478,7 @@ export default function OfflineBooking() {
               <Label>Custom Price (₹)</Label>
               <Input
                 type="number"
+                className="mt-1"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="Enter total price"
