@@ -256,7 +256,7 @@ export default function OfflineBooking() {
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* TRAVELLER DETAILS */}
+  
         <Card>
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
@@ -264,7 +264,7 @@ export default function OfflineBooking() {
 
           <CardContent className="space-y-3">
 
-            {/* ⭐ STEP 1: MOBILE FIRST */}
+          
             <div className="flex items-end gap-2">
               <div className="flex-1">
                 <Label>Mobile</Label>
@@ -287,7 +287,7 @@ export default function OfflineBooking() {
               </Button>
             </div>
 
-            {/* SHOW FORM ONLY AFTER VERIFY */}
+        
             {allowForm && (
               <>
                 <div className="grid grid-cols-2 gap-3">
@@ -408,14 +408,14 @@ export default function OfflineBooking() {
           </CardContent>
         </Card>
 
-        {/* BOOKING DETAILS */}
+   
         <Card>
           <CardHeader>
             <CardTitle>Booking Details</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-3">
-            {/* DATE RANGE */}
+      
             <div className="relative">
               <Label>Dates</Label>
               <div
@@ -441,7 +441,7 @@ export default function OfflineBooking() {
               )}
             </div>
 
-            {/* GUESTS */}
+         
             <div>
               <Label>Guests</Label>
               <Input
@@ -453,7 +453,6 @@ export default function OfflineBooking() {
               />
             </div>
 
-            {/* PRICE */}
             <div>
               <Label>Custom Price (₹)</Label>
               <Input
@@ -475,7 +474,7 @@ export default function OfflineBooking() {
         </Card>
       </div>
 
-      {/* POPUP */}
+ 
       <Dialog open={showPopup} onOpenChange={setShowPopup}>
         <DialogContent>
           <DialogHeader>
