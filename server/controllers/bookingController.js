@@ -46,6 +46,7 @@ export const createOrder = async (req, res) => {
   }
 };
 
+
 export const verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
@@ -53,66 +54,81 @@ export const verifyPayment = async (req, res) => {
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(body.toString())
+      .update(body)
       .digest("hex");
 
-    if (expectedSignature === razorpay_signature) {
-      const booking = await Booking.findOneAndUpdate(
-        { orderId: razorpay_order_id },
-        { paymentStatus: "paid", paymentId: razorpay_payment_id },
-        { new: true }
-      )
-        .populate("userId", "firstName lastName email mobile") 
-        .populate("propertyId", "propertyName city state");
-
-      if (booking && booking.userId?.email) {
-        const mailData = bookingConfirmationTemplate({
-          travellerName: `${booking.userId.firstName} ${booking.userId.lastName}`,
-          propertyName: booking.propertyId.propertyName,
-          checkIn: booking.checkIn,
-          checkOut: booking.checkOut,
-          totalAmount: booking.totalAmount,
-          bookingId: booking._id,
-          nights: booking.totalNights,
-          guests: booking.guests,
-          portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
-        });
-
-        try {
-          await sendMail({
-            to: booking.userId.email,
-            subject: mailData.subject,
-            html: mailData.html,
-          });
-          console.log(`📩 Booking confirmation mail sent to ${booking.userId.email}`);
-        } catch (mailErr) {
-          console.error("Failed to send booking confirmation mail:", mailErr);
-        }
-      }
-
-      try {
-        if (booking?.userId?.mobile) {
-          const msg = `🎉 *Booking Confirmed!*\n\nDear ${booking.userId.firstName}, your stay at *${booking.propertyId.propertyName}* is confirmed!\n\n📅 *Check-in:* ${new Date(
-            booking.checkIn
-          ).toLocaleDateString("en-IN")}\n📅 *Check-out:* ${new Date(
-            booking.checkOut
-          ).toLocaleDateString("en-IN")}\n👥 *Guests:* ${booking.guests}\n📍 *Location:* ${booking.propertyId.city}, ${booking.propertyId.state}\n💰 *Total:* ₹${booking.totalAmount.toLocaleString(
-            "en-IN"
-          )}\n\nYou can view your booking here:\n${process.env.PORTAL_URL}/traveller/bookings/${booking._id}\n\nThank you for booking with *${booking.propertyId.propertyName}*! 🏡`;
-
-          await sendWhatsAppText(booking.userId.mobile, msg);
-          console.log(`📱 WhatsApp confirmation sent to ${booking.userId.mobile}`);
-        }
-      } catch (waErr) {
-        console.error("Failed to send WhatsApp message:", waErr);
-      }
-
-      return res.json({ success: true, message: "Payment verified", booking });
-    } else {
+    if (expectedSignature !== razorpay_signature) {
       return res.status(400).json({ success: false, message: "Invalid signature" });
     }
+
+    const booking = await Booking.findOneAndUpdate(
+      { orderId: razorpay_order_id },
+      { paymentStatus: "paid", paymentId: razorpay_payment_id },
+      { new: true }
+    )
+      .populate("userId", "firstName lastName email mobile")
+      .populate("propertyId", "propertyName city state address");
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    console.log("✅ Payment verified for:", booking._id);
+
+    if (booking.userId?.email) {
+      const mailData = bookingConfirmationTemplate({
+        travellerName: `${booking.userId.firstName} ${booking.userId.lastName}`,
+        propertyName: booking.propertyId.propertyName,
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        nights: booking.totalNights,
+        guests: booking.guests,
+        totalAmount: booking.totalAmount,
+        bookingId: booking._id,
+        portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
+      });
+
+      try {
+        await sendMail({
+          to: booking.userId.email,
+          subject: mailData.subject,
+          html: mailData.html,
+        });
+        console.log("📩 Booking confirmation email sent →", booking.userId.email);
+      } catch (emailErr) {
+        console.error("❌ Email sending failed:", emailErr);
+      }
+    }
+
+    try {
+      if (booking.userId.mobile) {
+        const msg = `🎉 *Booking Confirmed!*
+
+Dear ${booking.userId.firstName},
+
+Your stay at *${booking.propertyId.propertyName}* is confirmed!
+
+📅 *Check-in:* ${new Date(booking.checkIn).toLocaleDateString("en-IN")}
+📅 *Check-out:* ${new Date(booking.checkOut).toLocaleDateString("en-IN")}
+🧍‍♂️ *Guests:* ${booking.guests}
+💰 *Amount Paid:* ₹${booking.totalAmount.toLocaleString("en-IN")}
+📍 *Location:* ${booking.propertyId.city}, ${booking.propertyId.state}
+
+🔗 View Booking:
+${process.env.PORTAL_URL}/traveller/bookings/${booking._id}
+
+Thank you for choosing us! 🏡`;
+
+        await sendWhatsAppText(booking.userId.mobile, msg);
+        console.log("📱 WhatsApp message sent →", booking.userId.mobile);
+      }
+    } catch (waErr) {
+      console.error("❌ WhatsApp sending failed:", waErr);
+    }
+
+    return res.json({ success: true, message: "Payment verified", booking });
   } catch (err) {
-    console.error(err);
+    console.error("Payment verification ERROR:", err);
     res.status(500).json({ success: false, message: "Verification failed" });
   }
 };

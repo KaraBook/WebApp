@@ -436,7 +436,7 @@ export const createOfflineBooking = async (req, res) => {
       totalAmount: Number(totalAmount),
       orderId: order.id,
       bookedBy: ownerId,
-      paymentStatus: "initiated",
+      paymentStatus: "pending",
       isOffline: true,
     });
 

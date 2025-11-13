@@ -284,7 +284,12 @@ export default function OfflineBooking() {
         currency: "INR",
         order_id: order.id,
         handler: async (response) => {
-          await api.post(SummaryApi.verifyBookingPayment.url, response);
+          await api.post(SummaryApi.verifyBookingPayment.url, {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+
           toast.success("Booking successful!");
         },
         prefill: {
