@@ -60,6 +60,15 @@ export default function OfflineBooking() {
     },
   ]);
 
+const nights = Math.max(
+  1,
+  Math.ceil(
+    (dateRange[0].endDate - dateRange[0].startDate) /
+      (1000 * 60 * 60 * 24)
+  )
+);
+
+
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
 
@@ -264,10 +273,6 @@ export default function OfflineBooking() {
     try {
       const { startDate, endDate } = dateRange[0];
 
-      const nights = Math.max(
-        1,
-        Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))
-      );
       const totalAmount = nights * Number(price);
 
       const { data } = await api.post(SummaryApi.ownerOfflineBooking.url, {
