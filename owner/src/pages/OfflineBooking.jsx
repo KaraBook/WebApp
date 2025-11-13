@@ -28,18 +28,18 @@ import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import loadRazorpay from "../utils/Razorpay";
 
-import {
-  getIndianStates,
-  getCitiesByState,
-} from "@/utils/locationUtils";
+import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
+import { useAuth } from "../auth/AuthContext"; // 🔥 Needed for owner email/mobile
 
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 export default function OfflineBooking() {
   const { id } = useParams();
-  const [propertyId] = useState(id || "");
+  const { user } = useAuth(); // 🔥 Logged in owner user  
+  const ownerMobile = user?.mobile;
 
+  const [propertyId] = useState(id || "");
   const [guestCount, setGuestCount] = useState(1);
   const [price, setPrice] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,7 +49,7 @@ export default function OfflineBooking() {
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
-  const [allowForm, setAllowForm] = useState(false); // hide form until mobile verified
+  const [allowForm, setAllowForm] = useState(false);
 
   const [traveller, setTraveller] = useState({
     firstName: "",
@@ -78,132 +78,122 @@ export default function OfflineBooking() {
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
 
-  /* ------------------- Load States Once ------------------- */
+  /* ---------------- Load States ---------------- */
   useEffect(() => {
-    const list = getIndianStates();
-    setStates(list);
+    setStates(getIndianStates());
   }, []);
 
-  /* ---------------- Calendar outside click ----------------- */
+  /* ---------------- DateRange Outside Click -------------- */
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handleOutside = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
         setShowCalendar(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  /* ---------------------- MOBILE VERIFY --------------------- */
+  /* ------------------- VERIFY MOBILE ------------------- */
   const verifyMobile = async () => {
-    if (traveller.mobile.length !== 10) {
-      toast.error("Please enter a valid 10-digit mobile number.");
+    const mobile = traveller.mobile;
+
+    if (mobile.length !== 10) return toast.error("Enter valid mobile number");
+
+    // 🔥 Block owner number
+    if (mobile === ownerMobile) {
+      setShowPopup(true);
+      setPopupTitle("Owner Number Detected");
+      setPopupMsg("This number belongs to the property owner. You cannot create a booking for yourself.");
+      setAllowForm(false);
       return;
     }
 
     setChecking(true);
     try {
-      const res = await api.post(
-        SummaryApi.checkTravellerByMobile.url,
-        { mobile: traveller.mobile }
-      );
+      const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
+        mobile,
+      });
 
       const data = res.data;
-
-      setAllowForm(true); // show other fields after verify
+      setAllowForm(true);
 
       if (data.exists) {
-        // Auto-fill traveller data
         const t = data.traveller;
-
-        // Convert DOB format yyyy-mm-dd
-        const dobFormatted = t.dateOfBirth
-          ? t.dateOfBirth.substring(0, 10)
-          : "";
+        const dob = t.dateOfBirth ? t.dateOfBirth.substring(0, 10) : "";
 
         // Auto-select state
         const stateObj = states.find((s) => s.name === t.state);
         const iso = stateObj?.isoCode || "";
 
-        // Load cities
         const cityList = iso ? getCitiesByState(iso) : [];
-
         setCities(cityList);
         setSelectedStateCode(iso);
 
         setTraveller({
-          firstName: t.firstName || "",
-          lastName: t.lastName || "",
-          email: t.email || "",
-          mobile: t.mobile || traveller.mobile,
-          dateOfBirth: dobFormatted,
-          address: t.address || "",
-          pinCode: t.pinCode || "",
-          state: t.state || "",
-          city: t.city || "",
+          firstName: t.firstName,
+          lastName: t.lastName,
+          email: t.email,
+          mobile: t.mobile,
+          dateOfBirth: dob,
+          address: t.address,
+          pinCode: t.pinCode,
+          state: t.state,
+          city: t.city,
         });
 
         setPopupTitle("Traveller Found");
-        setPopupMsg(
-          "This number is already registered. Traveller details are auto-filled. You can continue."
-        );
+        setPopupMsg("Traveller details auto-filled. You can continue.");
       } else {
         setPopupTitle("New Traveller");
-        setPopupMsg(
-          "This mobile number is not registered. Please fill the traveller details."
-        );
+        setPopupMsg("This number is not registered. Please fill all details.");
       }
 
       setShowPopup(true);
     } catch (err) {
-      toast.error("Error checking mobile number");
+      toast.error("Error verifying mobile number");
     } finally {
       setChecking(false);
     }
   };
 
-  /* ---------------------- STATE CHANGE ---------------------- */
+  /* ------------------- STATE CHANGE ------------------- */
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
 
-    const selectedState = states.find((s) => s.isoCode === code);
-
+    const selected = states.find((s) => s.isoCode === code);
     setTraveller((p) => ({
       ...p,
-      state: selectedState?.name || "",
+      state: selected?.name || "",
       city: "",
     }));
 
-    const list = getCitiesByState(code);
-    setCities(list);
+    setCities(getCitiesByState(code));
   };
 
-  /* --------------------- CREATE BOOKING --------------------- */
+  /* ------------------- CREATE BOOKING ------------------- */
   const handleBooking = async () => {
-    if (
-      !traveller.firstName ||
-      !traveller.lastName ||
-      !traveller.email ||
-      !traveller.mobile ||
-      !traveller.dateOfBirth ||
-      !traveller.address ||
-      !traveller.pinCode
-    ) {
-      return toast.error("Please fill all traveller details completely.");
+    const required = [
+      "firstName",
+      "lastName",
+      "email",
+      "mobile",
+      "dateOfBirth",
+      "address",
+      "pinCode",
+      "state",
+      "city",
+    ];
+
+    for (let f of required) {
+      if (!traveller[f]) return toast.error("Please fill all fields");
     }
 
-    if (!traveller.state || !traveller.city) {
-      return toast.error("Please select state and city.");
-    }
-
-    if (!price || Number(price) <= 0) {
-      return toast.error("Enter a valid price.");
-    }
+    if (!price || Number(price) <= 0) return toast.error("Invalid price");
 
     setLoading(true);
 
@@ -222,30 +212,26 @@ export default function OfflineBooking() {
       const { order } = data;
 
       const loaded = await loadRazorpay();
-      if (!loaded) return toast.error("Razorpay failed to load");
+      if (!loaded) return toast.error("Razorpay load failed");
 
-      const options = {
+      new window.Razorpay({
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: "INR",
-        name: "Offline Villa Booking",
-        description: "Owner created booking",
         order_id: order.id,
         handler: async (response) => {
           await api.post(SummaryApi.verifyBookingPayment.url, response);
-          toast.success("Booking created successfully!");
+          toast.success("Booking successful!");
         },
         prefill: {
-          name: traveller.firstName + " " + traveller.lastName,
+          name: `${traveller.firstName} ${traveller.lastName}`,
           email: traveller.email,
           contact: traveller.mobile,
         },
         theme: { color: "#233b19" },
-      };
-
-      new window.Razorpay(options).open();
+      }).open();
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Booking failed");
+      toast.error("Booking failed");
     } finally {
       setLoading(false);
     }
@@ -256,15 +242,15 @@ export default function OfflineBooking() {
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  
+        
+        {/* LEFT CARD */}
         <Card>
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
           </CardHeader>
-
           <CardContent className="space-y-3">
 
-          
+            {/* MOBILE FIRST */}
             <div className="flex items-end gap-2">
               <div className="flex-1">
                 <Label>Mobile</Label>
@@ -287,7 +273,7 @@ export default function OfflineBooking() {
               </Button>
             </div>
 
-        
+            {/* SHOW FORM ONLY AFTER VERIFY */}
             {allowForm && (
               <>
                 <div className="grid grid-cols-2 gap-3">
@@ -295,18 +281,14 @@ export default function OfflineBooking() {
                     <Label>First Name</Label>
                     <Input
                       value={traveller.firstName}
-                      onChange={(e) =>
-                        handleChange("firstName", e.target.value)
-                      }
+                      onChange={(e) => handleChange("firstName", e.target.value)}
                     />
                   </div>
                   <div>
                     <Label>Last Name</Label>
                     <Input
                       value={traveller.lastName}
-                      onChange={(e) =>
-                        handleChange("lastName", e.target.value)
-                      }
+                      onChange={(e) => handleChange("lastName", e.target.value)}
                     />
                   </div>
                 </div>
@@ -316,9 +298,7 @@ export default function OfflineBooking() {
                   <Input
                     type="email"
                     value={traveller.email}
-                    onChange={(e) =>
-                      handleChange("email", e.target.value)
-                    }
+                    onChange={(e) => handleChange("email", e.target.value)}
                   />
                 </div>
 
@@ -328,19 +308,20 @@ export default function OfflineBooking() {
                     <Input
                       type="date"
                       value={traveller.dateOfBirth}
-                      onChange={(e) =>
-                        handleChange("dateOfBirth", e.target.value)
-                      }
+                      onChange={(e) => handleChange("dateOfBirth", e.target.value)}
                     />
                   </div>
 
                   <div>
                     <Label>Pin Code</Label>
                     <Input
-                      maxLength={6}
                       value={traveller.pinCode}
+                      maxLength={6}
                       onChange={(e) =>
-                        handleChange("pinCode", e.target.value.replace(/\D/g, ""))
+                        handleChange(
+                          "pinCode",
+                          e.target.value.replace(/\D/g, "")
+                        )
                       }
                     />
                   </div>
@@ -350,9 +331,7 @@ export default function OfflineBooking() {
                   <Label>Address</Label>
                   <Input
                     value={traveller.address}
-                    onChange={(e) =>
-                      handleChange("address", e.target.value)
-                    }
+                    onChange={(e) => handleChange("address", e.target.value)}
                   />
                 </div>
 
@@ -367,9 +346,9 @@ export default function OfflineBooking() {
                         <SelectValue placeholder="Select State" />
                       </SelectTrigger>
                       <SelectContent>
-                        {states.map((st) => (
-                          <SelectItem key={st.isoCode} value={st.isoCode}>
-                            {st.name}
+                        {states.map((s) => (
+                          <SelectItem key={s.isoCode} value={s.isoCode}>
+                            {s.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -387,12 +366,9 @@ export default function OfflineBooking() {
                     >
                       <SelectTrigger>
                         <SelectValue
-                          placeholder={
-                            cities.length ? "Select City" : "Select State first"
-                          }
+                          placeholder={cities.length ? "Select City" : "Select State first"}
                         />
                       </SelectTrigger>
-
                       <SelectContent>
                         {cities.map((c) => (
                           <SelectItem key={c.name} value={c.name}>
@@ -408,14 +384,13 @@ export default function OfflineBooking() {
           </CardContent>
         </Card>
 
-   
+        {/* RIGHT CARD */}
         <Card>
           <CardHeader>
             <CardTitle>Booking Details</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-3">
-      
             <div className="relative">
               <Label>Dates</Label>
               <div
@@ -429,7 +404,7 @@ export default function OfflineBooking() {
               {showCalendar && (
                 <div
                   ref={calendarRef}
-                  className="absolute z-50 mt-2 border bg-white shadow-lg rounded-xl"
+                  className="absolute mt-2 bg-white shadow-lg border rounded-xl z-50"
                 >
                   <DateRange
                     ranges={dateRange}
@@ -441,7 +416,6 @@ export default function OfflineBooking() {
               )}
             </div>
 
-         
             <div>
               <Label>Guests</Label>
               <Input
@@ -457,14 +431,14 @@ export default function OfflineBooking() {
               <Label>Custom Price (₹)</Label>
               <Input
                 type="number"
-                placeholder="Enter total price"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+                placeholder="Enter total price"
               />
             </div>
 
             <Button
-              className="w-full mt-3 bg-[#efcc61] text-black hover:bg-[#f5d972]"
+              className="w-full bg-[#efcc61] hover:bg-[#f5d972] text-black"
               disabled={loading}
               onClick={handleBooking}
             >
@@ -474,14 +448,13 @@ export default function OfflineBooking() {
         </Card>
       </div>
 
- 
+      {/* POPUP */}
       <Dialog open={showPopup} onOpenChange={setShowPopup}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{popupTitle}</DialogTitle>
             <DialogDescription>{popupMsg}</DialogDescription>
           </DialogHeader>
-
           <Button className="mt-4" onClick={() => setShowPopup(false)}>
             Close
           </Button>
