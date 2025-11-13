@@ -264,13 +264,21 @@ export default function OfflineBooking() {
     try {
       const { startDate, endDate } = dateRange[0];
 
+      const nights = Math.max(
+        1,
+        Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))
+      );
+      const totalAmount = nights * Number(price);
+
       const { data } = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
         checkIn: startDate,
         checkOut: endDate,
         guests: guestCount,
-        totalAmount: Number(price),
+        pricePerNight: Number(price),
+        nights,
+        totalAmount
       });
 
       const { order } = data;
@@ -508,14 +516,19 @@ export default function OfflineBooking() {
             </div>
 
             <div>
-              <Label>Custom Price (₹)</Label>
+              <Label>Price Per Night (₹)</Label>
               <Input
                 type="number"
                 className="mt-1"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="Enter total price"
+                placeholder="Enter price for 1 night"
               />
+              {price && (
+                <p className="mt-2 text-sm text-gray-600">
+                  Total Amount: <strong>₹{(Number(price) * nights).toLocaleString()}</strong>
+                </p>
+              )}
             </div>
 
             <Button
