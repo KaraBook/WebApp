@@ -35,7 +35,6 @@ export default function OfflineBooking() {
   const [allowForm, setAllowForm] = useState(false);
 
   const [blockedDates, setBlockedDates] = useState([]);
-  const { startDate, endDate } = dateRange[0];
 
   const [traveller, setTraveller] = useState({
     firstName: "",
@@ -90,21 +89,6 @@ export default function OfflineBooking() {
       return date >= start && date <= end;
     });
   };
-
-  const overlaps = blockedDates.some((range) => {
-  const blockedStart = new Date(range.start);
-  const blockedEnd = new Date(range.end);
-
-  return (
-    (startDate >= blockedStart && startDate <= blockedEnd) ||
-    (endDate >= blockedStart && endDate <= blockedEnd) ||
-    (startDate <= blockedStart && endDate >= blockedEnd)
-  );
-});
-
-if (overlaps) {
-  return toast.error("Selected dates include blocked dates. Please choose another date range.");
-}
 
 
   useEffect(() => {
@@ -250,6 +234,24 @@ if (overlaps) {
       "state",
       "city",
     ];
+
+    const { startDate, endDate } = dateRange[0];
+
+    const overlaps = blockedDates.some((range) => {
+      const bStart = new Date(range.start);
+      const bEnd = new Date(range.end);
+
+      return (
+        (startDate >= bStart && startDate <= bEnd) ||
+        (endDate >= bStart && endDate <= bEnd) ||
+        (startDate <= bStart && endDate >= bEnd)
+      );
+    });
+
+    if (overlaps) {
+      toast.error("Selected dates fall inside a blocked date range. Please pick different dates.");
+      return;
+    }
 
     for (let f of required) {
       if (!traveller[f]) return toast.error("Please fill all fields");
@@ -481,7 +483,7 @@ if (overlaps) {
                     onChange={(item) => setDateRange([item.selection])}
                     minDate={new Date()}
                     rangeColors={["#efcc61"]}
-                    disabledDay={isDateBlocked}  
+                    disabledDay={isDateBlocked}
                   />
 
                 </div>
