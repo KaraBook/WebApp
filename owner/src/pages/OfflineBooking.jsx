@@ -98,70 +98,89 @@ export default function OfflineBooking() {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  /* ------------------- VERIFY MOBILE ------------------- */
+
   const verifyMobile = async () => {
-    const mobile = traveller.mobile;
+  if (traveller.mobile.length !== 10) {
+    toast.error("Please enter a valid 10-digit mobile number.");
+    return;
+  }
 
-    if (mobile.length !== 10) return toast.error("Enter valid mobile number");
+  setChecking(true);
 
-    // 🔥 Block owner number
-    if (mobile === ownerMobile) {
-      setShowPopup(true);
-      setPopupTitle("Owner Number Detected");
-      setPopupMsg("This number belongs to the property owner. You cannot create a booking for yourself.");
-      setAllowForm(false);
-      return;
-    }
+  try {
+    const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
+      mobile: traveller.mobile,
+    });
 
-    setChecking(true);
-    try {
-      const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
-        mobile,
+    const data = res.data;
+
+    setAllowForm(true); 
+
+    if (data.exists) {
+
+      const t = data.traveller;
+
+      const dobFormatted = t.dateOfBirth
+        ? t.dateOfBirth.substring(0, 10)
+        : "";
+
+      const stateObj = states.find((s) => s.name === t.state);
+      const iso = stateObj?.isoCode || "";
+      const cityList = iso ? getCitiesByState(iso) : [];
+
+      setCities(cityList);
+      setSelectedStateCode(iso);
+
+      setTraveller({
+        firstName: t.firstName || "",
+        lastName: t.lastName || "",
+        email: t.email || "",
+        mobile: t.mobile,
+        dateOfBirth: dobFormatted,
+        address: t.address || "",
+        pinCode: t.pinCode || "",
+        state: t.state || "",
+        city: t.city || "",
       });
 
-      const data = res.data;
-      setAllowForm(true);
+      setPopupTitle("Traveller Found");
+      setPopupMsg(
+        "This number is already registered. Traveller details are auto-filled."
+      );
+    } 
+    
+    else {
+      setTraveller({
+        firstName: "",
+        lastName: "",
+        email: "",
+        mobile: traveller.mobile, 
+        dateOfBirth: "",
+        address: "",
+        pinCode: "",
+        state: "",
+        city: "",
+      });
 
-      if (data.exists) {
-        const t = data.traveller;
-        const dob = t.dateOfBirth ? t.dateOfBirth.substring(0, 10) : "";
+      setSelectedStateCode("");
+      setCities([]);
 
-        // Auto-select state
-        const stateObj = states.find((s) => s.name === t.state);
-        const iso = stateObj?.isoCode || "";
-
-        const cityList = iso ? getCitiesByState(iso) : [];
-        setCities(cityList);
-        setSelectedStateCode(iso);
-
-        setTraveller({
-          firstName: t.firstName,
-          lastName: t.lastName,
-          email: t.email,
-          mobile: t.mobile,
-          dateOfBirth: dob,
-          address: t.address,
-          pinCode: t.pinCode,
-          state: t.state,
-          city: t.city,
-        });
-
-        setPopupTitle("Traveller Found");
-        setPopupMsg("Traveller details auto-filled. You can continue.");
-      } else {
-        setPopupTitle("New Traveller");
-        setPopupMsg("This number is not registered. Please fill all details.");
-      }
-
-      setShowPopup(true);
-    } catch (err) {
-      toast.error("Error verifying mobile number");
-    } finally {
-      setChecking(false);
+      setPopupTitle("New Traveller");
+      setPopupMsg(
+        "This mobile number is not registered. Please fill the traveller details."
+      );
     }
-  };
 
-  /* ------------------- STATE CHANGE ------------------- */
+    setShowPopup(true);
+
+  } catch (err) {
+    toast.error("Error checking mobile number");
+  } finally {
+    setChecking(false);
+  }
+};
+
+
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
 
