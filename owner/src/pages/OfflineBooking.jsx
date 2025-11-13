@@ -3,34 +3,17 @@ import { useParams } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import { toast } from "sonner";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import loadRazorpay from "../utils/Razorpay";
-
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 import { useAuth } from "../auth/AuthContext";
-
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -50,6 +33,9 @@ export default function OfflineBooking() {
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
   const [allowForm, setAllowForm] = useState(false);
+
+  const [blockedDates, setBlockedDates] = useState([]);
+  const { startDate, endDate } = dateRange[0];
 
   const [traveller, setTraveller] = useState({
     firstName: "",
@@ -82,6 +68,44 @@ export default function OfflineBooking() {
     setStates(getIndianStates());
   }, []);
 
+  useEffect(() => {
+    if (!propertyId) return;
+
+    const fetchBlocked = async () => {
+      try {
+        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
+        setBlockedDates(res.data.dates || []);
+      } catch (err) {
+        console.error("Failed to load blocked dates", err);
+      }
+    };
+
+    fetchBlocked();
+  }, [propertyId]);
+
+  const isDateBlocked = (date) => {
+    return blockedDates.some((range) => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      return date >= start && date <= end;
+    });
+  };
+
+  const overlaps = blockedDates.some((range) => {
+  const blockedStart = new Date(range.start);
+  const blockedEnd = new Date(range.end);
+
+  return (
+    (startDate >= blockedStart && startDate <= blockedEnd) ||
+    (endDate >= blockedStart && endDate <= blockedEnd) ||
+    (startDate <= blockedStart && endDate >= blockedEnd)
+  );
+});
+
+if (overlaps) {
+  return toast.error("Selected dates include blocked dates. Please choose another date range.");
+}
+
 
   useEffect(() => {
     const handleOutside = (e) => {
@@ -99,79 +123,19 @@ export default function OfflineBooking() {
 
 
   const verifyMobile = async () => {
-  if (traveller.mobile.length !== 10) {
-    toast.error("Please enter a valid 10-digit mobile number.");
-    return;
-  }
-
-  if (traveller.mobile === ownerMobile) {
-    setAllowForm(false);
-
-    setPopupTitle("Owner Number Not Allowed");
-    setPopupMsg(
-      "This mobile number belongs to a Property Owner account. You cannot create a traveller booking using this number."
-    );
-
-    setTraveller({
-      firstName: "",
-      lastName: "",
-      email: "",
-      mobile: traveller.mobile,
-      dateOfBirth: "",
-      address: "",
-      pinCode: "",
-      state: "",
-      city: "",
-    });
-
-    setSelectedStateCode("");
-    setCities([]);
-    setShowPopup(true);
-    return;
-  }
-
-  setChecking(true);
-
-  try {
-    const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
-      mobile: traveller.mobile,
-    });
-
-    const data = res.data;
-
-    setAllowForm(true);
-
-    if (data.exists) {
-      const t = data.traveller;
-
-      const dobFormatted = t.dateOfBirth
-        ? t.dateOfBirth.substring(0, 10)
-        : "";
-
-      const stateObj = states.find((s) => s.name === t.state);
-      const iso = stateObj?.isoCode || "";
-      const cityList = iso ? getCitiesByState(iso) : [];
-
-      setCities(cityList);
-      setSelectedStateCode(iso);
-
-      setTraveller({
-        firstName: t.firstName || "",
-        lastName: t.lastName || "",
-        email: t.email || "",
-        mobile: t.mobile,
-        dateOfBirth: dobFormatted,
-        address: t.address || "",
-        pinCode: t.pinCode || "",
-        state: t.state || "",
-        city: t.city || "",
-      });
-
-      setPopupTitle("Traveller Found");
-      setPopupMsg("This number is already registered. Traveller details are auto-filled.");
+    if (traveller.mobile.length !== 10) {
+      toast.error("Please enter a valid 10-digit mobile number.");
+      return;
     }
 
-    else {
+    if (traveller.mobile === ownerMobile) {
+      setAllowForm(false);
+
+      setPopupTitle("Owner Number Not Allowed");
+      setPopupMsg(
+        "This mobile number belongs to a Property Owner account. You cannot create a traveller booking using this number."
+      );
+
       setTraveller({
         firstName: "",
         lastName: "",
@@ -186,18 +150,78 @@ export default function OfflineBooking() {
 
       setSelectedStateCode("");
       setCities([]);
-
-      setPopupTitle("New Traveller");
-      setPopupMsg("This mobile number is not registered. Please fill the traveller details.");
+      setShowPopup(true);
+      return;
     }
 
-    setShowPopup(true);
-  } catch (err) {
-    toast.error("Error checking mobile number");
-  } finally {
-    setChecking(false);
-  }
-};
+    setChecking(true);
+
+    try {
+      const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
+        mobile: traveller.mobile,
+      });
+
+      const data = res.data;
+
+      setAllowForm(true);
+
+      if (data.exists) {
+        const t = data.traveller;
+
+        const dobFormatted = t.dateOfBirth
+          ? t.dateOfBirth.substring(0, 10)
+          : "";
+
+        const stateObj = states.find((s) => s.name === t.state);
+        const iso = stateObj?.isoCode || "";
+        const cityList = iso ? getCitiesByState(iso) : [];
+
+        setCities(cityList);
+        setSelectedStateCode(iso);
+
+        setTraveller({
+          firstName: t.firstName || "",
+          lastName: t.lastName || "",
+          email: t.email || "",
+          mobile: t.mobile,
+          dateOfBirth: dobFormatted,
+          address: t.address || "",
+          pinCode: t.pinCode || "",
+          state: t.state || "",
+          city: t.city || "",
+        });
+
+        setPopupTitle("Traveller Found");
+        setPopupMsg("This number is already registered. Traveller details are auto-filled.");
+      }
+
+      else {
+        setTraveller({
+          firstName: "",
+          lastName: "",
+          email: "",
+          mobile: traveller.mobile,
+          dateOfBirth: "",
+          address: "",
+          pinCode: "",
+          state: "",
+          city: "",
+        });
+
+        setSelectedStateCode("");
+        setCities([]);
+
+        setPopupTitle("New Traveller");
+        setPopupMsg("This mobile number is not registered. Please fill the traveller details.");
+      }
+
+      setShowPopup(true);
+    } catch (err) {
+      toast.error("Error checking mobile number");
+    } finally {
+      setChecking(false);
+    }
+  };
 
 
 
@@ -280,7 +304,7 @@ export default function OfflineBooking() {
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
+
         {/* LEFT CARD */}
         <Card>
           <CardHeader>
@@ -457,7 +481,9 @@ export default function OfflineBooking() {
                     onChange={(item) => setDateRange([item.selection])}
                     minDate={new Date()}
                     rangeColors={["#efcc61"]}
+                    disabledDay={isDateBlocked}  
                   />
+
                 </div>
               )}
             </div>
