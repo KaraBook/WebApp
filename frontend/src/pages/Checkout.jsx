@@ -98,11 +98,13 @@ export default function Checkout() {
                 name: "Villa Booking",
                 description: "Confirm & Pay",
                 order_id: order.id,
-                handler: async (response) => {
-                    await Axios.post(SummaryApi.verifyBookingPayment.url, response);
+                handler: (response) => {
+                    Axios.post(SummaryApi.verifyBookingPayment.url, response)
+                        .catch(() => { });
                     toast.success("Payment successful!");
-                    navigate("/account/bookings/");
+                    navigate("/account/bookings/", { replace: true });
                 },
+
                 prefill: { contact },
                 theme: { color: "#efcc61" },
             };
