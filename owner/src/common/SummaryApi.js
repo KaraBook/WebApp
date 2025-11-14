@@ -62,6 +62,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/check-traveller`,
         method: "POST",
     },
+    confirmOfflinePayment: {
+        url: `${BASE_URL}/api/owner/confirm-offline-payment`,
+        method: "POST",
+    },
 
 
 };
