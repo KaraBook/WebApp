@@ -73,10 +73,10 @@ export default function OwnerBookings() {
       <div className="flex items-center justify-between mb-4">
         <Input
           placeholder="Search: booking id / traveller / phone / property"
-          className="w-80"
+          className="w-80 bg-white"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="bg-white"
+          
         />
 
         <Button onClick={fetchBookings}>Refresh</Button>
