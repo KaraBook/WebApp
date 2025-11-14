@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const bookingSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -8,9 +10,12 @@ const bookingSchema = new mongoose.Schema(
     guests: Number,
     totalNights: Number,
     totalAmount: Number,
+
+    // Online fields
     paymentId: String,
     orderId: String,
 
+    // Offline fields
     paymentMethod: {
       type: String,
       enum: ["online", "cash", "upi"],
@@ -32,3 +37,6 @@ const bookingSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+
+export default mongoose.model("Booking", bookingSchema);
