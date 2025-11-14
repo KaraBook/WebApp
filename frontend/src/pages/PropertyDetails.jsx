@@ -197,8 +197,8 @@ export default function PropertyDetails() {
         <button
           onClick={toggleWishlist}
           className={`p-2 rounded-full border -mb-6 ${wishlist.includes(property._id)
-              ? "bg-red-500 text-white border-red-500"
-              : "border-gray-300 text-gray-600 hover:bg-gray-100"
+            ? "bg-red-500 text-white border-red-500"
+            : "border-gray-300 text-gray-600 hover:bg-gray-100"
             }`}
         >
           <Heart
@@ -288,8 +288,8 @@ export default function PropertyDetails() {
                       return (
                         <div
                           className={`relative w-full h-full flex items-center justify-center rounded-full transition-all duration-200 ${disabled
-                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                              : "hover:bg-[#efcc61] hover:text-black"
+                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : "hover:bg-[#efcc61] hover:text-black"
                             }`}
                           title={disabled ? "Unavailable" : ""}
                         >
@@ -301,6 +301,43 @@ export default function PropertyDetails() {
                 </div>
               )}
 
+            </div>
+
+
+            <div className="relative mt-4">
+              <label className="text-xs text-gray-500 uppercase ml-1">Guests</label>
+              <div
+                onClick={() => setShowGuestDropdown(!showGuestDropdown)}
+                className="flex items-center justify-between border border-gray-300 hover:border-black rounded-full px-4 py-2 mt-1 cursor-pointer"
+              >
+                <span className="text-gray-700 text-sm font-medium">
+                  {guestCount} {guestCount > 1 ? "guests" : "guest"}
+                </span>
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              </div>
+
+              {showGuestDropdown && (
+                <div className="absolute z-50 mt-2 right-0 bg-white border border-gray-200 rounded-2xl shadow-xl p-3 w-40">
+                  <p className="text-sm text-gray-600 mb-2 font-medium">Select guests</p>
+                  <div className="max-h-48 overflow-y-auto">
+                    {[...Array(property.maxGuests || 10)].map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setGuestCount(i + 1);
+                          setShowGuestDropdown(false);
+                        }}
+                        className={`block w-full text-left px-3 py-2 rounded-lg text-sm ${guestCount === i + 1
+                            ? "bg-[#efcc61] text-black font-semibold"
+                            : "hover:bg-gray-100 text-gray-700"
+                          }`}
+                      >
+                        {i + 1} {i === 0 ? "Guest" : "Guests"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <Button
