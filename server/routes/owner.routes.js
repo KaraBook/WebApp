@@ -10,6 +10,7 @@ import {
   addBlockedDates,
   removeBlockedDates,
   createOfflineBooking,
+  confirmOfflinePayment,
   checkTravellerByMobile
 } from "../controllers/owner.controller.js";
 import upload from "../middlewares/multer.js";
@@ -34,6 +35,7 @@ router.get("/property/:id/blocked-dates", requireAuth, getPropertyBlockedDates);
 router.post("/property/:id/block-dates", requireAuth, addBlockedDates);
 router.delete("/property/:id/block-dates", requireAuth, removeBlockedDates);
 router.post("/offline-booking", requireAuth, createOfflineBooking);
+router.post("/confirm-offline-payment", requireAuth, confirmOfflinePayment);
 router.post("/check-traveller", requireAuth, checkTravellerByMobile);
 
 

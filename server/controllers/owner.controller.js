@@ -374,7 +374,15 @@ export const removeBlockedDates = async (req, res) => {
 
 export const createOfflineBooking = async (req, res) => {
   try {
-    const { traveller, propertyId, checkIn, checkOut, guests, totalAmount } = req.body;
+    const {
+      traveller,
+      propertyId,
+      checkIn,
+      checkOut,
+      guests,
+      totalAmount
+    } = req.body;
+
     const ownerId = req.user.id;
 
     if (!propertyId || !traveller?.mobile || !totalAmount) {
@@ -385,18 +393,18 @@ export const createOfflineBooking = async (req, res) => {
     let user = await User.findOne({ mobile: normalized });
 
     if (user) {
+      const fields = ["firstName", "lastName", "email", "state", "city", "dateOfBirth", "address", "pinCode"];
       let updated = false;
 
-      const updatableFields = ["firstName", "lastName", "email", "state", "city", "dateOfBirth", "address", "pinCode"];
-
-      updatableFields.forEach((field) => {
-        if (!user[field] && traveller[field]) {
-          user[field] = traveller[field];
+      fields.forEach((f) => {
+        if (!user[f] && traveller[f]) {
+          user[f] = traveller[f];
           updated = true;
         }
       });
 
       if (updated) await user.save();
+
     } else {
       user = await User.create({
         firstName: traveller.firstName,
@@ -413,19 +421,6 @@ export const createOfflineBooking = async (req, res) => {
       });
     }
 
-
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      console.error("❌ Missing Razorpay credentials in environment variables");
-      return res.status(500).json({ success: false, message: "Payment configuration error" });
-    }
-
-    const order = await razorpay.orders.create({
-      amount: Math.round(Number(totalAmount) * 100),
-      currency: "INR",
-      receipt: `OFFLINE_${Date.now()}`,
-      notes: { createdByOwner: ownerId },
-    });
-
     const booking = await Booking.create({
       userId: user._id,
       propertyId,
@@ -434,20 +429,47 @@ export const createOfflineBooking = async (req, res) => {
       guests,
       totalNights: Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)),
       totalAmount: Number(totalAmount),
-      orderId: order.id,
       bookedBy: ownerId,
-      paymentStatus: "pending",
       isOffline: true,
+      paymentMethod: "offline",
+      paymentStatus: "pending" 
     });
 
-    console.log(`✅ Offline booking created for property ${propertyId}`);
-    res.json({ success: true, order, booking, traveller: user });
+    return res.json({ success: true, booking });
+
   } catch (err) {
     console.error("🔥 Offline Booking Error:", err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message || "Offline booking failed",
     });
+  }
+};
+
+
+export const confirmOfflinePayment = async (req, res) => {
+  try {
+    const { bookingId, paymentMethod, transactionId, receiptImage } = req.body;
+
+    if (!bookingId || !paymentMethod)
+      return res.status(400).json({ success: false, message: "Missing fields" });
+
+    const booking = await Booking.findById(bookingId);
+    if (!booking)
+      return res.status(404).json({ success: false, message: "Booking not found" });
+
+    booking.paymentMethod = paymentMethod;
+    booking.offlineTransactionId = transactionId || "";
+    booking.offlineReceiptImage = receiptImage || "";
+    booking.paymentStatus = "paid";
+
+    await booking.save();
+
+    return res.json({ success: true, message: "Booking confirmed", booking });
+
+  } catch (err) {
+    console.error("Confirm Payment Error:", err);
+    res.status(500).json({ success: false, message: "Error confirming payment" });
   }
 };
 

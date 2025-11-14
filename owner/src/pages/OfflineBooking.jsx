@@ -3,15 +3,26 @@ import { useParams } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
-import loadRazorpay from "../utils/Razorpay";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 import { useAuth } from "../auth/AuthContext";
 import "react-date-range/dist/styles.css";
@@ -52,6 +63,12 @@ export default function OfflineBooking() {
   const [popupTitle, setPopupTitle] = useState("");
   const [popupMsg, setPopupMsg] = useState("");
 
+  const [showPaymentBox, setShowPaymentBox] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [transactionId, setTransactionId] = useState("");
+  const [receiptImage, setReceiptImage] = useState(null);
+  const [bookingId, setBookingId] = useState(null);
+
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -60,28 +77,31 @@ export default function OfflineBooking() {
     },
   ]);
 
-const nights = Math.max(
-  1,
-  Math.ceil(
-    (dateRange[0].endDate - dateRange[0].startDate) /
-      (1000 * 60 * 60 * 24)
-  )
-);
-
+  const nights = Math.max(
+    1,
+    Math.ceil(
+      (dateRange[0].endDate - dateRange[0].startDate) /
+        (1000 * 60 * 60 * 24)
+    )
+  );
 
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
 
+  // Load States
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
+  // Fetch Blocked Dates
   useEffect(() => {
     if (!propertyId) return;
 
     const fetchBlocked = async () => {
       try {
-        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
+        const res = await api.get(
+          SummaryApi.getPropertyBlockedDates.url(propertyId)
+        );
         setBlockedDates(res.data.dates || []);
       } catch (err) {
         console.error("Failed to load blocked dates", err);
@@ -99,7 +119,6 @@ const nights = Math.max(
     });
   };
 
-
   useEffect(() => {
     const handleOutside = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -107,14 +126,15 @@ const nights = Math.max(
       }
     };
     document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleOutside);
   }, []);
 
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-
+  // Verify Traveller Mobile
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10) {
       toast.error("Please enter a valid 10-digit mobile number.");
@@ -126,7 +146,7 @@ const nights = Math.max(
 
       setPopupTitle("Owner Number Not Allowed");
       setPopupMsg(
-        "This mobile number belongs to a Property Owner account. You cannot create a traveller booking using this number."
+        "You cannot create a booking using an Owner's mobile number."
       );
 
       setTraveller({
@@ -143,6 +163,7 @@ const nights = Math.max(
 
       setSelectedStateCode("");
       setCities([]);
+
       setShowPopup(true);
       return;
     }
@@ -150,12 +171,12 @@ const nights = Math.max(
     setChecking(true);
 
     try {
-      const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
-        mobile: traveller.mobile,
-      });
+      const res = await api.post(
+        SummaryApi.checkTravellerByMobile.url,
+        { mobile: traveller.mobile }
+      );
 
       const data = res.data;
-
       setAllowForm(true);
 
       if (data.exists) {
@@ -185,10 +206,10 @@ const nights = Math.max(
         });
 
         setPopupTitle("Traveller Found");
-        setPopupMsg("This number is already registered. Traveller details are auto-filled.");
-      }
-
-      else {
+        setPopupMsg(
+          "Traveller exists. Details auto-filled for convenience."
+        );
+      } else {
         setTraveller({
           firstName: "",
           lastName: "",
@@ -205,7 +226,9 @@ const nights = Math.max(
         setCities([]);
 
         setPopupTitle("New Traveller");
-        setPopupMsg("This mobile number is not registered. Please fill the traveller details.");
+        setPopupMsg(
+          "Traveller not found. Please enter details manually."
+        );
       }
 
       setShowPopup(true);
@@ -215,8 +238,6 @@ const nights = Math.max(
       setChecking(false);
     }
   };
-
-
 
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
@@ -231,6 +252,7 @@ const nights = Math.max(
     setCities(getCitiesByState(code));
   };
 
+  // 🔥 Create Offline Booking (NO Razorpay)
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -244,101 +266,95 @@ const nights = Math.max(
       "city",
     ];
 
-    const { startDate, endDate } = dateRange[0];
-
-    const overlaps = blockedDates.some((range) => {
-      const bStart = new Date(range.start);
-      const bEnd = new Date(range.end);
-
-      return (
-        (startDate >= bStart && startDate <= bEnd) ||
-        (endDate >= bStart && endDate <= bEnd) ||
-        (startDate <= bStart && endDate >= bEnd)
-      );
-    });
-
-    if (overlaps) {
-      toast.error("Selected dates fall inside a blocked date range. Please pick different dates.");
-      return;
-    }
-
     for (let f of required) {
       if (!traveller[f]) return toast.error("Please fill all fields");
     }
 
-    if (!price || Number(price) <= 0) return toast.error("Invalid price");
+    if (!price || Number(price) <= 0)
+      return toast.error("Invalid price amount");
+
+    const { startDate, endDate } = dateRange[0];
 
     setLoading(true);
 
     try {
-      const { startDate, endDate } = dateRange[0];
-
       const totalAmount = nights * Number(price);
 
-      const { data } = await api.post(SummaryApi.ownerOfflineBooking.url, {
+      const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
         checkIn: startDate,
         checkOut: endDate,
         guests: guestCount,
-        pricePerNight: Number(price),
         nights,
-        totalAmount
+        totalAmount,
       });
 
-      const { order } = data;
+      setBookingId(res.data.booking._id);
+      setShowPaymentBox(true);
+      toast.success("Booking created. Please confirm payment.");
 
-      const loaded = await loadRazorpay();
-      if (!loaded) return toast.error("Razorpay load failed");
-
-      new window.Razorpay({
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: "INR",
-        order_id: order.id,
-        handler: async (response) => {
-          await api.post(SummaryApi.verifyBookingPayment.url, {
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-          });
-
-          toast.success("Booking successful!");
-        },
-        prefill: {
-          name: `${traveller.firstName} ${traveller.lastName}`,
-          email: traveller.email,
-          contact: traveller.mobile,
-        },
-        theme: { color: "#233b19" },
-      }).open();
     } catch (err) {
-      toast.error("Booking failed");
+      toast.error("Failed to create booking");
     } finally {
       setLoading(false);
     }
   };
 
+  // 🔥 Confirm Payment (Cash / UPI)
+  const confirmPayment = async () => {
+    if (!paymentMethod)
+      return toast.error("Select payment method");
+
+    let uploadedImageUrl = "";
+
+    if (receiptImage) {
+      const form = new FormData();
+      form.append("file", receiptImage);
+
+      const uploadRes = await api.post("/upload/offline-receipt", form);
+      uploadedImageUrl = uploadRes.data.url;
+    }
+
+    try {
+      await api.post(SummaryApi.confirmOfflinePayment.url, {
+        bookingId,
+        paymentMethod,
+        transactionId,
+        receiptImage: uploadedImageUrl,
+      });
+
+      toast.success("Booking confirmed successfully!");
+      setShowPaymentBox(false);
+
+    } catch (err) {
+      toast.error("Payment confirmation failed");
+    }
+  };
+
   return (
     <div className="max-w-5xl p-2">
-      <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
+      <h1 className="text-2xl font-semibold mb-8">
+        Create Offline Booking
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
         {/* LEFT CARD */}
         <Card>
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-
             <div className="flex items-end gap-2">
               <div className="flex-1">
                 <Label>Mobile</Label>
                 <Input
                   value={traveller.mobile}
                   onChange={(e) =>
-                    handleChange("mobile", e.target.value.replace(/\D/g, ""))
+                    handleChange(
+                      "mobile",
+                      e.target.value.replace(/\D/g, "")
+                    )
                   }
                   placeholder="10-digit number"
                   maxLength={10}
@@ -355,7 +371,6 @@ const nights = Math.max(
               </Button>
             </div>
 
-            {/* SHOW FORM ONLY AFTER VERIFY */}
             {allowForm && (
               <>
                 <div className="grid grid-cols-2 gap-3">
@@ -363,7 +378,9 @@ const nights = Math.max(
                     <Label>First Name</Label>
                     <Input
                       value={traveller.firstName}
-                      onChange={(e) => handleChange("firstName", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("firstName", e.target.value)
+                      }
                       className="mt-1"
                     />
                   </div>
@@ -371,7 +388,9 @@ const nights = Math.max(
                     <Label>Last Name</Label>
                     <Input
                       value={traveller.lastName}
-                      onChange={(e) => handleChange("lastName", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("lastName", e.target.value)
+                      }
                       className="mt-1"
                     />
                   </div>
@@ -382,7 +401,9 @@ const nights = Math.max(
                   <Input
                     type="email"
                     value={traveller.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("email", e.target.value)
+                    }
                     className="mt-1"
                   />
                 </div>
@@ -393,7 +414,9 @@ const nights = Math.max(
                     <Input
                       type="date"
                       value={traveller.dateOfBirth}
-                      onChange={(e) => handleChange("dateOfBirth", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("dateOfBirth", e.target.value)
+                      }
                       className="mt-1"
                     />
                   </div>
@@ -419,7 +442,9 @@ const nights = Math.max(
                   <Input
                     value={traveller.address}
                     className="mt-1"
-                    onChange={(e) => handleChange("address", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("address", e.target.value)
+                    }
                   />
                 </div>
 
@@ -429,14 +454,16 @@ const nights = Math.max(
                     <Select
                       value={selectedStateCode}
                       onValueChange={handleStateChange}
-                      className="mt-1"
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select State" />
                       </SelectTrigger>
                       <SelectContent>
                         {states.map((s) => (
-                          <SelectItem key={s.isoCode} value={s.isoCode}>
+                          <SelectItem
+                            key={s.isoCode}
+                            value={s.isoCode}
+                          >
                             {s.name}
                           </SelectItem>
                         ))}
@@ -448,7 +475,6 @@ const nights = Math.max(
                     <Label>City</Label>
                     <Select
                       value={traveller.city}
-                      className="mt-1"
                       onValueChange={(v) =>
                         setTraveller((p) => ({ ...p, city: v }))
                       }
@@ -456,7 +482,11 @@ const nights = Math.max(
                     >
                       <SelectTrigger>
                         <SelectValue
-                          placeholder={cities.length ? "Select City" : "Select State first"}
+                          placeholder={
+                            cities.length
+                              ? "Select City"
+                              : "Select State first"
+                          }
                         />
                       </SelectTrigger>
                       <SelectContent>
@@ -498,12 +528,13 @@ const nights = Math.max(
                 >
                   <DateRange
                     ranges={dateRange}
-                    onChange={(item) => setDateRange([item.selection])}
+                    onChange={(item) =>
+                      setDateRange([item.selection])
+                    }
                     minDate={new Date()}
                     rangeColors={["#efcc61"]}
                     disabledDay={isDateBlocked}
                   />
-
                 </div>
               )}
             </div>
@@ -514,9 +545,11 @@ const nights = Math.max(
                 type="number"
                 className="mt-1"
                 value={guestCount}
-                onChange={(e) => setGuestCount(Number(e.target.value))}
+                onChange={(e) =>
+                  setGuestCount(Number(e.target.value))
+                }
                 min={1}
-                max={20}
+                max={50}
               />
             </div>
 
@@ -527,22 +560,73 @@ const nights = Math.max(
                 className="mt-1"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="Enter price for 1 night"
+                placeholder="Enter price"
               />
               {price && (
-                <p className="mt-2 text-sm text-gray-600">
-                  Total Amount: <strong>₹{(Number(price) * nights).toLocaleString()}</strong>
+                <p className="mt-2 text-sm">
+                  Total Amount:{" "}
+                  <strong>
+                    ₹{(Number(price) * nights).toLocaleString()}
+                  </strong>
                 </p>
               )}
             </div>
 
             <Button
-              className="w-full bg-[#efcc61] hover:bg-[#f5d972] text-black"
+              className="w-full bg-[#efcc61] hover:bg-[#e6c04f] text-black"
               disabled={loading}
               onClick={handleBooking}
             >
-              {loading ? "Processing..." : "Proceed to Payment"}
+              {loading ? "Creating..." : "Proceed to Payment"}
             </Button>
+
+            {/* PAYMENT BOX */}
+            {showPaymentBox && (
+              <div className="mt-4 border p-4 rounded-lg bg-gray-50 space-y-4">
+                <Label>Payment Method</Label>
+
+                <Select
+                  onValueChange={setPaymentMethod}
+                  value={paymentMethod}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="upi">UPI</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {paymentMethod === "upi" && (
+                  <>
+                    <Label>Transaction ID (Optional)</Label>
+                    <Input
+                      value={transactionId}
+                      onChange={(e) =>
+                        setTransactionId(e.target.value)
+                      }
+                    />
+
+                    <Label>Receipt Image (Optional)</Label>
+                    <Input
+                      type="file"
+                      onChange={(e) =>
+                        setReceiptImage(e.target.files[0])
+                      }
+                    />
+                  </>
+                )}
+
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  disabled={!paymentMethod}
+                  onClick={confirmPayment}
+                >
+                  Confirm Booking
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
