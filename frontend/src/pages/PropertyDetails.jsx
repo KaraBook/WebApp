@@ -29,12 +29,13 @@ export default function PropertyDetails() {
   const navigate = useNavigate();
 
   const [bookedDates, setBookedDates] = useState([]);
-  const [blockedDates, setBlockedDates] = useState([]); // ✅ new
+  const [blockedDates, setBlockedDates] = useState([]); 
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
   const [guestCount, setGuestCount] = useState(1);
+  const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const [dateRange, setDateRange] = useState([
     {
