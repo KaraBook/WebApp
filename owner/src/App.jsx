@@ -8,6 +8,7 @@ import ViewProperty from "./pages/ViewProperty";
 import EditProperty from "./pages/EditProperty";
 import OfflineBooking from "./pages/OfflineBooking";
 import Calendar from "./pages/Calendar";
+import OwnerBookings from "./pages/OwnerBookings";
 
 export default function App() {
   return (
@@ -29,7 +30,7 @@ export default function App() {
         <Route path="view-property/:id" element={<ViewProperty />} /> 
         <Route path="edit-property/:id" element={<EditProperty />} />
         <Route path="offline-booking/:id" element={<OfflineBooking />} />
-        {/* <Route path="bookings" element={<Bookings />} /> */}
+        <Route path="bookings" element={<OwnerBookings />} />
         <Route path="calendar" element={<Calendar />} />
       </Route>
 
