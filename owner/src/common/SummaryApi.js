@@ -66,6 +66,12 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/confirm-offline-payment`,
         method: "POST",
     },
+    ownerGetInvoice: {
+        url: (id) => `${BASE_URL}/api/owner/invoice/${id}`,
+        method: "GET",
+    },
+
+
 
 
 };

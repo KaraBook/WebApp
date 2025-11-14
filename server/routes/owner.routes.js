@@ -13,6 +13,7 @@ import {
   confirmOfflinePayment,
   checkTravellerByMobile
 } from "../controllers/owner.controller.js";
+import { getBookingInvoice } from "../controllers/bookingController.js";
 import upload from "../middlewares/multer.js";
 
 const router = express.Router();
@@ -37,6 +38,7 @@ router.delete("/property/:id/block-dates", requireAuth, removeBlockedDates);
 router.post("/offline-booking", requireAuth, createOfflineBooking);
 router.post("/confirm-offline-payment", requireAuth, confirmOfflinePayment);
 router.post("/check-traveller", requireAuth, checkTravellerByMobile);
+router.get("/invoice/:bookingId", requireAuth, getBookingInvoice);
 
 
 

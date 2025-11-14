@@ -179,15 +179,43 @@ export const getUserBookings = async (req, res) => {
 export const getBookingInvoice = async (req, res) => {
   try {
     const { bookingId } = req.params;
+    const requesterId = req.user?.id; // who is calling — traveller / admin / owner
 
     const booking = await Booking.findById(bookingId)
       .populate("userId", "firstName lastName email mobile")
-      .populate("propertyId", "propertyName address city state pricingPerNightWeekdays");
+      .populate("propertyId", "propertyName address city state ownerUserId resortOwner pricingPerNightWeekdays");
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
+    /* ---------------------------------------------------------------
+       🛡️ OWNER ACCESS VALIDATION — IMPORTANT
+       If the user is an owner, ensure this booking belongs to their property
+    ---------------------------------------------------------------- */
+    if (req.user.role === "owner") {
+      const property = booking.propertyId;
+
+      const isOwner =
+        property.ownerUserId?.toString() === requesterId ||
+        property.resortOwner?.mobile === req.user.mobile ||
+        property.resortOwner?.email === req.user.email;
+
+      if (!isOwner) {
+        return res.status(403).json({ success: false, message: "Access denied — not your booking" });
+      }
+    }
+
+    // Traveller: must match userId
+    if (req.user.role === "traveller") {
+      if (booking.userId._id.toString() !== requesterId) {
+        return res.status(403).json({ success: false, message: "Not your booking" });
+      }
+    }
+
+    /* ---------------------------------------------------------------
+       Invoice Builder (Same as your existing one)
+    ---------------------------------------------------------------- */
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
       propertyName: booking.propertyId.propertyName,
