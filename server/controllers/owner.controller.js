@@ -385,11 +385,30 @@ export const createOfflineBooking = async (req, res) => {
 
     const ownerId = req.user.id;
 
-    if (!propertyId || !traveller?.mobile || !totalAmount) {
-      return res.status(400).json({ success: false, message: "Missing required fields" });
+    // Basic validation
+    if (!propertyId) {
+      return res.status(400).json({ success: false, message: "Property ID missing" });
     }
 
+    if (!traveller || !traveller.mobile) {
+      return res.status(400).json({ success: false, message: "Traveller mobile missing" });
+    }
+
+    if (!checkIn || !checkOut) {
+      return res.status(400).json({ success: false, message: "Check-in & check-out required" });
+    }
+
+    if (!totalAmount || Number(totalAmount) <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid amount" });
+    }
+
+    // Normalize mobile number safely
     const normalized = normalizeMobile(traveller.mobile);
+    if (!normalized || normalized.length !== 10) {
+      return res.status(400).json({ success: false, message: "Invalid traveller number" });
+    }
+
+    // Lookup or create user
     let user = await User.findOne({ mobile: normalized });
 
     if (user) {
@@ -421,18 +440,23 @@ export const createOfflineBooking = async (req, res) => {
       });
     }
 
+    const nights = Math.ceil(
+      (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
+    );
+
+    // Create offline booking
     const booking = await Booking.create({
       userId: user._id,
       propertyId,
       checkIn,
       checkOut,
       guests,
-      totalNights: Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)),
+      totalNights: nights,
       totalAmount: Number(totalAmount),
       bookedBy: ownerId,
       isOffline: true,
-      paymentMethod: "offline",
-      paymentStatus: "pending" 
+      paymentMethod: "cash",   // default offline
+      paymentStatus: "pending"
     });
 
     return res.json({ success: true, booking });
@@ -441,37 +465,46 @@ export const createOfflineBooking = async (req, res) => {
     console.error("🔥 Offline Booking Error:", err);
     return res.status(500).json({
       success: false,
-      message: err.message || "Offline booking failed",
+      message: "Offline booking failed",
+      error: err.message,
     });
   }
 };
+
 
 
 export const confirmOfflinePayment = async (req, res) => {
   try {
     const { bookingId, paymentMethod, transactionId, receiptImage } = req.body;
 
-    if (!bookingId || !paymentMethod)
-      return res.status(400).json({ success: false, message: "Missing fields" });
+    if (!bookingId || !paymentMethod) {
+      return res.status(400).json({ success: false, message: "Missing payment fields" });
+    }
 
     const booking = await Booking.findById(bookingId);
-    if (!booking)
+    if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
+    }
 
-    booking.paymentMethod = paymentMethod;
+    booking.paymentMethod = paymentMethod; // cash / upi
     booking.offlineTransactionId = transactionId || "";
     booking.offlineReceiptImage = receiptImage || "";
     booking.paymentStatus = "paid";
 
     await booking.save();
 
-    return res.json({ success: true, message: "Booking confirmed", booking });
+    return res.json({
+      success: true,
+      message: "Payment confirmed",
+      booking
+    });
 
   } catch (err) {
     console.error("Confirm Payment Error:", err);
     res.status(500).json({ success: false, message: "Error confirming payment" });
   }
 };
+
 
 
 export const checkTravellerByMobile = async (req, res) => {

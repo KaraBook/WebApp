@@ -1,26 +1,15 @@
-import mongoose from "mongoose";
-
 const bookingSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
-    propertyId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Property",
-      required: true,
-    },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    propertyId: { type: mongoose.Schema.Types.ObjectId, ref: "Property", required: true },
 
     checkIn: Date,
     checkOut: Date,
     guests: Number,
     totalNights: Number,
     totalAmount: Number,
-    paymentId: String,       
-    orderId: String,           
+    paymentId: String,
+    orderId: String,
 
     paymentMethod: {
       type: String,
@@ -28,15 +17,8 @@ const bookingSchema = new mongoose.Schema(
       default: "online",
     },
 
-    offlineTransactionId: {
-      type: String,
-      default: "",
-    },
-
-    offlineReceiptImage: {
-      type: String,
-      default: "",
-    },
+    offlineTransactionId: String,
+    offlineReceiptImage: String,
 
     paymentStatus: {
       type: String,
@@ -44,16 +26,9 @@ const bookingSchema = new mongoose.Schema(
       default: "pending",
     },
 
-    contactNumber: String,
-
     bookedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
-    isOffline: {
-      type: Boolean,
-      default: false,
-    },
+    isOffline: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
-
-export default mongoose.model("Booking", bookingSchema);
