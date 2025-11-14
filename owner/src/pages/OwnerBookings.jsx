@@ -66,7 +66,7 @@ export default function OwnerBookings() {
     );
 
   return (
-    <div className="p-6">
+    <div className="p-2">
       <h1 className="text-2xl font-semibold mb-6">Bookings</h1>
 
       {/* TOP BAR */}
@@ -76,6 +76,7 @@ export default function OwnerBookings() {
           className="w-80"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          className="bg-white"
         />
 
         <Button onClick={fetchBookings}>Refresh</Button>
@@ -83,7 +84,7 @@ export default function OwnerBookings() {
 
       {/* TABLE */}
       <div className="border rounded-xl overflow-x-auto">
-        <table className="min-w-full text-sm">
+        <table className="min-w-full text-sm bg-white">
           <thead className="bg-gray-50 border-b">
             <tr>
               <th className="py-3 px-4 text-left font-medium">Traveller</th>
