@@ -53,11 +53,13 @@ export default function OwnerLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      
+      {/* SIDEBAR */}
       <aside
         className={`${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } 
-        md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 
+        md:translate-x-0 fixed inset-y-0 left-0 z-40 w-64 
         bg-white border-r shadow-sm flex flex-col justify-between 
         transform transition-transform duration-200`}
       >
@@ -115,7 +117,8 @@ export default function OwnerLayout() {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col md:ml-64">
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex flex-col md:pl-64">
         <header className="bg-white border-b p-4 flex items-center justify-between shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -131,6 +134,7 @@ export default function OwnerLayout() {
           <Outlet />
         </main>
       </div>
+
     </div>
   );
 }
