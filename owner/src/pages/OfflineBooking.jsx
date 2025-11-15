@@ -25,6 +25,7 @@ import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 import { useAuth } from "../auth/AuthContext";
+import { navigation } from "lucide-react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -325,6 +326,7 @@ export default function OfflineBooking() {
       });
 
       toast.success("Booking confirmed successfully!");
+      navigation("/owner/bookings");
       setShowPaymentBox(false);
 
     } catch (err) {
