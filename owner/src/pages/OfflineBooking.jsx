@@ -3,24 +3,12 @@ import { useParams } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
