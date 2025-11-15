@@ -25,7 +25,7 @@ import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 import { useAuth } from "../auth/AuthContext";
-import { navigation } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -39,6 +39,7 @@ export default function OfflineBooking() {
   const [price, setPrice] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
+  const navigate = useNavigate();
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -89,12 +90,10 @@ export default function OfflineBooking() {
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
 
-  // Load States
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  // Fetch Blocked Dates
   useEffect(() => {
     if (!propertyId) return;
 
@@ -135,7 +134,6 @@ export default function OfflineBooking() {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  // Verify Traveller Mobile
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10) {
       toast.error("Please enter a valid 10-digit mobile number.");
@@ -253,7 +251,6 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  // 🔥 Create Offline Booking (NO Razorpay)
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -302,7 +299,6 @@ export default function OfflineBooking() {
     }
   };
 
-  // 🔥 Confirm Payment (Cash / UPI)
   const confirmPayment = async () => {
     if (!paymentMethod)
       return toast.error("Select payment method");
@@ -326,7 +322,7 @@ export default function OfflineBooking() {
       });
 
       toast.success("Booking confirmed successfully!");
-      navigation("/owner/bookings");
+      navigate("/owner/bookings");
       setShowPaymentBox(false);
 
     } catch (err) {
