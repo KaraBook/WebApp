@@ -144,7 +144,7 @@ const EditProperty = () => {
     if (fetching) return <FullPageLoader />;
 
     return (
-        <div className="p-2 w-full mx-auto max-w-5xl">
+        <div className="p-2 w-full max-w-5xl">
             <h2 className="text-2xl font-bold mb-6">Edit Property</h2>
 
             <form onSubmit={handleSubmit} className="space-y-8">
