@@ -1,34 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { IoIosArrowDropdown } from "react-icons/io";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { HiDotsVertical } from "react-icons/hi";
 import { Switch } from "@/components/ui/switch";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from "@/components/ui/alert-dialog";
-
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 
@@ -45,7 +26,7 @@ const PropertiesPage = () => {
   const [properties, setProperties] = useState([]);
   const [confirm, setConfirm] = useState({ open: false, type: null, property: null });
   const [openDropdownId, setOpenDropdownId] = useState(null);
-
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -55,6 +36,7 @@ const PropertiesPage = () => {
   };
 
   const closeConfirm = () => setConfirm({ open: false, type: null, property: null });
+
 
   const fetchProperties = async () => {
     try {
@@ -177,17 +159,37 @@ const PropertiesPage = () => {
   };
 
   const filteredProperties = useMemo(() => {
+    let final = properties;
+
     switch (selectedFilter) {
       case "blocked":
-        return properties.filter((p) => p.isBlocked);
+        final = final.filter((p) => p.isBlocked);
+        break;
       case "published":
-        return properties.filter((p) => p.publishNow && !p.isBlocked);
+        final = final.filter((p) => p.publishNow && !p.isBlocked);
+        break;
       case "featured":
-        return properties.filter((p) => p.featured && !p.isBlocked);
+        final = final.filter((p) => p.featured && !p.isBlocked);
+        break;
       default:
-        return properties;
+        break;
     }
-  }, [properties, selectedFilter]);
+
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase();
+
+      final = final.filter((p) =>
+        p.propertyName?.toLowerCase().includes(term) ||
+        p.state?.toLowerCase().includes(term) ||
+        p.city?.toLowerCase().includes(term) ||
+        `${p.resortOwner?.firstName || ""} ${p.resortOwner?.lastName || ""}`
+          .toLowerCase()
+          .includes(term)
+      );
+    }
+
+    return final;
+  }, [properties, selectedFilter, searchTerm]);
 
   const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
   const paginatedProperties = useMemo(() => {
@@ -211,27 +213,38 @@ const PropertiesPage = () => {
           {filterOptions.find((o) => o.value === selectedFilter)?.label ||
             "All Properties"}
         </h2>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-64 justify-between bg-white text-primary"
-            >
-              {filterOptions.find((o) => o.value === selectedFilter)?.label || "Select"}
-              <IoIosArrowDropdown className="ml-2" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-64">
-            {filterOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                onSelect={() => setSelectedFilter(option.value)}
+        <div className="flex items-center gap-3">
+          <div>
+            <input
+              type="text"
+              placeholder="Search property..."
+              className="border rounded-md px-3 py-2 w-64 text-sm focus:outline-none focus:ring-1 focus:ring-black"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-64 justify-between bg-white text-primary"
               >
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                {filterOptions.find((o) => o.value === selectedFilter)?.label || "Select"}
+                <IoIosArrowDropdown className="ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64">
+              {filterOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onSelect={() => setSelectedFilter(option.value)}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
       <div className="mt-6">
@@ -351,11 +364,10 @@ const PropertiesPage = () => {
                 key={i}
                 size="sm"
                 variant={currentPage === i + 1 ? "default bg-transparent" : "bg-transparent"}
-                className={`${
-                  currentPage === i + 1
-                    ? "bg-transparent border text-black"
-                    : "border"
-                }`}
+                className={`${currentPage === i + 1
+                  ? "bg-transparent border text-black"
+                  : "border"
+                  }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
