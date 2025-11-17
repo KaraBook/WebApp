@@ -15,7 +15,7 @@ const DashboardPage = () => {
       setLoading(true);
       const [bookingsRes, usersRes, propertiesRes] = await Promise.all([
         Axios.get(SummaryApi.getAllBookings.url),
-        Axios.get("/api/admin/users"), // you'll add this route
+        Axios.get("/api/admin/users"), 
         Axios.get(SummaryApi.getProperties.url),
       ]);
 
