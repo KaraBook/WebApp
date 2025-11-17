@@ -105,7 +105,6 @@ const EditProperty = () => {
         try {
             const data = new FormData();
 
-            // Calculate total rooms
             const rb = formData.roomBreakdown;
             const total = Number(rb.ac) + Number(rb.nonAc) + Number(rb.deluxe) + Number(rb.luxury);
 
@@ -145,7 +144,7 @@ const EditProperty = () => {
     if (fetching) return <FullPageLoader />;
 
     return (
-        <div className="p-4 w-full mx-auto max-w-5xl">
+        <div className="p-2 w-full mx-auto max-w-5xl">
             <h2 className="text-2xl font-bold mb-6">Edit Property</h2>
 
             <form onSubmit={handleSubmit} className="space-y-8">

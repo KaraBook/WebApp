@@ -120,6 +120,7 @@ export const getSingleOwnerProperty = async (req, res) => {
 };
 
 
+
 export const updateOwnerProperty = async (req, res) => {
   const session = await mongoose.startSession();
 
@@ -162,7 +163,6 @@ export const updateOwnerProperty = async (req, res) => {
 
     const body = req.body;
     const updatedData = {};
-
 
     allowedFields.forEach((field) => {
       if (body[field] !== undefined) {
