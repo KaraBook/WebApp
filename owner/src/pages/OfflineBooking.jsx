@@ -87,10 +87,7 @@ export default function OfflineBooking() {
 
   const nights = Math.max(
     1,
-    Math.ceil(
-      (dateRange[0].endDate - dateRange[0].startDate) /
-        (1000 * 60 * 60 * 24)
-    )
+    Math.ceil((dateRange[0].endDate - dateRange[0].startDate) / (1000 * 60 * 60 * 24))
   );
 
   /* ---------------- Load states ---------------- */
@@ -104,12 +101,8 @@ export default function OfflineBooking() {
 
     const loadDates = async () => {
       try {
-        const bookedRes = await api.get(
-          SummaryApi.getBookedDates.url(propertyId)
-        );
-        const blockedRes = await api.get(
-          SummaryApi.getPropertyBlockedDates.url(propertyId)
-        );
+        const bookedRes = await api.get(SummaryApi.getBookedDates.url(propertyId));
+        const blockedRes = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
 
         setBookedDates(bookedRes.data.dates || []);
         setBlockedDates(blockedRes.data.dates || []);
@@ -121,9 +114,10 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-  /* ---------------- Disable days logic (same as PropertyDetails) ---------------- */
+  /* ---------------- Disable day logic (same as PropertyDetails) ---------------- */
   const isDateDisabled = (date) => {
     const allRanges = [...bookedDates, ...blockedDates];
+
     return allRanges.some((range) => {
       const start = new Date(range.start);
       const end = new Date(range.end);
@@ -131,7 +125,7 @@ export default function OfflineBooking() {
     });
   };
 
-  /* ---------------- Validate selection (extra safety) ---------------- */
+  /* ---------------- Validate selection & block disabled days ---------------- */
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
     let d = new Date(startDate);
@@ -146,7 +140,7 @@ export default function OfflineBooking() {
     }
 
     if (invalid) {
-      toast.error("Selected dates include unavailable days.");
+      toast.error("These dates are unavailable.");
       return;
     }
 
@@ -171,8 +165,7 @@ export default function OfflineBooking() {
 
   /* ---------------- Mobile verification ---------------- */
   const verifyMobile = async () => {
-    if (traveller.mobile.length !== 10)
-      return toast.error("Invalid mobile number");
+    if (traveller.mobile.length !== 10) return toast.error("Invalid mobile number");
 
     if (traveller.mobile === ownerMobile) {
       setAllowForm(false);
@@ -235,7 +228,7 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- State dropdown logic ---------------- */
+  /* ---------------- State -> City select ---------------- */
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
     const st = states.find((s) => s.isoCode === code);
@@ -261,8 +254,7 @@ export default function OfflineBooking() {
       if (!traveller[f]) return toast.error("Fill all required fields");
     }
 
-    if (!price || Number(price) <= 0)
-      return toast.error("Invalid price");
+    if (!price || Number(price) <= 0) return toast.error("Invalid price");
 
     const { startDate, endDate } = dateRange[0];
     setLoading(true);
@@ -290,8 +282,7 @@ export default function OfflineBooking() {
 
   /* ---------------- Confirm Payment ---------------- */
   const confirmPayment = async () => {
-    if (!paymentMethod)
-      return toast.error("Select payment method");
+    if (!paymentMethod) return toast.error("Select payment method");
 
     let imageUrl = "";
 
@@ -362,9 +353,7 @@ export default function OfflineBooking() {
                     <Label>First Name</Label>
                     <Input
                       value={traveller.firstName}
-                      onChange={(e) =>
-                        handleChange("firstName", e.target.value)
-                      }
+                      onChange={(e) => handleChange("firstName", e.target.value)}
                       className="mt-1"
                     />
                   </div>
@@ -373,9 +362,7 @@ export default function OfflineBooking() {
                     <Label>Last Name</Label>
                     <Input
                       value={traveller.lastName}
-                      onChange={(e) =>
-                        handleChange("lastName", e.target.value)
-                      }
+                      onChange={(e) => handleChange("lastName", e.target.value)}
                       className="mt-1"
                     />
                   </div>
@@ -387,9 +374,7 @@ export default function OfflineBooking() {
                   <Input
                     type="email"
                     value={traveller.email}
-                    onChange={(e) =>
-                      handleChange("email", e.target.value)
-                    }
+                    onChange={(e) => handleChange("email", e.target.value)}
                     className="mt-1"
                   />
                 </div>
@@ -414,10 +399,7 @@ export default function OfflineBooking() {
                       maxLength={6}
                       value={traveller.pinCode}
                       onChange={(e) =>
-                        handleChange(
-                          "pinCode",
-                          e.target.value.replace(/\D/g, "")
-                        )
+                        handleChange("pinCode", e.target.value.replace(/\D/g, ""))
                       }
                       className="mt-1"
                     />
@@ -429,9 +411,7 @@ export default function OfflineBooking() {
                   <Label>Address</Label>
                   <Input
                     value={traveller.address}
-                    onChange={(e) =>
-                      handleChange("address", e.target.value)
-                    }
+                    onChange={(e) => handleChange("address", e.target.value)}
                     className="mt-1"
                   />
                 </div>
@@ -440,10 +420,7 @@ export default function OfflineBooking() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label>State</Label>
-                    <Select
-                      value={selectedStateCode}
-                      onValueChange={handleStateChange}
-                    >
+                    <Select value={selectedStateCode} onValueChange={handleStateChange}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select State" />
                       </SelectTrigger>
@@ -467,11 +444,7 @@ export default function OfflineBooking() {
                     >
                       <SelectTrigger>
                         <SelectValue
-                          placeholder={
-                            cities.length
-                              ? "Select City"
-                              : "Select State first"
-                          }
+                          placeholder={cities.length ? "Select City" : "Select State first"}
                         />
                       </SelectTrigger>
 
@@ -523,7 +496,6 @@ export default function OfflineBooking() {
                     showSelectionPreview={false}
                     months={1}
                     direction="horizontal"
-                    disabledDay={isDateDisabled}
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
 
@@ -531,9 +503,15 @@ export default function OfflineBooking() {
                         <div
                           className={`w-full h-full flex items-center justify-center rounded-full ${
                             disabled
-                              ? "bg-red-300 text-white cursor-not-allowed"
+                              ? "bg-gray-300 text-gray-400 cursor-not-allowed"
                               : "hover:bg-[#efcc61] hover:text-black"
                           }`}
+                          onClick={(e) => {
+                            if (disabled) {
+                              e.stopPropagation();
+                              toast.error("This date is unavailable.");
+                            }
+                          }}
                         >
                           {date.getDate()}
                         </div>
@@ -571,9 +549,7 @@ export default function OfflineBooking() {
               {price && (
                 <p className="mt-2 text-sm">
                   Total Amount:{" "}
-                  <strong>
-                    ₹{(Number(price) * nights).toLocaleString()}
-                  </strong>
+                  <strong>₹{(Number(price) * nights).toLocaleString()}</strong>
                 </p>
               )}
             </div>
@@ -592,10 +568,7 @@ export default function OfflineBooking() {
               <div className="mt-4 border p-4 rounded-lg bg-gray-50 space-y-4">
                 <Label>Payment Method</Label>
 
-                <Select
-                  value={paymentMethod}
-                  onValueChange={setPaymentMethod}
-                >
+                <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Method" />
                   </SelectTrigger>
@@ -611,17 +584,13 @@ export default function OfflineBooking() {
                     <Label>Transaction ID (Optional)</Label>
                     <Input
                       value={transactionId}
-                      onChange={(e) =>
-                        setTransactionId(e.target.value)
-                      }
+                      onChange={(e) => setTransactionId(e.target.value)}
                     />
 
                     <Label>Receipt Image (Optional)</Label>
                     <Input
                       type="file"
-                      onChange={(e) =>
-                        setReceiptImage(e.target.files[0])
-                      }
+                      onChange={(e) => setReceiptImage(e.target.files[0])}
                     />
                   </>
                 )}
@@ -647,10 +616,7 @@ export default function OfflineBooking() {
             <DialogDescription>{popupMsg}</DialogDescription>
           </DialogHeader>
 
-          <Button
-            onClick={() => setShowPopup(false)}
-            className="mt-4"
-          >
+          <Button onClick={() => setShowPopup(false)} className="mt-4">
             Close
           </Button>
         </DialogContent>
