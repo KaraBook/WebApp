@@ -78,7 +78,7 @@ export default function OfflineBooking() {
     1,
     Math.ceil(
       (dateRange[0].endDate - dateRange[0].startDate) /
-        (1000 * 60 * 60 * 24)
+      (1000 * 60 * 60 * 24)
     )
   );
 
@@ -213,7 +213,7 @@ export default function OfflineBooking() {
         mobile: traveller.mobile,
       });
 
-        setAllowForm(true);
+      setAllowForm(true);
 
       if (res.data.exists) {
         const t = res.data.traveller;
@@ -534,16 +534,17 @@ export default function OfflineBooking() {
                     showDateDisplay={false}
                     months={1}
                     direction="horizontal"
-                    disabledDay={(date) => isDateDisabled(date)}
+
+                    disabledDay={(date) => isDateDisabled(date)}   // ❌ REMOVE — not supported
+
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${
-                            disabled
+                          className={`w-full h-full flex items-center justify-center rounded-full ${disabled
                               ? "bg-gray-300 text-gray-400 cursor-not-allowed"
                               : "hover:bg-[#efcc61] hover:text-black"
-                          }`}
+                            }`}
                           onClick={(e) => {
                             if (disabled) {
                               e.stopPropagation();
@@ -556,6 +557,7 @@ export default function OfflineBooking() {
                       );
                     }}
                   />
+
                 </div>
               )}
             </div>
