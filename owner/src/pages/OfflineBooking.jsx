@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { DayPicker } from "react-day-picker";
-import { format, addDays } from "date-fns";
+import { DateRange } from "react-date-range";
+import { format } from "date-fns";
 import { toast } from "sonner";
 
 import {
@@ -28,7 +28,8 @@ import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 import { useAuth } from "../auth/AuthContext";
 
-import "react-day-picker/dist/style.css";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 
 export default function OfflineBooking() {
   const { id } = useParams();
@@ -64,22 +65,21 @@ export default function OfflineBooking() {
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
 
-  // DayPicker range: { from: Date | undefined, to: Date | undefined }
-  const [selectedRange, setSelectedRange] = useState({
-    from: new Date(),
-    to: addDays(new Date(), 1),
-  });
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      key: "selection",
+    },
+  ]);
 
-  // Nights calculation based on DayPicker range
-  const nights =
-    selectedRange.from && selectedRange.to
-      ? Math.max(
-          1,
-          Math.ceil(
-            (selectedRange.to - selectedRange.from) / (1000 * 60 * 60 * 24)
-          )
-        )
-      : 1;
+  const nights = Math.max(
+    1,
+    Math.ceil(
+      (dateRange[0].endDate - dateRange[0].startDate) /
+        (1000 * 60 * 60 * 24)
+    )
+  );
 
   /* ---------------- Load states ---------------- */
   useEffect(() => {
@@ -118,7 +118,6 @@ export default function OfflineBooking() {
         setBookedDates(booked.data.dates || []);
         setBlockedDates(blocked.data.dates || []);
       } catch (err) {
-        console.error("Failed to load dates", err);
         toast.error("Failed to load dates");
       }
     };
@@ -126,74 +125,29 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-  /* ---------------- Convert date ranges → array of disabled Date objects ---------------- */
-  const getDisabledDates = () => {
-    const all = [...bookedDates, ...blockedDates];
-    const disabledDays = [];
-
-    all.forEach((range) => {
-      if (!range?.start || !range?.end) return;
-
-      let start = new Date(range.start);
-      let end = new Date(range.end);
-
-      // normalize to noon to avoid timezone issues
-      start.setHours(12, 0, 0, 0);
-      end.setHours(12, 0, 0, 0);
-
-      let d = new Date(start);
-
-      while (d <= end) {
-        disabledDays.push(new Date(d));
-        d.setDate(d.getDate() + 1);
-      }
+  /* ---------------- Disable logic (EXACT calendar page logic) ---------------- */
+  const isDateBlocked = (date) => {
+    return [...bookedDates, ...blockedDates].some((range) => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+      return date >= start && date <= end;
     });
-
-    return disabledDays;
   };
 
-  // cache disabled dates and "today" per render
-  const disabledDates = getDisabledDates();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  /* ---------------- Range Validation (Detect blocked selection) ---------------- */
+  const handleDateRangeChange = (item) => {
+    const newRange = item.selection;
+    const { startDate, endDate } = newRange;
 
-  // function DayPicker will use to disable days (past + booked + blocked)
-  const isDateDisabled = (date) => {
-    const d = new Date(date);
+    let d = new Date(startDate);
     d.setHours(0, 0, 0, 0);
 
-    // disable all past dates
-    if (d < today) return true;
-
-    // disable all booked/blocked dates
-    return disabledDates.some(
-      (dd) => dd.toDateString() === d.toDateString()
-    );
-  };
-
-  /* ---------------- Validate selection: reject ranges touching disabled days ---------------- */
-  const handleRangeSelect = (range) => {
-    if (!range) {
-      setSelectedRange({ from: undefined, to: undefined });
-      return;
-    }
-
-    // allow selecting only "from" while user is dragging the range
-    if (!range.from || !range.to) {
-      setSelectedRange(range);
-      return;
-    }
-
-    const start = new Date(range.from);
-    const end = new Date(range.to);
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
-
-    let d = new Date(start);
     let invalid = false;
 
-    while (d <= end) {
-      if (isDateDisabled(d)) {
+    while (d <= endDate) {
+      if (isDateBlocked(d)) {
         invalid = true;
         break;
       }
@@ -201,15 +155,14 @@ export default function OfflineBooking() {
     }
 
     if (invalid) {
-      toast.error("Selected range includes unavailable (booked/blocked) dates.");
-      // do NOT update selectedRange so UI stays on previous valid dates
+      toast.error("Selected dates include unavailable (booked/blocked) dates.");
       return;
     }
 
-    setSelectedRange(range);
+    setDateRange([newRange]);
   };
 
-  /* ---------------- Close calendar when clicking outside ---------------- */
+  /* ---------------- Close calendar outside click ---------------- */
   useEffect(() => {
     const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -303,14 +256,6 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- State change ---------------- */
-  const handleStateChange = (code) => {
-    setSelectedStateCode(code);
-    const st = states.find((s) => s.isoCode === code);
-    setTraveller((p) => ({ ...p, state: st?.name || "", city: "" }));
-    setCities(getCitiesByState(code));
-  };
-
   /* ---------------- Create booking ---------------- */
   const handleBooking = async () => {
     const required = [
@@ -331,12 +276,7 @@ export default function OfflineBooking() {
 
     if (!price || Number(price) <= 0) return toast.error("Invalid price");
 
-    if (!selectedRange.from || !selectedRange.to) {
-      return toast.error("Select valid check-in and check-out dates");
-    }
-
-    const checkIn = selectedRange.from;
-    const checkOut = selectedRange.to;
+    const { startDate, endDate } = dateRange[0];
 
     setLoading(true);
 
@@ -346,8 +286,8 @@ export default function OfflineBooking() {
       const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
-        checkIn,
-        checkOut,
+        checkIn: startDate,
+        checkOut: endDate,
         guests: guestCount,
         nights,
         totalAmount,
@@ -396,12 +336,14 @@ export default function OfflineBooking() {
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
         {/* LEFT SIDE */}
         <Card>
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            
             {/* MOBILE */}
             <div className="flex items-end gap-2">
               <div className="flex-1">
@@ -425,7 +367,7 @@ export default function OfflineBooking() {
               </Button>
             </div>
 
-            {/* FORM FIELDS */}
+            {/* TRAVELLER FORM */}
             {allowForm && (
               <>
                 <div className="grid grid-cols-2 gap-3">
@@ -519,6 +461,7 @@ export default function OfflineBooking() {
                       </SelectContent>
                     </Select>
                   </div>
+
                   <div>
                     <Label>City</Label>
                     <Select
@@ -554,36 +497,35 @@ export default function OfflineBooking() {
             <CardTitle>Booking Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+
             {/* DATE PICKER */}
             <div className="relative">
               <Label>Dates</Label>
+
               <div
                 className="border rounded-lg p-2 mt-1 cursor-pointer"
                 onClick={() => setShowCalendar(!showCalendar)}
               >
-                {selectedRange.from && selectedRange.to ? (
-                  <>
-                    {format(selectedRange.from, "dd MMM")} –{" "}
-                    {format(selectedRange.to, "dd MMM")}
-                  </>
-                ) : (
-                  "Select dates"
-                )}
+                {format(dateRange[0].startDate, "dd MMM")} –{" "}
+                {format(dateRange[0].endDate, "dd MMM")}
               </div>
 
               {showCalendar && (
                 <div
                   ref={calendarRef}
-                  className="absolute mt-2 bg-white shadow-xl rounded-xl z-50 border"
+                  className="absolute mt-2 bg-white shadow-xl border rounded-xl z-50"
                 >
-                  <DayPicker
-                    mode="range"
-                    selected={selectedRange}
-                    onSelect={handleRangeSelect}
-                    disabled={isDateDisabled}
-                    defaultMonth={selectedRange.from || new Date()}
-                    numberOfMonths={1}
-                    weekStartsOn={1}
+                  <DateRange
+                    ranges={dateRange}
+                    onChange={handleDateRangeChange}
+                    minDate={new Date()}
+                    rangeColors={["#efcc61"]}
+                    moveRangeOnFirstSelection={false}
+                    showSelectionPreview={false}
+                    showDateDisplay={false}
+                    months={1}
+                    direction="horizontal"
+                    disabledDay={isDateBlocked}
                   />
                 </div>
               )}
@@ -612,12 +554,10 @@ export default function OfflineBooking() {
                 className="mt-1"
                 placeholder="Enter price"
               />
-              {price && selectedRange.from && selectedRange.to && (
+              {price && (
                 <p className="mt-2 text-sm">
                   Total Amount:{" "}
-                  <strong>
-                    ₹{(Number(price) * nights).toLocaleString("en-IN")}
-                  </strong>
+                  <strong>₹{(Number(price) * nights).toLocaleString()}</strong>
                 </p>
               )}
             </div>
@@ -652,6 +592,7 @@ export default function OfflineBooking() {
                       value={transactionId}
                       onChange={(e) => setTransactionId(e.target.value)}
                     />
+
                     <Label>Receipt Image (Optional)</Label>
                     <Input
                       type="file"
