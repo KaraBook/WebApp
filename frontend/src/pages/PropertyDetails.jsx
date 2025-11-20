@@ -38,7 +38,6 @@ export default function PropertyDetails() {
 
   const calendarRef = useRef(null);
 
-  /* ---------------- Fetch property ---------------- */
   useEffect(() => {
     const fetchProperty = async () => {
       try {
@@ -53,15 +52,18 @@ export default function PropertyDetails() {
     fetchProperty();
   }, [id]);
 
-  /* ---------------- Normalize date ranges ---------------- */
   const normalizeRanges = (ranges) =>
-    ranges.map((r) => ({
-      start: new Date(r.start.split("T")[0] + "T00:00:00"),
-      end: new Date(r.end.split("T")[0] + "T00:00:00"),
-    }));
+  ranges.map((r) => {
+    const start = new Date(r.start.split("T")[0] + "T00:00:00");
+    const end = new Date(r.end.split("T")[0] + "T00:00:00");
 
-  /* ---------------- Fetch booked + blocked dates ---------------- */
-  useEffect(() => {
+    end.setDate(end.getDate() + 1);
+
+    return { start, end };
+  });
+
+
+    useEffect(() => {
     if (!property?._id) return;
 
     const fetchDates = async () => {
