@@ -1,5 +1,3 @@
-// --- OFFLINE BOOKING (FINAL & FULLY FIXED) ---
-
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
@@ -39,13 +37,12 @@ export default function OfflineBooking() {
   const { user } = useAuth();
   const ownerMobile = user?.mobile;
 
-  // --- BASIC STATE ---
   const [propertyId] = useState(id || "");
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
-  const [disabledDays, setDisabledDays] = useState([]); // ← FINAL DISABLED DATES
+  const [disabledDays, setDisabledDays] = useState([]);
 
   const [guestCount, setGuestCount] = useState(1);
   const [price, setPrice] = useState("");
@@ -66,7 +63,6 @@ export default function OfflineBooking() {
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
 
-  // --- TRAVELLER DETAILS ---
   const [traveller, setTraveller] = useState({
     firstName: "",
     lastName: "",
@@ -79,7 +75,6 @@ export default function OfflineBooking() {
     city: "",
   });
 
-  // --- DATE RANGE ---
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -95,14 +90,10 @@ export default function OfflineBooking() {
     )
   );
 
-  // --- LOAD STATES ---
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  // --------------------------------------------------------
-  // 🔥 LOAD BOOKED + BLOCKED DATES (with inclusive fix)
-  // --------------------------------------------------------
   useEffect(() => {
     if (!propertyId) return;
 
@@ -125,7 +116,6 @@ export default function OfflineBooking() {
           const start = new Date(range.start.split("T")[0] + "T00:00:00");
           const end = new Date(range.end.split("T")[0] + "T00:00:00");
 
-          // 🟢 FIX: Make end inclusive
           end.setDate(end.getDate() + 1);
 
           const days = eachDayOfInterval({ start, end });
@@ -142,18 +132,14 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-  // --------------------------------------------------------
-  // CHECK IF DATE IS DISABLED
-  // --------------------------------------------------------
+
   const isDateDisabled = (date) => {
     return disabledDays.some(
       (d) => d.toDateString() === new Date(date).toDateString()
     );
   };
 
-  // --------------------------------------------------------
-  // VALIDATE RANGE SELECTION
-  // --------------------------------------------------------
+
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
 
@@ -176,7 +162,7 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
-  // --- CLOSE CALENDAR ON OUTSIDE CLICK ---
+
   useEffect(() => {
     const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -187,16 +173,12 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  // --------------------------------------------------------
-  // TRAVELLER INPUTS
-  // --------------------------------------------------------
+
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  // --------------------------------------------------------
-  // VERIFY TRAVELLER MOBILE
-  // --------------------------------------------------------
+
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -265,7 +247,6 @@ export default function OfflineBooking() {
     }
   };
 
-  // STATE CHANGE
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
 
@@ -280,9 +261,7 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  // --------------------------------------------------------
-  // CREATE BOOKING (OFFLINE)
-  // --------------------------------------------------------
+
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -331,9 +310,7 @@ export default function OfflineBooking() {
     }
   };
 
-  // --------------------------------------------------------
-  // CONFIRM PAYMENT
-  // --------------------------------------------------------
+
   const confirmPayment = async () => {
     if (!paymentMethod) return toast.error("Select payment method");
 
@@ -362,9 +339,7 @@ export default function OfflineBooking() {
     }
   };
 
-  // -------------------------------------------------------------------------
-  // JSX UI
-  // -------------------------------------------------------------------------
+
 
   return (
     <div className="max-w-5xl p-2">
@@ -559,27 +534,36 @@ export default function OfflineBooking() {
                     ranges={dateRange}
                     onChange={handleDateSelection}
                     minDate={new Date()}
-                    disabledDates={disabledDays}
                     rangeColors={["#efcc61"]}
                     moveRangeOnFirstSelection={false}
                     showSelectionPreview={false}
                     months={1}
                     direction="horizontal"
+                    disabledDates={disabledDays}
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
+
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${
-                            disabled
+                          onClick={(e) => {
+                            if (disabled) {
+                              e.stopPropagation();
+                              toast.error("This date is unavailable.");
+                            }
+                          }}
+                          className={`w-full h-full flex items-center justify-center rounded-full
+          ${disabled
                               ? "bg-red-300 text-white cursor-not-allowed"
                               : "hover:bg-[#efcc61] hover:text-black"
-                          }`}
+                            }
+        `}
                         >
                           {date.getDate()}
                         </div>
                       );
                     }}
                   />
+
                 </div>
               )}
             </div>
