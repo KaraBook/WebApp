@@ -37,7 +37,6 @@ export default function OfflineBooking() {
   const { user } = useAuth();
   const ownerMobile = user?.mobile;
 
-  // propertyId: from URL if present, otherwise first owner property (same as OwnerCalendar)
   const [propertyId, setPropertyId] = useState(id || "");
 
   const [states, setStates] = useState([]);
@@ -82,89 +81,83 @@ export default function OfflineBooking() {
     )
   );
 
-  /* ---------------- Load states once ---------------- */
+  /* ---------------- Load states ---------------- */
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  /* ---------------- If no :id, fetch owner's propertyId ---------------- */
+  /* ---------------- Fetch owner's property ID ---------------- */
   useEffect(() => {
-    if (propertyId) return; // already set from URL
+    if (propertyId) return;
 
-    const fetchOwnerProperties = async () => {
+    const load = async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerProperties.url);
         const list = res.data.data || [];
-        if (list.length > 0) {
-          setPropertyId(list[0]._id);
-        } else {
-          toast.error("No property found for this owner.");
-        }
-      } catch (err) {
-        console.error("Failed to fetch properties:", err);
+        if (list.length) setPropertyId(list[0]._id);
+      } catch {
         toast.error("Unable to load property");
       }
     };
 
-    fetchOwnerProperties();
+    load();
   }, [propertyId]);
 
-  /* ---------------- Load booked + blocked dates whenever propertyId changes ---------------- */
+  /* ---------------- Load booked + blocked dates ---------------- */
   useEffect(() => {
     if (!propertyId) return;
 
     const loadDates = async () => {
       try {
-        const bookedRes = await api.get(
-          SummaryApi.getBookedDates.url(propertyId)
-        );
-        const blockedRes = await api.get(
+        const booked = await api.get(SummaryApi.getBookedDates.url(propertyId));
+        const blocked = await api.get(
           SummaryApi.getPropertyBlockedDates.url(propertyId)
         );
 
-        setBookedDates(bookedRes.data.dates || []);
-        setBlockedDates(blockedRes.data.dates || []);
-      } catch (err) {
-        console.error("Failed to fetch dates", err);
+        setBookedDates(booked.data.dates || []);
+        setBlockedDates(blocked.data.dates || []);
+      } catch {
+        toast.error("Failed to load dates");
       }
     };
 
     loadDates();
   }, [propertyId]);
 
-  /* ---------------- Helper: is a given date inside any booked/blocked range? ---------------- */
-  const isDateDisabled = (date) => {
-    const allRanges = [...bookedDates, ...blockedDates];
+  /* ---------------- Convert date ranges → single disabled days ---------------- */
+  const getDisabledDates = () => {
+    const all = [...bookedDates, ...blockedDates];
+    const disabledDays = [];
 
-    return allRanges.some((range) => {
-      const start = new Date(range.start);
-      const end = new Date(range.end);
-      // normalize time to midnight to avoid timezone issues
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
+    all.forEach((range) => {
+      let start = new Date(range.start);
+      let end = new Date(range.end);
 
-      const d = new Date(date);
-      d.setHours(12, 0, 0, 0);
+      start.setHours(12, 0, 0, 0);
+      end.setHours(12, 0, 0, 0);
 
-      return d >= start && d <= end;
+      let d = new Date(start);
+
+      while (d <= end) {
+        disabledDays.push(new Date(d));
+        d.setDate(d.getDate() + 1);
+      }
     });
+
+    return disabledDays;
   };
 
-  /* ---------------- Validate selection: reject if any disabled date is inside ---------------- */
+  /* ---------------- Validate selection ---------------- */
   const handleDateSelection = (item) => {
+    const disabled = getDisabledDates();
     const { startDate, endDate } = item.selection;
-
-    if (!startDate || !endDate) {
-      setDateRange([item.selection]);
-      return;
-    }
 
     let d = new Date(startDate);
     d.setHours(12, 0, 0, 0);
     let invalid = false;
 
     while (d <= endDate) {
-      if (isDateDisabled(d)) {
+      if (disabled.some((dd) => dd.toDateString() === d.toDateString())) {
         invalid = true;
         break;
       }
@@ -172,26 +165,25 @@ export default function OfflineBooking() {
     }
 
     if (invalid) {
-      toast.error("These dates are unavailable (booked or blocked).");
-      // do NOT update dateRange → UI stays on previous valid range
+      toast.error("Selected dates include unavailable days.");
       return;
     }
 
     setDateRange([item.selection]);
   };
 
-  /* ---------------- Close calendar on outside click ---------------- */
+  /* ---------------- Close calendar when clicking outside ---------------- */
   useEffect(() => {
-    const handleClick = (e) => {
+    const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
         setShowCalendar(false);
       }
     };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  /* ---------------- Traveller form state ---------------- */
+  /* ---------------- Traveller form ---------------- */
   const [traveller, setTraveller] = useState({
     firstName: "",
     lastName: "",
@@ -274,14 +266,6 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- State change ---------------- */
-  const handleStateChange = (code) => {
-    setSelectedStateCode(code);
-    const st = states.find((s) => s.isoCode === code);
-    setTraveller((p) => ({ ...p, state: st?.name || "", city: "" }));
-    setCities(getCitiesByState(code));
-  };
-
   /* ---------------- Create booking ---------------- */
   const handleBooking = async () => {
     const required = [
@@ -320,6 +304,7 @@ export default function OfflineBooking() {
 
       setBookingId(res.data.booking._id);
       setShowPaymentBox(true);
+
       toast.success("Booking created! Confirm payment.");
     } finally {
       setLoading(false);
@@ -350,7 +335,7 @@ export default function OfflineBooking() {
       toast.success("Booking confirmed!");
       navigate("/owner/bookings");
     } catch {
-      toast.error("Payment confirmation failed");
+      toast.error("Payment failed");
     }
   };
 
@@ -392,15 +377,12 @@ export default function OfflineBooking() {
             {/* FORM FIELDS */}
             {allowForm && (
               <>
-                {/* Names */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label>First Name</Label>
                     <Input
                       value={traveller.firstName}
-                      onChange={(e) =>
-                        handleChange("firstName", e.target.value)
-                      }
+                      onChange={(e) => handleChange("firstName", e.target.value)}
                       className="mt-1"
                     />
                   </div>
@@ -408,15 +390,12 @@ export default function OfflineBooking() {
                     <Label>Last Name</Label>
                     <Input
                       value={traveller.lastName}
-                      onChange={(e) =>
-                        handleChange("lastName", e.target.value)
-                      }
+                      onChange={(e) => handleChange("lastName", e.target.value)}
                       className="mt-1"
                     />
                   </div>
                 </div>
 
-                {/* Email */}
                 <div>
                   <Label>Email</Label>
                   <Input
@@ -427,7 +406,6 @@ export default function OfflineBooking() {
                   />
                 </div>
 
-                {/* DOB + Pincode */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label>Date of Birth</Label>
@@ -446,29 +424,22 @@ export default function OfflineBooking() {
                       maxLength={6}
                       value={traveller.pinCode}
                       onChange={(e) =>
-                        handleChange(
-                          "pinCode",
-                          e.target.value.replace(/\D/g, "")
-                        )
+                        handleChange("pinCode", e.target.value.replace(/\D/g, ""))
                       }
                       className="mt-1"
                     />
                   </div>
                 </div>
 
-                {/* Address */}
                 <div>
                   <Label>Address</Label>
                   <Input
                     value={traveller.address}
-                    onChange={(e) =>
-                      handleChange("address", e.target.value)
-                    }
+                    onChange={(e) => handleChange("address", e.target.value)}
                     className="mt-1"
                   />
                 </div>
 
-                {/* State + City */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label>State</Label>
@@ -527,7 +498,7 @@ export default function OfflineBooking() {
             <div className="relative">
               <Label>Dates</Label>
               <div
-                className="border rounded-lg p-2 cursor-pointer mt-1"
+                className="border rounded-lg p-2 mt-1 cursor-pointer"
                 onClick={() => setShowCalendar(!showCalendar)}
               >
                 {format(dateRange[0].startDate, "dd MMM")} –{" "}
@@ -537,7 +508,7 @@ export default function OfflineBooking() {
               {showCalendar && (
                 <div
                   ref={calendarRef}
-                  className="absolute mt-2 bg-white shadow-xl border rounded-xl z-50"
+                  className="absolute mt-2 bg-white shadow-xl rounded-xl z-50 border"
                 >
                   <DateRange
                     ranges={dateRange}
@@ -545,32 +516,11 @@ export default function OfflineBooking() {
                     minDate={new Date()}
                     rangeColors={["#efcc61"]}
                     moveRangeOnFirstSelection={false}
-                    showSelectionPreview={false}
                     showDateDisplay={false}
+                    showPreview={false}
                     months={1}
                     direction="horizontal"
-                    // Custom day rendering — same look as PropertyDetails
-                    dayContentRenderer={(date) => {
-                      const disabled = isDateDisabled(date);
-                      return (
-                        <div
-                          className={`relative w-full h-full flex items-center justify-center rounded-full transition-all duration-200 ${
-                            disabled
-                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                              : "hover:bg-[#efcc61] hover:text-black"
-                          }`}
-                          title={disabled ? "Unavailable" : ""}
-                          onClick={(e) => {
-                            if (disabled) {
-                              e.stopPropagation();
-                              toast.error("This date is unavailable.");
-                            }
-                          }}
-                        >
-                          {date.getDate()}
-                        </div>
-                      );
-                    }}
+                    disabledDates={getDisabledDates()}
                   />
                 </div>
               )}
@@ -635,16 +585,12 @@ export default function OfflineBooking() {
                     <Label>Transaction ID (Optional)</Label>
                     <Input
                       value={transactionId}
-                      onChange={(e) =>
-                        setTransactionId(e.target.value)
-                      }
+                      onChange={(e) => setTransactionId(e.target.value)}
                     />
                     <Label>Receipt Image (Optional)</Label>
                     <Input
                       type="file"
-                      onChange={(e) =>
-                        setReceiptImage(e.target.files[0])
-                      }
+                      onChange={(e) => setReceiptImage(e.target.files[0])}
                     />
                   </>
                 )}
