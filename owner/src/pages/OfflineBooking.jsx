@@ -3,12 +3,26 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
@@ -23,7 +37,9 @@ export default function OfflineBooking() {
   const { user } = useAuth();
   const ownerMobile = user?.mobile;
 
-  const [propertyId] = useState(id || "");
+  // 🔥 make propertyId mutable so we can set it when id is not in URL
+  const [propertyId, setPropertyId] = useState(id || "");
+
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
@@ -60,20 +76,51 @@ export default function OfflineBooking() {
 
   const nights = Math.max(
     1,
-    Math.ceil((dateRange[0].endDate - dateRange[0].startDate) / (1000 * 60 * 60 * 24))
+    Math.ceil(
+      (dateRange[0].endDate - dateRange[0].startDate) /
+        (1000 * 60 * 60 * 24)
+    )
   );
 
+  // ---------------- Load states ----------------
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
+  // ---------------- If no :id in URL, fetch owner propertyId (same logic as OwnerCalendar) ----------------
+  useEffect(() => {
+    if (propertyId) return; // already have it from URL
+
+    const fetchOwnerProperties = async () => {
+      try {
+        const res = await api.get(SummaryApi.getOwnerProperties.url);
+        const list = res.data.data || [];
+        if (list.length > 0) {
+          setPropertyId(list[0]._id);
+        } else {
+          toast.error("No property found for this owner.");
+        }
+      } catch (err) {
+        console.error("Failed to fetch properties:", err);
+        toast.error("Unable to load property");
+      }
+    };
+
+    fetchOwnerProperties();
+  }, [propertyId]);
+
+  // ---------------- Load booked + blocked dates ----------------
   useEffect(() => {
     if (!propertyId) return;
 
     const loadDates = async () => {
       try {
-        const bookedRes = await api.get(SummaryApi.getBookedDates.url(propertyId));
-        const blockedRes = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
+        const bookedRes = await api.get(
+          SummaryApi.getBookedDates.url(propertyId)
+        );
+        const blockedRes = await api.get(
+          SummaryApi.getPropertyBlockedDates.url(propertyId)
+        );
 
         setBookedDates(bookedRes.data.dates || []);
         setBlockedDates(blockedRes.data.dates || []);
@@ -85,6 +132,7 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
+  // ---------------- Disable day logic ----------------
   const isDateDisabled = (date) => {
     const allRanges = [...bookedDates, ...blockedDates];
 
@@ -95,6 +143,7 @@ export default function OfflineBooking() {
     });
   };
 
+  // ---------------- Validate selection ----------------
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
 
@@ -117,6 +166,7 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
+  // ---------------- Close calendar on outside click ----------------
   useEffect(() => {
     const handleClick = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -127,10 +177,7 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const handleChange = (key, val) => {
-    setTraveller((prev) => ({ ...prev, [key]: val }));
-  };
-
+  // ---------------- Traveller form logic ----------------
   const [traveller, setTraveller] = useState({
     firstName: "",
     lastName: "",
@@ -143,6 +190,11 @@ export default function OfflineBooking() {
     city: "",
   });
 
+  const handleChange = (key, val) => {
+    setTraveller((prev) => ({ ...prev, [key]: val }));
+  };
+
+  // ---------------- Mobile verification ----------------
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -161,7 +213,7 @@ export default function OfflineBooking() {
         mobile: traveller.mobile,
       });
 
-      setAllowForm(true);
+        setAllowForm(true);
 
       if (res.data.exists) {
         const t = res.data.traveller;
@@ -208,6 +260,7 @@ export default function OfflineBooking() {
     }
   };
 
+  // ---------------- State change ----------------
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
     const st = states.find((s) => s.isoCode === code);
@@ -215,6 +268,7 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
+  // ---------------- Create booking ----------------
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -258,9 +312,9 @@ export default function OfflineBooking() {
     }
   };
 
+  // ---------------- Confirm Payment ----------------
   const confirmPayment = async () => {
-    if (!paymentMethod)
-      return toast.error("Select payment method");
+    if (!paymentMethod) return toast.error("Select payment method");
 
     let imageUrl = "";
 
@@ -291,15 +345,12 @@ export default function OfflineBooking() {
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         {/* LEFT SIDE */}
         <Card>
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
           </CardHeader>
-
           <CardContent className="space-y-3">
-
             {/* MOBILE */}
             <div className="flex items-end gap-2">
               <div className="flex-1">
@@ -314,7 +365,6 @@ export default function OfflineBooking() {
                   className="mt-1"
                 />
               </div>
-
               <Button
                 onClick={verifyMobile}
                 disabled={checking || traveller.mobile.length !== 10}
@@ -333,16 +383,19 @@ export default function OfflineBooking() {
                     <Label>First Name</Label>
                     <Input
                       value={traveller.firstName}
-                      onChange={(e) => handleChange("firstName", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("firstName", e.target.value)
+                      }
                       className="mt-1"
                     />
                   </div>
-
                   <div>
                     <Label>Last Name</Label>
                     <Input
                       value={traveller.lastName}
-                      onChange={(e) => handleChange("lastName", e.target.value)}
+                      onChange={(e) =>
+                        handleChange("lastName", e.target.value)
+                      }
                       className="mt-1"
                     />
                   </div>
@@ -372,14 +425,16 @@ export default function OfflineBooking() {
                       className="mt-1"
                     />
                   </div>
-
                   <div>
                     <Label>Pin Code</Label>
                     <Input
                       maxLength={6}
                       value={traveller.pinCode}
                       onChange={(e) =>
-                        handleChange("pinCode", e.target.value.replace(/\D/g, ""))
+                        handleChange(
+                          "pinCode",
+                          e.target.value.replace(/\D/g, "")
+                        )
                       }
                       className="mt-1"
                     />
@@ -391,7 +446,9 @@ export default function OfflineBooking() {
                   <Label>Address</Label>
                   <Input
                     value={traveller.address}
-                    onChange={(e) => handleChange("address", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("address", e.target.value)
+                    }
                     className="mt-1"
                   />
                 </div>
@@ -404,7 +461,9 @@ export default function OfflineBooking() {
                       value={selectedStateCode}
                       onValueChange={handleStateChange}
                     >
-                      <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select State" />
+                      </SelectTrigger>
                       <SelectContent>
                         {states.map((s) => (
                           <SelectItem key={s.isoCode} value={s.isoCode}>
@@ -414,7 +473,6 @@ export default function OfflineBooking() {
                       </SelectContent>
                     </Select>
                   </div>
-
                   <div>
                     <Label>City</Label>
                     <Select
@@ -424,7 +482,9 @@ export default function OfflineBooking() {
                     >
                       <SelectTrigger>
                         <SelectValue
-                          placeholder={cities.length ? "Select City" : "Select State first"}
+                          placeholder={
+                            cities.length ? "Select City" : "Select State first"
+                          }
                         />
                       </SelectTrigger>
                       <SelectContent>
@@ -447,13 +507,10 @@ export default function OfflineBooking() {
           <CardHeader>
             <CardTitle>Booking Details</CardTitle>
           </CardHeader>
-
           <CardContent className="space-y-3">
-
-            {/* DATE PICKER (UPDATED) */}
+            {/* DATE PICKER */}
             <div className="relative">
               <Label>Dates</Label>
-
               <div
                 className="border rounded-lg p-2 cursor-pointer mt-1"
                 onClick={() => setShowCalendar(!showCalendar)}
@@ -474,19 +531,19 @@ export default function OfflineBooking() {
                     rangeColors={["#efcc61"]}
                     moveRangeOnFirstSelection={false}
                     showSelectionPreview={false}
-                    showDateDisplay={false}     
+                    showDateDisplay={false}
                     months={1}
                     direction="horizontal"
                     disabledDay={(date) => isDateDisabled(date)}
-
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${disabled
+                          className={`w-full h-full flex items-center justify-center rounded-full ${
+                            disabled
                               ? "bg-gray-300 text-gray-400 cursor-not-allowed"
                               : "hover:bg-[#efcc61] hover:text-black"
-                            }`}
+                          }`}
                           onClick={(e) => {
                             if (disabled) {
                               e.stopPropagation();
@@ -499,7 +556,6 @@ export default function OfflineBooking() {
                       );
                     }}
                   />
-
                 </div>
               )}
             </div>
@@ -527,7 +583,6 @@ export default function OfflineBooking() {
                 className="mt-1"
                 placeholder="Enter price"
               />
-
               {price && (
                 <p className="mt-2 text-sm">
                   Total Amount:{" "}
@@ -549,9 +604,10 @@ export default function OfflineBooking() {
             {showPaymentBox && (
               <div className="mt-4 border p-4 rounded-lg bg-gray-50 space-y-4">
                 <Label>Payment Method</Label>
-
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <SelectTrigger><SelectValue placeholder="Select Method" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Method" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="cash">Cash</SelectItem>
                     <SelectItem value="upi">UPI</SelectItem>
@@ -563,13 +619,16 @@ export default function OfflineBooking() {
                     <Label>Transaction ID (Optional)</Label>
                     <Input
                       value={transactionId}
-                      onChange={(e) => setTransactionId(e.target.value)}
+                      onChange={(e) =>
+                        setTransactionId(e.target.value)
+                      }
                     />
-
                     <Label>Receipt Image (Optional)</Label>
                     <Input
                       type="file"
-                      onChange={(e) => setReceiptImage(e.target.files[0])}
+                      onChange={(e) =>
+                        setReceiptImage(e.target.files[0])
+                      }
                     />
                   </>
                 )}
@@ -594,7 +653,6 @@ export default function OfflineBooking() {
             <DialogTitle>{popupTitle}</DialogTitle>
             <DialogDescription>{popupMsg}</DialogDescription>
           </DialogHeader>
-
           <Button onClick={() => setShowPopup(false)} className="mt-4">
             Close
           </Button>
