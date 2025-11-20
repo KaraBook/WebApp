@@ -1,4 +1,4 @@
-// --- OFFLINE BOOKING (UPDATED + FIXED) ---
+// --- OFFLINE BOOKING (FINAL & FULLY FIXED) ---
 
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -44,9 +44,7 @@ export default function OfflineBooking() {
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
-  const [blockedDates, setBlockedDates] = useState([]);
-  const [bookedDates, setBookedDates] = useState([]);
-  const [disabledDays, setDisabledDays] = useState([]); // FINAL DISABLED LIST
+  const [disabledDays, setDisabledDays] = useState([]); // FINAL disabled list
 
   const [guestCount, setGuestCount] = useState(1);
   const [price, setPrice] = useState("");
@@ -94,12 +92,12 @@ export default function OfflineBooking() {
     )
   );
 
-  // LOAD STATES
+  // Load states
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  // ************ LOAD BLOCKED + BOOKED DATES ************
+  // Load both blocked + booked dates
   useEffect(() => {
     if (!propertyId) return;
 
@@ -108,6 +106,7 @@ export default function OfflineBooking() {
         const blockedRes = await api.get(
           SummaryApi.getPropertyBlockedDates.url(propertyId)
         );
+
         const bookedRes = await api.get(
           SummaryApi.getBookedDates.url(propertyId)
         );
@@ -115,10 +114,6 @@ export default function OfflineBooking() {
         const blocked = blockedRes.data.dates || [];
         const booked = bookedRes.data.dates || [];
 
-        setBlockedDates(blocked);
-        setBookedDates(booked);
-
-        // Convert both into full disabled day list
         const fullList = [];
 
         [...blocked, ...booked].forEach((range) => {
@@ -131,7 +126,7 @@ export default function OfflineBooking() {
 
         setDisabledDays(fullList);
       } catch (err) {
-        console.error("FAILED TO LOAD DATES:", err);
+        console.error("Failed to load dates:", err);
         toast.error("Failed to load dates");
       }
     };
@@ -139,14 +134,14 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-  // DISABLED CHECK
+  // Check if date is disabled
   const isDateDisabled = (date) => {
     return disabledDays.some(
       (d) => d.toDateString() === new Date(date).toDateString()
     );
   };
 
-  // CHECK SELECTED RANGE FOR DISABLED
+  // Validate selected range
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
 
@@ -169,7 +164,7 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
-  // CLICK OUTSIDE CLOSE
+  // Close calendar on outside click
   useEffect(() => {
     const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -180,12 +175,12 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  // CHANGE HANDLER
+  // Traveller input handler
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  // VERIFY MOBILE
+  // Verify traveller mobile
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -254,7 +249,7 @@ export default function OfflineBooking() {
     }
   };
 
-  // STATE CHANGE
+  // State change
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
 
@@ -269,7 +264,7 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  // CREATE BOOKING
+  // Create booking
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -311,14 +306,14 @@ export default function OfflineBooking() {
       setShowPaymentBox(true);
 
       toast.success("Booking created! Confirm payment.");
-    } catch (err) {
+    } catch {
       toast.error("Failed to create booking");
     } finally {
       setLoading(false);
     }
   };
 
-  // CONFIRM PAYMENT
+  // Confirm payment
   const confirmPayment = async () => {
     if (!paymentMethod) return toast.error("Select payment method");
 
@@ -354,12 +349,13 @@ export default function OfflineBooking() {
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
         {/* LEFT */}
         <Card>
-          <CardHeader><CardTitle>Traveller Details</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
+          <CardHeader>
+            <CardTitle>Traveller Details</CardTitle>
+          </CardHeader>
 
+          <CardContent className="space-y-3">
             {/* MOBILE */}
             <div className="flex items-end gap-2">
               <div className="flex-1">
@@ -471,6 +467,7 @@ export default function OfflineBooking() {
                       <SelectTrigger>
                         <SelectValue placeholder="Select State" />
                       </SelectTrigger>
+
                       <SelectContent>
                         {states.map((s) => (
                           <SelectItem key={s.isoCode} value={s.isoCode}>
@@ -490,7 +487,9 @@ export default function OfflineBooking() {
                     >
                       <SelectTrigger>
                         <SelectValue
-                          placeholder={cities.length ? "Select City" : "Select State first"}
+                          placeholder={
+                            cities.length ? "Select City" : "Select State first"
+                          }
                         />
                       </SelectTrigger>
 
@@ -511,12 +510,15 @@ export default function OfflineBooking() {
 
         {/* RIGHT */}
         <Card>
-          <CardHeader><CardTitle>Booking Details</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
+          <CardHeader>
+            <CardTitle>Booking Details</CardTitle>
+          </CardHeader>
 
+          <CardContent className="space-y-3">
             {/* DATE PICKER */}
             <div className="relative">
               <Label>Dates</Label>
+
               <div
                 className="border rounded-lg p-2 cursor-pointer mt-1"
                 onClick={() => setShowCalendar(!showCalendar)}
@@ -531,6 +533,7 @@ export default function OfflineBooking() {
                   className="absolute mt-2 bg-white shadow-xl border rounded-xl z-50"
                 >
                   <DateRange
+                    key={disabledDays.length} // IMPORTANT FIX
                     ranges={dateRange}
                     onChange={handleDateSelection}
                     minDate={new Date()}
@@ -585,7 +588,9 @@ export default function OfflineBooking() {
               {price && (
                 <p className="mt-2 text-sm">
                   Total:{" "}
-                  <strong>₹{(Number(price) * nights).toLocaleString()}</strong>
+                  <strong>
+                    ₹{(Number(price) * nights).toLocaleString()}
+                  </strong>
                 </p>
               )}
             </div>
@@ -611,6 +616,7 @@ export default function OfflineBooking() {
                   <SelectTrigger>
                     <SelectValue placeholder="Select Method" />
                   </SelectTrigger>
+
                   <SelectContent>
                     <SelectItem value="cash">Cash</SelectItem>
                     <SelectItem value="upi">UPI</SelectItem>
