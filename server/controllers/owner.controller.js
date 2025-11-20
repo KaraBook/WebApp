@@ -554,3 +554,33 @@ export const checkTravellerByMobile = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+export const checkOwnerByMobile = async (req, res) => {
+  try {
+    const { mobile } = req.body;
+    const normalized = normalizeMobile(mobile);
+
+    if (!normalized || normalized.length !== 10)
+      return res.status(400).json({ success: false, message: "Invalid mobile number" });
+
+    const owner = await User.findOne({
+      mobile: normalized,
+      role: { $in: ["resortOwner", "owner", "propertyOwner", "admin"] }  
+    });
+
+    if (owner) {
+      return res.json({
+        success: true,
+        exists: true,
+        role: owner.role,
+        message: "Number belongs to a resort owner"
+      });
+    }
+
+    return res.json({ success: true, exists: false });
+  } catch (err) {
+    console.error("checkOwnerByMobile error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

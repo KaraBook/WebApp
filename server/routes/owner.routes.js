@@ -11,7 +11,8 @@ import {
   removeBlockedDates,
   createOfflineBooking,
   confirmOfflinePayment,
-  checkTravellerByMobile
+  checkTravellerByMobile,
+  checkOwnerByMobile,
 } from "../controllers/owner.controller.js";
 import { getBookingInvoice } from "../controllers/bookingController.js";
 import upload from "../middlewares/multer.js";
@@ -39,6 +40,7 @@ router.post("/offline-booking", requireAuth, createOfflineBooking);
 router.post("/confirm-offline-payment", requireAuth, confirmOfflinePayment);
 router.post("/check-traveller", requireAuth, checkTravellerByMobile);
 router.get("/invoice/:bookingId", requireAuth, getBookingInvoice);
+router.post("/check-owner-mobile", requireAuth, checkOwnerByMobile);
 
 
 

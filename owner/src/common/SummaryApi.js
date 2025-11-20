@@ -38,7 +38,7 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/property/${id}`,
         method: "PUT",
     }),
-     getPropertyBlockedDates: {
+    getPropertyBlockedDates: {
         url: (id) => `${BASE_URL}/api/owner/property/${id}/blocked-dates`,
         method: "GET",
     },
@@ -74,7 +74,10 @@ const SummaryApi = {
         url: (id) => `${BASE_URL}/api/owner/invoice/${id}`,
         method: "GET",
     },
-
+    checkOwnerByMobile: {
+        url: `${BASE_URL}/api/owner/check-owner-mobile`,
+        method: "POST",
+    },
 
 
 
