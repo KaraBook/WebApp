@@ -1,14 +1,28 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
-import { format, eachDayOfInterval } from "date-fns";
+import { format } from "date-fns";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
@@ -28,9 +42,8 @@ export default function OfflineBooking() {
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
-  const [blockedDates, setBlockedDates] = useState([]);
   const [bookedDates, setBookedDates] = useState([]);
-  const [disabledDays, setDisabledDays] = useState([]);
+  const [blockedDates, setBlockedDates] = useState([]);
 
   const [guestCount, setGuestCount] = useState(1);
   const [price, setPrice] = useState("");
@@ -76,43 +89,30 @@ export default function OfflineBooking() {
     1,
     Math.ceil(
       (dateRange[0].endDate - dateRange[0].startDate) /
-      (1000 * 60 * 60 * 24)
+        (1000 * 60 * 60 * 24)
     )
   );
 
+  /* ---------------- Load states ---------------- */
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
+  /* ---------------- Load booked + blocked dates ---------------- */
   useEffect(() => {
     if (!propertyId) return;
 
     const loadDates = async () => {
       try {
-        const blockRes = await api.get(
-          SummaryApi.getPropertyBlockedDates.url(propertyId)
-        );
-        const bookRes = await api.get(
+        const bookedRes = await api.get(
           SummaryApi.getBookedDates.url(propertyId)
         );
+        const blockedRes = await api.get(
+          SummaryApi.getPropertyBlockedDates.url(propertyId)
+        );
 
-        const blocked = blockRes.data.dates || [];
-        const booked = bookRes.data.dates || [];
-
-        setBlockedDates(blocked);
-        setBookedDates(booked);
-
-        const fullList = [];
-
-        [...blocked, ...booked].forEach((r) => {
-          const days = eachDayOfInterval({
-            start: new Date(r.start),
-            end: new Date(r.end),
-          });
-          fullList.push(...days);
-        });
-
-        setDisabledDays(fullList);
+        setBookedDates(bookedRes.data.dates || []);
+        setBlockedDates(blockedRes.data.dates || []);
       } catch (err) {
         console.error("Failed to fetch dates", err);
       }
@@ -121,16 +121,17 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-
+  /* ---------------- Disable days logic (same as PropertyDetails) ---------------- */
   const isDateDisabled = (date) => {
-    return [...bookedDates, ...blockedDates].some((range) => {
+    const allRanges = [...bookedDates, ...blockedDates];
+    return allRanges.some((range) => {
       const start = new Date(range.start);
       const end = new Date(range.end);
       return date >= start && date <= end;
     });
   };
 
-
+  /* ---------------- Validate selection (extra safety) ---------------- */
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
     let d = new Date(startDate);
@@ -152,6 +153,7 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
+  /* ---------------- Close calendar on outside click ---------------- */
   useEffect(() => {
     const handleClick = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -162,10 +164,12 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  /* ---------------- Traveller form logic ---------------- */
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
+  /* ---------------- Mobile verification ---------------- */
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -231,6 +235,7 @@ export default function OfflineBooking() {
     }
   };
 
+  /* ---------------- State dropdown logic ---------------- */
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
     const st = states.find((s) => s.isoCode === code);
@@ -238,6 +243,7 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
+  /* ---------------- Create Booking ---------------- */
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -282,6 +288,7 @@ export default function OfflineBooking() {
     }
   };
 
+  /* ---------------- Confirm Payment ---------------- */
   const confirmPayment = async () => {
     if (!paymentMethod)
       return toast.error("Select payment method");
@@ -315,7 +322,6 @@ export default function OfflineBooking() {
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
         {/* LEFT SIDE */}
         <Card>
           <CardHeader>
@@ -510,47 +516,30 @@ export default function OfflineBooking() {
                 >
                   <DateRange
                     ranges={dateRange}
-                    onChange={(item) => {
-                      const { startDate, endDate } = item.selection;
-
-                      let d = new Date(startDate);
-                      while (d <= endDate) {
-                        if (isDateDisabled(d)) {
-                          toast.error("These dates are unavailable.");
-                          return; // STOP SELECTION
-                        }
-                        d.setDate(d.getDate() + 1);
-                      }
-
-                      setDateRange([item.selection]);
-                    }}
+                    onChange={handleDateSelection}
                     minDate={new Date()}
                     rangeColors={["#efcc61"]}
                     moveRangeOnFirstSelection={false}
                     showSelectionPreview={false}
                     months={1}
                     direction="horizontal"
+                    disabledDay={isDateDisabled}
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
 
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full
-          ${disabled ? "bg-red-300 text-white cursor-not-allowed" : "hover:bg-[#efcc61] hover:text-black"}
-        `}
-                          onClick={(e) => {
-                            if (disabled) {
-                              e.stopPropagation(); 
-                              toast.error("This date is unavailable.");
-                            }
-                          }}
+                          className={`w-full h-full flex items-center justify-center rounded-full ${
+                            disabled
+                              ? "bg-red-300 text-white cursor-not-allowed"
+                              : "hover:bg-[#efcc61] hover:text-black"
+                          }`}
                         >
                           {date.getDate()}
                         </div>
                       );
                     }}
                   />
-
                 </div>
               )}
             </div>
