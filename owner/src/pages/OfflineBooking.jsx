@@ -3,26 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format, eachDayOfInterval } from "date-fns";
 import { toast } from "sonner";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
@@ -90,16 +76,14 @@ export default function OfflineBooking() {
     1,
     Math.ceil(
       (dateRange[0].endDate - dateRange[0].startDate) /
-        (1000 * 60 * 60 * 24)
+      (1000 * 60 * 60 * 24)
     )
   );
 
-  /* ---------------- Load states ---------------- */
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  /* ---------------- Load blocked + booked dates ---------------- */
   useEffect(() => {
     if (!propertyId) return;
 
@@ -137,14 +121,16 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-  /* ---------------- Disable days logic ---------------- */
-  const isDateDisabled = (day) => {
-    return disabledDays.some(
-      (d) => d.toDateString() === new Date(day).toDateString()
-    );
+
+  const isDateDisabled = (date) => {
+    return [...bookedDates, ...blockedDates].some((range) => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      return date >= start && date <= end;
+    });
   };
 
-  /* ---------------- Selection validation ---------------- */
+
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
     let d = new Date(startDate);
@@ -166,7 +152,6 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
-  /* ---------------- Close calendar on outside click ---------------- */
   useEffect(() => {
     const handleClick = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -177,12 +162,10 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  /* ---------------- Traveller form logic ---------------- */
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  /* ---------------- Mobile verification ---------------- */
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -248,7 +231,6 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- State dropdown logic ---------------- */
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
     const st = states.find((s) => s.isoCode === code);
@@ -256,7 +238,6 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  /* ---------------- Create Booking ---------------- */
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -301,7 +282,6 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- Confirm Payment ---------------- */
   const confirmPayment = async () => {
     if (!paymentMethod)
       return toast.error("Select payment method");
@@ -330,13 +310,12 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- Render ---------------- */
   return (
     <div className="max-w-5xl p-2">
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
+
         {/* LEFT SIDE */}
         <Card>
           <CardHeader>
@@ -531,7 +510,20 @@ export default function OfflineBooking() {
                 >
                   <DateRange
                     ranges={dateRange}
-                    onChange={handleDateSelection}
+                    onChange={(item) => {
+                      const { startDate, endDate } = item.selection;
+
+                      let d = new Date(startDate);
+                      while (d <= endDate) {
+                        if (isDateDisabled(d)) {
+                          toast.error("These dates are unavailable.");
+                          return; // STOP SELECTION
+                        }
+                        d.setDate(d.getDate() + 1);
+                      }
+
+                      setDateRange([item.selection]);
+                    }}
                     minDate={new Date()}
                     rangeColors={["#efcc61"]}
                     moveRangeOnFirstSelection={false}
@@ -543,17 +535,22 @@ export default function OfflineBooking() {
 
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${
-                            disabled
-                              ? "bg-red-300 text-white cursor-not-allowed"
-                              : "hover:bg-[#efcc61] hover:text-black"
-                          }`}
+                          className={`w-full h-full flex items-center justify-center rounded-full
+          ${disabled ? "bg-red-300 text-white cursor-not-allowed" : "hover:bg-[#efcc61] hover:text-black"}
+        `}
+                          onClick={(e) => {
+                            if (disabled) {
+                              e.stopPropagation(); 
+                              toast.error("This date is unavailable.");
+                            }
+                          }}
                         >
                           {date.getDate()}
                         </div>
                       );
                     }}
                   />
+
                 </div>
               )}
             </div>
