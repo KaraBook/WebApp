@@ -29,7 +29,7 @@ export default function PropertyDetails() {
   const navigate = useNavigate();
 
   const [bookedDates, setBookedDates] = useState([]);
-  const [blockedDates, setBlockedDates] = useState([]); 
+  const [blockedDates, setBlockedDates] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -276,7 +276,28 @@ export default function PropertyDetails() {
                 <div className="absolute top-[70px] left-0 bg-white p-4 rounded-2xl shadow-2xl border border-gray-100 z-50">
                   <DateRange
                     ranges={dateRange}
-                    onChange={(item) => setDateRange([item.selection])}
+                    onChange={(item) => {
+                      const start = item.selection.startDate;
+                      const end = item.selection.endDate;
+
+                      let isInvalid = false;
+
+                      const current = new Date(start);
+                      while (current <= end) {
+                        if (isDateDisabled(current)) {
+                          isInvalid = true;
+                          break;
+                        }
+                        current.setDate(current.getDate() + 1);
+                      }
+
+                      if (isInvalid) {
+                        toast.error("These dates are unavailable. Please choose different dates.");
+                        return; 
+                      }
+
+                      setDateRange([item.selection]);
+                    }}
                     minDate={new Date()}
                     rangeColors={["#efcc61"]}
                     moveRangeOnFirstSelection={false}
@@ -289,16 +310,16 @@ export default function PropertyDetails() {
                       return (
                         <div
                           className={`relative w-full h-full flex items-center justify-center rounded-full transition-all duration-200 ${disabled
-                            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            : "hover:bg-[#efcc61] hover:text-black"
+                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                              : "hover:bg-[#efcc61] hover:text-black"
                             }`}
-                          title={disabled ? "Unavailable" : ""}
                         >
                           {date.getDate()}
                         </div>
                       );
                     }}
                   />
+
                 </div>
               )}
 
@@ -329,8 +350,8 @@ export default function PropertyDetails() {
                           setShowGuestDropdown(false);
                         }}
                         className={`block w-full text-left px-3 py-2 rounded-lg text-sm ${guestCount === i + 1
-                            ? "bg-[#efcc61] text-black font-semibold"
-                            : "hover:bg-gray-100 text-gray-700"
+                          ? "bg-[#efcc61] text-black font-semibold"
+                          : "hover:bg-gray-100 text-gray-700"
                           }`}
                       >
                         {i + 1} {i === 0 ? "Guest" : "Guests"}

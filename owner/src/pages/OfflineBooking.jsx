@@ -533,7 +533,7 @@ export default function OfflineBooking() {
                   className="absolute mt-2 bg-white shadow-xl border rounded-xl z-50"
                 >
                   <DateRange
-                    key={disabledDays.length} // IMPORTANT FIX
+                    key={disabledDays.length}
                     ranges={dateRange}
                     onChange={handleDateSelection}
                     minDate={new Date()}
