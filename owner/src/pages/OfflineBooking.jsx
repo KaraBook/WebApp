@@ -1,30 +1,14 @@
-// ---------------- OFFLINE BOOKING (UPDATED) ---------------- //
-
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import { toast } from "sonner";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
@@ -79,12 +63,10 @@ export default function OfflineBooking() {
     Math.ceil((dateRange[0].endDate - dateRange[0].startDate) / (1000 * 60 * 60 * 24))
   );
 
-  /* ---------------- Load states ---------------- */
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  /* ---------------- Load booked + blocked dates ---------------- */
   useEffect(() => {
     if (!propertyId) return;
 
@@ -103,7 +85,6 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-  /* ---------------- Disable day logic ---------------- */
   const isDateDisabled = (date) => {
     const allRanges = [...bookedDates, ...blockedDates];
 
@@ -114,7 +95,6 @@ export default function OfflineBooking() {
     });
   };
 
-  /* ---------------- Validate selection ---------------- */
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
 
@@ -137,7 +117,6 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
-  /* ---------------- Close calendar on outside click ---------------- */
   useEffect(() => {
     const handleClick = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -148,12 +127,10 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  /* ---------------- Traveller form logic ---------------- */
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  /* ---------------- Mobile verification ---------------- */
   const [traveller, setTraveller] = useState({
     firstName: "",
     lastName: "",
@@ -231,7 +208,6 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- State Change ---------------- */
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
     const st = states.find((s) => s.isoCode === code);
@@ -239,7 +215,6 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  /* ---------------- Create Booking ---------------- */
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -283,7 +258,6 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- Confirm Payment ---------------- */
   const confirmPayment = async () => {
     if (!paymentMethod)
       return toast.error("Select payment method");
@@ -500,22 +474,19 @@ export default function OfflineBooking() {
                     rangeColors={["#efcc61"]}
                     moveRangeOnFirstSelection={false}
                     showSelectionPreview={false}
+                    showDateDisplay={false}     
                     months={1}
                     direction="horizontal"
-
-                    /* 🔥 REQUIRED FIX: Disable blocked + booked days */
                     disabledDay={(date) => isDateDisabled(date)}
 
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
-
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${
-                            disabled
+                          className={`w-full h-full flex items-center justify-center rounded-full ${disabled
                               ? "bg-gray-300 text-gray-400 cursor-not-allowed"
                               : "hover:bg-[#efcc61] hover:text-black"
-                          }`}
+                            }`}
                           onClick={(e) => {
                             if (disabled) {
                               e.stopPropagation();
@@ -528,6 +499,7 @@ export default function OfflineBooking() {
                       );
                     }}
                   />
+
                 </div>
               )}
             </div>
