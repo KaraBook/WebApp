@@ -281,8 +281,8 @@ export default function PropertyDetails() {
                       const end = item.selection.endDate;
 
                       let isInvalid = false;
-
                       const current = new Date(start);
+
                       while (current <= end) {
                         if (isDateDisabled(current)) {
                           isInvalid = true;
@@ -293,7 +293,7 @@ export default function PropertyDetails() {
 
                       if (isInvalid) {
                         toast.error("These dates are unavailable. Please choose different dates.");
-                        return; 
+                        return;
                       }
 
                       setDateRange([item.selection]);
@@ -307,9 +307,17 @@ export default function PropertyDetails() {
                     direction="horizontal"
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
+
                       return (
                         <div
-                          className={`relative w-full h-full flex items-center justify-center rounded-full transition-all duration-200 ${disabled
+                          onClick={(e) => {
+                            if (disabled) {
+                              e.stopPropagation();
+                              toast.error("These dates are unavailable!");
+                            }
+                          }}
+                          className={`relative w-full h-full flex items-center justify-center rounded-full transition-all duration-200
+        ${disabled
                               ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                               : "hover:bg-[#efcc61] hover:text-black"
                             }`}
@@ -317,7 +325,8 @@ export default function PropertyDetails() {
                           {date.getDate()}
                         </div>
                       );
-                    }}
+                    }
+                    }
                   />
 
                 </div>
