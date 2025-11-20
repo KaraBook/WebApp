@@ -42,6 +42,10 @@ const SummaryApi = {
         url: (id) => `${BASE_URL}/api/owner/property/${id}/blocked-dates`,
         method: "GET",
     },
+    getBookedDates: {
+        url: (id) => `${BASE_URL}/api/booking/booked-dates/${id}`,
+        method: "GET",
+    },
     addBlockedDates: {
         url: (id) => `${BASE_URL}/api/owner/property/${id}/block-dates`,
         method: "POST",
