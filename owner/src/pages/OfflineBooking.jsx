@@ -1,3 +1,5 @@
+// ---------------- OFFLINE BOOKING (UPDATED) ---------------- //
+
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
@@ -51,19 +53,6 @@ export default function OfflineBooking() {
   const [checking, setChecking] = useState(false);
 
   const [allowForm, setAllowForm] = useState(false);
-
-  const [traveller, setTraveller] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobile: "",
-    dateOfBirth: "",
-    address: "",
-    pinCode: "",
-    state: "",
-    city: "",
-  });
-
   const [showPopup, setShowPopup] = useState(false);
   const [popupTitle, setPopupTitle] = useState("");
   const [popupMsg, setPopupMsg] = useState("");
@@ -114,7 +103,7 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-  /* ---------------- Disable day logic (same as PropertyDetails) ---------------- */
+  /* ---------------- Disable day logic ---------------- */
   const isDateDisabled = (date) => {
     const allRanges = [...bookedDates, ...blockedDates];
 
@@ -125,9 +114,10 @@ export default function OfflineBooking() {
     });
   };
 
-  /* ---------------- Validate selection & block disabled days ---------------- */
+  /* ---------------- Validate selection ---------------- */
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
+
     let d = new Date(startDate);
     let invalid = false;
 
@@ -164,8 +154,21 @@ export default function OfflineBooking() {
   };
 
   /* ---------------- Mobile verification ---------------- */
+  const [traveller, setTraveller] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    mobile: "",
+    dateOfBirth: "",
+    address: "",
+    pinCode: "",
+    state: "",
+    city: "",
+  });
+
   const verifyMobile = async () => {
-    if (traveller.mobile.length !== 10) return toast.error("Invalid mobile number");
+    if (traveller.mobile.length !== 10)
+      return toast.error("Invalid mobile number");
 
     if (traveller.mobile === ownerMobile) {
       setAllowForm(false);
@@ -228,7 +231,7 @@ export default function OfflineBooking() {
     }
   };
 
-  /* ---------------- State -> City select ---------------- */
+  /* ---------------- State Change ---------------- */
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
     const st = states.find((s) => s.isoCode === code);
@@ -282,7 +285,8 @@ export default function OfflineBooking() {
 
   /* ---------------- Confirm Payment ---------------- */
   const confirmPayment = async () => {
-    if (!paymentMethod) return toast.error("Select payment method");
+    if (!paymentMethod)
+      return toast.error("Select payment method");
 
     let imageUrl = "";
 
@@ -313,6 +317,7 @@ export default function OfflineBooking() {
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
         {/* LEFT SIDE */}
         <Card>
           <CardHeader>
@@ -320,6 +325,7 @@ export default function OfflineBooking() {
           </CardHeader>
 
           <CardContent className="space-y-3">
+
             {/* MOBILE */}
             <div className="flex items-end gap-2">
               <div className="flex-1">
@@ -420,11 +426,11 @@ export default function OfflineBooking() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label>State</Label>
-                    <Select value={selectedStateCode} onValueChange={handleStateChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select State" />
-                      </SelectTrigger>
-
+                    <Select
+                      value={selectedStateCode}
+                      onValueChange={handleStateChange}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
                       <SelectContent>
                         {states.map((s) => (
                           <SelectItem key={s.isoCode} value={s.isoCode}>
@@ -447,7 +453,6 @@ export default function OfflineBooking() {
                           placeholder={cities.length ? "Select City" : "Select State first"}
                         />
                       </SelectTrigger>
-
                       <SelectContent>
                         {cities.map((c) => (
                           <SelectItem key={c.name} value={c.name}>
@@ -470,7 +475,8 @@ export default function OfflineBooking() {
           </CardHeader>
 
           <CardContent className="space-y-3">
-            {/* DATE PICKER */}
+
+            {/* DATE PICKER (UPDATED) */}
             <div className="relative">
               <Label>Dates</Label>
 
@@ -496,6 +502,10 @@ export default function OfflineBooking() {
                     showSelectionPreview={false}
                     months={1}
                     direction="horizontal"
+
+                    /* 🔥 REQUIRED FIX: Disable blocked + booked days */
+                    disabledDay={(date) => isDateDisabled(date)}
+
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
 
@@ -569,10 +579,7 @@ export default function OfflineBooking() {
                 <Label>Payment Method</Label>
 
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Method" />
-                  </SelectTrigger>
-
+                  <SelectTrigger><SelectValue placeholder="Select Method" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="cash">Cash</SelectItem>
                     <SelectItem value="upi">UPI</SelectItem>
