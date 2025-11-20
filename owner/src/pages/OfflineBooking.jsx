@@ -37,7 +37,7 @@ export default function OfflineBooking() {
   const { user } = useAuth();
   const ownerMobile = user?.mobile;
 
-  // 🔥 make propertyId mutable so we can set it when id is not in URL
+  // propertyId: from URL if present, otherwise first owner property (same as OwnerCalendar)
   const [propertyId, setPropertyId] = useState(id || "");
 
   const [states, setStates] = useState([]);
@@ -78,18 +78,18 @@ export default function OfflineBooking() {
     1,
     Math.ceil(
       (dateRange[0].endDate - dateRange[0].startDate) /
-      (1000 * 60 * 60 * 24)
+        (1000 * 60 * 60 * 24)
     )
   );
 
-  // ---------------- Load states ----------------
+  /* ---------------- Load states once ---------------- */
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  // ---------------- If no :id in URL, fetch owner propertyId (same logic as OwnerCalendar) ----------------
+  /* ---------------- If no :id, fetch owner's propertyId ---------------- */
   useEffect(() => {
-    if (propertyId) return; // already have it from URL
+    if (propertyId) return; // already set from URL
 
     const fetchOwnerProperties = async () => {
       try {
@@ -109,7 +109,7 @@ export default function OfflineBooking() {
     fetchOwnerProperties();
   }, [propertyId]);
 
-  // ---------------- Load booked + blocked dates ----------------
+  /* ---------------- Load booked + blocked dates whenever propertyId changes ---------------- */
   useEffect(() => {
     if (!propertyId) return;
 
@@ -132,22 +132,35 @@ export default function OfflineBooking() {
     loadDates();
   }, [propertyId]);
 
-  // ---------------- Disable day logic ----------------
+  /* ---------------- Helper: is a given date inside any booked/blocked range? ---------------- */
   const isDateDisabled = (date) => {
     const allRanges = [...bookedDates, ...blockedDates];
 
     return allRanges.some((range) => {
       const start = new Date(range.start);
       const end = new Date(range.end);
-      return date >= start && date <= end;
+      // normalize time to midnight to avoid timezone issues
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+
+      const d = new Date(date);
+      d.setHours(12, 0, 0, 0);
+
+      return d >= start && d <= end;
     });
   };
 
-  // ---------------- Validate selection ----------------
+  /* ---------------- Validate selection: reject if any disabled date is inside ---------------- */
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
 
+    if (!startDate || !endDate) {
+      setDateRange([item.selection]);
+      return;
+    }
+
     let d = new Date(startDate);
+    d.setHours(12, 0, 0, 0);
     let invalid = false;
 
     while (d <= endDate) {
@@ -159,14 +172,15 @@ export default function OfflineBooking() {
     }
 
     if (invalid) {
-      toast.error("These dates are unavailable.");
+      toast.error("These dates are unavailable (booked or blocked).");
+      // do NOT update dateRange → UI stays on previous valid range
       return;
     }
 
     setDateRange([item.selection]);
   };
 
-  // ---------------- Close calendar on outside click ----------------
+  /* ---------------- Close calendar on outside click ---------------- */
   useEffect(() => {
     const handleClick = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -177,7 +191,7 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // ---------------- Traveller form logic ----------------
+  /* ---------------- Traveller form state ---------------- */
   const [traveller, setTraveller] = useState({
     firstName: "",
     lastName: "",
@@ -194,7 +208,7 @@ export default function OfflineBooking() {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  // ---------------- Mobile verification ----------------
+  /* ---------------- Mobile verification ---------------- */
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -260,7 +274,7 @@ export default function OfflineBooking() {
     }
   };
 
-  // ---------------- State change ----------------
+  /* ---------------- State change ---------------- */
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
     const st = states.find((s) => s.isoCode === code);
@@ -268,7 +282,7 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  // ---------------- Create booking ----------------
+  /* ---------------- Create booking ---------------- */
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -312,7 +326,7 @@ export default function OfflineBooking() {
     }
   };
 
-  // ---------------- Confirm Payment ----------------
+  /* ---------------- Confirm Payment ---------------- */
   const confirmPayment = async () => {
     if (!paymentMethod) return toast.error("Select payment method");
 
@@ -340,6 +354,7 @@ export default function OfflineBooking() {
     }
   };
 
+  /* ---------------- JSX ---------------- */
   return (
     <div className="max-w-5xl p-2">
       <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
@@ -534,17 +549,17 @@ export default function OfflineBooking() {
                     showDateDisplay={false}
                     months={1}
                     direction="horizontal"
-
-                    disabledDay={(date) => isDateDisabled(date)}   // ❌ REMOVE — not supported
-
+                    // Custom day rendering — same look as PropertyDetails
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${disabled
-                              ? "bg-gray-300 text-gray-400 cursor-not-allowed"
+                          className={`relative w-full h-full flex items-center justify-center rounded-full transition-all duration-200 ${
+                            disabled
+                              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                               : "hover:bg-[#efcc61] hover:text-black"
-                            }`}
+                          }`}
+                          title={disabled ? "Unavailable" : ""}
                           onClick={(e) => {
                             if (disabled) {
                               e.stopPropagation();
@@ -557,7 +572,6 @@ export default function OfflineBooking() {
                       );
                     }}
                   />
-
                 </div>
               )}
             </div>
