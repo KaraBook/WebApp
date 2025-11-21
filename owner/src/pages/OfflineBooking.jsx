@@ -42,7 +42,7 @@ export default function OfflineBooking() {
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
-  const [disabledDays, setDisabledDays] = useState([]); 
+  const [disabledDays, setDisabledDays] = useState([]);
 
   const [guestCount, setGuestCount] = useState(1);
   const [price, setPrice] = useState("");
@@ -94,7 +94,7 @@ export default function OfflineBooking() {
     setStates(getIndianStates());
   }, []);
 
-  
+
   useEffect(() => {
     if (!propertyId) return;
 
@@ -117,8 +117,6 @@ export default function OfflineBooking() {
           const start = new Date(range.start.split("T")[0] + "T00:00:00");
           const end = new Date(range.end.split("T")[0] + "T00:00:00");
 
-          end.setDate(end.getDate() + 1);
-
           const days = eachDayOfInterval({ start, end });
           fullList.push(...days);
         });
@@ -130,17 +128,18 @@ export default function OfflineBooking() {
       }
     };
 
+
     loadDates();
   }, [propertyId]);
 
- 
+
   const isDateDisabled = (date) => {
     return disabledDays.some(
       (d) => d.toDateString() === new Date(date).toDateString()
     );
   };
 
-  
+
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
 
@@ -173,87 +172,87 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  
+
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
   const verifyMobile = async () => {
-  if (traveller.mobile.length !== 10)
-    return toast.error("Invalid mobile number");
+    if (traveller.mobile.length !== 10)
+      return toast.error("Invalid mobile number");
 
-  try {
-    const ownerCheck = await api.post(SummaryApi.checkOwnerByMobile.url, {
-      mobile: traveller.mobile,
-    });
-
-    if (ownerCheck.data.exists) {
-      setAllowForm(false);
-
-      setPopupTitle("Not Allowed");
-      setPopupMsg("This mobile belongs to a Resort Owner. Owners cannot be booked as travellers.");
-      setShowPopup(true);
-      return;
-    }
-  } catch (err) {
-    console.error("Owner check failed:", err);
-  }
-
-  setChecking(true);
-
-  try {
-    const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
-      mobile: traveller.mobile,
-    });
-
-    setAllowForm(true);
-
-    if (res.data.exists) {
-      const t = res.data.traveller;
-
-      const st = states.find((s) => s.name === t.state);
-      const iso = st?.isoCode || "";
-
-      setCities(iso ? getCitiesByState(iso) : []);
-      setSelectedStateCode(iso);
-
-      setTraveller({
-        firstName: t.firstName,
-        lastName: t.lastName,
-        email: t.email,
-        mobile: t.mobile,
-        dateOfBirth: t.dateOfBirth?.substring(0, 10),
-        address: t.address,
-        pinCode: t.pinCode,
-        state: t.state,
-        city: t.city,
+    try {
+      const ownerCheck = await api.post(SummaryApi.checkOwnerByMobile.url, {
+        mobile: traveller.mobile,
       });
 
-      setPopupTitle("Traveller Found");
-      setPopupMsg("Traveller details auto-filled.");
-    } else {
-      setTraveller((p) => ({
-        ...p,
-        firstName: "",
-        lastName: "",
-        email: "",
-        address: "",
-        state: "",
-        city: "",
-      }));
+      if (ownerCheck.data.exists) {
+        setAllowForm(false);
 
-      setCities([]);
-      setSelectedStateCode("");
-
-      setPopupTitle("New Traveller");
-      setPopupMsg("Enter traveller details manually.");
+        setPopupTitle("Not Allowed");
+        setPopupMsg("This mobile belongs to a Resort Owner. Owners cannot be booked as travellers.");
+        setShowPopup(true);
+        return;
+      }
+    } catch (err) {
+      console.error("Owner check failed:", err);
     }
 
-    setShowPopup(true);
-  } finally {
-    setChecking(false);
-  }
-};
+    setChecking(true);
+
+    try {
+      const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
+        mobile: traveller.mobile,
+      });
+
+      setAllowForm(true);
+
+      if (res.data.exists) {
+        const t = res.data.traveller;
+
+        const st = states.find((s) => s.name === t.state);
+        const iso = st?.isoCode || "";
+
+        setCities(iso ? getCitiesByState(iso) : []);
+        setSelectedStateCode(iso);
+
+        setTraveller({
+          firstName: t.firstName,
+          lastName: t.lastName,
+          email: t.email,
+          mobile: t.mobile,
+          dateOfBirth: t.dateOfBirth?.substring(0, 10),
+          address: t.address,
+          pinCode: t.pinCode,
+          state: t.state,
+          city: t.city,
+        });
+
+        setPopupTitle("Traveller Found");
+        setPopupMsg("Traveller details auto-filled.");
+      } else {
+        setTraveller((p) => ({
+          ...p,
+          firstName: "",
+          lastName: "",
+          email: "",
+          address: "",
+          state: "",
+          city: "",
+        }));
+
+        setCities([]);
+        setSelectedStateCode("");
+
+        setPopupTitle("New Traveller");
+        setPopupMsg("Enter traveller details manually.");
+      }
+
+      setShowPopup(true);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
@@ -269,7 +268,7 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  
+
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -318,7 +317,7 @@ export default function OfflineBooking() {
     }
   };
 
-  
+
   const confirmPayment = async () => {
     if (!paymentMethod) return toast.error("Select payment method");
 
@@ -554,11 +553,10 @@ export default function OfflineBooking() {
                       const disabled = isDateDisabled(date);
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${
-                            disabled
+                          className={`w-full h-full flex items-center justify-center rounded-full ${disabled
                               ? "bg-red-300 text-white cursor-not-allowed"
                               : "hover:bg-[#efcc61] hover:text-black"
-                          }`}
+                            }`}
                         >
                           {date.getDate()}
                         </div>
