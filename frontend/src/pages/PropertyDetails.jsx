@@ -54,10 +54,11 @@ export default function PropertyDetails() {
 
   const normalizeRanges = (ranges) =>
   ranges.map((r) => {
-    const start = new Date(r.start.split("T")[0] + "T00:00:00");
-    const end = new Date(r.end.split("T")[0] + "T00:00:00");
+    const start = new Date(r.start);
+    const end = new Date(r.end);
 
-    end.setDate(end.getDate() + 1);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
 
     return { start, end };
   });
