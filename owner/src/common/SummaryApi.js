@@ -43,7 +43,7 @@ const SummaryApi = {
         method: "GET",
     },
     getBookedDates: {
-        url: (id) => `${BASE_URL}/api/booking/booked-dates/${id}`,
+        url: (id) => `${BASE_URL}/api/owner/property/${id}/booked-dates`,
         method: "GET",
     },
     addBlockedDates: {

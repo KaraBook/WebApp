@@ -584,3 +584,30 @@ export const checkOwnerByMobile = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+
+export const getBookedDates = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const bookings = await Booking.find({
+      propertyId: id,
+      paymentStatus: "paid", 
+    }).select("checkIn checkOut");
+
+    const formatted = bookings.map((b) => ({
+      start: b.checkIn,
+      end: b.checkOut,
+    }));
+
+    res.json({ success: true, dates: formatted });
+  } catch (err) {
+    console.error("getBookedDates error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to load booked dates",
+      error: err.message,
+    });
+  }
+};

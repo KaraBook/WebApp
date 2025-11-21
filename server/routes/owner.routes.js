@@ -13,6 +13,7 @@ import {
   confirmOfflinePayment,
   checkTravellerByMobile,
   checkOwnerByMobile,
+  getBookedDates,
 } from "../controllers/owner.controller.js";
 import { getBookingInvoice } from "../controllers/bookingController.js";
 import upload from "../middlewares/multer.js";
@@ -41,6 +42,7 @@ router.post("/confirm-offline-payment", requireAuth, confirmOfflinePayment);
 router.post("/check-traveller", requireAuth, checkTravellerByMobile);
 router.get("/invoice/:bookingId", requireAuth, getBookingInvoice);
 router.post("/check-owner-mobile", requireAuth, checkOwnerByMobile);
+router.get("/property/:id/booked-dates", requireAuth, getBookedDates);
 
 
 
