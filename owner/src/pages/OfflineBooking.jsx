@@ -36,17 +36,27 @@ export default function OfflineBooking() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const propertyId = id;
+  const [propertyId] = useState(id || "");
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
   const [disabledDays, setDisabledDays] = useState([]);
+
   const [guestCount, setGuestCount] = useState(1);
   const [price, setPrice] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
+
   const [allowForm, setAllowForm] = useState(false);
+  const [bookingId, setBookingId] = useState(null);
+
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupTitle, setPopupTitle] = useState("");
+  const [popupMsg, setPopupMsg] = useState("");
+
+  const [showCalendar, setShowCalendar] = useState(false);
+  const calendarRef = useRef(null);
 
   const [traveller, setTraveller] = useState({
     firstName: "",
@@ -63,7 +73,7 @@ export default function OfflineBooking() {
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
-      endDate: new Date(Date.now() + 86400000),
+      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
       key: "selection",
     },
   ]);
@@ -71,24 +81,16 @@ export default function OfflineBooking() {
   const nights = Math.max(
     1,
     Math.ceil(
-      (dateRange[0].endDate - dateRange[0].startDate) /
-        (1000 * 60 * 60 * 24)
+      (dateRange[0].endDate - dateRange[0].startDate) / (1000 * 60 * 60 * 24)
     )
   );
 
-  const [showCalendar, setShowCalendar] = useState(false);
-  const calendarRef = useRef(null);
-
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupTitle, setPopupTitle] = useState("");
-  const [popupMsg, setPopupMsg] = useState("");
-
-  // Load states
+  // States
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  // Fetch blocked + booked dates
+  // Load disabled dates
   useEffect(() => {
     if (!propertyId) return;
 
@@ -104,19 +106,21 @@ export default function OfflineBooking() {
         const blocked = blockedRes.data.dates || [];
         const booked = bookedRes.data.dates || [];
 
-        const merged = [];
+        const fullList = [];
 
-        [...blocked, ...booked].forEach((r) => {
-          const s = new Date(r.start);
-          const e = new Date(r.end);
-          s.setHours(0, 0, 0, 0);
-          e.setHours(0, 0, 0, 0);
-          const days = eachDayOfInterval({ start: s, end: e });
-          merged.push(...days);
+        [...blocked, ...booked].forEach((range) => {
+          const start = new Date(range.start);
+          const end = new Date(range.end);
+
+          start.setHours(0, 0, 0, 0);
+          end.setHours(0, 0, 0, 0);
+
+          const days = eachDayOfInterval({ start, end });
+          fullList.push(...days);
         });
 
-        setDisabledDays(merged);
-      } catch (error) {
+        setDisabledDays(fullList);
+      } catch (err) {
         toast.error("Failed to load dates");
       }
     };
@@ -125,83 +129,93 @@ export default function OfflineBooking() {
   }, [propertyId]);
 
   const isDateDisabled = (date) => {
-    return disabledDays.some((d) => d.toDateString() === date.toDateString());
+    return disabledDays.some(
+      (d) => d.toDateString() === new Date(date).toDateString()
+    );
   };
 
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
-    let d = new Date(startDate);
 
+    let d = new Date(startDate);
     while (d <= endDate) {
       if (isDateDisabled(d)) {
-        toast.error("This range contains blocked/unavailable dates");
+        toast.error("Selected range contains unavailable dates.");
         return;
       }
       d.setDate(d.getDate() + 1);
     }
+
     setDateRange([item.selection]);
   };
 
-  // click outside → close calendar
+  // Close calendar on outside click
   useEffect(() => {
-    const handler = (e) => {
+    const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
         setShowCalendar(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  // Verify mobile → load traveller data
+  // Verify mobile
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
 
     try {
-      setChecking(true);
-
-      // Owner check
-      const ownerCheck = await api.post(
-        SummaryApi.checkOwnerByMobile.url,
-        { mobile: traveller.mobile }
-      );
+      const ownerCheck = await api.post(SummaryApi.checkOwnerByMobile.url, {
+        mobile: traveller.mobile,
+      });
 
       if (ownerCheck.data.exists) {
         setAllowForm(false);
         setPopupTitle("Not Allowed");
-        setPopupMsg("This number belongs to a Resort Owner.");
+        setPopupMsg(
+          "This mobile belongs to a Resort Owner. Owners cannot be booked as travellers."
+        );
         setShowPopup(true);
         return;
       }
+    } catch {}
 
-      // Traveller check
-      const t = await api.post(SummaryApi.checkTravellerByMobile.url, {
+    setChecking(true);
+
+    try {
+      const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
         mobile: traveller.mobile,
       });
 
       setAllowForm(true);
 
-      if (t.data.exists) {
-        const data = t.data.traveller;
-        const st = states.find((s) => s.name === data.state);
+      if (res.data.exists) {
+        const t = res.data.traveller;
+        const st = states.find((s) => s.name === t.state);
+        const iso = st?.isoCode || "";
 
-        if (st) {
-          setSelectedStateCode(st.isoCode);
-          setCities(getCitiesByState(st.isoCode));
-        }
+        setCities(iso ? getCitiesByState(iso) : []);
+        setSelectedStateCode(iso);
 
         setTraveller({
-          ...data,
-          dateOfBirth: data.dateOfBirth?.substring(0, 10),
+          firstName: t.firstName,
+          lastName: t.lastName,
+          email: t.email,
+          mobile: t.mobile,
+          dateOfBirth: t.dateOfBirth?.substring(0, 10),
+          address: t.address,
+          pinCode: t.pinCode,
+          state: t.state,
+          city: t.city,
         });
 
         setPopupTitle("Traveller Found");
-        setPopupMsg("Details auto-filled.");
+        setPopupMsg("Traveller details auto-filled.");
       } else {
         setTraveller((p) => ({
           ...p,
@@ -209,13 +223,15 @@ export default function OfflineBooking() {
           lastName: "",
           email: "",
           address: "",
-          city: "",
           state: "",
-          pinCode: "",
+          city: "",
         }));
 
+        setCities([]);
+        setSelectedStateCode("");
+
         setPopupTitle("New Traveller");
-        setPopupMsg("Enter details manually.");
+        setPopupMsg("Enter traveller details manually.");
       }
 
       setShowPopup(true);
@@ -224,25 +240,21 @@ export default function OfflineBooking() {
     }
   };
 
-  const handleStateChange = (iso) => {
-    const st = states.find((s) => s.isoCode === iso);
-    setSelectedStateCode(iso);
-    setCities(getCitiesByState(iso));
-    setTraveller((p) => ({ ...p, state: st.name, city: "" }));
+  const handleStateChange = (code) => {
+    setSelectedStateCode(code);
+
+    const st = states.find((s) => s.isoCode === code);
+
+    setTraveller((p) => ({
+      ...p,
+      state: st?.name || "",
+      city: "",
+    }));
+
+    setCities(getCitiesByState(code));
   };
 
-  // Razorpay script loader
-  const loadRazorpay = () =>
-    new Promise((resolve) => {
-      if (window.Razorpay) return resolve(true);
-      const s = document.createElement("script");
-      s.src = "https://checkout.razorpay.com/v1/checkout.js";
-      s.onload = () => resolve(true);
-      s.onerror = () => resolve(false);
-      document.body.appendChild(s);
-    });
-
-  // ---- MAIN BOOKING FLOW ----
+  // CREATE BOOKING → THEN RAZORPAY PAYMENT
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -256,99 +268,140 @@ export default function OfflineBooking() {
       "city",
     ];
 
-    for (const k of required) {
-      if (!traveller[k]) return toast.error("Fill all fields");
+    for (const f of required) {
+      if (!traveller[f]) return toast.error("Fill all required fields");
     }
 
-    if (!price) return toast.error("Enter price");
-
-    const totalAmount = nights * Number(price);
-    const { startDate, endDate } = dateRange[0];
+    if (!price || Number(price) <= 0)
+      return toast.error("Invalid price");
 
     setLoading(true);
 
     try {
-      // 1️⃣ Create booking
-      const b = await api.post(SummaryApi.ownerOfflineBooking.url, {
+      const totalAmount = nights * Number(price);
+
+      // 1) CREATE BOOKING
+      const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
-        checkIn: startDate,
-        checkOut: endDate,
+        checkIn: dateRange[0].startDate,
+        checkOut: dateRange[0].endDate,
         guests: guestCount,
+        nights,
         totalAmount,
       });
 
-      const bookingId = b.data.booking._id;
+      const bId = res.data.booking._id;
+      setBookingId(bId);
 
-      // 2️⃣ Create Razorpay Order
-      const o = await api.post(SummaryApi.ownerCreateOrder.url, {
-        bookingId,
-        amount: totalAmount,
-      });
+      toast.success("Booking created! Opening payment...");
 
-      const { order } = o.data;
+      // 2) CREATE ORDER
+      const orderRes = await api.post(
+        SummaryApi.ownerCreateOrder.url,
+        {
+          bookingId: bId,
+          amount: totalAmount,
+        }
+      );
 
-      // 3️⃣ Load Razorpay
-      const ok = await loadRazorpay();
-      if (!ok) return toast.error("Razorpay SDK failed.");
+      const { order } = orderRes.data;
 
-      const rzp = new window.Razorpay({
+      // 3) LOAD Razorpay script
+      const load = await loadRazorpayScript();
+      if (!load) {
+        toast.error("Razorpay failed to load");
+        return;
+      }
+
+      const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: "INR",
+        name: "Booking Payment",
+        description: "Offline Booking Payment",
         order_id: order.id,
-        name: "Offline Booking",
+
         handler: async function (response) {
-          await api.post(SummaryApi.ownerVerifyPayment.url, {
-            orderId: response.razorpay_order_id,
-            paymentId: response.razorpay_payment_id,
-            signature: response.razorpay_signature,
-            bookingId,
-          });
+          try {
+            await api.post(SummaryApi.ownerVerifyPayment.url, {
+              bookingId: bId,
+              orderId: response.razorpay_order_id,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+            });
 
-          toast.success("Payment Successful!");
-          navigate("/owner/bookings");
+            toast.success("Payment successful!");
+            navigate("/owner/bookings");
+          } catch {
+            toast.error("Payment verification failed");
+          }
         },
-        theme: { color: "#efcc61" },
-      });
 
+        prefill: {
+          name: traveller.firstName + " " + traveller.lastName,
+          email: traveller.email,
+          contact: traveller.mobile,
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
       rzp.open();
-    } catch (err) {
-      console.error(err);
-      toast.error("Booking or payment failed");
+    } catch {
+      toast.error("Failed to create booking");
     } finally {
       setLoading(false);
     }
   };
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) return resolve(true);
+
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   return (
     <div className="max-w-5xl p-2">
-      <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
+      <h1 className="text-2xl font-semibold mb-8">
+        Create Offline Booking
+      </h1>
 
-      {/* ---- Grid ---- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left: Traveller */}
+        {/* LEFT */}
         <Card>
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-3">
-            {/* Verify Mobile */}
-            <div className="flex gap-2 items-end">
+            {/* MOBILE */}
+            <div className="flex items-end gap-2">
               <div className="flex-1">
                 <Label>Mobile</Label>
                 <Input
-                  maxLength={10}
                   value={traveller.mobile}
                   onChange={(e) =>
-                    handleChange("mobile", e.target.value.replace(/\D/g, ""))
+                    handleChange(
+                      "mobile",
+                      e.target.value.replace(/\D/g, "")
+                    )
                   }
+                  maxLength={10}
+                  placeholder="10-digit number"
+                  className="mt-1"
                 />
               </div>
+
               <Button
                 onClick={verifyMobile}
                 disabled={checking || traveller.mobile.length !== 10}
+                className="bg-[#233b19] hover:bg-[#1b2e13] text-white"
               >
                 {checking ? "Checking..." : "Verify"}
               </Button>
@@ -364,8 +417,10 @@ export default function OfflineBooking() {
                       onChange={(e) =>
                         handleChange("firstName", e.target.value)
                       }
+                      className="mt-1"
                     />
                   </div>
+
                   <div>
                     <Label>Last Name</Label>
                     <Input
@@ -373,33 +428,38 @@ export default function OfflineBooking() {
                       onChange={(e) =>
                         handleChange("lastName", e.target.value)
                       }
+                      className="mt-1"
                     />
                   </div>
                 </div>
 
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={traveller.email}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                />
+                <div>
+                  <Label>Email</Label>
+                  <Input
+                    value={traveller.email}
+                    onChange={(e) =>
+                      handleChange("email", e.target.value)
+                    }
+                    className="mt-1"
+                  />
+                </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label>DOB</Label>
+                    <Label>Date of Birth</Label>
                     <Input
                       type="date"
                       value={traveller.dateOfBirth}
                       onChange={(e) =>
                         handleChange("dateOfBirth", e.target.value)
                       }
+                      className="mt-1"
                     />
                   </div>
 
                   <div>
                     <Label>Pin Code</Label>
                     <Input
-                      maxLength={6}
                       value={traveller.pinCode}
                       onChange={(e) =>
                         handleChange(
@@ -407,15 +467,22 @@ export default function OfflineBooking() {
                           e.target.value.replace(/\D/g, "")
                         )
                       }
+                      maxLength={6}
+                      className="mt-1"
                     />
                   </div>
                 </div>
 
-                <Label>Address</Label>
-                <Input
-                  value={traveller.address}
-                  onChange={(e) => handleChange("address", e.target.value)}
-                />
+                <div>
+                  <Label>Address</Label>
+                  <Input
+                    value={traveller.address}
+                    onChange={(e) =>
+                      handleChange("address", e.target.value)
+                    }
+                    className="mt-1"
+                  />
+                </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -444,10 +511,19 @@ export default function OfflineBooking() {
                     <Label>City</Label>
                     <Select
                       value={traveller.city}
-                      onValueChange={(v) => handleChange("city", v)}
+                      onValueChange={(v) =>
+                        handleChange("city", v)
+                      }
+                      disabled={!cities.length}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select City" />
+                        <SelectValue
+                          placeholder={
+                            cities.length
+                              ? "Select City"
+                              : "Select State first"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {cities.map((c) => (
@@ -464,71 +540,100 @@ export default function OfflineBooking() {
           </CardContent>
         </Card>
 
-        {/* Right: Booking */}
+        {/* RIGHT */}
         <Card>
           <CardHeader>
             <CardTitle>Booking Details</CardTitle>
           </CardHeader>
 
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
+            {/* Dates */}
             <div className="relative">
               <Label>Dates</Label>
-
               <div
-                className="border p-2 rounded cursor-pointer mt-1"
-                onClick={() => setShowCalendar(true)}
+                className="border rounded-lg p-2 cursor-pointer mt-1"
+                onClick={() => setShowCalendar(!showCalendar)}
               >
                 {format(dateRange[0].startDate, "dd MMM")} –{" "}
-                {format(dateRange[0].endDate, "dd MMM")} ({nights} nights)
+                {format(dateRange[0].endDate, "dd MMM")}
               </div>
 
               {showCalendar && (
                 <div
                   ref={calendarRef}
-                  className="absolute bg-white border rounded shadow-xl z-50 mt-2"
+                  className="absolute mt-2 bg-white shadow-xl border rounded-xl z-50"
                 >
                   <DateRange
+                    key={disabledDays.length}
                     ranges={dateRange}
                     onChange={handleDateSelection}
-                    disabledDates={disabledDays}
-                    moveRangeOnFirstSelection={false}
                     minDate={new Date()}
+                    disabledDates={disabledDays}
                     rangeColors={["#efcc61"]}
+                    moveRangeOnFirstSelection={false}
+                    showSelectionPreview={false}
+                    months={1}
+                    direction="horizontal"
+                    dayContentRenderer={(date) => {
+                      const disabled = isDateDisabled(date);
+                      return (
+                        <div
+                          className={`w-full h-full flex items-center justify-center rounded-full ${
+                            disabled
+                              ? "bg-red-300 text-white cursor-not-allowed"
+                              : "hover:bg-[#efcc61] hover:text-black"
+                          }`}
+                        >
+                          {date.getDate()}
+                        </div>
+                      );
+                    }}
                   />
                 </div>
               )}
             </div>
 
-            <Label>Guests</Label>
-            <Input
-              type="number"
-              value={guestCount}
-              onChange={(e) => setGuestCount(Number(e.target.value))}
-              min={1}
-            />
+            {/* Guests */}
+            <div>
+              <Label>Guests</Label>
+              <Input
+                type="number"
+                value={guestCount}
+                onChange={(e) =>
+                  setGuestCount(Number(e.target.value))
+                }
+                min={1}
+                className="mt-1"
+              />
+            </div>
 
-            <Label>Price Per Night (₹)</Label>
-            <Input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            />
+            {/* Price */}
+            <div>
+              <Label>Price / Night</Label>
+              <Input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="mt-1"
+              />
 
-            {price && (
-              <p>
-                Total:{" "}
-                <strong>
-                  ₹{(Number(price) * nights).toLocaleString()}
-                </strong>
-              </p>
-            )}
+              {price && (
+                <p className="mt-2 text-sm">
+                  Total:{" "}
+                  <strong>
+                    ₹{(Number(price) * nights).toLocaleString()}
+                  </strong>
+                </p>
+              )}
+            </div>
 
+            {/* Payment button */}
             <Button
-              className="w-full bg-[#efcc61] hover:bg-[#e6c04f]"
+              className="w-full bg-[#efcc61] hover:bg-[#e6c04f] text-black"
               disabled={loading}
               onClick={handleBooking}
             >
-              {loading ? "Processing..." : "Proceed to Payment"}
+              {loading ? "Creating..." : "Proceed to Payment"}
             </Button>
           </CardContent>
         </Card>
@@ -541,7 +646,10 @@ export default function OfflineBooking() {
             <DialogTitle>{popupTitle}</DialogTitle>
             <DialogDescription>{popupMsg}</DialogDescription>
           </DialogHeader>
-          <Button onClick={() => setShowPopup(false)}>Close</Button>
+
+          <Button onClick={() => setShowPopup(false)} className="mt-4">
+            Close
+          </Button>
         </DialogContent>
       </Dialog>
     </div>
