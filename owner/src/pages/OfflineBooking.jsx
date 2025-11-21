@@ -114,12 +114,16 @@ export default function OfflineBooking() {
         const fullList = [];
 
         [...blocked, ...booked].forEach((range) => {
-          const start = new Date(range.start.split("T")[0] + "T00:00:00");
-          const end = new Date(range.end.split("T")[0] + "T00:00:00");
+          const start = new Date(range.start);
+          const end = new Date(range.end);
+
+          start.setHours(0, 0, 0, 0);
+          end.setHours(0, 0, 0, 0);
 
           const days = eachDayOfInterval({ start, end });
           fullList.push(...days);
         });
+
 
         setDisabledDays(fullList);
       } catch (err) {
@@ -554,8 +558,8 @@ export default function OfflineBooking() {
                       return (
                         <div
                           className={`w-full h-full flex items-center justify-center rounded-full ${disabled
-                              ? "bg-red-300 text-white cursor-not-allowed"
-                              : "hover:bg-[#efcc61] hover:text-black"
+                            ? "bg-red-300 text-white cursor-not-allowed"
+                            : "hover:bg-[#efcc61] hover:text-black"
                             }`}
                         >
                           {date.getDate()}
