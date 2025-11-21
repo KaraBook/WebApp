@@ -388,6 +388,51 @@ export const removeBlockedDates = async (req, res) => {
 };
 
 
+export const createRazorpayOrder = async (req, res) => {
+  try {
+    const { bookingId, amount } = req.body;
+
+    const order = await razorpay.orders.create({
+      amount: amount * 100,
+      currency: "INR",
+      receipt: bookingId,
+    });
+
+    res.json({ success: true, order });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Order create failed" });
+  }
+};
+
+
+export const verifyRazorpayPayment = async (req, res) => {
+  try {
+    const { orderId, paymentId, signature, bookingId } = req.body;
+
+    const expected = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(orderId + "|" + paymentId)
+      .digest("hex");
+
+    if (expected !== signature) {
+      return res.status(400).json({ success: false, message: "Invalid signature" });
+    }
+
+    const booking = await Booking.findById(bookingId);
+
+    booking.paymentMethod = "razorpay";
+    booking.paymentStatus = "paid";
+    booking.paymentId = paymentId;
+    booking.orderId = orderId;
+
+    await booking.save();
+
+    res.json({ success: true, message: "Payment verified" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Payment verification failed" });
+  }
+};
+
 
 export const createOfflineBooking = async (req, res) => {
   try {
@@ -468,8 +513,8 @@ export const createOfflineBooking = async (req, res) => {
       totalAmount: Number(totalAmount),
       bookedBy: ownerId,
       isOffline: true,
-      paymentMethod: "cash",   
-      paymentStatus: "pending"
+      paymentMethod: "razorpay",
+      paymentStatus: "initiated"
     });
 
     return res.json({ success: true, booking });
@@ -481,40 +526,6 @@ export const createOfflineBooking = async (req, res) => {
       message: "Offline booking failed",
       error: err.message,
     });
-  }
-};
-
-
-
-export const confirmOfflinePayment = async (req, res) => {
-  try {
-    const { bookingId, paymentMethod, transactionId, receiptImage } = req.body;
-
-    if (!bookingId || !paymentMethod) {
-      return res.status(400).json({ success: false, message: "Missing payment fields" });
-    }
-
-    const booking = await Booking.findById(bookingId);
-    if (!booking) {
-      return res.status(404).json({ success: false, message: "Booking not found" });
-    }
-
-    booking.paymentMethod = paymentMethod; 
-    booking.offlineTransactionId = transactionId || "";
-    booking.offlineReceiptImage = receiptImage || "";
-    booking.paymentStatus = "paid";
-
-    await booking.save();
-
-    return res.json({
-      success: true,
-      message: "Payment confirmed",
-      booking
-    });
-
-  } catch (err) {
-    console.error("Confirm Payment Error:", err);
-    res.status(500).json({ success: false, message: "Error confirming payment" });
   }
 };
 

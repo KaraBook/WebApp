@@ -11,19 +11,14 @@ const bookingSchema = new mongoose.Schema(
     totalNights: Number,
     totalAmount: Number,
 
-    // Online fields
     paymentId: String,
     orderId: String,
 
-    // Offline fields
     paymentMethod: {
       type: String,
-      enum: ["online", "cash", "upi"],
-      default: "online",
+      enum: ["razorpay", "cash"],
+      default: "razorpay",
     },
-
-    offlineTransactionId: String,
-    offlineReceiptImage: String,
 
     paymentStatus: {
       type: String,
