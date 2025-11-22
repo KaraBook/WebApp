@@ -358,7 +358,7 @@ export default function PropertyDetails() {
               ) : (
                 <div className="space-y-4">
                   {reviews.map((r) => (
-                    <div key={r._id} className="p-4 border rounded-xl bg-gray-50">
+                    <div key={r._id} className="p-4 border bg-gray-50">
                       <div className="flex items-center gap-2">
                         {[...Array(r.rating)].map((_, i) => (
                           <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
@@ -375,7 +375,7 @@ export default function PropertyDetails() {
 
               {/* Submit Review */}
               {user ? (
-                <div className="mt-5 p-4 border rounded-xl bg-white shadow-sm">
+                <div className="mt-5 p-4 border bg-white shadow-sm">
                   <p className="font-semibold mb-2">Write a Review</p>
 
                   {/* Rating Stars */}
@@ -395,7 +395,7 @@ export default function PropertyDetails() {
                   </div>
 
                   <textarea
-                    className="w-full border p-3 rounded-lg"
+                    className="w-full border p-3"
                     rows="3"
                     placeholder="Write your experience..."
                     value={newReview.comment}
@@ -405,7 +405,7 @@ export default function PropertyDetails() {
                   />
 
                   <Button
-                    className="mt-3 bg-black text-white hover:bg-black/80"
+                    className="mt-3 bg-black rounded-[0] text-white hover:bg-black/80"
                     onClick={submitReview}
                   >
                     Submit Review
