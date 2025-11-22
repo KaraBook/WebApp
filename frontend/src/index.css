@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
 
 @layer base {
   :root {
@@ -67,5 +72,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    @apply font-sans;
   }
 }
+
+
+

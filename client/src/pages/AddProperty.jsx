@@ -781,12 +781,35 @@ const AddProperty = () => {
                         </div>
 
                         <div className="w-[48%]">
-                            <TagInput
-                                label="Amenities"
-                                values={formData.amenities}
-                                onChange={(vals) => setFormData((prev) => ({ ...prev, amenities: vals }))}
-                                placeholder="Type and press Enter to add amenities"
-                            />
+                            <label className="block mb-2 text-sm font-medium">Amenities</label>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                {amenitiesOptions.map((item) => {
+                                    const Icon = item.icon;
+                                    const selected = formData.amenities.includes(item.value);
+
+                                    return (
+                                        <button
+                                            key={item.value}
+                                            type="button"
+                                            onClick={() => {
+                                                const exists = formData.amenities.includes(item.value);
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    amenities: exists
+                                                        ? prev.amenities.filter((a) => a !== item.value)
+                                                        : [...prev.amenities, item.value],
+                                                }));
+                                            }}
+                                            className={`flex items-center gap-2 p-3 rounded-lg border transition 
+            ${selected ? "bg-black text-white border-black" : "bg-white border-gray-300"}`}
+                                        >
+                                            <Icon className="w-5 h-5" />
+                                            <span>{item.label}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </>
                 )}

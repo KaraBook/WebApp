@@ -3,8 +3,10 @@ import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
-import { Heart, MapPin, Home, Calendar, ChevronDown } from "lucide-react";
+import { Heart, MapPin, Home, Calendar, ChevronDown, Share2, Star } from "lucide-react";
+import { amenitiesOptions } from "@/constants/dropdownOptions";
 import AmenitiesList from "../components/AmenitiesList";
+import PropertyGallery from "../components/PropertyGallery";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "../store/auth";
 import { DateRange } from "react-date-range";
@@ -37,6 +39,7 @@ export default function PropertyDetails() {
   ]);
 
   const calendarRef = useRef(null);
+  const guestRef = useRef(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -52,19 +55,21 @@ export default function PropertyDetails() {
     fetchProperty();
   }, [id]);
 
+
+
   const normalizeRanges = (ranges) =>
-  ranges.map((r) => {
-    const start = new Date(r.start);
-    const end = new Date(r.end);
+    ranges.map((r) => {
+      const start = new Date(r.start);
+      const end = new Date(r.end);
 
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
 
-    return { start, end };
-  });
+      return { start, end };
+    });
 
 
-    useEffect(() => {
+  useEffect(() => {
     if (!property?._id) return;
 
     const fetchDates = async () => {
@@ -82,24 +87,26 @@ export default function PropertyDetails() {
     fetchDates();
   }, [property]);
 
-  /* ---------------- Click outside to close calendar ---------------- */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
         setShowCalendar(false);
       }
+      if (guestRef.current && !guestRef.current.contains(e.target)) {
+        setShowGuestDropdown(false);
+      }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ---------------- Disable booked + blocked dates ---------------- */
+
   const isDateDisabled = (date) => {
     const all = [...bookedDates, ...blockedDates];
     return all.some((range) => date >= range.start && date <= range.end);
   };
 
-  /* ---------------- Wishlist toggle ---------------- */
   const toggleWishlist = async () => {
     if (!user) return showAuthModal();
     try {
@@ -114,7 +121,6 @@ export default function PropertyDetails() {
     }
   };
 
-  /* ---------------- Reservation ---------------- */
   const handleReserve = () => {
     if (!user) return showAuthModal();
 
@@ -126,7 +132,6 @@ export default function PropertyDetails() {
     });
   };
 
-  /* ---------------- Gallery ---------------- */
   const images = [property?.coverImage, ...(property?.galleryPhotos || [])].filter(Boolean);
 
   const renderGallery = () => {
@@ -149,7 +154,7 @@ export default function PropertyDetails() {
     }
 
     return (
-      <div className="grid grid-cols-2 grid-rows-2 gap-2 rounded-3xl overflow-hidden">
+      <div className="grid grid-cols-2 grid-rows-2 gap-2 overflow-hidden">
         <img src={images[0]} className="col-span-1 row-span-2 w-full h-[400px] object-cover" />
         {images.slice(1, 3).map((img, i) => (
           <img key={i} src={img} className="w-full h-[195px] object-cover" />
@@ -167,199 +172,356 @@ export default function PropertyDetails() {
 
   if (!property) return <div className="text-center py-20">Property not found.</div>;
 
-  /* ---------------- Main Render ---------------- */
   return (
-    <motion.div
-      className="max-w-7xl mx-auto px-4 py-10"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
-      {/* Header */}
-      <div className="flex justify-between mb-2 pr-6">
-        <h1 className="text-3xl font-bold text-[#233b19]">{property.propertyName}</h1>
-        <button
-          onClick={toggleWishlist}
-          className={`p-2 rounded-full border ${
-            wishlist.includes(property._id)
-              ? "bg-red-500 text-white border-red-500"
-              : "border-gray-300 text-gray-600 hover:bg-gray-100"
-          }`}
-        >
-          <Heart className="w-4 h-4" fill={wishlist.includes(property._id) ? "currentColor" : "none"} />
-        </button>
-      </div>
+    <div className="w-full bg-[#fff5f529]">
+      <motion.div
+        className="max-w-7xl mx-auto px-4 py-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-[#233b19] font-sans">
+              {property.propertyName}
+            </h1>
 
-      <div className="text-gray-600 text-sm mb-6">
-        {property.maxGuests} guests · {property.totalRooms} rooms ·{" "}
-        {property.roomTypes?.join(", ")}
-      </div>
+            <div className="flex items-center gap-2 text-[15px] text-gray-800 mt-1">
 
-      {renderGallery()}
+              <span className="flex items-center gap-1 font-medium">
+                <Star className="w-4 h-4 text-black fill-black" />
+                {property.averageRating ? property.averageRating.toFixed(1) : "0.0"}
+              </span>
 
-      <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* LEFT */}
-        <div className="lg:col-span-2">
-          <p className="text-gray-700 leading-relaxed mb-6">{property.description}</p>
+              <span className="text-gray-500">·</span>
 
-          <div className="border-t pt-6 mt-6">
-            <h2 className="text-xl font-semibold flex items-center gap-2 mb-3">
-              <Home className="w-5 h-5" /> Amenities
-            </h2>
-            <AmenitiesList amenities={property.amenities || []} />
+              <span className="cursor-pointer">
+                {property.reviewCount || 0} reviews
+              </span>
+
+              <span className="text-gray-500">·</span>
+
+              {property.city && property.state && (
+                <a
+                  href={property.locationLink || "#"}
+                  className="underline text-gray-800 hover:text-black"
+                >
+                  {property.city}, {property.state}
+                </a>
+              )}
+            </div>
           </div>
 
-          <div className="border-t pt-6 mt-6">
-            <h2 className="text-xl font-semibold flex items-center gap-2 mb-3">
-              <MapPin className="w-5 h-5" /> Location
-            </h2>
-            <p className="text-gray-700 mb-2">
-              {property.city}, {property.state}
-            </p>
-            <a
-              href={property.locationLink}
-              target="_blank"
-              className="underline text-sm text-[#233b19]"
+          <div className="flex items-center gap-5 pr-2">
+
+            <button
+              onClick={toggleWishlist}
+              className="flex items-center gap-1 text-gray-700 hover:text-black"
             >
-              View on Google Maps
-            </a>
+              <Heart
+                className={`w-4 h-4 ${wishlist.includes(property._id)
+                  ? "fill-red-500 text-red-500"
+                  : "fill-none"
+                  }`}
+              />
+              <span className="text-sm font-bold">
+                {wishlist.includes(property._id) ? "Saved" : "Save"}
+              </span>
+            </button>
+
+            <button
+              className="flex items-center gap-1 text-gray-700 hover:text-black"
+              onClick={() => {
+                navigator.share
+                  ? navigator.share({
+                    title: property.propertyName,
+                    text: "Check out this property",
+                    url: window.location.href,
+                  })
+                  : window.open(window.location.href, "_blank");
+              }}
+            >
+              <Share2 className="w-4 h-4" />
+              <span className="text-sm font-bold">Share</span>
+            </button>
+
           </div>
         </div>
 
-        {/* RIGHT BOOKING BOX */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-24 border rounded-2xl shadow-md p-5">
-            <div className="flex justify-between mb-3">
-              <h3 className="text-2xl font-semibold text-[#233b19]">
-                ₹{property.pricingPerNightWeekdays?.toLocaleString()}
-                <span className="text-sm text-gray-500"> / night</span>
-              </h3>
+
+        {images.length > 0 && <PropertyGallery images={images} />}
+
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* LEFT */}
+          <div className="lg:col-span-2">
+            <p className="text-gray-700 leading-relaxed mb-6">{property.description}</p>
+
+            <div className="border-t pt-6 mt-6">
+              <h2 className="text-xl font-semibold flex items-center gap-2 mb-3">
+                <Home className="w-5 h-5" /> Amenities
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                {property.amenities.map((a) => {
+                  const findAmenity = amenitiesOptions.find((x) => x.value === a);
+                  if (!findAmenity) return null;
+
+                  const Icon = findAmenity.icon;
+
+                  return (
+                    <div key={a} className="flex items-center gap-2 text-gray-800">
+                      <Icon className="w-5 h-5" />
+                      <span>{findAmenity.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Calendar */}
-            <div className="relative mb-4" ref={calendarRef}>
-              <label className="text-xs text-gray-500 uppercase ml-1">
-                Check-in / Check-out
-              </label>
-
-              <div
-                className="flex justify-between border border-gray-300 rounded-full px-4 py-2 mt-1 cursor-pointer hover:border-black"
-                onClick={() => setShowCalendar(!showCalendar)}
-              >
-                <span className="text-gray-700 text-sm font-medium">
-                  {`${format(dateRange[0].startDate, "MMM d")} - ${format(
-                    dateRange[0].endDate,
-                    "MMM d"
-                  )}`}
-                </span>
-                <Calendar className="w-4 h-4 text-gray-500" />
-              </div>
-
-              {showCalendar && (
-                <div className="absolute top-[70px] left-0 bg-white p-4 rounded-2xl shadow-2xl border z-50">
-                  <DateRange
-                    ranges={dateRange}
-                    minDate={new Date()}
-                    rangeColors={["#efcc61"]}
-                    months={1}
-                    direction="horizontal"
-                    moveRangeOnFirstSelection={false}
-                    showDateDisplay={false}
-                    showSelectionPreview={false}
-                    onChange={(item) => {
-                      const start = item.selection.startDate;
-                      const end = item.selection.endDate;
-
-                      // validate full range
-                      const current = new Date(start);
-                      let invalid = false;
-                      while (current <= end) {
-                        if (isDateDisabled(current)) invalid = true;
-                        current.setDate(current.getDate() + 1);
-                      }
-
-                      if (invalid) {
-                        toast.error("These dates are unavailable!");
-                        return;
-                      }
-
-                      setDateRange([item.selection]);
-                    }}
-                    dayContentRenderer={(date) => {
-                      const disabled = isDateDisabled(date);
-
-                      return (
-                        <div
-                          onClick={(e) => {
-                            if (disabled) {
-                              e.stopPropagation();
-                              toast.error("These dates are unavailable!");
-                            }
-                          }}
-                          className={`w-full h-full flex items-center justify-center rounded-full
-                            ${
-                              disabled
-                                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                : "hover:bg-[#efcc61] hover:text-black"
-                            }
-                          `}
-                        >
-                          {date.getDate()}
-                        </div>
-                      );
-                    }}
-                  />
+            <div className="border-t pt-6 mt-6">
+              <h2 className="text-xl font-semibold flex items-center gap-2 mb-3">
+                <MapPin className="w-5 h-5" /> Location
+              </h2>
+              <p className="text-gray-700 mb-2">
+                {property.city}, {property.state}
+              </p>
+              <div className="w-full h-64 mt-3 overflow-hidden rounded-xl">
+                <div className="w-full h-full" style={{ filter: "grayscale(100%)" }}>
+                  <iframe
+                    src={`https://www.google.com/maps?q=${encodeURIComponent(
+                      property.addressLine1 +
+                      " " +
+                      property.city +
+                      " " +
+                      property.state
+                    )}&output=embed`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    allowFullScreen
+                  ></iframe>
                 </div>
-              )}
+              </div>
             </div>
+          </div>
 
-            {/* Guests */}
-            <div className="relative mt-4">
-              <label className="text-xs text-gray-500 uppercase ml-1">Guests</label>
-              <div
-                onClick={() => setShowGuestDropdown(!showGuestDropdown)}
-                className="flex justify-between border border-gray-300 rounded-full px-4 py-2 mt-1 cursor-pointer hover:border-black"
-              >
-                <span className="text-gray-700 text-sm font-medium">
-                  {guestCount} {guestCount > 1 ? "guests" : "guest"}
-                </span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+          {/* RIGHT BOOKING BOX */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 border shadow-xl p-6 bg-white">
+
+              <div className="flex items-center justify-between">
+                <h3 className="text-3xl font-semibold text-[#233b19]">
+                  ₹{property.pricingPerNightWeekdays?.toLocaleString()}
+                  <span className="text-sm text-gray-600 font-normal"> / night</span>
+                </h3>
+
+                <div className="flex items-center gap-1 text-sm text-gray-700">
+                  <Star className="w-4 h-4 text-black fill-black" />
+                  <span>{property.averageRating?.toFixed(1) || "0.0"}</span>
+                  <span className="underline cursor-pointer text-gray-500">
+                    {property.reviewCount || 0} reviews
+                  </span>
+                </div>
               </div>
 
-              {showGuestDropdown && (
-                <div className="absolute mt-2 right-0 bg-white border rounded-2xl shadow-xl p-3 z-50 w-40">
-                  {[...Array(property.maxGuests)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        setGuestCount(i + 1);
-                        setShowGuestDropdown(false);
+              <div className="mt-5 relative" ref={calendarRef}>
+
+                <div
+                  onClick={() => {
+                    setShowCalendar(true);
+                    setShowGuestDropdown(false);
+                  }}
+                  className="grid grid-cols-2 border border-gray-300 overflow-hidden cursor-pointer"
+                >
+                  <div className="border-r p-3 bg-white hover:bg-gray-50">
+                    <label className="text-[10px] uppercase text-gray-500">Check-in</label>
+                    <p className="text-sm font-medium text-gray-900">
+                      {format(dateRange[0].startDate, "MMM d, yyyy")}
+                    </p>
+                  </div>
+
+                  <div className="p-3 bg-white hover:bg-gray-50">
+                    <label className="text-[10px] uppercase text-gray-500">Check-out</label>
+                    <p className="text-sm font-medium text-gray-900">
+                      {format(dateRange[0].endDate, "MMM d, yyyy")}
+                    </p>
+                  </div>
+                </div>
+
+                {showCalendar && (
+                  <div
+                    className="
+      absolute mt-3 bg-white border shadow-2xl
+      z-[999] p-4 w-[650px] max-w-[90vw] right-0
+    "
+                  >
+                    <DateRange
+                      ranges={dateRange}
+                      months={2}
+                      direction="horizontal"
+                      showDateDisplay={false}
+                      moveRangeOnFirstSelection={false}
+                      rangeColors={["#000"]}
+                      minDate={new Date()}
+
+                      dayContentRenderer={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        const isPast = date < today;
+                        const isBlocked = isDateDisabled(date);
+
+                        const disabled = isPast || isBlocked;
+
+                        const isSelected =
+                          date >= dateRange[0].startDate && date <= dateRange[0].endDate;
+
+                        return (
+                          <div
+                            onClick={(e) => {
+                              if (disabled) {
+                                e.stopPropagation();
+                                toast.error("This date is unavailable");
+                              }
+                            }}
+                            className={`
+        flex items-center justify-center w-full h-full rounded-full
+        ${disabled ? "bg-gray-200 text-gray-400 cursor-not-allowed" : ""}
+        ${!disabled && !isSelected ? "hover:bg-black hover:text-white cursor-pointer" : ""}
+        ${isSelected ? "bg-black text-white font-semibold" : ""}
+      `}
+                          >
+                            {date.getDate()}
+                          </div>
+                        );
                       }}
-                      className={`block w-full text-left px-3 py-2 rounded-lg text-sm 
-                        ${
-                          guestCount === i + 1
-                            ? "bg-[#efcc61] text-black font-semibold"
-                            : "hover:bg-gray-100 text-gray-700"
+
+
+                      onChange={(item) => {
+                        const start = item.selection.startDate;
+                        const end = item.selection.endDate;
+
+                        let invalid = false;
+                        let curr = new Date(start);
+
+                        while (curr <= end) {
+                          if (isDateDisabled(curr)) invalid = true;
+                          curr.setDate(curr.getDate() + 1);
                         }
-                      `}
-                    >
-                      {i + 1} {i === 0 ? "Guest" : "Guests"}
-                    </button>
-                  ))}
+
+                        if (invalid) {
+                          toast.error("These dates include unavailable days!");
+                          return;
+                        }
+
+                        setDateRange([item.selection]);
+
+                        if (item.selection.startDate !== item.selection.endDate) {
+                          setShowCalendar(false);
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+              </div>
+
+
+              <div className="mt-4 border border-gray-300 p-3 relative" ref={guestRef}>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase">Guests</label>
+
+                <div
+                  onClick={() => setShowGuestDropdown(!showGuestDropdown)}
+                  className="flex justify-between items-center cursor-pointer mt-1"
+                >
+                  <span className="text-sm font-medium text-gray-900">
+                    {guestCount} {guestCount > 1 ? "guests" : "guest"}
+                  </span>
+                  <ChevronDown className="w-4 h-4 text-gray-600" />
                 </div>
-              )}
+
+                {showGuestDropdown && (
+                  <div className="absolute left-0 w-full bg-white border shadow-xl p-3 mt-2 z-[999]">
+                    {Array.from({ length: property.maxGuests }).map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setGuestCount(i + 1);
+                          setShowGuestDropdown(false);
+                        }}
+                        className={`block w-full text-left px-3 py-2 text-sm ${guestCount === i + 1
+                          ? "bg-black text-white font-semibold"
+                          : "hover:bg-gray-100 text-gray-700"
+                          }`}
+                      >
+                        {i + 1} {i === 0 ? "Guest" : "Guests"}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+
+              <div className="mt-6 text-sm text-gray-700">
+                <div className="flex justify-between mb-1">
+                  <span>
+                    ₹{property.pricingPerNightWeekdays} ×{" "}
+                    {Math.max(
+                      1,
+                      Math.ceil(
+                        (dateRange[0].endDate - dateRange[0].startDate) / (1000 * 60 * 60 * 24)
+                      )
+                    )}{" "}
+                    nights
+                  </span>
+
+                  <span className="font-medium text-gray-900">
+                    ₹
+                    {property.pricingPerNightWeekdays *
+                      Math.max(
+                        1,
+                        Math.ceil(
+                          (dateRange[0].endDate - dateRange[0].startDate) /
+                          (1000 * 60 * 60 * 24)
+                        )
+                      )}
+                  </span>
+                </div>
+
+
+                <div className="flex justify-between font-semibold text-lg border-t pt-3">
+                  <span>Total</span>
+                  <span>
+                    ₹
+                    {property.pricingPerNightWeekdays *
+                      Math.max(
+                        1,
+                        Math.ceil(
+                          (dateRange[0].endDate - dateRange[0].startDate) /
+                          (1000 * 60 * 60 * 24)
+                        )
+                      )}
+                  </span>
+                </div>
+              </div>
+
+
+              <Button
+                onClick={handleReserve}
+                className="w-full mt-4 bg-black text-white rounded-[0px] py-5 text-lg hover:bg-black/90"
+              >
+                Reserve →
+              </Button>
+
+              <p className="text-center text-xs text-gray-500 mt-2">
+                You won’t be charged yet
+              </p>
             </div>
-
-            <Button
-              onClick={handleReserve}
-              className="w-full mt-5 bg-[#efcc61] text-black rounded-full py-3 text-lg"
-            >
-              Reserve
-            </Button>
-
-            <p className="text-center text-xs text-gray-500 mt-2">You won’t be charged yet</p>
           </div>
+
+
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

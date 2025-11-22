@@ -754,13 +754,38 @@ const EditProperty = () => {
             </div>
 
             <div className="w-[48%]">
-              <MultiSelectButtons
-                label="Amenities"
-                options={amenitiesOptions}
-                selected={formData.amenities}
-                onChange={(selected) => setFormData((prev) => ({ ...prev, amenities: selected }))}
-              />
+              <label className="block text-sm mb-2 font-medium">Amenities</label>
+
+              <div className="flex flex-wrap gap-2">
+                {amenitiesOptions.map((item) => {
+                  const Icon = item.icon; // IMPORTANT
+                  const isSelected = formData.amenities.includes(item.value);
+
+                  return (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => {
+                          const nowSelected = prev.amenities.includes(item.value)
+                            ? prev.amenities.filter((a) => a !== item.value)
+                            : [...prev.amenities, item.value];
+
+                          return { ...prev, amenities: nowSelected };
+                        });
+                      }}
+                      className={`flex items-center gap-2 px-3 py-2 border rounded-md text-sm
+            ${isSelected ? "bg-black text-white border-black" : "bg-gray-100 text-gray-700"}
+          `}
+                    >
+                      <Icon size={16} />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
           </>
         )}
 

@@ -1,84 +1,114 @@
-import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import { ZoomIn, ZoomOut, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogContent,
+} from "@/components/ui/dialog";
 
-export default function PropertyGalleryModal({ images = [], onClose }) {
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
+export default function PropertyGalleryModal({ images = [], open, onClose }) {
   const [current, setCurrent] = useState(0);
-  const [zoom, setZoom] = useState(1);
 
-  const nextSlide = () => setCurrent((prev) => (prev + 1) % images.length);
-  const prevSlide = () => setCurrent((prev) => (prev - 1 + images.length) % images.length);
+  const nextSlide = () => setCurrent((i) => (i + 1) % images.length);
+  const prevSlide = () => setCurrent((i) => (i - 1 + images.length) % images.length);
 
-  const toggleZoom = (type) => {
-    setZoom((z) => (type === "in" ? z + 0.2 : Math.max(1, z - 0.2)));
-  };
+  const handleKeys = useCallback((e) => {
+    if (e.key === "ArrowRight") nextSlide();
+    if (e.key === "ArrowLeft") prevSlide();
+    if (e.key === "Escape") onClose();
+  }, []);
+
+  useEffect(() => {
+    if (open) document.addEventListener("keydown", handleKeys);
+    return () => document.removeEventListener("keydown", handleKeys);
+  }, [open]);
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent
-        className="p-0 bg-black border-0 max-w-[95vw] max-h-[95vh] overflow-hidden rounded-2xl flex items-center justify-center relative"
-      >
-        <div className="absolute top-4 right-4 flex gap-2 z-20">
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={() => toggleZoom("in")}
-            className="bg-white/10 hover:bg-white/20 text-white rounded-full"
-          >
-            <ZoomIn size={18} />
-          </Button>
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={() => toggleZoom("out")}
-            className="bg-white/10 hover:bg-white/20 text-white rounded-full"
-          >
-            <ZoomOut size={18} />
-          </Button>
-          <Button
-            variant="secondary"
-            size="icon"
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogPortal>
+
+        <DialogOverlay className="max-w-full fixed inset-0 bg-black/80 z-[9998]" />
+
+        <DialogContent
+          className="
+            fixed inset-0 
+            bg-transparent 
+            p-0 m-0 
+            max-w-full
+            border-none shadow-none 
+            w-screen h-screen 
+            z-[9999]
+            !transform-none !left-0 !top-0
+            !flex-none !items-start !justify-start
+          "
+        >
+
+          {/* CLOSE BUTTON */}
+          <button
             onClick={onClose}
-            className="bg-white/10 hover:bg-white/20 text-white rounded-full"
+            className="absolute top-6 right-6 z-[10000] bg-white/20 hover:bg-white/30 
+                       text-white p-2"
           >
-            <X size={18} />
-          </Button>
-        </div>
+            <X size={26} />
+          </button>
 
-        {images.length > 1 && (
-          <>
-            <Button
-              variant="secondary"
-              size="icon"
+          {/* LEFT ARROW */}
+          {images.length > 1 && (
+            <button
               onClick={prevSlide}
-              className="absolute left-4 bg-white/10 hover:bg-white/20 text-white rounded-full z-10"
+              className="absolute left-6 top-1/2 -translate-y-1/2 z-[10000] 
+                         bg-white/20 hover:bg-white/30 p-3 text-white"
             >
-              <ChevronLeft size={22} />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={nextSlide}
-              className="absolute right-4 bg-white/10 hover:bg-white/20 text-white rounded-full z-10"
-            >
-              <ChevronRight size={22} />
-            </Button>
-          </>
-        )}
+              <ChevronLeft size={34} />
+            </button>
+          )}
 
-        <motion.img
-          key={current}
-          src={images[current]}
-          alt={`Image ${current + 1}`}
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: zoom }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="max-w-full max-h-[90vh] object-contain mx-auto select-none"
-        />
-      </DialogContent>
+          {/* RIGHT ARROW */}
+          {images.length > 1 && (
+            <button
+              onClick={nextSlide}
+              className="absolute right-6 top-1/2 -translate-y-1/2 z-[10000] 
+                         bg-white/20 hover:bg-white/30 p-3 text-white"
+            >
+              <ChevronRight size={34} />
+            </button>
+          )}
+
+          {/* PERFECTLY CENTERED IMAGE */}
+          <div className="fixed inset-0 flex items-center justify-center z-[9999] pointer-events-none">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={current}
+                src={images[current]}
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="max-h-[90vh] max-w-[90vw] object-contain mx-auto pointer-events-none"
+              />
+            </AnimatePresence>
+          </div>
+
+          {/* THUMBNAILS */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[10000] 
+                          flex gap-3 bg-black/40 p-3 backdrop-blur">
+            {images.map((img, i) => (
+              <img
+                key={i}
+                src={img}
+                onClick={() => setCurrent(i)}
+                className={`w-20 h-20 object-cover cursor-pointer border 
+                  ${i === current ? "border-white" : "border-transparent opacity-60 hover:opacity-100"}
+                `}
+              />
+            ))}
+          </div>
+
+        </DialogContent>
+      </DialogPortal>
     </Dialog>
   );
 }
