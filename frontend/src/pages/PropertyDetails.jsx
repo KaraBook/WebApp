@@ -361,7 +361,7 @@ export default function PropertyDetails() {
                     <div key={r._id} className="p-4 border bg-gray-50">
                       <div className="flex items-center gap-2">
                         {[...Array(r.rating)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                          <Star key={i} className="w-4 h-4 text-black-500 fill-black-500" />
                         ))}
                       </div>
                       <p className="text-gray-800 mt-2">{r.comment}</p>
