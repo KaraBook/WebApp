@@ -22,6 +22,11 @@ export default function PropertyDetails() {
   const [loading, setLoading] = useState(true);
   const { wishlist, setWishlist, user, showAuthModal, accessToken } = useAuthStore();
   const navigate = useNavigate();
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({
+    rating: 0,
+    comment: "",
+  });
 
   const [bookedDates, setBookedDates] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
@@ -72,6 +77,14 @@ export default function PropertyDetails() {
   useEffect(() => {
     if (!property?._id) return;
 
+    const fetchReviews = async () => {
+      try {
+        const res = await Axios.get(SummaryApi.getPropertyReviews.url(property._id));
+        setReviews(res.data.data || []);
+      } catch (err) {
+        console.log("Failed to load reviews");
+      }
+    };
     const fetchDates = async () => {
       try {
         const bookedRes = await Axios.get(SummaryApi.getBookedDates.url(property._id));
@@ -84,6 +97,7 @@ export default function PropertyDetails() {
       }
     };
 
+    fetchReviews();
     fetchDates();
   }, [property]);
 
@@ -100,6 +114,33 @@ export default function PropertyDetails() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+
+  const submitReview = async () => {
+    if (!newReview.rating) return toast.error("Please select a rating");
+
+    try {
+      const res = await Axios.post(
+        SummaryApi.addReview.url,
+        {
+          propertyId: property._id,
+          rating: newReview.rating,
+          comment: newReview.comment,
+        },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      toast.success("Review submitted!");
+      setNewReview({ rating: 0, comment: "" });
+      const updated = await Axios.get(SummaryApi.getPropertyReviews.url(property._id));
+      setReviews(updated.data.data);
+
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to submit review");
+    }
+  };
 
 
   const isDateDisabled = (date) => {
@@ -303,6 +344,86 @@ export default function PropertyDetails() {
                 </div>
               </div>
             </div>
+
+
+            {/* REVIEWS SECTION */}
+            <div className="border-t pt-6 mt-6">
+              <h2 className="text-xl font-semibold flex items-center gap-2 mb-3">
+                <Star className="w-5 h-5 text-black fill-black" /> Reviews
+              </h2>
+
+              {/* Existing Reviews */}
+              {reviews.length === 0 ? (
+                <p className="text-gray-600">No reviews yet. Be the first to review!</p>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((r) => (
+                    <div key={r._id} className="p-4 border rounded-xl bg-gray-50">
+                      <div className="flex items-center gap-2">
+                        {[...Array(r.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        ))}
+                      </div>
+                      <p className="text-gray-800 mt-2">{r.comment}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        — {r.userId?.name || "Traveller"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Submit Review */}
+              {user ? (
+                <div className="mt-5 p-4 border rounded-xl bg-white shadow-sm">
+                  <p className="font-semibold mb-2">Write a Review</p>
+
+                  {/* Rating Stars */}
+                  <div className="flex gap-2 mb-3">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-6 h-6 cursor-pointer ${star <= newReview.rating
+                            ? "text-yellow-500 fill-yellow-500"
+                            : "text-gray-400"
+                          }`}
+                        onClick={() =>
+                          setNewReview((prev) => ({ ...prev, rating: star }))
+                        }
+                      />
+                    ))}
+                  </div>
+
+                  <textarea
+                    className="w-full border p-3 rounded-lg"
+                    rows="3"
+                    placeholder="Write your experience..."
+                    value={newReview.comment}
+                    onChange={(e) =>
+                      setNewReview((prev) => ({ ...prev, comment: e.target.value }))
+                    }
+                  />
+
+                  <Button
+                    className="mt-3 bg-black text-white hover:bg-black/80"
+                    onClick={submitReview}
+                  >
+                    Submit Review
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600 mt-3">
+                  <button
+                    className="underline font-semibold"
+                    onClick={showAuthModal}
+                  >
+                    Login
+                  </button>{" "}
+                  to write a review.
+                </p>
+              )}
+            </div>
+
           </div>
 
           {/* RIGHT BOOKING BOX */}
