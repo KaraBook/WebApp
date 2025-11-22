@@ -325,7 +325,7 @@ export default function PropertyDetails() {
               <p className="text-gray-700 mb-2">
                 {property.city}, {property.state}
               </p>
-              <div className="w-full h-64 mt-3 overflow-hidden rounded-xl">
+              <div className="w-full h-64 mt-3 overflow-hidden">
                 <div className="w-full h-full" style={{ filter: "grayscale(100%)" }}>
                   <iframe
                     src={`https://www.google.com/maps?q=${encodeURIComponent(
