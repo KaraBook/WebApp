@@ -384,7 +384,7 @@ export default function PropertyDetails() {
                       <Star
                         key={star}
                         className={`w-6 h-6 cursor-pointer ${star <= newReview.rating
-                            ? "text-black-500 fill-yellow-500"
+                            ? "text-black-500 fill-black-500"
                             : "text-gray-400"
                           }`}
                         onClick={() =>
