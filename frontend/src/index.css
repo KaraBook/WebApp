@@ -84,4 +84,8 @@
 .rdrInRange, .rdrStartEdge, .rdrEndEdge {
   background-color: #00000000!important;   
 }
+.break-inside-avoid {
+  break-inside: avoid-column;
+}
+
 
