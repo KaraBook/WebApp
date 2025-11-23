@@ -17,32 +17,32 @@ export default function PropertyCard({ property }) {
   );
 
   const toggleWishlist = async () => {
-  if (!user) {
-    showAuthModal();
-    return;
-  }
-
-  try {
-    const res = await Axios.post(
-      SummaryApi.toggleWishlist.url,
-      { propertyId: property._id },
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-
-    const updated = res.data.data.properties.map((id) => id.toString());
-    setWishlist(updated);
-
-    const isAdded = updated.includes(property._id);
-
-    if (isAdded) {
-      toast.success("Added to wishlist");
-    } else {
-      toast.success("Removed from wishlist");
+    if (!user) {
+      showAuthModal();
+      return;
     }
-  } catch (err) {
-    toast.error("Failed to update wishlist");
-  }
-};
+
+    try {
+      const res = await Axios.post(
+        SummaryApi.toggleWishlist.url,
+        { propertyId: property._id },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+
+      const updated = res.data.data.properties.map((id) => id.toString());
+      setWishlist(updated);
+
+      const isAdded = updated.includes(property._id);
+
+      if (isAdded) {
+        toast.success("Added to wishlist");
+      } else {
+        toast.success("Removed from wishlist");
+      }
+    } catch (err) {
+      toast.error("Failed to update wishlist");
+    }
+  };
 
 
   return (
@@ -50,26 +50,24 @@ export default function PropertyCard({ property }) {
 
       <div className="p-2 relative">
         <div className="relative">
-         <Link to={`/properties/${property._id}`}>
-          <img
-            src={property.coverImage}
-            alt={property.propertyName}
-            className="w-full max-h-[200px] h-[200px] object-cover transition-transform duration-500 hover:scale-105"
-          />
+          <Link to={`/properties/${property._id}`}>
+            <img
+              src={property.coverImage}
+              alt={property.propertyName}
+              className="w-full max-h-[200px] h-[200px] object-cover transition-transform duration-500 hover:scale-105"
+            />
           </Link>
 
           <button
             onClick={toggleWishlist}
-            className={`absolute top-3 right-3 p-0 transition-all duration-300 shadow-sm ${inWishlist
-              ? "bg-black-500 text-white"
-              : "bg-transparent text-white"
-              }`}
+            className="absolute top-3 right-3 p-1 bg-white/40 backdrop-blur-md rounded-full transition"
           >
             <Heart
-              className="w-5 h-5 fill-white"
-              fill={inWishlist ? "red" : "none"}
+              className={`w-5 h-5 transition ${inWishlist ? "text-red-500 fill-red-500" : "text-white fill-none"
+                }`}
             />
           </button>
+
 
           <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-gray-800 text-xs font-medium px-3 py-1 shadow-sm flex items-center gap-1">
             <Home className="w-3 h-3 text-gray-500" />
@@ -81,9 +79,9 @@ export default function PropertyCard({ property }) {
       <CardContent className="px-4 pb-0">
         <div className="flex justify-between items-center">
           <Link to={`/properties/${property._id}`}>
-          <h3 className="text-base font-semibold text-gray-900 mt-1">
-            {property.propertyName || "Property Name"}
-          </h3>
+            <h3 className="text-base font-semibold text-gray-900 mt-1">
+              {property.propertyName || "Property Name"}
+            </h3>
           </Link>
 
           <div className="flex items-center text-yellow-400 text-sm mt-1">
