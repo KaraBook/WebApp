@@ -6,6 +6,10 @@ import SummaryApi from "../common/SummaryApi";
 import { Heart, MapPin, Home, Calendar, ChevronDown, Share2, Star } from "lucide-react";
 import { amenitiesOptions } from "@/constants/dropdownOptions";
 import AmenitiesList from "../components/AmenitiesList";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import { Navigation } from "swiper/modules";
 import PropertyGallery from "../components/PropertyGallery";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "../store/auth";
@@ -237,8 +241,9 @@ export default function PropertyDetails() {
               <span className="text-gray-500">·</span>
 
               <span className="cursor-pointer">
-                {property.reviewCount || 0} reviews
+                {reviews.length} reviews
               </span>
+
 
               <span className="text-gray-500">·</span>
 
@@ -261,7 +266,7 @@ export default function PropertyDetails() {
             >
               <Heart
                 className={`w-4 h-4 ${wishlist.includes(property._id)
-                  ? "fill-red-500 text-red-500"
+                  ? "fill-black text-black"
                   : "fill-none"
                   }`}
               />
@@ -352,39 +357,17 @@ export default function PropertyDetails() {
                 <Star className="w-5 h-5 text-black fill-black" /> Reviews
               </h2>
 
-              {/* Existing Reviews */}
-              {reviews.length === 0 ? (
-                <p className="text-gray-600">No reviews yet. Be the first to review!</p>
-              ) : (
-                <div className="space-y-4">
-                  {reviews.map((r) => (
-                    <div key={r._id} className="p-4 border bg-gray-50">
-                      <div className="flex items-center gap-2">
-                        {[...Array(r.rating)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 text-black-500 fill-black-500" />
-                        ))}
-                      </div>
-                      <p className="text-gray-800 mt-2">{r.comment}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        — {r.userId?.name || "Traveller"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Submit Review */}
+              {/* Submit Review Section FIRST */}
               {user ? (
                 <div className="mt-5 p-4 border bg-white shadow-sm">
                   <p className="font-semibold mb-2">Write a Review</p>
 
-                  {/* Rating Stars */}
                   <div className="flex gap-2 mb-3">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
                         className={`w-6 h-6 cursor-pointer ${star <= newReview.rating
-                            ? "text-black-500 fill-black-500"
+                            ? "text-black fill-black"
                             : "text-gray-400"
                           }`}
                         onClick={() =>
@@ -413,16 +396,50 @@ export default function PropertyDetails() {
                 </div>
               ) : (
                 <p className="text-sm text-gray-600 mt-3">
-                  <button
-                    className="underline font-semibold"
-                    onClick={showAuthModal}
-                  >
+                  <button className="underline font-semibold" onClick={showAuthModal}>
                     Login
                   </button>{" "}
                   to write a review.
                 </p>
               )}
+
+              {/* Carousel AFTER review form */}
+              <div className="mt-8">
+                {reviews.length === 0 ? (
+                  <p className="text-gray-600">No reviews yet. Be the first to review!</p>
+                ) : (
+                  <Swiper
+                    modules={[Navigation]}
+                    navigation
+                    spaceBetween={20}
+                    slidesPerView={1}
+                    className="mySwiper z-0"
+                  >
+                    {reviews.map((r) => (
+                      <SwiperSlide key={r._id}>
+                        <div className="p-5 border bg-gray-50 shadow-sm">
+                          <div className="flex items-center gap-2">
+                            {[...Array(r.rating)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className="w-4 h-4 text-black fill-black"
+                              />
+                            ))}
+                          </div>
+
+                          <p className="text-gray-800 mt-2">{r.comment}</p>
+
+                          <p className="text-xs text-gray-500 mt-1">
+                            — {r.userId?.name || "Traveller"}
+                          </p>
+                        </div>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                )}
+              </div>
             </div>
+
 
           </div>
 
@@ -440,7 +457,7 @@ export default function PropertyDetails() {
                   <Star className="w-4 h-4 text-black fill-black" />
                   <span>{property.averageRating?.toFixed(1) || "0.0"}</span>
                   <span className="underline cursor-pointer text-gray-500">
-                    {property.reviewCount || 0} reviews
+                    {reviews.length} reviews
                   </span>
                 </div>
               </div>
@@ -507,9 +524,9 @@ export default function PropertyDetails() {
                             }}
                             className={`
         flex items-center justify-center w-full h-full rounded-full
-        ${disabled ? "bg-gray-200 text-gray-400 cursor-not-allowed" : ""}
-        ${!disabled && !isSelected ? "hover:bg-black hover:text-white cursor-pointer" : ""}
-        ${isSelected ? "bg-black text-white font-semibold" : ""}
+        ${disabled ? "bg-[#1297a317] text-gray-400 cursor-not-allowed" : ""}
+        ${!disabled && !isSelected ? "hover:bg-primary border-primary hover:text-white cursor-pointer" : ""}
+        ${isSelected ? "bg-primary text-white font-semibold" : ""}
       `}
                           >
                             {date.getDate()}
@@ -571,7 +588,7 @@ export default function PropertyDetails() {
                           setShowGuestDropdown(false);
                         }}
                         className={`block w-full text-left px-3 py-2 text-sm ${guestCount === i + 1
-                          ? "bg-black text-white font-semibold"
+                          ? "bg-primary text-white font-semibold"
                           : "hover:bg-gray-100 text-gray-700"
                           }`}
                       >
@@ -629,7 +646,7 @@ export default function PropertyDetails() {
 
               <Button
                 onClick={handleReserve}
-                className="w-full mt-4 bg-black text-white rounded-[0px] py-5 text-lg hover:bg-black/90"
+                className="w-full mt-4 bg-primary text-white rounded-[0px] py-5 text-lg hover:bg-primary/90"
               >
                 Reserve →
               </Button>
@@ -639,7 +656,6 @@ export default function PropertyDetails() {
               </p>
             </div>
           </div>
-
 
         </div>
       </motion.div>
