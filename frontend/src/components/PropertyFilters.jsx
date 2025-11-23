@@ -206,7 +206,7 @@ export default function PropertyFilters({ onFilter }) {
             {/* Search Button */}
             <button
                 onClick={applyFilters}
-                className="bg-primary text-black rounded-full px-8 py-2 mt-6 font-semibold transition-all duration-300 shadow-md"
+                className="bg-primary text-white rounded-full px-8 py-2 mt-6 font-semibold transition-all duration-300 shadow-md"
             >
                 Search
             </button>

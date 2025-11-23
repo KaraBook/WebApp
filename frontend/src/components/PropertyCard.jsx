@@ -46,22 +46,22 @@ export default function PropertyCard({ property }) {
 
 
   return (
-    <Card className="rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
+    <Card className="bg-white rounded-[0] border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
 
       <div className="p-2 relative">
-        <div className="relative rounded-xl">
+        <div className="relative">
          <Link to={`/properties/${property._id}`}>
           <img
             src={property.coverImage}
             alt={property.propertyName}
-            className="w-full max-h-[200px] object-cover transition-transform duration-500 hover:scale-105 rounded-xl"
+            className="w-full max-h-[200px] object-cover transition-transform duration-500 hover:scale-105"
           />
           </Link>
 
           <button
             onClick={toggleWishlist}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 shadow-sm ${inWishlist
-              ? "bg-red-500 text-white"
+            className={`absolute top-3 right-3 p-1 transition-all duration-300 shadow-sm ${inWishlist
+              ? "bg-black-500 text-white"
               : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
           >
@@ -71,7 +71,7 @@ export default function PropertyCard({ property }) {
             />
           </button>
 
-          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-gray-800 text-xs font-medium px-3 py-1 rounded-full shadow-sm flex items-center gap-1">
+          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-gray-800 text-xs font-medium px-3 py-1 shadow-sm flex items-center gap-1">
             <Home className="w-3 h-3 text-gray-500" />
             {property.propertyType || "Club Double Room"}
           </div>
@@ -113,7 +113,7 @@ export default function PropertyCard({ property }) {
         <Link to={`/properties/${property._id}`}>
           <Button
             variant="outline"
-            className="rounded-full text-sm font-medium border-gray-300 text-gray-700 hover:bg-gray-100 mt-4"
+            className="rounded-[0] text-sm font-medium border-gray-300 text-gray-700 hover:bg-primary hover:text-white mt-4"
           >
             Reserve Now
           </Button>
