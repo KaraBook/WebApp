@@ -60,10 +60,10 @@ export default function PropertyCard({ property }) {
 
           <button
             onClick={toggleWishlist}
-            className="absolute top-3 right-3 p-1 bg-white/40 backdrop-blur-md rounded-full transition"
+            className="absolute top-3 right-3 p-1 bg-transparent transition"
           >
             <Heart
-              className={`w-5 h-5 transition ${inWishlist ? "text-red-500 fill-red-500" : "text-white fill-none"
+              className={`w-5 h-5 transition ${inWishlist ? "text-red-500 fill-red-500" : "text-white fill-white"
                 }`}
             />
           </button>
