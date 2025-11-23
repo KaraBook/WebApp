@@ -499,7 +499,7 @@ export default function PropertyDetails() {
                       direction="horizontal"
                       showDateDisplay={false}
                       moveRangeOnFirstSelection={false}
-                      rangeColors={["#000"]}
+                      rangeColors={["#04929f"]}
                       minDate={new Date()}
 
                       dayContentRenderer={(date) => {

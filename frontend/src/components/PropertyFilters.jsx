@@ -56,7 +56,7 @@ export default function PropertyFilters({ onFilter }) {
 
     const applyFilters = () => {
         onFilter({
-            state: selectedState?.value || "", 
+            state: selectedState?.value || "",
             city: selectedCity?.value || "",
             checkIn: dateRange[0].startDate,
             checkOut: dateRange[0].endDate,
@@ -67,8 +67,8 @@ export default function PropertyFilters({ onFilter }) {
     const selectStyles = {
         control: (provided, state) => ({
             ...provided,
-            borderRadius: "9999px",
-            border: state.isFocused ? "1.5px solid black" : "1px solid #e5e7eb",
+            borderRadius: "0px",
+            border: state.isFocused ? "1.5px solid #038ba0" : "1px solid #e5e7eb",
             boxShadow: "none",
             paddingLeft: "8px",
             height: "40px",
@@ -78,9 +78,9 @@ export default function PropertyFilters({ onFilter }) {
         option: (provided, state) => ({
             ...provided,
             backgroundColor: state.isSelected
-                ? "#efcc61"
+                ? "#038ba0"
                 : state.isFocused
-                    ? "#efcc6154"
+                    ? "#038ba02d"
                     : "white",
             color: state.isSelected ? "#ffffff" : "#111827",
             cursor: "pointer",
@@ -95,7 +95,7 @@ export default function PropertyFilters({ onFilter }) {
         }),
         menu: (provided) => ({
             ...provided,
-            borderRadius: "1rem",
+            borderRadius: "0rem",
             overflow: "hidden",
             zIndex: 9999,
             width: "250px",
@@ -104,10 +104,10 @@ export default function PropertyFilters({ onFilter }) {
     };
 
     return (
-        <div className="w-full bg-white shadow-xl rounded-full px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[9] border border-gray-100">
+        <div className="w-full bg-white shadow-xl px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[9] border border-gray-100">
             {/* State */}
             <div className="flex-1 min-w-[180px] z-10">
-                <label className="text-xs text-gray-500 uppercase ml-4">State</label>
+                <label className="text-[14px] text-black uppercase ml-1">State</label>
                 <Select
                     options={states}
                     placeholder="Select state"
@@ -118,14 +118,14 @@ export default function PropertyFilters({ onFilter }) {
                     menuPosition="fixed"
                     menuPlacement="bottom"
                     menuShouldScrollIntoView={false}
-                    className="mt-1"
+                    className="mt-1 text-sm"
                     theme={(theme) => ({
                         ...theme,
                         colors: {
                             ...theme.colors,
-                            primary: "#efcc61",
-                            primary25: "#efcc6154",
-                            primary50: "#efcc6154",
+                            primary: "#038ba0",
+                            primary25: "#038ba0",
+                            primary50: "#038ba0",
                         },
                     })}
                 />
@@ -133,7 +133,7 @@ export default function PropertyFilters({ onFilter }) {
 
             {/* City */}
             <div className="flex-1 min-w-[180px]">
-                <label className="text-xs text-gray-500 uppercase ml-4">City</label>
+                <label className="text-[14px] text-black uppercase ml-1">City</label>
                 <Select
                     options={cities}
                     placeholder="Select city"
@@ -145,14 +145,14 @@ export default function PropertyFilters({ onFilter }) {
                     menuPosition="fixed"
                     menuPlacement="bottom"
                     menuShouldScrollIntoView={false}
-                    className="mt-1"
+                    className="mt-1 text-sm"
                     theme={(theme) => ({
                         ...theme,
                         colors: {
                             ...theme.colors,
-                            primary: "#efcc61",
-                            primary25: "#efcc6154",
-                            primary50: "#efcc6154",
+                            primary: "#038ba0",
+                            primary25: "#038ba0",
+                            primary50: "#038ba0",
                         },
                     })}
                 />
@@ -160,9 +160,9 @@ export default function PropertyFilters({ onFilter }) {
 
             {/* Date Range */}
             <div className="flex-1 min-w-[220px] relative" ref={calendarRef}>
-                <label className="text-xs text-gray-500 uppercase ml-4">Check-in / Check-out</label>
+                <label className="text-[14px] text-black uppercase ml-1">Check-in - Check-out</label>
                 <div
-                    className="flex items-center justify-between border border-gray-300 hover:border-black rounded-full px-4 py-2 mt-1 cursor-pointer transition-all duration-200"
+                    className="flex items-center justify-between border border-gray-300 hover:border-primary px-4 py-2 mt-1 cursor-pointer transition-all duration-200"
                     onClick={() => setShowCalendar(!showCalendar)}
                 >
                     <span className="text-gray-700 text-sm font-medium">
@@ -174,39 +174,66 @@ export default function PropertyFilters({ onFilter }) {
                     <Calendar className="w-4 h-4 text-gray-500" />
                 </div>
                 {showCalendar && (
-                    <div className="absolute top-[71px] left-0 bg-white p-3 rounded-2xl shadow-2xl border border-gray-100 z-[999999]">
+                    <div className="absolute top-[71px] left-0 bg-white p-3 shadow-2xl border border-gray-100 z-[999999]">
                         <DateRange
                             ranges={dateRange}
                             onChange={(item) => setDateRange([item.selection])}
                             minDate={new Date()}
-                            rangeColors={["#efcc61"]}
                             moveRangeOnFirstSelection={false}
                             showSelectionPreview={false}
                             showDateDisplay={false}
                             months={1}
                             direction="horizontal"
+                            rangeColors={["#04929f"]}
                             className="z-10"
+                            dayContentRenderer={(date) => {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+
+                                const isPast = date < today;
+                                const isSelected =
+                                    date >= dateRange[0].startDate &&
+                                    date <= dateRange[0].endDate;
+
+                                return (
+                                    <div
+                                        className={`
+                flex items-center justify-center w-full h-full rounded-full
+                transition-all duration-150
+                ${isPast
+                                                ? "bg-[#1297a317] text-gray-400 cursor-not-allowed"
+                                                : isSelected
+                                                    ? "bg-primary text-white font-semibold"
+                                                    : "hover:bg-primary hover:text-white cursor-pointer"
+                                            }
+            `}
+                                    >
+                                        {date.getDate()}
+                                    </div>
+                                );
+                            }}
                         />
+
                     </div>
                 )}
             </div>
 
             {/* Guests */}
             <div className="flex-1 min-w-[150px]">
-                <label className="text-xs text-gray-500 uppercase ml-4">Traveller</label>
+                <label className="text-[14px] text-black uppercase ml-1">Traveller</label>
                 <input
                     type="number"
                     min={1}
                     value={guestCount}
                     onChange={(e) => setGuestCount(Number(e.target.value))}
-                    className="border border-gray-300 hover:border-black rounded-full px-4 py-2 mt-1 w-full text-gray-700 focus:outline-none focus:ring-1 focus:ring-black transition-all duration-200"
+                    className="border text-sm border-gray-300 hover:border-black px-4 py-2 mt-1 w-full text-gray-700 focus:outline-none focus:ring-1 focus:ring-black transition-all duration-200"
                 />
             </div>
 
             {/* Search Button */}
             <button
                 onClick={applyFilters}
-                className="bg-primary text-white rounded-full px-8 py-2 mt-6 font-semibold transition-all duration-300 shadow-md"
+                className="bg-primary text-white px-8 py-2 mt-6 font-semibold transition-all duration-300 shadow-md"
             >
                 Search
             </button>

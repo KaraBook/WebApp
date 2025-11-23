@@ -6,7 +6,8 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { CalendarCheck, Heart, User as UserIcon, Star, LifeBuoy, LogOut, Menu } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { CalendarCheck, Heart, User as UserIcon, Star, LifeBuoy, LogOut, Menu, Icon } from "lucide-react";
 
 export default function Header({ onLoginClick }) {
   const { user, clearAuth } = useAuthStore();
@@ -22,6 +23,18 @@ export default function Header({ onLoginClick }) {
             className="h-6 w-auto md:h-10"
           />
         </Link>
+
+        <div className="flex gap-5">
+          <Link to="/properties" className="tracking-[2px] uppercase md:text-[14px] font-medium">
+            Explore
+          </Link>
+          <Link to="/top-places" className="tracking-[2px] uppercase md:text-[14px] font-medium">
+            Top Places
+          </Link>
+          <Link to="/contact" className="tracking-[2px] uppercase md:text-[14px] font-medium">
+            Contact
+          </Link>
+        </div>
 
         {/* Right Section */}
         <div className="flex items-center gap-3">
@@ -85,8 +98,8 @@ export default function Header({ onLoginClick }) {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button onClick={onLoginClick} className="text-sm">
-              Login
+            <Button onClick={onLoginClick} className="text-sm rounded-none tracking-[3px]">
+              SIGN IN<ChevronRight className="w-4 h-4" />
             </Button>
           )}
         </div>
