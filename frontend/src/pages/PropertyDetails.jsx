@@ -366,7 +366,7 @@ export default function PropertyDetails() {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className={`w-6 h-6 cursor-pointer ${star <= newReview.rating
+                        className={`w-4 h-4 cursor-pointer ${star <= newReview.rating
                             ? "text-black fill-black"
                             : "text-gray-400"
                           }`}
