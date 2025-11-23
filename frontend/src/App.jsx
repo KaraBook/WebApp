@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/auth";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";   
 import PhoneLoginModal from "@/components/PhoneLoginModal";
 import AppRoutes from "@/routes";
 import { Toaster } from "sonner";
 
 export default function App() {
-  const { init, loginModalOpen, showAuthModal, hideAuthModal, user } = useAuthStore();
+  const { init, loginModalOpen, showAuthModal, hideAuthModal } = useAuthStore();
 
   useEffect(() => {
     const run = () => {
@@ -27,11 +28,20 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
+
       <Header onLoginClick={showAuthModal} />
+
       <main className="flex-1">
         <AppRoutes />
       </main>
-      <PhoneLoginModal open={loginModalOpen} onOpenChange={(o) => (o ? showAuthModal() : hideAuthModal())} />
+
+      <Footer />
+
+      <PhoneLoginModal 
+        open={loginModalOpen}
+        onOpenChange={(o) => (o ? showAuthModal() : hideAuthModal())}
+      />
+
       <Toaster richColors position="top-center" />
     </div>
   );
