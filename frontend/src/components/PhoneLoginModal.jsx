@@ -78,7 +78,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
       setConfirmResult(confirmation);
       setStep("otp");
-      setTimer(30); 
+      setTimer(60); 
 
     } catch (err) {
       alert(err?.message || "Failed to send OTP");

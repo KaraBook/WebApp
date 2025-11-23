@@ -388,7 +388,7 @@ export default function PropertyDetails() {
                   />
 
                   <Button
-                    className="mt-3 bg-black rounded-[0] text-white hover:bg-black/80"
+                    className="mt-3 bg-primary rounded-[0] text-white hover:bg-primary/80"
                     onClick={submitReview}
                   >
                     Submit Review
