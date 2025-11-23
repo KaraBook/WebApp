@@ -6,17 +6,25 @@ import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useRef } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay, FreeMode } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/free-mode";
 
 export default function Home() {
   const [properties, setProperties] = useState([]);
   const navigate = useNavigate();
+  const prevRef = useRef(null);
+  const nextRef = useRef(null);
 
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
         const res = await Axios.get(SummaryApi.getPublishedProperties.url);
         if (res.data.success) {
-          setProperties(res.data.data.slice(0, 10)); // show top 10
+          setProperties(res.data.data.slice(0, 10));
         }
       } catch (err) {
         console.error("Failed to fetch featured properties:", err);
@@ -141,26 +149,67 @@ export default function Home() {
       {/* Properties Smooth Carousel */}
       <section className="w-full py-16 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex justify-between">
-          <h2 className="text-3xl font-bold mb-6">Popular Stays</h2>
-          <Button className="rounded-[0] mb-6" onClick={() => navigate('/properties')}>
-            View All Properties
-          </Button>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold">Popular Stays</h2>
+
+            <Button
+              className="rounded-none"
+              onClick={() => navigate("/properties")}
+            >
+              View All Properties
+            </Button>
           </div>
-          <div className="relative w-full overflow-hidden">
-            {/* SCROLL WRAPPER */}
-            <div className="flex gap-6 animate-infinite-scroll">
-              {[...properties, ...properties].map((property, i) => (
-                <div key={i} className="min-w-[270px]">
+          <Swiper
+            modules={[Navigation, Autoplay, FreeMode]}
+            onBeforeInit={(swiper) => {
+              swiper.params.navigation.prevEl = prevRef.current;
+              swiper.params.navigation.nextEl = nextRef.current;
+            }}
+            navigation={{
+              prevEl: prevRef.current,
+              nextEl: nextRef.current,
+            }}
+            loop={true}
+            autoplay={{
+              delay: 1,
+              disableOnInteraction: false,
+            }}
+            speed={5000}
+            freeMode={true}
+            freeModeMomentum={false}
+            slidesPerView="auto"
+            spaceBetween={24}
+            grabCursor={true}
+            className="relative"
+          >
+            {properties.map((property, i) => (
+              <SwiperSlide key={i} style={{ width: "270px" }}>
+                <div className="h-[380px] flex">
                   <PropertyCard property={property} />
                 </div>
-              ))}
-            </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          {/* ARROWS */}
+          <div className="flex justify-end gap-3 mt-6 pr-2">
+            <button
+              ref={prevRef}
+              className="w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white transition flex items-center justify-center"
+            >
+              ←
+            </button>
+
+            <button
+              ref={nextRef}
+              className="w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white transition flex items-center justify-center"
+            >
+              →
+            </button>
           </div>
+
         </div>
       </section>
-
-
 
 
     </div>

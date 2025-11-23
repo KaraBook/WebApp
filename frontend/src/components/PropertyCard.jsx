@@ -54,7 +54,7 @@ export default function PropertyCard({ property }) {
           <img
             src={property.coverImage}
             alt={property.propertyName}
-            className="w-full max-h-[200px] object-cover transition-transform duration-500 hover:scale-105"
+            className="w-full max-h-[200px] h-[200px] object-cover transition-transform duration-500 hover:scale-105"
           />
           </Link>
 

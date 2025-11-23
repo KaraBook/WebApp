@@ -52,11 +52,9 @@ export default function Properties() {
         ) : !properties.length ? (
           <p className="text-center text-gray-500 py-20">No resorts found.</p>
         ) : (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {properties.map((prop) => (
-              <div key={prop._id} className="break-inside-avoid mb-6">
-                <PropertyCard property={prop} />
-              </div>
+              <PropertyCard key={prop._id} property={prop} />
             ))}
           </div>
         )}
