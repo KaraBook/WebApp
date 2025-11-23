@@ -41,7 +41,7 @@ export default function Header({ onLoginClick }) {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 px-2 py-1 hover:bg-muted transition-colors">
+                <button className="flex items-center rounded-full gap-2 px-2 py-1 hover:bg-muted transition-colors">
                   <Avatar className="h-8 w-8 md:h-9 md:w-9 shadow-sm">
                     <AvatarImage src={user?.avatarUrl} alt={user?.name} />
                     <AvatarFallback>
@@ -59,7 +59,7 @@ export default function Header({ onLoginClick }) {
               {/* DROPDOWN PANEL */}
               <DropdownMenuContent
                 align="end"
-                className="w-60 p-0 shadow-2xl border border-gray-100 rounded-xl overflow-hidden"
+                className="w-60 p-0 shadow-2xl border border-gray-100 overflow-hidden"
               >
                 {/* Account Name */}
                 <div className="px-4 py-3 border-b">
