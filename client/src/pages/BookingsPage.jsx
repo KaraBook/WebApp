@@ -128,14 +128,16 @@ const BookingsPage = () => {
     const isPast = (b) => (b?.checkOut ? new Date(b.checkOut) < startOfDay(new Date()) : false);
 
     const filtered = useMemo(() => {
-        const base = bookings.filter((b) => {
-            if (selectedFilter === "paid") return b.paymentStatus === "paid";
-            if (selectedFilter === "pending") return b.paymentStatus === "pending";
-            if (selectedFilter === "failed") return b.paymentStatus === "failed";
-            if (selectedFilter === "upcoming") return isUpcoming(b);
-            if (selectedFilter === "past") return isPast(b);
-            return true;
-        });
+        const base = bookings
+            .filter((b) => {
+                if (selectedFilter === "paid") return b.paymentStatus === "paid";
+                if (selectedFilter === "pending") return b.paymentStatus === "pending";
+                if (selectedFilter === "failed") return b.paymentStatus === "failed";
+                if (selectedFilter === "upcoming") return isUpcoming(b);
+                if (selectedFilter === "past") return isPast(b);
+                return true;
+            })
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
         const q = search.trim().toLowerCase();
         if (!q) return base;
@@ -157,6 +159,7 @@ const BookingsPage = () => {
             );
         });
     }, [bookings, selectedFilter, search]);
+
 
     const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
     const paginated = useMemo(() => {
