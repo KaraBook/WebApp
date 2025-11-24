@@ -62,11 +62,12 @@ export default function Support() {
 
   return (
     <div className="max-w-5xl mx-auto py-0 px-2">
-      <h1 className="text-3xl font-semibold text-[#233b19] mb-8">Support & Help</h1>
-
+      <h1 className="text-2xl uppercase tracking-[1px] font-[500] mb-6 text-[#233b19]">
+        Support & Help
+      </h1>
       <Tabs defaultValue="contact" className="w-full">
-        <TabsList className="grid grid-cols-2 w-full max-w-sm mb-8">
-          <TabsTrigger value="contact">
+        <TabsList className="grid grid-cols-2 w-full max-w-sm mb-8 rounded-[0] ">
+          <TabsTrigger value="contact" className="rounded-[0]">
             <Mail className="w-4 h-4 mr-2" /> Contact Form
           </TabsTrigger>
           <TabsTrigger value="faq">
@@ -78,7 +79,7 @@ export default function Support() {
         <TabsContent value="contact">
           <form
             onSubmit={handleSubmit}
-            className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 space-y-5"
+            className="bg-white border border-gray-200 shadow-sm rounded-[0] p-6 space-y-5"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -90,7 +91,7 @@ export default function Support() {
                   value={form.name}
                   onChange={handleChange}
                   placeholder="Enter your name"
-                  className="rounded-md"
+                  className="rounded-[0]"
                 />
               </div>
               <div>
@@ -103,7 +104,7 @@ export default function Support() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
-                  className="rounded-md"
+                  className="rounded-[0]"
                 />
               </div>
             </div>
@@ -117,7 +118,7 @@ export default function Support() {
                 value={form.subject}
                 onChange={handleChange}
                 placeholder="What can we help you with?"
-                className="rounded-md"
+                className="rounded-[0]"
               />
             </div>
 
@@ -131,14 +132,14 @@ export default function Support() {
                 value={form.message}
                 onChange={handleChange}
                 placeholder="Write your message here..."
-                className="rounded-md"
+                className="rounded-[0]"
               />
             </div>
 
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="bg-[#efcc61] hover:bg-[#efcc61] text-black px-6 py-2 rounded-md"
+                className="bg-primary hover:bg-primary text-white px-6 py-2 rounded-md"
               >
                 Send Message
               </Button>
