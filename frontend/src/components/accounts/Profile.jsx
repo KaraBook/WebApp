@@ -80,7 +80,7 @@ export default function Profile() {
     : "—";
 
   return (
-    <div className="max-w-5xl mx-auto px-2 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-2 py-4 space-y-8">
 
       <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Profile</h1>
 
