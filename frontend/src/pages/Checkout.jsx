@@ -18,6 +18,22 @@ export default function Checkout() {
     const [contact, setContact] = useState("");
     const [loading, setLoading] = useState(true);
     const [showGuestDropdown, setShowGuestDropdown] = useState(false);
+    const [bookedDates, setBookedDates] = useState([]);
+    const [blockedDates, setBlockedDates] = useState([]);
+
+    const normalizeRanges = (ranges) =>
+        ranges.map((r) => {
+            const start = new Date(r.start);
+            const end = new Date(r.end);
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+            return { start, end };
+        });
+
+    const isDateDisabled = (date) => {
+        const all = [...bookedDates, ...blockedDates];
+        return all.some((range) => date >= range.start && date <= range.end);
+    };
 
     const { from, to, guests } = state || {};
     const [guestCount, setGuestCount] = useState(guests || 1);
@@ -44,6 +60,30 @@ export default function Checkout() {
         };
         fetch();
     }, [propertyId]);
+
+
+    useEffect(() => {
+        if (!propertyId) return;
+
+        const fetchDates = async () => {
+            try {
+                const bookedRes = await Axios.get(
+                    SummaryApi.getBookedDates.url(propertyId)
+                );
+                const blockedRes = await Axios.get(
+                    SummaryApi.getPropertyBlockedDates.url(propertyId)
+                );
+
+                setBookedDates(normalizeRanges(bookedRes.data.dates || []));
+                setBlockedDates(normalizeRanges(blockedRes.data.dates || []));
+            } catch (err) {
+                console.error("Failed to fetch calendar dates on checkout");
+            }
+        };
+
+        fetchDates();
+    }, [propertyId]);
+
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -127,14 +167,15 @@ export default function Checkout() {
                 <div className="border rounded-2xl p-5 mb-6">
                     <h3 className="font-semibold mb-2 text-lg">Your trip</h3>
 
-                    {/* Dates */}
-                    <div className="flex justify-between text-sm mb-3 relative">
+                    {/* DATE PICKER */}
+                    <div className="flex justify-between text-sm mb-3 relative" ref={calendarRef}>
                         <div>
                             <span className="block text-gray-700 font-medium">Dates</span>
                             <span>
-                                {format(startDate, "dd MMM")} – {format(endDate, "dd MMM")}
+                                {format(dateRange[0].startDate, "dd MMM")} – {format(dateRange[0].endDate, "dd MMM")}
                             </span>
                         </div>
+
                         <button
                             onClick={() => setShowCalendar(!showCalendar)}
                             className="text-[#233b19] font-semibold hover:underline"
@@ -143,27 +184,76 @@ export default function Checkout() {
                         </button>
 
                         {showCalendar && (
-                            <div
-                                ref={calendarRef}
-                                className="absolute top-10 left-0 bg-white p-3 rounded-2xl shadow-2xl border border-gray-100 z-50"
-                            >
+                            <div className="absolute top-10 left-0 bg-white p-3 rounded-2xl shadow-2xl border border-gray-100 z-50">
                                 <DateRange
                                     ranges={dateRange}
-                                    onChange={(item) => setDateRange([item.selection])}
-                                    minDate={new Date()}
-                                    rangeColors={["#efcc61"]}
-                                    moveRangeOnFirstSelection={false}
-                                    showSelectionPreview={false}
-                                    showDateDisplay={false}
-                                    months={1}
+                                    months={2}
                                     direction="horizontal"
+                                    showDateDisplay={false}
+                                    moveRangeOnFirstSelection={false}
+                                    rangeColors={["#04929f"]}
+                                    minDate={new Date()}
+                                    dayContentRenderer={(date) => {
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0);
+
+                                        const isPast = date < today;
+                                        const isBlocked = isDateDisabled(date);
+                                        const disabled = isPast || isBlocked;
+
+                                        const isSelected =
+                                            date >= dateRange[0].startDate &&
+                                            date <= dateRange[0].endDate;
+
+                                        return (
+                                            <div
+                                                onClick={(e) => {
+                                                    if (disabled) {
+                                                        e.stopPropagation();
+                                                        toast.error("This date is unavailable");
+                                                    }
+                                                }}
+                                                className={`
+                flex items-center justify-center w-full h-full rounded-full
+                ${disabled ? "bg-[#1297a317] text-gray-400 cursor-not-allowed" : ""}
+                ${!disabled && !isSelected ? "hover:bg-primary border-primary hover:text-white cursor-pointer" : ""}
+                ${isSelected ? "bg-primary text-white font-semibold" : ""}
+              `}
+                                            >
+                                                {date.getDate()}
+                                            </div>
+                                        );
+                                    }}
+                                    onChange={(item) => {
+                                        const start = item.selection.startDate;
+                                        const end = item.selection.endDate;
+
+                                        let invalid = false;
+                                        let curr = new Date(start);
+                                        while (curr <= end) {
+                                            if (isDateDisabled(curr)) invalid = true;
+                                            curr.setDate(curr.getDate() + 1);
+                                        }
+
+                                        if (invalid) {
+                                            toast.error("These dates include unavailable days!");
+                                            return;
+                                        }
+
+                                        setDateRange([item.selection]);
+
+                                        if (item.selection.startDate !== item.selection.endDate) {
+                                            setShowCalendar(false);
+                                        }
+                                    }}
                                 />
                             </div>
                         )}
                     </div>
 
-                    {/* Guests */}
-                    <div className="flex justify-between text-sm items-center relative">
+
+                    {/* GUESTS */}
+                    <div className="flex justify-between text-sm items-center relative" ref={guestRef}>
                         <div>
                             <span className="block text-gray-700 font-medium">Guests</span>
                             <span>
@@ -173,34 +263,32 @@ export default function Checkout() {
 
                         <button
                             onClick={() => setShowGuestDropdown(!showGuestDropdown)}
-                            className="text-[#233b19] font-semibold hover:underline relative"
+                            className="text-[#233b19] font-semibold hover:underline"
                         >
                             Edit
                         </button>
 
                         {showGuestDropdown && (
-                            <div className="absolute right-0 top-8 bg-white border border-gray-100 rounded-2xl shadow-2xl p-3 w-40 z-50">
-                                <p className="text-sm text-gray-600 mb-2 font-medium">Select guests</p>
-                                <div className="max-h-48 overflow-y-auto">
-                                    {[...Array(property.maxGuests || 10)].map((_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => {
-                                                setGuestCount(i + 1);
-                                                setShowGuestDropdown(false);
-                                            }}
-                                            className={`block w-full text-left px-3 py-2 rounded-lg text-sm ${guestCount === i + 1
-                                                ? "bg-[#efcc61] text-black font-semibold"
+                            <div className="absolute right-0 top-8 bg-white border shadow-xl p-3 w-full z-50">
+                                {Array.from({ length: property.maxGuests }).map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => {
+                                            setGuestCount(i + 1);
+                                            setShowGuestDropdown(false);
+                                        }}
+                                        className={`block w-full text-left px-3 py-2 text-sm ${guestCount === i + 1
+                                                ? "bg-primary text-white font-semibold"
                                                 : "hover:bg-gray-100 text-gray-700"
-                                                }`}
-                                        >
-                                            {i + 1} {i === 0 ? "Guest" : "Guests"}
-                                        </button>
-                                    ))}
-                                </div>
+                                            }`}
+                                    >
+                                        {i + 1} {i === 0 ? "Guest" : "Guests"}
+                                    </button>
+                                ))}
                             </div>
                         )}
                     </div>
+
                 </div>
 
                 {/* Contact */}
@@ -211,7 +299,7 @@ export default function Checkout() {
                         value={contact}
                         onChange={handleContactChange}
                         placeholder="Enter 10-digit mobile number"
-                        className="border border-gray-300 rounded-full px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-black"
+                        className="border border-gray-300 rounded-[0] px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-black"
                     />
                     <p className="text-xs text-gray-500 mt-2">
                         We'll contact you on this number for booking confirmation.
@@ -221,7 +309,7 @@ export default function Checkout() {
                 <Button
                     onClick={handlePayment}
                     disabled={contact.length !== 10}
-                    className="w-full bg-[#efcc61] text-black rounded-full py-3 text-lg hover:bg-[#efcc61]"
+                    className="w-full bg-primary text-black rounded-[0] py-3 text-lg hover:bg-primary"
                 >
                     Pay Now
                 </Button>
