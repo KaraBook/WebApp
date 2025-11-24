@@ -160,16 +160,6 @@ export default function Bookings() {
 
                           <DropdownMenuItem
                             onClick={() =>
-                              navigator.clipboard.writeText(
-                                b.property?.contactNumber || ""
-                              )
-                            }
-                          >
-                            Copy Phone
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            onClick={() =>
                               window.open(`tel:${b.property?.contactNumber}`)
                             }
                           >

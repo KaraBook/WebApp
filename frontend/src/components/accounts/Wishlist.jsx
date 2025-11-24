@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Heart, MapPin, Star, Trash2 } from "lucide-react";
+import { MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
@@ -20,7 +20,6 @@ export default function Wishlist() {
         });
         setWishlist(res.data.data || []);
       } catch (err) {
-        console.error(err);
         toast.error("Failed to load wishlist");
       } finally {
         setLoading(false);
@@ -31,14 +30,14 @@ export default function Wishlist() {
 
   const removeFromWishlist = async (propertyId) => {
     try {
-      const res = await Axios.post(
+      await Axios.post(
         SummaryApi.toggleWishlist.url,
         { propertyId },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
       toast.success("Removed from wishlist");
       setWishlist((prev) => prev.filter((p) => p._id !== propertyId));
-    } catch (err) {
+    } catch {
       toast.error("Failed to remove");
     }
   };
@@ -46,86 +45,95 @@ export default function Wishlist() {
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="w-10 h-10 border-4 border-gray-300 border-t-[#efcc61] rounded-full animate-spin"></div>
+        <div className="w-10 h-10 border-4 border-gray-300 border-t-[#efcc61] animate-spin" />
       </div>
     );
 
   if (!wishlist.length)
     return (
-      <div className="text-center py-20 text-gray-500">
-        Your wishlist is empty.
-      </div>
+      <div className="text-center py-20 text-gray-500">Your wishlist is empty.</div>
     );
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-0 space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-6">My Wishlist</h1>
+    <div className="max-w-6xl mx-auto px-4 py-0">
+      <h1 className="text-2xl font-semibold text-[#233b19] mb-6">My Wishlist</h1>
 
-      {wishlist.map((property) => (
-        <div
-          key={property._id}
-          className="bg-white p-2 border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col md:flex-row overflow-hidden"
-        >
-          {/* Image */}
-          <div className="relative w-full md:w-1/3">
-            <img
-              src={property.coverImage}
-              alt={property.propertyName}
-              className="w-full h-60 md:h-[152px] object-cover rounded-l-xl"
-            />
-            <button
-              onClick={() => removeFromWishlist(property._id)}
-              className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 transition"
+      <div className="space-y-4">
+        {wishlist.map((property) => (
+          <div
+            key={property._id}
+            className="border border-gray-200 bg-white hover:bg-gray-50 transition flex w-full"
+          >
+            {/* IMAGE */}
+            <Link
+              to={`/properties/${property._id}`}
+              className="w-40 h-32 flex-shrink-0 border-r border-gray-200"
             >
-              <Trash2 className="w-4 h-4 text-gray-600" />
-            </button>
-          </div>
+              <img
+                src={property.coverImage}
+                alt={property.propertyName}
+                className="w-full h-full object-cover"
+              />
+            </Link>
 
-          {/* Details */}
-          <div className="flex-1 flex flex-col justify-between p-5 md:py-2 md:px-4">
-            <div>
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {property.propertyName}
-                </h2>
-                <div className="bg-[#233b19]/10 text-[#233b19] text-sm font-medium px-3 py-1 rounded-full">
-                  {property.propertyType}
+            {/* DETAILS */}
+            <div className="flex-1 p-4 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start">
+                  {/* CLICKABLE TITLE */}
+                  <Link to={`/properties/${property._id}`}>
+                    <h2 className="text-[17px] font-semibold text-gray-900 hover:underline">
+                      {property.propertyName}
+                    </h2>
+                  </Link>
+
+                  {/* REMOVE BUTTON (modern minimal) */}
+                  <button
+                    onClick={() => removeFromWishlist(property._id)}
+                    className="text-gray-500 hover:text-black p-1"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {/* LOCATION */}
+                <div className="flex items-center text-gray-500 mt-1 text-sm">
+                  <MapPin className="w-4 h-4 mr-1 text-gray-400" />
+                  {property.city}, {property.state}
+                </div>
+
+                {/* RATING */}
+                <div className="flex items-center text-yellow-500 text-sm mt-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i}>
+                      {i < Math.round(property.averageRating || 0) ? "★" : "☆"}
+                    </span>
+                  ))}
+                  <span className="text-gray-500 text-xs ml-1">
+                    {property.averageRating
+                      ? property.averageRating.toFixed(1)
+                      : "—"}
+                  </span>
                 </div>
               </div>
 
-              <div className="flex items-center text-gray-500 mt-2 text-sm">
-                <MapPin className="w-4 h-4 mr-1 text-gray-400" />
-                {property.city}, {property.state}
-              </div>
-              {/* Ratings */}
-              <div className="flex items-center text-yellow-400 text-sm mt-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i}>
-                    {i < Math.round(property.averageRating || 0) ? "★" : "☆"}
-                  </span>
-                ))}
-                <span className="text-gray-500 text-xs ml-1">
-                  {property.averageRating ? property.averageRating.toFixed(1) : "—"}
-                </span>
-              </div>
+              {/* PRICE + BUTTON */}
+              <div className="flex items-center justify-between border-t border-gray-200 pt-2 mt-3">
+                <p className="text-lg font-semibold">
+                  ₹{property.pricingPerNightWeekdays.toLocaleString()}
+                  <span className="text-sm text-gray-500 ml-1">/ night</span>
+                </p>
 
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-3 border-t pt-2">
-              <div className="text-lg font-semibold text-gray-900">
-                ₹{property.pricingPerNightWeekdays?.toLocaleString()}
-                <span className="text-sm text-gray-500 ml-1">/ night</span>
+                <Link to={`/properties/${property._id}`}>
+                  <Button className="bg-[#efcc61] hover:bg-[#efcc61] text-black rounded-none text-xs px-4 py-2">
+                    View Property
+                  </Button>
+                </Link>
               </div>
-
-              <Link to={`/properties/${property._id}`}>
-                <Button className="bg-[#efcc61] hover:bg-[#efcc61] text-[12px] text-black rounded-full mt-3 sm:mt-0">
-                  View Property
-                </Button>
-              </Link>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
