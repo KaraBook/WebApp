@@ -46,7 +46,7 @@ export default function Bookings() {
   return (
     <div className="w-full px-4">
       {/* TITLE */}
-      <h1 className="text-2xl font-semibold text-[#233b19] mb-6">My Bookings</h1>
+      <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Bookings</h1>
 
       {/* TABLE WRAPPER */}
       <div className="border border-gray-200 bg-white">
