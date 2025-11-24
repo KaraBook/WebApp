@@ -20,6 +20,7 @@ export default function Checkout() {
     const [showGuestDropdown, setShowGuestDropdown] = useState(false);
     const [bookedDates, setBookedDates] = useState([]);
     const [blockedDates, setBlockedDates] = useState([]);
+    const guestRef = useRef(null);
 
     const normalizeRanges = (ranges) =>
         ranges.map((r) => {
