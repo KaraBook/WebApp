@@ -48,7 +48,7 @@ export default function Ratings() {
               <img
                 src={r.propertyId?.coverImage}
                 alt={r.propertyId?.propertyName}
-                className="w-28 h-24 object-cover border"
+                className="w-28 h-[120px] object-cover border"
               />
             </Link>
 
@@ -72,7 +72,7 @@ export default function Ratings() {
                       key={i}
                       className={`w-4 h-4 ${
                         i < r.rating
-                          ? "text-[#efcc61] fill-[#efcc61]"
+                          ? "text-black fill-black"
                           : "text-gray-300"
                       }`}
                     />
