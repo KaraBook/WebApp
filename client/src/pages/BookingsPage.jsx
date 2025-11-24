@@ -67,13 +67,18 @@ const BookingsPage = () => {
                 method: SummaryApi.getAllBookings.method,
                 url: SummaryApi.getAllBookings.url,
             });
-            setBookings(res?.data?.data || []);
+            const sorted = [...(res?.data?.data || [])].sort(
+                (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+
+            setBookings(sorted);
         } catch (err) {
             console.error("Error fetching bookings:", err);
         } finally {
             setLoading(false);
         }
     };
+
 
     useEffect(() => {
         fetchBookings();
