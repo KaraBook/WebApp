@@ -139,7 +139,7 @@ export default function Support() {
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="bg-primary hover:bg-primary text-white px-6 py-2 rounded-md"
+                className="bg-primary hover:bg-primary text-white px-6 py-2 rounded-[0]"
               >
                 Send Message
               </Button>
@@ -149,7 +149,7 @@ export default function Support() {
 
         {/* FAQs */}
         <TabsContent value="faq">
-          <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6">
+          <div className="bg-white border border-gray-200 shadow-sm rounded-[0] p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
               Frequently Asked Questions
             </h2>
