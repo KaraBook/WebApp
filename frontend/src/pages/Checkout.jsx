@@ -185,7 +185,7 @@ export default function Checkout() {
                         </button>
 
                         {showCalendar && (
-                            <div className="absolute top-10 left-0 bg-white p-3 rounded-2xl shadow-2xl border border-gray-100 z-50">
+                            <div className="absolute top-10 left-0 bg-white p-3 rounded-[0] shadow-2xl border border-gray-100 z-50">
                                 <DateRange
                                     ranges={dateRange}
                                     months={2}
@@ -270,7 +270,7 @@ export default function Checkout() {
                         </button>
 
                         {showGuestDropdown && (
-                            <div className="absolute right-0 top-8 bg-white border shadow-xl p-3 w-full z-50">
+                            <div className="absolute right-0 top-8 bg-white border shadow-xl p-3 w-[50%] z-50">
                                 {Array.from({ length: property.maxGuests }).map((_, i) => (
                                     <button
                                         key={i}
@@ -310,7 +310,7 @@ export default function Checkout() {
                 <Button
                     onClick={handlePayment}
                     disabled={contact.length !== 10}
-                    className="w-full bg-primary text-black rounded-[0] py-3 text-lg hover:bg-primary"
+                    className="w-full bg-primary text-white rounded-[0] py-3 text-lg hover:bg-primary"
                 >
                     Pay Now
                 </Button>
