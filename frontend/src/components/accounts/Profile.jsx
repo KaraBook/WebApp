@@ -73,32 +73,50 @@ export default function Profile() {
   const memberSince = new Date(profile.createdAt).getFullYear();
   const dob = profile.dateOfBirth
     ? new Date(profile.dateOfBirth).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-      })
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    })
     : "—";
 
   return (
     <div className="max-w-5xl mx-auto px-2 py-10 space-y-8">
+
+      <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Profile</h1>
 
       {/* --------- PROFILE HEADER (SLIM, PROFESSIONAL) --------- */}
       <div className="border shadow-sm bg-white p-6 flex items-center gap-6">
 
         {/* Avatar */}
         <div className="relative">
-          <img
-            src={avatarPreview || "/placeholder-avatar.png"}
-            className="w-24 h-24 object-cover border shadow-sm"
-          />
+          {avatarPreview ? (
+            <img
+              src={avatarPreview}
+              className="w-[180px] h-[150px] object-cover border shadow-sm"
+            />
+          ) : (
+            <div className="w-[180px] h-[150px] border shadow-sm bg-gray-100 
+                    flex items-center justify-center text-5xl font-semibold text-[#233b19]">
+              {profile?.name?.charAt(0)?.toUpperCase()}
+            </div>
+          )}
+
           <button
             onClick={() => fileRef.current.click()}
             className="absolute bottom-0 right-0 bg-white p-1 shadow border hover:bg-gray-100"
           >
             <Camera size={16} />
           </button>
-          <input hidden ref={fileRef} type="file" accept="image/*" onChange={handleAvatarChange} />
+
+          <input
+            hidden
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarChange}
+          />
         </div>
+
 
         {/* User Info */}
         <div className="flex-1">
