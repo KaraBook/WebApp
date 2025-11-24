@@ -2,19 +2,20 @@ import { useEffect, useState } from "react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import { Button } from "@/components/ui/button";
-import { Phone, FileDown } from "lucide-react";
+import { Phone, MoreVertical, Download, FileDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
-import InvoicePage from "@/pages/InvoicePage";
 import { Link } from "react-router-dom";
 
 export default function Bookings() {
   const { accessToken } = useAuthStore();
   const [bookings, setBookings] = useState([]);
-  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -29,137 +30,165 @@ export default function Bookings() {
     })();
   }, []);
 
-  const statusColor = (status) => {
+  const statusDot = (status) => {
     switch (status) {
-      case "paid": return "bg-green-500";
-      case "pending": return "bg-blue-500";
-      case "failed": return "bg-red-500";
-      default: return "bg-gray-400";
+      case "paid":
+        return "bg-green-500";
+      case "pending":
+        return "bg-yellow-500";
+      case "failed":
+        return "bg-red-500";
+      default:
+        return "bg-gray-400";
     }
   };
 
-  const handleDownload = async (booking) => {
-    setSelected(booking);
-    setTimeout(async () => {
-      const invoiceElement = document.getElementById("invoice-pdf");
-      const canvas = await html2canvas(invoiceElement, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const width = pdf.internal.pageSize.getWidth();
-      const height = (canvas.height * width) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, width, height);
-      pdf.save(`Invoice-${booking._id}.pdf`);
-    }, 300);
-  };
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-0">
-  <h1 className="text-2xl font-semibold text-[#233b19] mb-6">
-    My Bookings
-  </h1>
+    <div className="w-full px-4">
+      {/* TITLE */}
+      <h1 className="text-2xl font-semibold text-[#233b19] mb-6">My Bookings</h1>
 
-  <div className="bg-white border rounded-xl shadow-sm">
-    {/* This div handles scroll only for table */}
-    <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded-xl">
-      <table className="min-w-[1200px] w-full border-collapse text-sm ">
-        <thead className="bg-gray-100 text-gray-700 sticky top-0">
-          <tr>
-            {[
-              "Sr. No.",
-              "Booking ID",
-              "Property Name",
-              "State",
-              "City",
-              "Check-in Date",
-              "Check-out Date",
-              "Nights",
-              "Guests",
-              "Total Amount",
-              "Payment Status",
-              "Booking Date",
-              "Resort Contact",
-              "Actions",
-            ].map((h) => (
-              <th
-                key={h}
-                className="px-4 py-3 border text-left font-medium whitespace-nowrap"
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody className="divide-y">
-          {bookings.map((b, i) => {
-            const nights = Math.max(
-              1,
-              (new Date(b.checkOut) - new Date(b.checkIn)) /
-                (1000 * 60 * 60 * 24)
-            );
-            return (
-              <tr key={b._id} className="hover:bg-gray-50 transition">
-                <td className="px-4 py-3">{i + 1}</td>
-                <td className="px-4 py-3 font-semibold text-[#233b19]">
-                  {b._id.slice(-5)}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  {b.property?.propertyName || "—"}
-                </td>
-                <td className="px-4 py-3">{b.property?.state || "—"}</td>
-                <td className="px-4 py-3">{b.property?.city || "—"}</td>
-                <td className="px-4 py-3">
-                  {format(new Date(b.checkIn), "dd MMM yyyy")}
-                </td>
-                <td className="px-4 py-3">
-                  {format(new Date(b.checkOut), "dd MMM yyyy")}
-                </td>
-                <td className="px-4 py-3 text-center">{nights}</td>
-                <td className="px-4 py-3 text-center">{b.guests}</td>
-                <td className="px-4 py-3 font-semibold whitespace-nowrap">
-                  ₹{b.totalAmount.toLocaleString()}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <span
-                    className={`inline-block w-3 h-3 rounded-full ${
-                      b.paymentStatus === "paid"
-                        ? "bg-green-500"
-                        : b.paymentStatus === "pending"
-                        ? "bg-blue-500"
-                        : "bg-red-500"
-                    }`}
-                  ></span>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                  {format(new Date(b.createdAt), "dd MMM yyyy")}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <button className="text-gray-600 hover:text-[#233b19]">
-                    <Phone className="w-4 h-4" />
-                  </button>
-                </td>
-                <td className="px-4 py-3 space-y-1">
-                  <Link to={`/invoice/${b._id}`}>
-                    <Button variant="outline" size="sm" className="rounded-full">
-                      <FileDown className="w-4 h-4 mr-1" /> Invoice
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full text-red-500 hover:text-red-700"
+      {/* TABLE WRAPPER */}
+      <div className="border border-gray-200 bg-white">
+        <div className="overflow-x-auto">
+          <table className="min-w-[1100px] w-full text-sm">
+            <thead className="bg-gray-100 text-gray-700 border-b border-gray-200">
+              <tr>
+                {[
+                  "Booking ID",
+                  "Property",
+                  "Check-in",
+                  "Check-out",
+                  "Nights",
+                  "Guests",
+                  "Amount",
+                  "Status",
+                  "Created",
+                  "Actions",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="px-4 py-3 text-left font-medium border-r last:border-r-0"
                   >
-                    Cancel
-                  </Button>
-                </td>
+                    {h}
+                  </th>
+                ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+            </thead>
 
+            <tbody>
+              {bookings.length === 0 && (
+                <tr>
+                  <td colSpan="10" className="text-center py-10 text-gray-500">
+                    No bookings found
+                  </td>
+                </tr>
+              )}
+
+              {bookings.map((b) => {
+                const nights = Math.max(
+                  1,
+                  (new Date(b.checkOut) - new Date(b.checkIn)) /
+                    (1000 * 60 * 60 * 24)
+                );
+
+                return (
+                  <tr
+                    key={b._id}
+                    className="hover:bg-gray-50 border-b border-gray-200"
+                  >
+                    {/* Booking ID */}
+                    <td className="px-4 py-3 font-medium text-[#233b19]">
+                      #{b._id.slice(-5)}
+                    </td>
+
+                    {/* Property */}
+                    <td className="px-4 py-3">
+                      {b.property?.propertyName || "—"}
+                    </td>
+
+                    {/* Check-in */}
+                    <td className="px-4 py-3">
+                      {format(new Date(b.checkIn), "dd MMM yyyy")}
+                    </td>
+
+                    {/* Check-out */}
+                    <td className="px-4 py-3">
+                      {format(new Date(b.checkOut), "dd MMM yyyy")}
+                    </td>
+
+                    {/* Nights */}
+                    <td className="px-4 py-3 text-center">{nights}</td>
+
+                    {/* Guests */}
+                    <td className="px-4 py-3 text-center">{b.guests}</td>
+
+                    {/* Amount */}
+                    <td className="px-4 py-3 font-semibold">
+                      ₹{b.totalAmount.toLocaleString()}
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-block w-3 h-3 rounded-full ${statusDot(
+                          b.paymentStatus
+                        )}`}
+                      ></span>
+                    </td>
+
+                    {/* Created */}
+                    <td className="px-4 py-3">
+                      {format(new Date(b.createdAt), "dd MMM yyyy")}
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="px-4 py-3 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <MoreVertical className="h-5 w-5 text-gray-700 hover:text-black cursor-pointer" />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="shadow-md border bg-white p-1">
+                          <DropdownMenuItem asChild>
+                            <Link to={`/invoice/${b._id}`}>
+                              <div className="flex items-center gap-2">
+                                <FileDown size={16} /> View Invoice
+                              </div>
+                            </Link>
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            onClick={() =>
+                              navigator.clipboard.writeText(
+                                b.property?.contactNumber || ""
+                              )
+                            }
+                          >
+                            Copy Phone
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            onClick={() =>
+                              window.open(`tel:${b.property?.contactNumber}`)
+                            }
+                          >
+                            Call Resort
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem className="text-red-600">
+                            Cancel Booking
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }
