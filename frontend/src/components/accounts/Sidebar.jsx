@@ -28,7 +28,7 @@ export default function Sidebar({ onNavigate, className }) {
   return (
     <aside
       className={cn(
-        "hidden md:flex flex-col bg-white border-r border-gray-200 h-screen sticky top-0 transition-all duration-300",
+        "hidden md:flex flex-col bg-[#f7f7f7] border-r border-gray-200 h-screen sticky top-0 transition-all duration-300",
         collapsed ? "w-20" : "w-64",
         className
       )}
