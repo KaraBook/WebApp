@@ -100,7 +100,7 @@ export default function Wishlist() {
               </div>
 
               {/* Rating */}
-              <div className="flex items-center text-yellow-500 mt-1 text-sm">
+              <div className="flex items-center text-primary-500 mt-1 text-sm">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <span key={i}>
                     {i < Math.round(property.averageRating || 0) ? "★" : "☆"}
@@ -120,7 +120,7 @@ export default function Wishlist() {
 
                 <Link to={`/properties/${property._id}`}>
                   <Button
-                    className="bg-[#efcc61] text-white rounded-none hover:bg-primary px-4"
+                    className="bg-primary text-white rounded-none hover:bg-primary px-4"
                     size="sm"
                   >
                     View
