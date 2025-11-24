@@ -3,6 +3,7 @@ import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
 import { Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Ratings() {
   const { accessToken } = useAuthStore();
@@ -25,52 +26,75 @@ export default function Ratings() {
   if (!reviews.length)
     return (
       <div className="text-center py-20 text-gray-500">
-        You haven’t rated any properties yet.
+        You haven't rated any properties yet.
       </div>
     );
 
   return (
-    <div className="max-w-5xl mx-auto px-2 py-0">
-      <h1 className="text-2xl font-semibold mb-6 text-[#233b19]">
+    <div className="max-w-6xl mx-auto px-4 py-0">
+      <h1 className="text-2xl uppercase tracking-[1px] font-[500] mb-6 text-[#233b19]">
         My Ratings & Reviews
       </h1>
 
-      <div className=" flex justify-between">
+      {/* GRID WRAPPER */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {reviews.map((r) => (
           <div
             key={r._id}
-            className="flex w-[48%] gap-4 border border-gray-100 bg-white rounded-2xl shadow-sm p-4"
+            className="border border-gray-200 bg-white shadow-sm p-4 flex gap-4 hover:shadow-md transition-all duration-200"
           >
-            <img
-              src={r.propertyId?.coverImage}
-              alt={r.propertyId?.propertyName}
-              className="w-28 h-26 rounded-xl object-cover"
-            />
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">
-                {r.propertyId?.propertyName}
-              </h3>
-              <p className="text-sm text-gray-500 mb-2">
-                {r.propertyId?.city}, {r.propertyId?.state}
-              </p>
+            {/* IMAGE */}
+            <Link to={`/properties/${r.propertyId?._id}`}>
+              <img
+                src={r.propertyId?.coverImage}
+                alt={r.propertyId?.propertyName}
+                className="w-28 h-24 object-cover border"
+              />
+            </Link>
 
-              <div className="flex items-center text-yellow-400 mb-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${
-                      i < r.rating ? "fill-yellow-400" : "text-gray-300"
-                    }`}
-                  />
-                ))}
+            {/* DETAILS */}
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                <Link to={`/properties/${r.propertyId?._id}`}>
+                  <h3 className="font-semibold text-gray-900 hover:text-[#233b19] transition">
+                    {r.propertyId?.propertyName}
+                  </h3>
+                </Link>
+
+                <p className="text-sm text-gray-500 mb-2">
+                  {r.propertyId?.city}, {r.propertyId?.state}
+                </p>
+
+                {/* STARS */}
+                <div className="flex items-center mb-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-4 h-4 ${
+                        i < r.rating
+                          ? "text-[#efcc61] fill-[#efcc61]"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* COMMENT */}
+                {r.comment && (
+                  <p className="text-gray-700 text-sm leading-snug mt-1">
+                    {r.comment}
+                  </p>
+                )}
               </div>
 
-              {r.comment && (
-                <p className="text-gray-700 text-sm leading-snug">{r.comment}</p>
-              )}
-
-              <p className="text-xs text-gray-400 mt-1">
-                Reviewed on {new Date(r.createdAt).toLocaleDateString()}
+              {/* DATE */}
+              <p className="text-xs text-gray-400 mt-3">
+                Reviewed on{" "}
+                {new Date(r.createdAt).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
               </p>
             </div>
           </div>
