@@ -165,7 +165,7 @@ export default function Checkout() {
                 <h2 className="text-2xl font-bold mb-6">Confirm and pay</h2>
 
                 {/* Trip Summary */}
-                <div className="border rounded-2xl p-5 mb-6">
+                <div className="border rounded-[0] p-5 mb-6">
                     <h3 className="font-semibold mb-2 text-lg">Your trip</h3>
 
                     {/* DATE PICKER */}
@@ -293,7 +293,7 @@ export default function Checkout() {
                 </div>
 
                 {/* Contact */}
-                <div className="border rounded-2xl p-5 mb-6">
+                <div className="border rounded-[0] p-5 mb-6">
                     <h3 className="font-semibold mb-3 text-lg">Contact number</h3>
                     <input
                         type="tel"
@@ -318,12 +318,12 @@ export default function Checkout() {
 
             {/* RIGHT SECTION */}
             <div>
-                <div className="border rounded-2xl p-5 shadow-sm">
+                <div className="border rounded-[0] p-5 shadow-sm">
                     <div className="flex gap-3 mb-3">
                         <img
                             src={property.coverImage}
                             alt={property.propertyName}
-                            className="w-24 h-24 object-cover rounded-lg"
+                            className="w-24 h-24 object-cover rounded-[0]"
                         />
                         <div>
                             <h4 className="font-semibold">{property.propertyName}</h4>
