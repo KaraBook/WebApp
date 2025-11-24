@@ -120,7 +120,7 @@ export default function Wishlist() {
 
                 <Link to={`/properties/${property._id}`}>
                   <Button
-                    className="bg-[#efcc61] text-black rounded-none hover:bg-[#e3bf59] px-4"
+                    className="bg-[#efcc61] text-white rounded-none hover:bg-primary px-4"
                     size="sm"
                   >
                     View
