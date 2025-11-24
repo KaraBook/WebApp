@@ -79,7 +79,7 @@ export default function Sidebar({ onNavigate, className }) {
               cn(
                 "flex items-center gap-3 px-6 py-3 text-sm text-gray-700 transition-colors border-l-4",
                 isActive
-                  ? "bg-gray-100 border-black text-black"
+                  ? "bg-[#ededed] border-black text-black"
                   : "border-transparent hover:bg-gray-50"
               )
             }
