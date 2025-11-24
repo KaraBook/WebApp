@@ -59,7 +59,7 @@ export default function Header({ onLoginClick }) {
               {/* DROPDOWN PANEL */}
               <DropdownMenuContent
                 align="end"
-                className="w-60 p-0 shadow-2xl border border-gray-100 overflow-hidden"
+                className="w-60 p-0 shadow-2xl rounded-[0] border border-gray-100 overflow-hidden"
               >
                 {/* Account Name */}
                 <div className="px-4 py-3 border-b">
