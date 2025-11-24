@@ -28,7 +28,7 @@ export default function Sidebar({ onNavigate, className }) {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
-    window.location.href = "/"; // redirect to home/login
+    window.location.href = "/"; 
   };
 
   return (

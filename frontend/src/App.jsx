@@ -6,9 +6,21 @@ import PhoneLoginModal from "@/components/PhoneLoginModal";
 import AppRoutes from "@/routes";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "sonner";
+import { useLocation } from "react-router-dom";
 
 export default function App() {
   const { init, loginModalOpen, showAuthModal, hideAuthModal } = useAuthStore();
+  const location = useLocation();
+
+   const hideFooterRoutes = [
+    "/account/bookings",
+    "/account/wishlist",
+    "/account/profile",
+    "/account/ratings",
+    "/account/support",
+  ];
+
+  const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
 
   useEffect(() => {
     const run = () => {
@@ -36,7 +48,7 @@ export default function App() {
         <AppRoutes />
       </main>
 
-      <Footer />
+      {!shouldHideFooter && <Footer />}
 
       <PhoneLoginModal 
         open={loginModalOpen}
