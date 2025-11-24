@@ -80,7 +80,7 @@ export default function Profile() {
     : "—";
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-2 py-10 space-y-8">
 
       {/* --------- PROFILE HEADER (SLIM, PROFESSIONAL) --------- */}
       <div className="border shadow-sm bg-white p-6 flex items-center gap-6">
