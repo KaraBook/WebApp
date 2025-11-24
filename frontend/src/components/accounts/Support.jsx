@@ -70,7 +70,7 @@ export default function Support() {
           <TabsTrigger value="contact" className="rounded-[0]">
             <Mail className="w-4 h-4 mr-2" /> Contact Form
           </TabsTrigger>
-          <TabsTrigger value="faq">
+          <TabsTrigger value="faq" className="rounded-[0]">
             <HelpCircle className="w-4 h-4 mr-2" /> FAQs
           </TabsTrigger>
         </TabsList>
