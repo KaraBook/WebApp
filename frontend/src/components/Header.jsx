@@ -44,7 +44,7 @@ export default function Header({ onLoginClick }) {
                 <button className="flex items-center rounded-full gap-2 px-2 py-1 hover:bg-muted transition-colors">
                   <Avatar className="h-8 w-8 md:h-9 md:w-9 shadow-sm">
                     <AvatarImage src={user?.avatarUrl} alt={user?.name} />
-                    <AvatarFallback>
+                    <AvatarFallback className="bg-primary text-white">
                       {(user?.name?.[0] || user?.mobile?.[0] || "U").toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
