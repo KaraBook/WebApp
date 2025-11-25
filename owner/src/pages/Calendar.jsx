@@ -118,7 +118,7 @@ export default function OwnerCalendar() {
           ranges={dateRange}
           onChange={(item) => setDateRange([item.selection])}
           minDate={new Date()}
-          rangeColors={["#efcc61"]}
+          rangeColors={["#000000"]}
           moveRangeOnFirstSelection={false}
           showSelectionPreview={false}
           showDateDisplay={false}
@@ -131,7 +131,7 @@ export default function OwnerCalendar() {
           <Button
             onClick={handleBlockDates}
             disabled={loading}
-            className="bg-[#233b19] text-white hover:bg-[#2f4d24]"
+            className="bg-[#000] text-white hover:bg-[#2f4d24]"
           >
             Block Selected Dates
           </Button>
