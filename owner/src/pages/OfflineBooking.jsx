@@ -557,7 +557,7 @@ export default function OfflineBooking() {
               {showCalendar && (
                 <div
                   ref={calendarRef}
-                  className="absolute mt-2 bg-white shadow-xl border rounded-xl z-50"
+                  className="absolute mt-2 bg-white shadow-xl border border-gray-200 rounded-2xl z-50 p-3"
                 >
                   <DateRange
                     key={disabledDays.length}
@@ -569,19 +569,21 @@ export default function OfflineBooking() {
                     showSelectionPreview={false}
                     months={1}
                     direction="horizontal"
-                    rangeColors={["#000"]} // Black selection highlight
-                    dayContentRenderer={(date) => {
-                      const disabled = isDateDisabled(date);
+                    rangeColors={["#000000"]} // BLACK selection highlight
+
+                    dayContentRenderer={(day) => {
+                      const disabled = isDateDisabled(day);
 
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-md transition
+                          className={`
+              w-full h-full flex items-center justify-center rounded-md transition
               ${disabled
                               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                              : "hover:bg-gray-100 text-black"}`
-                          }
+                              : "hover:bg-gray-900 hover:text-white text-black"}
+            `}
                         >
-                          {date.getDate()}
+                          {day.getDate()}
                         </div>
                       );
                     }}
