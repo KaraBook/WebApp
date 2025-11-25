@@ -15,7 +15,6 @@ export default function Profile() {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);
 
-  /* ---------------- FETCH USER DATA ---------------- */
   useEffect(() => {
     const fetchAll = async () => {
       try {
@@ -37,7 +36,6 @@ export default function Profile() {
     fetchAll();
   }, []);
 
-  /* ---------------- AVATAR UPLOAD ---------------- */
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -80,14 +78,12 @@ export default function Profile() {
     : "—";
 
   return (
-    <div className="max-w-5xl mx-auto px-2 py-2 space-y-8">
+    <div className="max-w-5xl px-2 py-2 space-y-8">
 
       <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Profile</h1>
 
-      {/* --------- PROFILE HEADER (SLIM, PROFESSIONAL) --------- */}
       <div className="border shadow-sm bg-white p-6 flex items-center gap-6">
 
-        {/* Avatar */}
         <div className="relative">
           {avatarPreview ? (
             <img
@@ -118,12 +114,10 @@ export default function Profile() {
         </div>
 
 
-        {/* User Info */}
         <div className="flex-1">
           <h2 className="text-xl font-semibold text-gray-900">{profile.name}</h2>
           <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
 
-          {/* Stats */}
           <div className="flex gap-6 mt-4">
             <Stat value={bookingCount} label="Bookings" />
             <Stat value={wishlistCount} label="Wishlist" />
@@ -131,7 +125,6 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Logout */}
         <Button
           onClick={logout}
           variant="outline"
@@ -141,7 +134,6 @@ export default function Profile() {
         </Button>
       </div>
 
-      {/* --------- USER INFO GRID --------- */}
       <div className="border shadow-sm bg-white p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
 
         <InfoRow icon={<Phone />} label="Mobile" value={profile.mobile} />
@@ -157,7 +149,6 @@ export default function Profile() {
   );
 }
 
-/* --------- CLEAN INFO ROW --------- */
 function InfoRow({ icon, label, value }) {
   return (
     <div className="flex items-center gap-3 border-b pb-3">
@@ -170,7 +161,6 @@ function InfoRow({ icon, label, value }) {
   );
 }
 
-/* --------- CLEAN STAT BOX --------- */
 function Stat({ value, label }) {
   return (
     <div className="text-center">

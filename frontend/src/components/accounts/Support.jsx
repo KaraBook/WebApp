@@ -61,7 +61,7 @@ export default function Support() {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto py-0 px-2">
+    <div className="max-w-5xl py-0 px-2">
       <h1 className="text-2xl uppercase tracking-[1px] font-[500] mb-6 text-[#233b19]">
         Support & Help
       </h1>
@@ -75,7 +75,6 @@ export default function Support() {
           </TabsTrigger>
         </TabsList>
 
-        {/* Contact Form */}
         <TabsContent value="contact">
           <form
             onSubmit={handleSubmit}
@@ -147,7 +146,6 @@ export default function Support() {
           </form>
         </TabsContent>
 
-        {/* FAQs */}
         <TabsContent value="faq">
           <div className="bg-white border border-gray-200 shadow-sm rounded-[0] p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
