@@ -20,7 +20,6 @@ export default function OwnerCalendar() {
     },
   ]);
 
-  /* ---------------- FETCH PROPERTIES ---------------- */
   useEffect(() => {
     const fetchOwnerProperties = async () => {
       try {
@@ -39,7 +38,6 @@ export default function OwnerCalendar() {
     fetchOwnerProperties();
   }, []);
 
-  /* ---------------- FETCH BLOCKED DATES ---------------- */
   useEffect(() => {
     if (!propertyId) return;
     const fetchBlockedDates = async () => {
@@ -53,7 +51,6 @@ export default function OwnerCalendar() {
     fetchBlockedDates();
   }, [propertyId]);
 
-  /* ---------------- BLOCK DATES ---------------- */
   const handleBlockDates = async () => {
     if (!propertyId) return toast.error("No property selected");
     const { startDate, endDate } = dateRange[0];
@@ -76,7 +73,6 @@ export default function OwnerCalendar() {
     }
   };
 
-  /* ---------------- UNBLOCK DATES ---------------- */
   const handleUnblockSingle = async (range) => {
     if (!propertyId) return toast.error("No property selected");
 
@@ -126,7 +122,7 @@ export default function OwnerCalendar() {
           ranges={dateRange}
           onChange={(item) => setDateRange([item.selection])}
           minDate={new Date()}
-          rangeColors={["#000000"]}   // ⬅ BLACK highlight
+          rangeColors={["#000000"]}  
           disabledDay={isDateBlocked}
           moveRangeOnFirstSelection={false}
           showSelectionPreview={false}

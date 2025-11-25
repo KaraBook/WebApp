@@ -66,3 +66,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.rdrDayDisabled {
+  opacity: 1 !important;              
+  background-color: #e5e5e5 !important; 
+  color: #6b7280 !important;         
+  cursor: not-allowed !important;
+  border-radius: 6px;
+}
+
+.rdrDayDisabled:hover {
+  background-color: #d4d4d4 !important;
+}
