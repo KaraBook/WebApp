@@ -59,7 +59,7 @@ export default function OwnerBookings() {
     const result = bookings.filter((b) => {
       return (
         b._id?.toLowerCase().includes(q) ||
-        b.userId?.firstName?.toLowerCase().includes(q) ||
+        b?.userId?.firstName?.toLowerCase().includes(q) ||
         b.userId?.lastName?.toLowerCase().includes(q) ||
         b.propertyId?.propertyName?.toLowerCase().includes(q) ||
         b.userId?.mobile?.includes(q)
@@ -82,19 +82,16 @@ export default function OwnerBookings() {
   const formatDate = (d) => format(new Date(d), "d MMM yy");
   const formatDateLong = (d) => format(new Date(d), "d MMMM yyyy");
 
-  /* ---------------------- COPY HANDLER ---------------------- */
   const handleCopy = async (text, label) => {
     await navigator.clipboard.writeText(text || "");
     toast.success(`${label} copied`);
   };
 
-  /* ---------------------- WHATSAPP HANDLER ---------------------- */
   const openWhatsApp = (phone, text) => {
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank");
   };
 
-  /* ---------------------- DOWNLOAD PDF ---------------------- */
   const downloadInvoicePDF = async (bookingId) => {
     try {
       toast.info("Generating Invoice…");
@@ -139,7 +136,6 @@ export default function OwnerBookings() {
     }
   };
 
-  /* ---------------------- CONFIRM ACTION ---------------------- */
   const onConfirm = async () => {
     const b = confirm.booking;
     closeConfirm();
@@ -170,7 +166,6 @@ export default function OwnerBookings() {
       <div className="p-2">
         <h1 className="text-2xl font-semibold mb-6">Bookings</h1>
 
-        {/* TOP BAR */}
         <div className="flex items-center justify-between mb-4">
           <Input
             placeholder="Search booking / traveller / phone / property"
@@ -182,7 +177,6 @@ export default function OwnerBookings() {
           <Button onClick={fetchBookings}>Refresh</Button>
         </div>
 
-        {/* TABLE */}
         <div className="border rounded-xl overflow-x-auto">
           <table className="min-w-full text-sm bg-white">
             <thead className="bg-gray-50 border-b">
@@ -205,9 +199,11 @@ export default function OwnerBookings() {
                 <tr key={b._id} className="border-b hover:bg-gray-50">
                   <td className="py-3 px-4">
                     <div className="font-semibold">
-                      {b.userId.firstName} {b.userId.lastName}
+                      {(b?.userId?.firstName || "") + " " + (b?.userId?.lastName || "")}
                     </div>
-                    <div className="text-xs text-gray-500">{b.userId.mobile}</div>
+                    <div className="text-xs text-gray-500">
+                      {b?.userId?.mobile || "—"}
+                    </div>
                   </td>
 
                   <td className="py-3 px-4">
@@ -284,7 +280,6 @@ export default function OwnerBookings() {
         </div>
       </div>
 
-      {/* CONFIRM MODAL */}
       <AlertDialog open={confirm.open} onOpenChange={(o) => !o && closeConfirm()}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -307,7 +302,6 @@ export default function OwnerBookings() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* HIDDEN INVOICE PREVIEW */}
       {invoiceData && (
         <div
           ref={invoiceRef}
