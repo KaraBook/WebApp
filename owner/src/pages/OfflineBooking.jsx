@@ -85,12 +85,10 @@ export default function OfflineBooking() {
     )
   );
 
-  // States
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  // Load disabled dates
   useEffect(() => {
     if (!propertyId) return;
 
@@ -149,7 +147,6 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
-  // Close calendar on outside click
   useEffect(() => {
     const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -164,7 +161,6 @@ export default function OfflineBooking() {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  // Verify mobile
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -183,7 +179,7 @@ export default function OfflineBooking() {
         setShowPopup(true);
         return;
       }
-    } catch {}
+    } catch { }
 
     setChecking(true);
 
@@ -569,20 +565,21 @@ export default function OfflineBooking() {
                     onChange={handleDateSelection}
                     minDate={new Date()}
                     disabledDates={disabledDays}
-                    rangeColors={["#efcc61"]}
                     moveRangeOnFirstSelection={false}
                     showSelectionPreview={false}
                     months={1}
                     direction="horizontal"
+                    rangeColors={["#000"]} // Black selection highlight
                     dayContentRenderer={(date) => {
                       const disabled = isDateDisabled(date);
+
                       return (
                         <div
-                          className={`w-full h-full flex items-center justify-center rounded-full ${
-                            disabled
-                              ? "bg-red-300 text-white cursor-not-allowed"
-                              : "hover:bg-[#efcc61] hover:text-black"
-                          }`}
+                          className={`w-full h-full flex items-center justify-center rounded-md transition
+              ${disabled
+                              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                              : "hover:bg-gray-100 text-black"}`
+                          }
                         >
                           {date.getDate()}
                         </div>
@@ -629,7 +626,7 @@ export default function OfflineBooking() {
 
             {/* Payment button */}
             <Button
-              className="w-full bg-[#efcc61] hover:bg-[#e6c04f] text-black"
+              className="w-full bg-black hover:bg-black text-white py-3"
               disabled={loading}
               onClick={handleBooking}
             >

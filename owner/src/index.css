@@ -79,3 +79,7 @@
 .rdrDayDisabled:hover {
   background-color: #d4d4d4 !important;
 }
+
+.rdrDays{
+  gap: 5px !important;
+}
