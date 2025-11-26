@@ -89,7 +89,7 @@ export default function Bookings() {
                 const nights = Math.max(
                   1,
                   (new Date(b.checkOut) - new Date(b.checkIn)) /
-                    (1000 * 60 * 60 * 24)
+                  (1000 * 60 * 60 * 24)
                 );
 
                 return (
@@ -97,52 +97,54 @@ export default function Bookings() {
                     key={b._id}
                     className="hover:bg-gray-50 border-b border-gray-200"
                   >
-                    {/* Booking ID */}
                     <td className="px-4 py-3 font-medium text-[#233b19]">
                       #{b._id.slice(-5)}
                     </td>
 
-                    {/* Property */}
                     <td className="px-4 py-3">
                       {b.property?.propertyName || "—"}
                     </td>
 
-                    {/* Check-in */}
                     <td className="px-4 py-3">
                       {format(new Date(b.checkIn), "dd MMM yyyy")}
                     </td>
 
-                    {/* Check-out */}
                     <td className="px-4 py-3">
                       {format(new Date(b.checkOut), "dd MMM yyyy")}
                     </td>
 
-                    {/* Nights */}
                     <td className="px-4 py-3 text-center">{nights}</td>
 
-                    {/* Guests */}
                     <td className="px-4 py-3 text-center">{b.guests}</td>
 
-                    {/* Amount */}
                     <td className="px-4 py-3 font-semibold">
                       ₹{b.totalAmount.toLocaleString()}
                     </td>
 
-                    {/* Status */}
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 relative group cursor-default">
                       <span
                         className={`inline-block w-3 h-3 rounded-full ${statusDot(
                           b.paymentStatus
                         )}`}
                       ></span>
+
+                      <div
+                        className="
+      absolute left-1/2 -translate-x-1/2 top-7
+      bg-black text-white text-xs px-2 py-1 rounded
+      opacity-0 group-hover:opacity-100
+      transition-all duration-200 whitespace-nowrap
+      pointer-events-none z-50
+    "
+                      >
+                        {b.paymentStatus?.toUpperCase()}
+                      </div>
                     </td>
 
-                    {/* Created */}
                     <td className="px-4 py-3">
                       {format(new Date(b.createdAt), "dd MMM yyyy")}
                     </td>
 
-                    {/* ACTIONS */}
                     <td className="px-4 py-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger>
