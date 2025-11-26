@@ -15,7 +15,6 @@ export default function Dashboard() {
       try {
         const res = await api.get(SummaryApi.getOwnerDashboard.url);
 
-        // SORT BY LATEST BOOKING FIRST
         const sorted = [...res.data.data.bookings].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -42,7 +41,6 @@ export default function Dashboard() {
     <div className="space-y-8">
       <h1 className="text-2xl font-semibold text-gray-800">Dashboard Overview</h1>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Total Bookings" value={stats?.totalBookings} />
         <StatCard label="Confirmed" value={stats?.confirmed} color="text-green-600" />
@@ -54,56 +52,79 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Recent Bookings */}
+   
       <div className="space-y-2">
         <h2 className="text-xl font-semibold text-gray-800">Recent Bookings</h2>
 
-        <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl shadow border overflow-x-auto">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 text-gray-600 text-left border-b">
-                <th className="p-3 font-medium">Traveller</th>
-                <th className="p-3 font-medium">Property</th>
-                <th className="p-3 font-medium">Amount</th>
-                <th className="p-3 font-medium">Status</th>
-                <th className="p-3 font-medium">Date</th>
+            <thead className="bg-gray-50 border-b text-gray-700">
+              <tr>
+                <th className="py-3 px-4 text-left">Traveller</th>
+                <th className="py-3 px-4 text-left">Property</th>
+                <th className="py-3 px-4 text-left">Check-in</th>
+                <th className="py-3 px-4 text-left">Check-out</th>
+                <th className="py-3 px-4 text-left">Nights</th>
+                <th className="py-3 px-4 text-left">Guests</th>
+                <th className="py-3 px-4 text-left">Amount</th>
+                <th className="py-3 px-4 text-left">Payment</th>
+                <th className="py-3 px-4 text-left">Created</th>
               </tr>
             </thead>
 
             <tbody>
               {bookings?.length ? (
                 bookings.map((b) => (
-                  <tr
-                    key={b._id}
-                    className="border-b transition hover:bg-gray-100/50"
-                  >
-                    <td className="p-3 font-medium text-gray-800">
-                      {b.userId?.firstName} {b.userId?.lastName}
-                      <div className="text-xs text-gray-500">
-                        {b.userId?.mobile}
+                  <tr key={b._id} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-4">
+                      <div className="font-semibold">
+                        {b.userId?.firstName} {b.userId?.lastName}
                       </div>
+                      <div className="text-xs text-gray-500">{b.userId?.mobile}</div>
                     </td>
 
-                    <td className="p-3 text-gray-700">
-                      {b.propertyId?.propertyName}
+                    <td className="py-3 px-4">{b.propertyId?.propertyName}</td>
+
+                    <td className="py-3 px-4">
+                      {new Date(b.checkIn).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "2-digit",
+                      })}
                     </td>
 
-                    <td className="p-3 font-semibold text-gray-900">
+                    <td className="py-3 px-4">
+                      {new Date(b.checkOut).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "2-digit",
+                      })}
+                    </td>
+
+                    <td className="py-3 px-4">{b.totalNights}</td>
+
+                    <td className="py-3 px-4">{b.guests}</td>
+
+                    <td className="py-3 px-4 font-semibold text-gray-900">
                       ₹{b.totalAmount.toLocaleString("en-IN")}
                     </td>
 
-                    <td className="p-3">
+                    <td className="py-3 px-4">
                       <StatusChip status={b.paymentStatus} />
                     </td>
 
-                    <td className="p-3 text-gray-600">
-                      {new Date(b.createdAt).toLocaleDateString("en-IN")}
+                    <td className="py-3 px-4 text-gray-600">
+                      {new Date(b.createdAt).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "2-digit",
+                      })}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="text-center py-8 text-gray-500">
+                  <td colSpan="10" className="text-center py-6 text-gray-500">
                     No bookings found.
                   </td>
                 </tr>
@@ -132,9 +153,6 @@ function StatCard({ label, value, color }) {
 }
 
 function StatusChip({ status }) {
-  const base =
-    "px-3 py-1 text-xs rounded-full font-medium border inline-block";
-
   const styles = {
     paid: "bg-green-100 text-green-700 border-green-300",
     pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
@@ -142,5 +160,9 @@ function StatusChip({ status }) {
     failed: "bg-red-100 text-red-700 border-red-300",
   };
 
-  return <span className={`${base} ${styles[status]}`}>{status}</span>;
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs border ${styles[status]}`}>
+      {status}
+    </span>
+  );
 }
