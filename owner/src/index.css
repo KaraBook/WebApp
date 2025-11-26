@@ -68,3 +68,15 @@
 }
 
 
+.rdrDay .rdrDayDisabled{
+  background-color: #e1e1e1;
+  border-radius: 20px;
+  height: 2.3em;
+}
+.rdrDay{
+  height: 2.5em;
+}
+.rdrDays{
+  gap: 3px;
+}
+
