@@ -48,7 +48,7 @@ export default function InvoicePage() {
     const imgData = canvas.toDataURL("image/png");
 
     const pdf = new jsPDF("p", "mm", "a4");
-    const imgWidth = 210; // A4 width
+    const imgWidth = 210; 
     const pageHeight = 297;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
