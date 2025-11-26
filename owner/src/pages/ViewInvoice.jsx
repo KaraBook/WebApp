@@ -77,7 +77,7 @@ export default function ViewInvoice() {
     return <div className="p-6 text-center">Invoice not found.</div>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 mt-6 bg-white shadow-md rounded-xl">
+    <div className="max-w-3xl p-6 mt-6 bg-white shadow-md rounded-xl">
       <div className="flex justify-end mb-4">
         <button
           onClick={downloadPDF}
