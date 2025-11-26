@@ -147,6 +147,7 @@ export default function PropertyFilters({ onFilter }) {
                     menuPlacement="bottom"
                     menuShouldScrollIntoView={false}
                     className="mt-1 text-sm"
+                    classNamePrefix="react-select" 
                     theme={(theme) => ({
                         ...theme,
                         colors: {
