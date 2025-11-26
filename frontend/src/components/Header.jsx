@@ -13,7 +13,7 @@ export default function Header({ onLoginClick }) {
   const { user, clearAuth } = useAuthStore();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
+    <header className="sticky top-0 z-40 w-full border-b bg-background z-[9999999]">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2" aria-label="Go to home">
