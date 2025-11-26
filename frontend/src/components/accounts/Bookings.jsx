@@ -153,7 +153,7 @@ export default function Bookings() {
 
                         <DropdownMenuContent className="shadow-md border bg-white p-1">
                           <DropdownMenuItem asChild>
-                            <Link to={`/invoice/${b._id}`}>
+                            <Link to={`/account/invoice/${b._id}`}>
                               <div className="flex items-center gap-2">
                                 <FileDown size={16} /> View Invoice
                               </div>
