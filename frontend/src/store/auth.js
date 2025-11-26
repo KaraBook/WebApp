@@ -9,7 +9,7 @@ export const useAuthStore = create(
       user: null,
       accessToken: null,
       refreshToken: null,
-      wishlist: [],   // 👈 store wishlist IDs here
+      wishlist: [],  
 
       loginModalOpen: false,
       showAuthModal: () => set({ loginModalOpen: true }),
@@ -51,7 +51,6 @@ export const useAuthStore = create(
             });
             set({ user: me.data.user });
 
-            // 👇 fetch wishlist
             const wl = await axios.get(baseURL + SummaryApi.getWishlist.url, {
               headers: { Authorization: `Bearer ${token}` },
             });

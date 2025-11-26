@@ -8,6 +8,7 @@ import { useReactToPrint } from "react-to-print";
 import { format } from "date-fns";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { useAuthStore } from "@/store/auth";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
@@ -15,12 +16,13 @@ export default function InvoicePage() {
   const { id } = useParams();
   const [invoice, setInvoice] = useState(null);
   const componentRef = useRef();
+  const { accessToken } = useAuthStore();
 
   const fetchInvoice = async () => {
     try {
       const res = await Axios.get(SummaryApi.getInvoice.url(id), {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       if (res.data.success) setInvoice(res.data.data);
