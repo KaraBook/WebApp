@@ -105,7 +105,7 @@ export default function PropertyCard({ property }) {
       <CardFooter className="px-4 pb-4 pt-0 flex items-center justify-between border-t border-gray-100">
         <div className="text-gray-900 font-semibold text-lg mt-2">
           ₹ {property.pricingPerNightWeekdays?.toLocaleString() || "N/A"}
-          <span className="text-sm text-gray-500 font-normal ml-1">/ night</span>
+          <span className="text-sm text-gray-500 font-normal ml-1">/ N</span>
         </div>
 
         <Link to={`/properties/${property._id}`}>
