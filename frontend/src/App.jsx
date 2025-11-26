@@ -18,6 +18,7 @@ export default function App() {
     "/account/profile",
     "/account/ratings",
     "/account/support",
+    "/invoice/:id",
   ];
 
   const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
