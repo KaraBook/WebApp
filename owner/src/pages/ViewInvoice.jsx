@@ -38,7 +38,7 @@ export default function ViewInvoice() {
     return <div className="p-6 text-center">Invoice not found.</div>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-xl mt-6">
+    <div className="max-w-3xl p-6 bg-white shadow-md rounded-xl mt-6">
       <InvoicePreview invoice={invoice} />
     </div>
   );
