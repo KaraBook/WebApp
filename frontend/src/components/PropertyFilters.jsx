@@ -104,7 +104,7 @@ export default function PropertyFilters({ onFilter }) {
     };
 
     return (
-        <div className="w-full bg-white shadow-xl px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[9] border border-gray-100">
+        <div className="w-full bg-white shadow-xl px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[20] border border-gray-100 overflow-visible">
             {/* State */}
             <div className="flex-1 min-w-[180px] z-10">
                 <label className="text-[14px] text-black uppercase ml-1">State</label>
@@ -119,6 +119,7 @@ export default function PropertyFilters({ onFilter }) {
                     menuPlacement="bottom"
                     menuShouldScrollIntoView={false}
                     className="mt-1 text-sm"
+                    classNamePrefix="react-select" 
                     theme={(theme) => ({
                         ...theme,
                         colors: {

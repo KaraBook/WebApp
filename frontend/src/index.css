@@ -103,3 +103,17 @@
 }
 
 
+.css-26l3qy-menu,      
+.css-1nmdiq5-menu,     
+.css-14el2xx-menu {    
+    z-index: 999999 !important;
+}
+
+.css-b62m3t-container {
+    position: relative !important;
+    z-index: 99999 !important;
+}
+
+.react-select__menu-portal {
+    z-index: 999999 !important;
+}
