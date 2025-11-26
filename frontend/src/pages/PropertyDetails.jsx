@@ -154,26 +154,25 @@ export default function PropertyDetails() {
 
   const toggleWishlist = async () => {
     if (!user) return showAuthModal();
-
     try {
       const res = await Axios.post(
         SummaryApi.toggleWishlist.url,
         { propertyId: property._id },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
-
       const updated = res.data.data.properties.map((id) => id.toString());
       const isAdded = !wishlist.includes(property._id);
       setWishlist(updated);
       if (isAdded) {
         toast.success("Added to wishlist!");
       } else {
-        toast.success("Removed from wishlist!");
+        toast.error("Removed from wishlist!");
       }
     } catch (err) {
       toast.error("Failed to update wishlist");
     }
   };
+
 
 
   const handleReserve = () => {
