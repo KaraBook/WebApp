@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { useAuthStore } from "@/store/auth";
+import Axios from "../utils/Axios";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
