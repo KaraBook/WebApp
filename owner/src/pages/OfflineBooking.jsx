@@ -567,27 +567,12 @@ export default function OfflineBooking() {
                     disabledDates={disabledDays}
                     moveRangeOnFirstSelection={false}
                     showSelectionPreview={false}
+                    showDateDisplay={false}
                     months={1}
                     direction="horizontal"
-                    rangeColors={["#000000"]} // BLACK selection highlight
-
-                    dayContentRenderer={(day) => {
-                      const disabled = isDateDisabled(day);
-
-                      return (
-                        <div
-                          className={`
-              w-full h-full flex items-center justify-center rounded-md transition
-              ${disabled
-                              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                              : "hover:bg-gray-900 hover:text-white text-black"}
-            `}
-                        >
-                          {day.getDate()}
-                        </div>
-                      );
-                    }}
+                    rangeColors={["#000000"]}
                   />
+
                 </div>
               )}
             </div>
