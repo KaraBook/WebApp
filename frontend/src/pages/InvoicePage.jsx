@@ -70,7 +70,7 @@ export default function InvoicePage() {
   if (!invoice) return <p className="text-center py-20 text-gray-500">Loading...</p>;
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col items-start py-4 px-4">
+    <div className="min-h-screen flex flex-col items-start py-4 px-4">
       <div className="max-w-3xl w-full py-4 flex items-start justify-between">
         <Link to="/account/bookings" className="bg-gray-200 text-black px-3 py-1 rounded-[0] ">
           Back
@@ -84,7 +84,7 @@ export default function InvoicePage() {
           Download Invoice
         </Button>
       </div>
-      <div className="bg-white rounded-xl shadow-md p-8 max-w-3xl w-full" ref={componentRef}>
+      <div className="bg-white rounded-[0] shadow-md p-8 max-w-3xl w-full" ref={componentRef}>
         <div className="flex justify-between items-start mb-8">
           <div>
             <h1 className="text-xl font-semibold">{invoice.propertyName}</h1>
