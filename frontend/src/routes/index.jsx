@@ -21,10 +21,10 @@ export default function AppRoutes() {
       <Route path="properties" element={<Properties />} />
       <Route path="/properties/:id" element={<PropertyDetails />} />
       <Route path="/checkout/:propertyId" element={<Checkout />} />
-      <Route path="/invoice/:id" element={<InvoicePage />} />
 
       {/* Dashboard-only area */}
       <Route element={<ProtectedRoute />}>
+      <Route path="/invoice/:id" element={<InvoicePage />} />
         <Route path="/account" element={<AccountLayout />}>
           <Route path="bookings" element={<Bookings />} />
           <Route path="wishlist" element={<Wishlist />} />
