@@ -3,26 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format, eachDayOfInterval } from "date-fns";
 import { toast } from "sonner";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
@@ -250,7 +236,6 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  // CREATE BOOKING → THEN RAZORPAY PAYMENT
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -276,7 +261,6 @@ export default function OfflineBooking() {
     try {
       const totalAmount = nights * Number(price);
 
-      // 1) CREATE BOOKING
       const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
@@ -292,7 +276,6 @@ export default function OfflineBooking() {
 
       toast.success("Booking created! Opening payment...");
 
-      // 2) CREATE ORDER
       const orderRes = await api.post(
         SummaryApi.ownerCreateOrder.url,
         {
@@ -303,7 +286,6 @@ export default function OfflineBooking() {
 
       const { order } = orderRes.data;
 
-      // 3) LOAD Razorpay script
       const load = await loadRazorpayScript();
       if (!load) {
         toast.error("Razorpay failed to load");

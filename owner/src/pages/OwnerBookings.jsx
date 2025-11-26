@@ -3,7 +3,7 @@ import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
@@ -36,6 +36,11 @@ export default function OwnerBookings() {
     try {
       setLoading(true);
       const res = await api.get(SummaryApi.getOwnerBookings.url);
+      const sorted = res.data.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setBookings(sorted);
+      setFiltered(sorted);
       setBookings(res.data.data);
       setFiltered(res.data.data);
     } catch (err) {

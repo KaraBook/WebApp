@@ -9,6 +9,7 @@ import EditProperty from "./pages/EditProperty";
 import OfflineBooking from "./pages/OfflineBooking";
 import Calendar from "./pages/Calendar";
 import OwnerBookings from "./pages/OwnerBookings";
+import ViewInvoice from "./pages/ViewInvoice";
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="offline-booking/:id" element={<OfflineBooking />} />
         <Route path="bookings" element={<OwnerBookings />} />
         <Route path="calendar" element={<Calendar />} />
+        <Route path="invoice/:id" element={<ViewInvoice />} />
       </Route>
 
       {/* Fallback */}
