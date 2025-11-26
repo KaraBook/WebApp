@@ -21,7 +21,14 @@ export default function App() {
     "/account/invoice/:id",
   ];
 
-  const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
+  const shouldHideFooter =
+  hideFooterRoutes.some((route) => {
+    if (route.includes(":id")) {
+      return location.pathname.startsWith(route.replace("/:id", ""));
+    }
+    return location.pathname === route;
+  });
+
 
   useEffect(() => {
     const run = () => {
