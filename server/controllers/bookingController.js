@@ -206,8 +206,6 @@ export const getBookingInvoice = async (req, res) => {
     if (req.user.role === "traveller") {
     }
 
-
-
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
       propertyName: booking.propertyId.propertyName,
