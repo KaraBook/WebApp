@@ -18,7 +18,11 @@ export default function InvoicePage() {
 
   const fetchInvoice = async () => {
     try {
-      const res = await Axios.get(SummaryApi.getInvoice.url(id));
+      const res = await Axios.get(SummaryApi.getInvoice.url(id), {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
       if (res.data.success) setInvoice(res.data.data);
     } catch (err) {
       console.error("Invoice fetch error:", err);
