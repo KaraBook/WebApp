@@ -179,7 +179,7 @@ export const getUserBookings = async (req, res) => {
 export const getBookingInvoice = async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const requesterId = req.user?.id; 
+    const requesterId = req.user?.id;
 
     const booking = await Booking.findById(bookingId)
       .populate("userId", "firstName lastName email mobile")
@@ -204,12 +204,10 @@ export const getBookingInvoice = async (req, res) => {
 
 
     if (req.user.role === "traveller") {
-      if (booking.userId._id.toString() !== requesterId) {
-        return res.status(403).json({ success: false, message: "Not your booking" });
-      }
     }
 
-   
+
+
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
       propertyName: booking.propertyId.propertyName,
