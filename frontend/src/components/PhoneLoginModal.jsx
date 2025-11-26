@@ -1,23 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {
-  auth,
-  buildRecaptcha,
-  signInWithPhoneNumber,
-} from "/firebase";
+import { auth, buildRecaptcha, signInWithPhoneNumber} from "/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -113,7 +102,8 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           accessToken: resp.data.accessToken,
           refreshToken: resp.data.refreshToken,
         });
-
+       
+        toast.success("Login successful!");
         onOpenChange(false);
       } else {
         onOpenChange(false);
