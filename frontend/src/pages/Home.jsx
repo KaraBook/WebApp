@@ -101,10 +101,10 @@ export default function Home() {
           <div className="flex md:w-[60%] w-full justify-between gap-4 md:gap-6 flex-wrap md:flex-nowrap">
 
             {/* CARD 1 */}
-            <div className="bg-white w-[48%] md:w-[33%] shadow-sm border overflow-hidden">
+            <div className="bg-white w-[100%] md:w-[33%] shadow-sm border overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
-                className="h-[220px] md:h-[300px] object-cover"
+                className="h-[220px] w-[100%] md:h-[300px] object-cover"
               />
               <div className="p-3 flex items-center justify-between border-t">
                 <span className="text-gray-900 font-medium">Villas</span>
@@ -114,10 +114,10 @@ export default function Home() {
             </div>
 
             {/* CARD 2 */}
-            <div className="bg-white w-[48%] md:w-[33%] shadow-sm border overflow-hidden">
+            <div className="bg-white w-[100%] md:w-[33%] shadow-sm border overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
-                className="h-[220px] md:h-[300px] object-cover"
+                className="h-[220px] w-[100%] md:h-[300px] object-cover"
               />
               <div className="p-3 flex items-center justify-between border-t">
                 <span className="text-gray-900 font-medium">Apartments</span>
@@ -130,7 +130,7 @@ export default function Home() {
             <div className="bg-white w-full md:w-[33%] shadow-sm border overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
-                className="h-[220px] md:h-[300px] object-cover"
+                className="h-[220px] md:h-[300px] w-[100%] object-cover"
               />
               <div className="p-3 flex items-center justify-between border-t">
                 <span className="text-gray-900 font-medium">Tents</span>
