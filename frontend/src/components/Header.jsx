@@ -87,7 +87,7 @@ export default function Header({ onLoginClick }) {
             onClick={() => setMobileOpen(!mobileOpen)}
             className="p-1 text-white rounded-md bg-primary"
           >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-7 w-6" />}
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </div>
