@@ -47,7 +47,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen relative">
 
       {/* HERO SECTION */}
-      <section className="relative w-full h-[65vh] md:h-[90vh] flex items-center justify-center">
+      <section className="relative w-full h-[65vh] md:h-[90vh] flex items-start md:justify-center justify-start pt-[15v h]">
         <img
           src="/bannerImg1.webp"
           alt="Banner"
@@ -78,7 +78,7 @@ export default function Home() {
       </section>
 
       {/* SECTION : Find Your Perfect Stay */}
-      <section className="w-full bg-[#faf7f4] py-[20px] mt-[230px] px-4 md:px-12">
+      <section className="w-full bg-[#faf7f4] py-[20px] mt-[250px] px-4 md:px-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10">
 
           {/* LEFT TEXT BLOCK */}
