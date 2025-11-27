@@ -47,7 +47,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen relative">
 
       {/* HERO SECTION */}
-      <section className="relative w-full h-[65vh] md:h-[90vh] flex items-center md:justify-center justify-start pt-[15vh]">
+      <section className="relative w-full h-[65vh] md:h-[90vh] flex md:items-center items:start md:justify-center justify-start pt-[15vh]">
         <img
           src="/bannerImg1.webp"
           alt="Banner"
