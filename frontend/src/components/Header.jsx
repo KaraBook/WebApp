@@ -33,7 +33,7 @@ export default function Header({ onLoginClick }) {
           <img
             src="/KarabookLogo.png"
             alt="BookMyStay"
-            className="h-6 w-auto md:h-10"
+            className="h-8 w-auto md:h-10"
           />
         </Link>
 
@@ -68,7 +68,7 @@ export default function Header({ onLoginClick }) {
           {!user && (
             <button
               onClick={onLoginClick}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
+              className="p-2 rounded-full bg-gray-200 hover:bg-gray-200"
             >
               <UserIcon className="h-6 w-6 text-gray-700" />
             </button>
@@ -85,7 +85,7 @@ export default function Header({ onLoginClick }) {
           {/* Mobile Hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 rounded-md hover:bg-gray-100"
+            className="p-1 rounded-md bg-primary"
           >
             {mobileOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
           </button>
