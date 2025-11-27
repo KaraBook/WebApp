@@ -39,7 +39,7 @@ export default function PropertyGalleryModal({ images = [], open, onClose }) {
             p-0 m-0 
             max-w-full
             border-none shadow-none 
-            w-screen h-screen 
+            w-screen h-[70vh] 
             z-[9999]
             !transform-none !left-0 !top-0
             !flex-none !items-start !justify-start
