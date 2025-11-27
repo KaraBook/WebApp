@@ -87,7 +87,7 @@ export default function PropertyGalleryModal({ images = [], open, onClose }) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="max-h-[70vh] max-w-[60vw] w-[100%] object-cover mx-auto pointer-events-none"
+                className="max-h-[70vh] h-[70vh] max-w-[60vw] w-[100%] object-cover mx-auto pointer-events-none"
               />
             </AnimatePresence>
           </div>
