@@ -70,7 +70,7 @@ export default function Header({ onLoginClick }) {
               onClick={onLoginClick}
               className="p-2 rounded-full bg-gray-200"
             >
-              <UserIcon className="h-6 w-6 text-gray-800" />
+              <UserIcon className="h-5 w-5 text-gray-800" />
             </button>
           )}
 
