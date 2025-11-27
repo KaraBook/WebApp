@@ -79,7 +79,7 @@ export default function Header({ onLoginClick }) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button>
-                  <Avatar className="h-8 w-8 shadow-sm">
+                  <Avatar className="h-9 w-9 shadow-sm">
                     <AvatarImage src={user?.avatarUrl} />
                     <AvatarFallback>{(user?.name?.[0] || "U").toUpperCase()}</AvatarFallback>
                   </Avatar>
@@ -194,7 +194,7 @@ function AccountDropdownPanel({ user, clearAuth }) {
       align="end"
       className="w-60 p-0 shadow-2xl rounded-[0] border border-gray-100 overflow-hidden"
     >
-      <div className="px-4 py-3 border-b">
+      <div className="px-4 py-3 mt-2 border-b">
         <p className="text-[15px] font-semibold truncate">{user?.name}</p>
         <p className="text-xs text-gray-500 -mt-0.5">Manage your account</p>
       </div>
