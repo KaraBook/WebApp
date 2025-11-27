@@ -37,7 +37,7 @@ export default function Header({ onLoginClick }) {
           />
         </Link>
 
-        {/* Desktop Navigation (Untouched) */}
+        {/* Desktop Navigation */}
         <div className="hidden md:flex gap-5">
           <Link to="/properties" className="tracking-[2px] uppercase md:text-[14px] font-medium">
             Explore
@@ -50,7 +50,7 @@ export default function Header({ onLoginClick }) {
           </Link>
         </div>
 
-        {/* Desktop Right Panel (Untouched) */}
+        {/* Desktop Right Side */}
         <div className="hidden md:flex items-center gap-3">
           {user ? (
             <AccountDropdown user={user} clearAuth={clearAuth} />
@@ -68,18 +68,27 @@ export default function Header({ onLoginClick }) {
           {!user && (
             <button
               onClick={onLoginClick}
-              className="p-2 rounded-full bg-gray-200 hover:bg-gray-200"
+              className="p-2 rounded-full bg-gray-200"
             >
-              <UserIcon className="h-6 w-6 text-gray-700" />
+              <UserIcon className="h-6 w-6 text-gray-800" />
             </button>
           )}
 
-          {/* Mobile User Avatar */}
+          {/* Mobile User Avatar (Triggers SAME DROPDOWN AS DESKTOP) */}
           {user && (
-            <Avatar className="h-8 w-8 shadow-sm">
-              <AvatarImage src={user?.avatarUrl} />
-              <AvatarFallback>{(user?.name?.[0] || "U").toUpperCase()}</AvatarFallback>
-            </Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button>
+                  <Avatar className="h-8 w-8 shadow-sm">
+                    <AvatarImage src={user?.avatarUrl} />
+                    <AvatarFallback>{(user?.name?.[0] || "U").toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+
+              {/* SAME DESKTOP DROPDOWN ON MOBILE */}
+              <AccountDropdownPanel user={user} clearAuth={clearAuth} />
+            </DropdownMenu>
           )}
 
           {/* Mobile Hamburger */}
@@ -92,7 +101,7 @@ export default function Header({ onLoginClick }) {
         </div>
       </div>
 
-      {/* MOBILE MENU PANEL */}
+      {/* MOBILE MENU PANEL — ONLY NAVIGATION NOW */}
       {mobileOpen && (
         <div className="md:hidden bg-white border-t shadow-sm animate-slideDown">
           <div className="flex flex-col gap-4 px-4 py-4">
@@ -107,31 +116,6 @@ export default function Header({ onLoginClick }) {
               Contact
             </Link>
 
-            {user && (
-              <div className="border-t pt-3 space-y-3">
-
-                <MobileItem icon={<CalendarCheck />} label="My Bookings" to="/account/bookings" close={() => setMobileOpen(false)} />
-
-                <MobileItem icon={<Heart />} label="Wishlist" to="/account/wishlist" close={() => setMobileOpen(false)} />
-
-                <MobileItem icon={<UserIcon />} label="My Profile" to="/account/profile" close={() => setMobileOpen(false)} />
-
-                <MobileItem icon={<Star />} label="My Ratings" to="/account/ratings" close={() => setMobileOpen(false)} />
-
-                <MobileItem icon={<LifeBuoy />} label="Support / Help" to="/account/support" close={() => setMobileOpen(false)} />
-
-                <button
-                  onClick={() => {
-                    clearAuth();
-                    setMobileOpen(false);
-                  }}
-                  className="flex items-center gap-2 text-red-600 pt-2"
-                >
-                  <LogOut className="h-4 w-4" /> Logout
-                </button>
-
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -139,50 +123,34 @@ export default function Header({ onLoginClick }) {
   );
 }
 
-/* ---------------- DESKTOP ACCOUNT DROPDOWN (UNCHANGED) ---------------- */
+/* ---------------- DESKTOP DROPDOWN REUSED FOR MOBILE ---------------- */
+
 function AccountDropdown({ user, clearAuth }) {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="flex items-center rounded-full gap-2 px-2 py-1 hover:bg-muted transition-colors">
-          <Avatar className="h-8 w-8 md:h-9 md:w-9 shadow-sm">
-            <AvatarImage src={user?.avatarUrl} />
-            <AvatarFallback className="bg-primary text-white">
-              {(user?.name?.[0] || "U").toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="flex items-center rounded-full gap-2 px-2 py-1 hover:bg-muted transition-colors">
+            <Avatar className="h-8 w-8 md:h-9 md:w-9 shadow-sm">
+              <AvatarImage src={user?.avatarUrl} />
+              <AvatarFallback className="bg-primary text-white">
+                {(user?.name?.[0] || "U").toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
 
-          <Menu className="h-9 w-9 text-gray-700 shadow-sm p-2 rounded-full bg-gray-100" strokeWidth={2} />
-        </button>
-      </DropdownMenuTrigger>
+            <Menu className="h-9 w-9 text-gray-700 shadow-sm p-2 rounded-full bg-gray-100" strokeWidth={2} />
+          </button>
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        align="end"
-        className="w-60 p-0 shadow-2xl rounded-[0] border border-gray-100 overflow-hidden"
-      >
-        <div className="px-4 py-3 border-b">
-          <p className="text-[15px] font-semibold truncate">{user?.name}</p>
-          <p className="text-xs text-gray-500 -mt-0.5">Manage your account</p>
-        </div>
-
-        <DesktopItem user={user} />
-
-        <DropdownMenuItem
-          onClick={clearAuth}
-          className="px-4 py-3 cursor-pointer hover:bg-red-50 flex items-center gap-3 text-red-600 font-medium"
-        >
-          <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
-            <LogOut className="h-4 w-4" />
-          </div>
-          Logout
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <AccountDropdownPanel user={user} clearAuth={clearAuth} />
+      </DropdownMenu>
+    </>
   );
 }
 
-/* Desktop List Items EXACTLY SAME */
-function DesktopItem() {
+/* SHARED DROPDOWN PANEL FOR BOTH MOBILE & DESKTOP */
+function AccountDropdownPanel({ user, clearAuth }) {
+
   const items = [
     {
       label: "My Bookings",
@@ -221,36 +189,44 @@ function DesktopItem() {
     },
   ];
 
-  return items.map((item, i) => (
-    <DropdownMenuItem
-      key={i}
-      asChild
-      className="px-4 py-2.5 cursor-pointer group hover:bg-gray-100 rounded-none"
-    >
-      <Link to={item.to} className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-3">
-          <div className={`h-8 w-8 rounded-full flex items-center justify-center ${item.bg}`}>
-            <span className={item.iconColor}>{item.icon}</span>
-          </div>
-          <span className="text-[15px] text-gray-700">{item.label}</span>
-        </div>
-        <ChevronRight className="h-4 w-4 text-gray-400 group-hover:translate-x-1 transition" />
-      </Link>
-    </DropdownMenuItem>
-  ));
-}
-
-/* MOBILE ITEM COMPONENT */
-function MobileItem({ icon, label, to, close }) {
   return (
-    <Link
-      to={to}
-      onClick={close}
-      className="flex items-center gap-2 text-[15px]"
+    <DropdownMenuContent
+      align="end"
+      className="w-60 p-0 shadow-2xl rounded-[0] border border-gray-100 overflow-hidden"
     >
-      {icon}
-      {label}
-    </Link>
+      <div className="px-4 py-3 border-b">
+        <p className="text-[15px] font-semibold truncate">{user?.name}</p>
+        <p className="text-xs text-gray-500 -mt-0.5">Manage your account</p>
+      </div>
+
+      {items.map((item, i) => (
+        <DropdownMenuItem
+          key={i}
+          asChild
+          className="px-4 py-2.5 cursor-pointer group hover:bg-gray-100"
+        >
+          <Link to={item.to} className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3">
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center ${item.bg}`}>
+                <span className={item.iconColor}>{item.icon}</span>
+              </div>
+              <span className="text-[15px] text-gray-700">{item.label}</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-gray-400 group-hover:translate-x-1 transition" />
+          </Link>
+        </DropdownMenuItem>
+      ))}
+
+      <DropdownMenuItem
+        onClick={clearAuth}
+        className="px-4 py-3 cursor-pointer hover:bg-red-50 flex items-center gap-3 text-red-600 font-medium"
+      >
+        <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
+          <LogOut className="h-4 w-4" />
+        </div>
+        Logout
+      </DropdownMenuItem>
+    </DropdownMenuContent>
   );
 }
 
