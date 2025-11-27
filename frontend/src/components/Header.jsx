@@ -1,151 +1,207 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { ChevronRight } from "lucide-react";
-import { CalendarCheck, Heart, User as UserIcon, Star, LifeBuoy, LogOut, Menu, Icon } from "lucide-react";
+import {
+  ChevronRight,
+  Menu,
+  X,
+  CalendarCheck,
+  Heart,
+  User as UserIcon,
+  Star,
+  LifeBuoy,
+  LogOut
+} from "lucide-react";
 
 export default function Header({ onLoginClick }) {
   const { user, clearAuth } = useAuthStore();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background z-[9999999]">
+    <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
+        
+        {/* LOGO */}
         <Link to="/" className="flex items-center gap-2" aria-label="Go to home">
-          <img
-            src="/KarabookLogo.png"
-            alt="BookMyStay"
-            className="h-6 w-auto md:h-10"
-          />
+          <img src="/KarabookLogo.png" alt="BookMyStay" className="h-8 w-auto md:h-10" />
         </Link>
 
-        <div className="flex gap-5">
-          <Link to="/properties" className="tracking-[2px] uppercase md:text-[14px] font-medium">
-            Explore
-          </Link>
-          <Link to="/top-places" className="tracking-[2px] uppercase md:text-[14px] font-medium">
-            Top Places
-          </Link>
-          <Link to="/contact" className="tracking-[2px] uppercase md:text-[14px] font-medium">
-            Contact
-          </Link>
-        </div>
+        {/* DESKTOP NAV */}
+        <nav className="hidden md:flex gap-6">
+          <Link to="/properties" className="tracking-[2px] uppercase text-sm font-medium">Explore</Link>
+          <Link to="/top-places" className="tracking-[2px] uppercase text-sm font-medium">Top Places</Link>
+          <Link to="/contact" className="tracking-[2px] uppercase text-sm font-medium">Contact</Link>
+        </nav>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-3">
+        {/* RIGHT SECTION DESKTOP */}
+        <div className="hidden md:flex items-center gap-3">
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center rounded-full gap-2 px-2 py-1 hover:bg-muted transition-colors">
-                  <Avatar className="h-8 w-8 md:h-9 md:w-9 shadow-sm">
-                    <AvatarImage src={user?.avatarUrl} alt={user?.name} />
-                    <AvatarFallback className="bg-primary text-white">
-                      {(user?.name?.[0] || user?.mobile?.[0] || "U").toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-
-                  <Menu
-                    className="h-9 w-9 text-gray-700 shadow-sm p-2 rounded-full bg-gray-100"
-                    strokeWidth={2}
-                  />
-                </button>
-              </DropdownMenuTrigger>
-
-              {/* DROPDOWN PANEL */}
-              <DropdownMenuContent
-                align="end"
-                className="w-60 p-0 shadow-2xl rounded-[0] border border-gray-100 overflow-hidden"
-              >
-                {/* Account Name */}
-                <div className="px-4 py-3 border-b">
-                  <p className="text-[15px] font-semibold truncate">{user?.name}</p>
-                  <p className="text-xs text-gray-500 -mt-0.5">Manage your account</p>
-                </div>
-
-                {/* MENU ITEMS */}
-                <div className="py-2">
-
-                  {/* Item Component */}
-                  {[
-                    {
-                      label: "My Bookings",
-                      icon: <CalendarCheck className="h-4 w-4" />,
-                      to: "/account/bookings",
-                      bg: "bg-[#D7F9F2]",
-                      iconColor: "text-[#00A685]"
-                    },
-                    {
-                      label: "Wishlist",
-                      icon: <Heart className="h-4 w-4" />,
-                      to: "/account/wishlist",
-                      bg: "bg-[#FFDCE5]",
-                      iconColor: "text-[#FF3B6A]"
-                    },
-                    {
-                      label: "My Profile",
-                      icon: <UserIcon className="h-4 w-4" />,
-                      to: "/account/profile",
-                      bg: "bg-[#E8F0FE]",
-                      iconColor: "text-[#3B6CFF]"
-                    },
-                    {
-                      label: "My Ratings",
-                      icon: <Star className="h-4 w-4" />,
-                      to: "/account/ratings",
-                      bg: "bg-[#FFF4CC]",
-                      iconColor: "text-[#F4B000]"
-                    },
-                    {
-                      label: "Support / Help",
-                      icon: <LifeBuoy className="h-4 w-4" />,
-                      to: "/account/support",
-                      bg: "bg-[#E5F4FF]",
-                      iconColor: "text-[#0090FF]"
-                    },
-                  ].map((item, i) => (
-                    <DropdownMenuItem
-                      key={i}
-                      asChild
-                      className="px-4 py-2.5 cursor-pointer group hover:bg-gray-100 rounded-none"
-                    >
-                      <Link to={item.to} className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-3">
-                          <div className={`h-8 w-8 rounded-full flex items-center justify-center ${item.bg}`}>
-                            <span className={item.iconColor}>{item.icon}</span>
-                          </div>
-                          <span className="text-[15px] text-gray-700">{item.label}</span>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-gray-400 group-hover:translate-x-1 transition" />
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-
-                  {/* Logout */}
-                  <DropdownMenuItem
-                    onClick={clearAuth}
-                    className="px-4 py-3 cursor-pointer hover:bg-red-50 flex items-center gap-3 text-red-600 font-medium"
-                  >
-                    <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center">
-                      <LogOut className="h-4 w-4" />
-                    </div>
-                    Logout
-                  </DropdownMenuItem>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <AccountMenu user={user} clearAuth={clearAuth} />
           ) : (
             <Button onClick={onLoginClick} className="text-sm rounded-none tracking-[3px]">
               SIGN IN <ChevronRight className="w-4 h-4" />
             </Button>
           )}
+        </div>
 
+        {/* MOBILE RIGHT SECTION */}
+        <div className="md:hidden flex items-center gap-3">
+
+          {/* MOBILE LOGIN ICON (when NOT logged in) */}
+          {!user && (
+            <button
+              onClick={onLoginClick}
+              className="p-2 rounded-full bg-gray-200 hover:bg-gray-200 transition"
+            >
+              <UserIcon className="h-5 w-5 text-gray-700" />
+            </button>
+          )}
+
+          {/* MOBILE USER AVATAR (when logged in) */}
+          {user && (
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="rounded-full"
+            >
+              <Avatar className="h-8 w-8 shadow-sm">
+                <AvatarImage src={user?.avatarUrl} />
+                <AvatarFallback>{(user?.name?.[0] || "U").toUpperCase()}</AvatarFallback>
+              </Avatar>
+            </button>
+          )}
+
+          {/* HAMBURGER BUTTON */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-1 rounded-md bg-primary text-white transition"
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
       </div>
+
+      {/* MOBILE DROPDOWN MENU */}
+      {mobileOpen && (
+        <div className="md:hidden bg-white border-b shadow-sm animate-slideDown">
+          <nav className="flex flex-col px-4 py-3 space-y-4 text-[15px]">
+            <Link onClick={() => setMobileOpen(false)} to="/properties">Explore</Link>
+            <Link onClick={() => setMobileOpen(false)} to="/top-places">Top Places</Link>
+            <Link onClick={() => setMobileOpen(false)} to="/contact">Contact</Link>
+
+            {/* IF USER LOGGED IN SHOW USER PANEL */}
+            {user && (
+              <div className="border-t pt-3">
+                <MobileUserPanel
+                  user={user}
+                  clearAuth={clearAuth}
+                  closeMenu={() => setMobileOpen(false)}
+                />
+              </div>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
+
+/* ------------------------- DESKTOP ACCOUNT MENU ------------------------ */
+function AccountMenu({ user, clearAuth }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="flex items-center rounded-full gap-2 px-2 py-1 hover:bg-muted transition-colors">
+          <Avatar className="h-8 w-8 shadow-sm">
+            <AvatarImage src={user?.avatarUrl} />
+            <AvatarFallback>{(user?.name?.[0] || "U").toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <Menu className="h-8 w-8 text-gray-700 p-2 rounded-full bg-gray-100" />
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-60 p-0 shadow-2xl border border-gray-100">
+        <div className="px-4 py-3 border-b">
+          <p className="font-semibold">{user?.name}</p>
+          <p className="text-xs text-gray-500">Manage your account</p>
+        </div>
+
+        <MenuItem to="/account/bookings" icon={<CalendarCheck />} label="My Bookings" />
+        <MenuItem to="/account/wishlist" icon={<Heart />} label="Wishlist" />
+        <MenuItem to="/account/profile" icon={<UserIcon />} label="My Profile" />
+        <MenuItem to="/account/ratings" icon={<Star />} label="My Ratings" />
+        <MenuItem to="/account/support" icon={<LifeBuoy />} label="Support / Help" />
+
+        <DropdownMenuItem
+          onClick={clearAuth}
+          className="px-4 py-3 cursor-pointer hover:bg-red-50 flex items-center gap-3 text-red-600 font-medium"
+        >
+          <LogOut className="h-4 w-4" /> Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function MenuItem({ to, icon, label }) {
+  return (
+    <DropdownMenuItem asChild className="px-4 py-2 cursor-pointer hover:bg-gray-100">
+      <Link to={to} className="flex items-center gap-3">
+        {icon} <span>{label}</span>
+      </Link>
+    </DropdownMenuItem>
+  );
+}
+
+/* ------------------------- MOBILE USER PANEL ------------------------- */
+function MobileUserPanel({ user, clearAuth, closeMenu }) {
+  return (
+    <div className="space-y-3">
+      <p className="font-semibold">{user?.name}</p>
+
+      <Link onClick={closeMenu} to="/account/bookings" className="flex items-center gap-3">
+        <CalendarCheck className="h-4 w-4" /> My Bookings
+      </Link>
+      <Link onClick={closeMenu} to="/account/wishlist" className="flex items-center gap-3">
+        <Heart className="h-4 w-4" /> Wishlist
+      </Link>
+      <Link onClick={closeMenu} to="/account/profile" className="flex items-center gap-3">
+        <UserIcon className="h-4 w-4" /> My Profile
+      </Link>
+      <Link onClick={closeMenu} to="/account/ratings" className="flex items-center gap-3">
+        <Star className="h-4 w-4" /> My Ratings
+      </Link>
+      <Link onClick={closeMenu} to="/account/support" className="flex items-center gap-3">
+        <LifeBuoy className="h-4 w-4" /> Support / Help
+      </Link>
+
+      <button
+        onClick={() => {
+          clearAuth();
+          closeMenu();
+        }}
+        className="flex items-center gap-3 text-red-600 mt-2"
+      >
+        <LogOut className="h-4 w-4" /> Logout
+      </button>
+    </div>
+  );
+}
+
+/* ------------------------- ANIMATION ------------------------- */
+const style = document.createElement("style");
+style.innerHTML = `
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slideDown { animation: slideDown 0.25s ease-out; }
+`;
+document.head.appendChild(style);
