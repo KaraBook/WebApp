@@ -30,7 +30,7 @@ export default function PropertyGalleryModal({ images = [], open, onClose }) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogPortal>
 
-        <DialogOverlay className="max-w-full fixed inset-0 bg-black/80 z-[999999]" />
+        <DialogOverlay className="max-w-full fixed inset-0 bg-black/80 z-[99999999]" />
 
         <DialogContent
           className="
@@ -40,7 +40,7 @@ export default function PropertyGalleryModal({ images = [], open, onClose }) {
             max-w-full
             border-none shadow-none 
             w-screen h-screen 
-            z-[9999]
+            z-[999999999]
             !transform-none !left-0 !top-0
             !flex-none !items-start !justify-start
           "
