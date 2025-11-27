@@ -85,9 +85,9 @@ export default function Header({ onLoginClick }) {
           {/* Mobile Hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-1 rounded-md bg-primary"
+            className="p-1 text-white rounded-md bg-primary"
           >
-            {mobileOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-7 w-7" />}
           </button>
         </div>
       </div>
