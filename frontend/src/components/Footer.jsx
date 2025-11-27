@@ -15,7 +15,7 @@ export default function Footer() {
           </div>
 
           {/* Explore */}
-          <div className="w-[48%] md:w-[12%]">
+          <div className="w-[45%] md:w-[12%]">
             <h3 className="text-base font-semibold text-gray-900 mb-3 tracking-wide">
               Explore
             </h3>
@@ -27,7 +27,7 @@ export default function Footer() {
           </div>
 
           {/* For Owners */}
-          <div className="w-[48%] md:w-[12%]">
+          <div className="w-[45%] md:w-[12%]">
             <h3 className="text-base font-semibold text-gray-900 mb-3 tracking-wide">
               For Owners
             </h3>
@@ -38,7 +38,7 @@ export default function Footer() {
           </div>
 
           {/* Connect */}
-          <div className="w-[48%] md:w-[12%]">
+          <div className="w-[45%] md:w-[12%]">
             <h3 className="text-base font-semibold text-gray-900 mb-3 tracking-wide">
               Connect
             </h3>
@@ -50,7 +50,7 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div className="w-[48%] md:w-[12%]">
+          <div className="w-[45%] md:w-[12%]">
             <h3 className="text-base font-semibold text-gray-900 mb-3 tracking-wide">
               Quick Links
             </h3>
