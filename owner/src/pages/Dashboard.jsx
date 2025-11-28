@@ -48,7 +48,7 @@ export default function Dashboard() {
         <StatCard
           label="Total Revenue"
           value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
-          color="text-emerald-700"
+          color="text-[#094da5]"
         />
       </div>
 
@@ -144,7 +144,7 @@ function StatCard({ label, value, color }) {
         <CardTitle className="text-sm text-gray-500">{label}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className={`text-2xl font-semibold ${color || "text-gray-800"}`}>
+        <p className={`text-[32px] font-bold ${color || "text-gray-800"}`}>
           {value || 0}
         </p>
       </CardContent>
