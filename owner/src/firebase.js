@@ -16,35 +16,28 @@ try {
 }
 export const auth = getAuth(app);
 
-export const buildRecaptcha = async () => {
-  if (typeof window === "undefined") throw new Error("No window object");
-  if (!auth || !auth.app) throw new Error("Auth instance not ready");
+export const buildRecaptcha = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      if (window.recaptchaVerifier) {
+        return resolve(window.recaptchaVerifier);
+      }
 
-  console.log("⚙️ Building reCAPTCHA with auth:", auth.app.name);
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        "recaptcha-container",
+        {
+          size: "invisible",
+        },
+        auth
+      );
 
-  if (window.recaptchaVerifier) {
-    try { await window.recaptchaVerifier.clear(); } catch {}
-    window.recaptchaVerifier = null;
-  }
-
-  const verifier = new RecaptchaVerifier(
-    auth, 
-    "recaptcha-container",
-    {
-      size: "invisible",
-      callback: () => console.log("✅ reCAPTCHA verified"),
-      "expired-callback": () => {
-        console.warn("⚠️ reCAPTCHA expired — clearing");
-        try { verifier.clear(); } catch {}
-        window.recaptchaVerifier = null;
-      },
+      window.recaptchaVerifier.render();
+      resolve(window.recaptchaVerifier);
+    } catch (e) {
+      reject(e);
     }
-  );
-
-  await verifier.render();
-  window.recaptchaVerifier = verifier;
-  console.log("✅ reCAPTCHA initialized successfully");
-  return verifier;
+  });
 };
+
 
 export { signInWithPhoneNumber };

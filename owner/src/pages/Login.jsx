@@ -40,40 +40,52 @@ export default function Login() {
     }
   }, []);
 
-  /* ---------------- SEND OTP ---------------- */
-  const sendOtp = async () => {
-    const ten = mobile.replace(/\D/g, "");
-    if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
 
-    if (!canResend) {
-      return toast.error(`Please wait ${timer}s before requesting a new OTP`);
-    }
 
-    setLoading(true);
-    try {
-      const check = await api.post(SummaryApi.ownerPrecheck.url, { mobile: ten });
-      if (!check.data?.success) {
-        toast.error(check.data?.message || "This number is not authorized to log in.");
-        setLoading(false);
-        return;
-      }
+ const sendOtp = async () => {
+  const ten = mobile.replace(/\D/g, "");
+  if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
 
-      const verifier = window.recaptchaVerifier || (await buildRecaptcha());
-      const confirmation = await signInWithPhoneNumber(auth, `+91${ten}`, verifier);
-      setConfirmRes(confirmation);
-      setPhase("verify");
-      toast.success("OTP sent successfully");
+  if (!canResend) {
+    return toast.error(`Please wait ${timer}s before requesting a new OTP`);
+  }
 
-      setCanResend(false);
-      setTimer(90);
+  setLoading(true);
 
-    } catch (e) {
-      console.error("sendOtp error:", e);
-      toast.error(e.response?.data?.message || "Failed to send OTP. Please try again.");
-    } finally {
+  try {
+    const check = await api.post(SummaryApi.ownerPrecheck.url, { mobile: ten });
+    if (!check.data?.success) {
+      toast.error(check.data.message);
       setLoading(false);
+      return;
     }
-  };
+
+    if (canResend) {
+      try {
+        await auth.signOut();
+      } catch (err) {
+        console.warn("signOut ignored:", err);
+      }
+    }
+
+    const verifier = window.recaptchaVerifier;
+    const confirmation = await signInWithPhoneNumber(auth, `+91${ten}`, verifier);
+    setConfirmRes(confirmation);
+
+    setPhase("verify");
+    toast.success("OTP sent successfully");
+    setCanResend(false);
+    setTimer(90);
+
+  } catch (e) {
+    console.error("sendOtp error:", e);
+    toast.error(e.response?.data?.message || "Failed to send OTP. Try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
 
   useEffect(() => {
