@@ -386,6 +386,13 @@ export const updateProperty = async (req, res) => {
         updatedData.shopAct = result.secure_url;
       }
 
+      let finalGallery = [...(existingProperty.galleryPhotos || [])];
+
+      if (req.body.existingGallery) {
+        try {
+          finalGallery = JSON.parse(req.body.existingGallery);
+        } catch { }
+      }
       if (galleryFiles.length > 0) {
         const galleryResults = await Promise.all(
           galleryFiles.map(async (f) => {
@@ -394,10 +401,11 @@ export const updateProperty = async (req, res) => {
           })
         );
 
-        updatedData.galleryPhotos = galleryResults.map((r) => r.secure_url);
-      } else {
-        updatedData.galleryPhotos = existingProperty.galleryPhotos;
+        const newUrls = galleryResults.map((r) => r.secure_url);
+        finalGallery.push(...newUrls);
       }
+      updatedData.galleryPhotos = finalGallery;
+
     }
 
     const effectiveCover = updatedData.coverImage || existingProperty.coverImage;

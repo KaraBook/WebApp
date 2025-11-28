@@ -884,9 +884,6 @@ const EditProperty = () => {
               />
             </div>
 
-
-
-
           </>
         )}
 
