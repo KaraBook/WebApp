@@ -13,16 +13,28 @@ export const auth = getAuth(app);
 
 
 export const buildRecaptcha = () => {
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      "recaptcha-container",
-      { size: "invisible" },
-      auth
-    );
-    window.recaptchaVerifier.render();
+  if (typeof window === "undefined") return null;
+
+  if (window.recaptchaVerifier) {
+    try { window.recaptchaVerifier.clear(); } catch {}
+    window.recaptchaVerifier = null;
   }
+  window.recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    "recaptcha-container",
+    {
+      size: "invisible",
+      callback: () => console.log("reCAPTCHA verified"),
+      "expired-callback": () => {
+        console.log("Recaptcha expired");
+        window.recaptchaVerifier = null;
+      }
+    }
+  );
+  window.recaptchaVerifier.render();
   return window.recaptchaVerifier;
 };
+
 
 
 export { signInWithPhoneNumber };
