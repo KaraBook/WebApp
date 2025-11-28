@@ -32,7 +32,6 @@ const EditProperty = () => {
     const [galleryImageFiles, setGalleryImageFiles] = useState([]);
     const [coverImagePreview, setCoverImagePreview] = useState(null);
     const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
-    const [replaceGallery, setReplaceGallery] = useState(false);
     const [shopActFile, setShopActFile] = useState(null);
     const [shopActPreview, setShopActPreview] = useState(null);
 
@@ -123,9 +122,7 @@ const EditProperty = () => {
             if (coverImageFile) data.append("coverImage", coverImageFile);
             if (shopActFile) data.append("shopAct", shopActFile);
 
-            if (replaceGallery && galleryImageFiles.length > 0) {
-                galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
-            }
+           galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
 
             await api.put(SummaryApi.updateOwnerProperty(id).url, data, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -272,14 +269,6 @@ const EditProperty = () => {
                         setShopActPreview={setShopActPreview}
                     />
 
-                    <div className="flex items-center gap-2 mt-4">
-                        <input
-                            type="checkbox"
-                            checked={replaceGallery}
-                            onChange={(e) => setReplaceGallery(e.target.checked)}
-                        />
-                        <Label>Replace full gallery</Label>
-                    </div>
                 </div>
 
                 {/* SUBMIT */}

@@ -208,12 +208,21 @@ export const updateOwnerProperty = async (req, res) => {
       const galleryResults = await Promise.all(
         files.galleryPhotos.map(async (f) => {
           const processed = await prepareImage(f.buffer);
-          const result = await uploadBuffer(processed, { folder: "properties/gallery" });
+          const result = await uploadBuffer(processed, {
+            folder: "properties/gallery",
+          });
           return result.secure_url;
         })
       );
-      updatedData.galleryPhotos = galleryResults;
+
+      updatedData.galleryPhotos = [
+        ...(existingProperty.galleryPhotos || []),
+        ...galleryResults,
+      ];
+    } else {
+      updatedData.galleryPhotos = existingProperty.galleryPhotos;
     }
+
 
     const finalCover = updatedData.coverImage || existingProperty.coverImage;
     const finalGallery =
@@ -289,17 +298,17 @@ export const getPropertyBlockedDates = async (req, res) => {
 
 export const addBlockedDates = async (req, res) => {
   try {
-    console.log("🟢 addBlockedDates hit");
+    console.log(" addBlockedDates hit");
     console.log("Body received:", req.body);
     console.log("Params received:", req.params);
 
     const { id } = req.params;
     const { start, end, reason } = req.body;
 
-    console.log("🟢 addBlockedDates hit", { id, start, end, reason });
+    console.log(" addBlockedDates hit", { id, start, end, reason });
 
     if (!start || !end) {
-      console.error("❌ Missing start or end date:", req.body);
+      console.error(" Missing start or end date:", req.body);
       return res
         .status(400)
         .json({ success: false, message: "Start and End dates are required" });
