@@ -926,20 +926,6 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-full -mt-2 flex items-center gap-3">
-              <input
-                id="replaceGallery"
-                type="checkbox"
-                checked={replaceGallery}
-                onChange={(e) => setReplaceGallery(e.target.checked)}
-                className="h-4 w-4"
-              />
-              <Label htmlFor="replaceGallery" className="text-sm">
-                Replace gallery with newly selected images (leave unchecked to keep current gallery)
-              </Label>
-            </div>
-
-
           </>
         )}
 
