@@ -132,7 +132,7 @@ function PropertyCard({ property }) {
           asChild
           variant="outline"
           size="sm"
-          className="rounded-md px-[20px]"
+          className="rounded-md px-8"
         >
           <Link to={`/view-property/${property._id}`}>View</Link>
         </Button>
@@ -140,7 +140,7 @@ function PropertyCard({ property }) {
         <Button
           asChild
           size="sm"
-          className="rounded-md px-[20px] bg-black text-white hover:bg-black/90"
+          className="rounded-md bg-black text-white px-8 hover:bg-black/90"
         >
           <Link
             to={
