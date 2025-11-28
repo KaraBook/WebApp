@@ -77,6 +77,10 @@ const SummaryApi = {
   url: (id) => `/api/properties/${id}/blocked-dates`,
   method: "GET",
  },
+ deleteReview: {
+  url: (id) => `/api/reviews/${id}`,
+  method: "delete"
+},
 
 };
 

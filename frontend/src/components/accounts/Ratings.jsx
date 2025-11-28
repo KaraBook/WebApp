@@ -2,26 +2,43 @@ import { useEffect, useState } from "react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import { Star } from "lucide-react";
+import { Star, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function Ratings() {
   const { accessToken } = useAuthStore();
   const [reviews, setReviews] = useState([]);
 
+  const fetchReviews = async () => {
+    try {
+      const res = await Axios.get(SummaryApi.getUserReviews.url, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setReviews(res.data.data || []);
+    } catch {
+      console.error("Failed to load reviews");
+    }
+  };
+
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const res = await Axios.get(SummaryApi.getUserReviews.url, {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
-        setReviews(res.data.data || []);
-      } catch {
-        console.error("Failed to load reviews");
-      }
-    };
     fetchReviews();
   }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await Axios.delete(SummaryApi.deleteReview.url(id), {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      setReviews((prev) => prev.filter((r) => r._id !== id));
+
+      toast.success("Review removed successfully");
+    } catch (err) {
+      toast.error("Failed to remove review");
+      console.error(err);
+    }
+  };
 
   if (!reviews.length)
     return (
@@ -31,7 +48,7 @@ export default function Ratings() {
     );
 
   return (
-    <div className="max-w-6xl  px-4 py-0">
+    <div className="max-w-6xl px-4 py-0">
       <h1 className="text-2xl uppercase tracking-[1px] font-[500] mb-6 text-[#233b19]">
         My Ratings & Reviews
       </h1>
@@ -40,8 +57,15 @@ export default function Ratings() {
         {reviews.map((r) => (
           <div
             key={r._id}
-            className="border border-gray-200 bg-white shadow-sm p-4 flex gap-4 hover:shadow-md transition-all duration-200"
+            className="relative border border-gray-200 bg-white shadow-sm p-4 flex gap-4 hover:shadow-md transition-all duration-200"
           >
+            <button
+              onClick={() => handleDelete(r._id)}
+              className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded-full"
+            >
+              <X className="w-5 h-5 text-gray-500 hover:text-red-600" />
+            </button>
+
             <Link to={`/properties/${r.propertyId?._id}`}>
               <img
                 src={r.propertyId?.coverImage}

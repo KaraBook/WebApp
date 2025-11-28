@@ -51,3 +51,32 @@ export const getUserReviews = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch user reviews" });
   }
 };
+
+
+
+export const deleteReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const userId = req.user.id;
+
+    const review = await Review.findOne({ _id: reviewId, userId });
+    if (!review) {
+      return res.status(404).json({ message: "Review not found or unauthorized" });
+    }
+
+    const propertyId = review.propertyId;
+    await Review.deleteOne({ _id: reviewId });
+    const allReviews = await Review.find({ propertyId });
+    const avgRating =
+      allReviews.length > 0
+        ? allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length
+        : 0;
+
+    await Property.findByIdAndUpdate(propertyId, { averageRating: avgRating });
+
+    res.json({ success: true, message: "Review removed" });
+  } catch (err) {
+    console.error("Delete review error:", err);
+    res.status(500).json({ message: "Failed to delete review" });
+  }
+};
