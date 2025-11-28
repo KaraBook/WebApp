@@ -18,17 +18,17 @@ export const buildRecaptcha = () => {
   }
 
   window.recaptchaVerifier = new RecaptchaVerifier(
+    auth,
     "recaptcha-container",
     {
       size: "invisible",
-      callback: () => console.log("reCAPTCHA success"),
-    },
-    auth
+      callback: (response) => {
+        console.log("reCAPTCHA resolved", response);
+      },
+    }
   );
 
-  return window.recaptchaVerifier.render().then(() => {
-    return window.recaptchaVerifier;
-  });
+  return window.recaptchaVerifier;
 };
 
 export { signInWithPhoneNumber };
