@@ -219,6 +219,7 @@ const EditProperty = () => {
         data.append("shopAct", shopActFile);
       }
 
+      data.append("existingGallery", JSON.stringify(galleryImagePreviews));
       if (galleryImageFiles.length > 0) {
         galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
       }

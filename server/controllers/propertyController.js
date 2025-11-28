@@ -391,20 +391,23 @@ export const updateProperty = async (req, res) => {
       if (req.body.existingGallery) {
         try {
           finalGallery = JSON.parse(req.body.existingGallery);
-        } catch { }
+        } catch (e) {
+          console.log("JSON parse error (existingGallery)", e);
+        }
       }
       if (galleryFiles.length > 0) {
-        const galleryResults = await Promise.all(
+        const newUploads = await Promise.all(
           galleryFiles.map(async (f) => {
             const processed = await prepareImage(f.buffer);
             return uploadBuffer(processed, { folder: "properties/gallery" });
           })
         );
-
-        const newUrls = galleryResults.map((r) => r.secure_url);
+        const newUrls = newUploads.map((u) => u.secure_url);
         finalGallery.push(...newUrls);
       }
+
       updatedData.galleryPhotos = finalGallery;
+
 
     }
 
