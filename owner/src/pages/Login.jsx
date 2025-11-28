@@ -43,9 +43,10 @@ export default function Login() {
 
 
  const sendOtp = async () => {
-  if (phone.length !== 10) return;
+  const ten = mobile.replace(/\D/g, "");
+  if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
 
-  setSending(true);
+  setLoading(true);
 
   try {
     try { await auth.signOut(); } catch {}
@@ -54,21 +55,24 @@ export default function Login() {
 
     const confirmation = await signInWithPhoneNumber(
       auth,
-      `+91${phone}`,
+      `+91${ten}`,
       verifier
     );
 
-    setConfirmResult(confirmation);
-    setStep("otp");
-    setTimer(60);
-    toast.success("OTP Sent");
+    setConfirmRes(confirmation);
+    setPhase("verify");
+    setCanResend(false);
+    setTimer(90);
+
+    toast.success("OTP sent successfully");
   } catch (err) {
-    console.error("sendOtp error", err);
-    toast.error(err?.message || "OTP failed");
+    console.error("sendOtp error:", err);
+    toast.error(err.message || "Failed to send OTP. Try again.");
   } finally {
-    setSending(false);
+    setLoading(false);
   }
 };
+
 
 
   useEffect(() => {
