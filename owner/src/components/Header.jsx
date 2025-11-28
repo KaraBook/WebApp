@@ -12,7 +12,6 @@ export default function Header() {
     user?.name ||
     "Owner";
 
-  // 🟦 Extract initials if no image
   const getInitials = (name) => {
     const parts = name.trim().split(" ");
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
@@ -30,28 +29,26 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full bg-white border-b shadow-sm px-6 py-3 flex items-center justify-between">
+    <header className="w-full bg-white/90 backdrop-blur border-b border-gray-200 px-8 py-3 flex items-center justify-between">
       {/* LEFT — LOGO */}
       <div className="flex items-center gap-2">
-        <img
-          src="/logo.png"
-          alt="logo"
-          className="h-8 w-8 object-cover"
-        />
-        <span className="font-semibold text-[18px] text-gray-800">KaraBook</span>
+        <img src="/logo.png" alt="logo" className="h-8 w-8 object-cover" />
+        <span className="font-semibold text-[18px] text-gray-800">
+          KaraBook
+        </span>
       </div>
 
       {/* CENTER — NAVIGATION */}
-      <nav className="hidden md:flex items-center gap-8">
+      <nav className="hidden md:flex items-center gap-6">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `text-[15px] transition ${
+              `text-[14px] leading-none px-3 py-1.5 rounded-full transition ${
                 isActive
-                  ? "font-semibold text-gray-900 bg-gray-100 px-3 py-1.5 rounded-lg"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
               }`
             }
           >
@@ -62,43 +59,40 @@ export default function Header() {
 
       {/* RIGHT — USER PROFILE */}
       <div className="relative flex items-center gap-3">
-        {/* AVATAR */}
         {user?.profilePhoto ? (
           <img
             src={user.profilePhoto}
             alt="profile"
             className="h-9 w-9 rounded-full border object-cover cursor-pointer"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
+            onClick={() => setDropdownOpen((p) => !p)}
           />
         ) : (
           <div
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold cursor-pointer"
+            onClick={() => setDropdownOpen((p) => !p)}
+            className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-sm cursor-pointer border"
           >
             {avatarInitial}
           </div>
         )}
 
-        {/* NAME */}
         <span
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="text-gray-800 font-medium text-[15px] cursor-pointer"
+          onClick={() => setDropdownOpen((p) => !p)}
+          className="text-gray-800 font-medium text-[14px] cursor-pointer"
         >
           {fullName}
         </span>
 
-        {/* DROPDOWN */}
         {dropdownOpen && (
-          <div className="absolute right-0 top-12 bg-white border shadow-lg rounded-xl w-44 py-2 z-50">
+          <div className="absolute right-0 top-11 bg-white border border-gray-200 shadow-lg rounded-xl w-44 py-2 z-50">
             <button
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-[14px] w-full text-left"
+              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] w-full text-left text-gray-700"
             >
               <User size={16} /> My Profile
             </button>
 
             <button
               onClick={logout}
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 text-[14px] text-red-600 w-full text-left"
+              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] text-red-600 w-full text-left"
             >
               <LogOut size={16} /> Logout
             </button>
