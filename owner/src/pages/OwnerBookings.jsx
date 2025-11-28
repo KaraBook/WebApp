@@ -71,7 +71,7 @@ export default function OwnerBookings() {
   }, [query, bookings]);
 
   const getStatusChip = (status) => {
-    const base = "px-3 py-1 rounded-full text-xs font-medium";
+    const base = "px-6 py-1 rounded-full text-xs font-medium";
     if (status === "paid")
       return <span className={`${base} bg-green-100 text-green-700`}>Paid</span>;
     if (status === "pending")
@@ -222,7 +222,7 @@ export default function OwnerBookings() {
                     {formatCurrency(b.totalAmount)}
                   </td>
 
-                  <td className="py-3 px-6"><span className="px-6">{getStatusChip(b.paymentStatus)}</span></td>
+                  <td className="py-3 px-6">{getStatusChip(b.paymentStatus)}</td>
 
                   <td className="py-3 px-4 text-xs text-gray-500">
                     {formatDate(b.createdAt)}
