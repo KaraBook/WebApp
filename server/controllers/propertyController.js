@@ -393,7 +393,10 @@ export const updateProperty = async (req, res) => {
             return uploadBuffer(processed, { folder: "properties/gallery" });
           })
         );
+
         updatedData.galleryPhotos = galleryResults.map((r) => r.secure_url);
+      } else {
+        updatedData.galleryPhotos = existingProperty.galleryPhotos;
       }
     }
 
@@ -407,12 +410,13 @@ export const updateProperty = async (req, res) => {
         message: "Cover image is required.",
       });
     }
-    if (!Array.isArray(effectiveGallery) || effectiveGallery.length < 3) {
+    if (!updatedData.galleryPhotos || updatedData.galleryPhotos.length < 3) {
       return res.status(400).json({
         success: false,
         message: "At least 3 gallery photos are required.",
       });
     }
+
 
     let updatedProperty;
     await session.withTransaction(async () => {

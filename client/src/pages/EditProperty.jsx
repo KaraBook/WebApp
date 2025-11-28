@@ -49,7 +49,6 @@ const EditProperty = () => {
   const [shopActPreview, setShopActPreview] = useState(null);
   const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
 
-  const [replaceGallery, setReplaceGallery] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -220,9 +219,10 @@ const EditProperty = () => {
         data.append("shopAct", shopActFile);
       }
 
-      if (replaceGallery && galleryImageFiles.length > 0) {
+      if (galleryImageFiles.length > 0) {
         galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
       }
+
 
       const response = await Axios.put(SummaryApi.editProperty(id).url, data, {
         headers: {
