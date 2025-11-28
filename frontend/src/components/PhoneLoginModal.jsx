@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { auth, buildRecaptcha, signInWithPhoneNumber} from "/firebase";
+import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   const [confirmResult, setConfirmResult] = useState(null);
 
-  const [timer, setTimer] = useState(0); 
+  const [timer, setTimer] = useState(0);
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
     try {
       buildRecaptcha();
-    } catch {}
+    } catch { }
   }, [open]);
 
   useEffect(() => {
@@ -60,21 +60,30 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
     setSending(true);
     try {
-      const verifier = buildRecaptcha();
-      const num = `+91${phone}`;
+      try { await auth.signOut(); } catch { }
 
+      let verifier = window.recaptchaVerifier;
+      if (!verifier) {
+        verifier = buildRecaptcha();
+      }
+
+      const num = `+91${phone}`;
       const confirmation = await signInWithPhoneNumber(auth, num, verifier);
 
       setConfirmResult(confirmation);
       setStep("otp");
-      setTimer(60); 
+      setTimer(60);
+
+      toast.success("OTP sent");
 
     } catch (err) {
-      alert(err?.message || "Failed to send OTP");
+      console.error("OTP error:", err);
+      toast.error(err?.message || "Failed to send OTP");
     } finally {
       setSending(false);
     }
   };
+
 
   const verifyOtp = async () => {
     if (!confirmResult || !otp) return;
@@ -102,7 +111,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           accessToken: resp.data.accessToken,
           refreshToken: resp.data.refreshToken,
         });
-       
+
         toast.success("Login successful!");
         onOpenChange(false);
       } else {

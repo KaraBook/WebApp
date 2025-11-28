@@ -14,11 +14,15 @@ export const auth = getAuth(app);
 
 export const buildRecaptcha = () => {
   if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-      size: "invisible",
-    });
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      { size: "invisible" },
+      auth
+    );
+    window.recaptchaVerifier.render();
   }
   return window.recaptchaVerifier;
 };
+
 
 export { signInWithPhoneNumber };
