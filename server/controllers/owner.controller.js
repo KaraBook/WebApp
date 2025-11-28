@@ -203,7 +203,6 @@ export const updateOwnerProperty = async (req, res) => {
       arr = Array.isArray(arr) ? arr : [arr];
       removed = [...removed, ...arr];
     }
-
     if (removed.length > 0) {
       existingProperty.galleryPhotos = existingProperty.galleryPhotos.filter(
         (img) => !removed.includes(img)
@@ -211,6 +210,7 @@ export const updateOwnerProperty = async (req, res) => {
 
       updatedData.galleryPhotos = existingProperty.galleryPhotos;
     }
+
 
 
     if (files.coverImage?.[0]) {
