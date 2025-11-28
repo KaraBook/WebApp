@@ -3,12 +3,24 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format, eachDayOfInterval } from "date-fns";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
@@ -20,7 +32,6 @@ import "react-date-range/dist/theme/default.css";
 export default function OfflineBooking() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [propertyId] = useState(id || "");
   const [states, setStates] = useState([]);
@@ -28,14 +39,13 @@ export default function OfflineBooking() {
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
   const [disabledDays, setDisabledDays] = useState([]);
-
   const [guestCount, setGuestCount] = useState(1);
-  const [price, setPrice] = useState("");
+
+  const [price, setPrice] = useState({ weekday: 0, weekend: 0 });
+
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
-
   const [allowForm, setAllowForm] = useState(false);
-  const [bookingId, setBookingId] = useState(null);
 
   const [showPopup, setShowPopup] = useState(false);
   const [popupTitle, setPopupTitle] = useState("");
@@ -64,6 +74,7 @@ export default function OfflineBooking() {
     },
   ]);
 
+  // Calculate number of nights
   const nights = Math.max(
     1,
     Math.ceil(
@@ -71,15 +82,31 @@ export default function OfflineBooking() {
     )
   );
 
+  // Load States
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
+  // Load Property Price + Blocked Dates + Booked Dates
   useEffect(() => {
     if (!propertyId) return;
 
-    const loadDates = async () => {
+    const loadData = async () => {
       try {
+        // 1️⃣ Load property details for price
+        const propRes = await api.get(
+          SummaryApi.getSingleProperty(propertyId).url
+        );
+        const prop = propRes.data.data;
+
+        if (prop) {
+          setPrice({
+            weekday: Number(prop.pricingPerNightWeekdays || 0),
+            weekend: Number(prop.pricingPerNightWeekend || 0),
+          });
+        }
+
+        // 2️⃣ Load blocked & booked dates
         const blockedRes = await api.get(
           SummaryApi.getPropertyBlockedDates.url(propertyId)
         );
@@ -105,11 +132,11 @@ export default function OfflineBooking() {
 
         setDisabledDays(fullList);
       } catch (err) {
-        toast.error("Failed to load dates");
+        toast.error("Failed to load property data");
       }
     };
 
-    loadDates();
+    loadData();
   }, [propertyId]);
 
   const isDateDisabled = (date) => {
@@ -133,6 +160,7 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
+  // Auto-close Calendar
   useEffect(() => {
     const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -143,10 +171,12 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
+  // Handle Traveller Field Change
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
+  // Verify Mobile Number
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -165,10 +195,9 @@ export default function OfflineBooking() {
         setShowPopup(true);
         return;
       }
-    } catch { }
+    } catch {}
 
     setChecking(true);
-
     try {
       const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
         mobile: traveller.mobile,
@@ -236,6 +265,28 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
+  // 🔥 AUTO CALCULATE TOTAL
+  const calculateTotal = () => {
+    let total = 0;
+
+    let d = new Date(dateRange[0].startDate);
+    const end = new Date(dateRange[0].endDate);
+
+    while (d < end) {
+      const day = d.getDay(); // 0 Sunday, 6 Saturday
+      const isWeekend = day === 0 || day === 6;
+
+      total += isWeekend
+        ? Number(price.weekend)
+        : Number(price.weekday);
+
+      d.setDate(d.getDate() + 1);
+    }
+
+    return total;
+  };
+
+  // Handle Booking
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -253,14 +304,15 @@ export default function OfflineBooking() {
       if (!traveller[f]) return toast.error("Fill all required fields");
     }
 
-    if (!price || Number(price) <= 0)
-      return toast.error("Invalid price");
+    const totalAmount = calculateTotal();
+
+    if (totalAmount <= 0)
+      return toast.error("Invalid total amount");
 
     setLoading(true);
 
     try {
-      const totalAmount = nights * Number(price);
-
+      // 1️⃣ Create booking
       const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
@@ -272,10 +324,10 @@ export default function OfflineBooking() {
       });
 
       const bId = res.data.booking._id;
-      setBookingId(bId);
 
       toast.success("Booking created! Opening payment...");
 
+      // 2️⃣ Create Razorpay order
       const orderRes = await api.post(
         SummaryApi.ownerCreateOrder.url,
         {
@@ -474,10 +526,7 @@ export default function OfflineBooking() {
                       </SelectTrigger>
                       <SelectContent>
                         {states.map((s) => (
-                          <SelectItem
-                            key={s.isoCode}
-                            value={s.isoCode}
-                          >
+                          <SelectItem key={s.isoCode} value={s.isoCode}>
                             {s.name}
                           </SelectItem>
                         ))}
@@ -554,7 +603,6 @@ export default function OfflineBooking() {
                     direction="horizontal"
                     rangeColors={["#000000"]}
                   />
-
                 </div>
               )}
             </div>
@@ -573,27 +621,15 @@ export default function OfflineBooking() {
               />
             </div>
 
-            {/* Price */}
+            {/* Total Price (Auto) */}
             <div>
-              <Label>Price / Night</Label>
-              <Input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="mt-1"
-              />
-
-              {price && (
-                <p className="mt-2 text-sm">
-                  Total:{" "}
-                  <strong>
-                    ₹{(Number(price) * nights).toLocaleString()}
-                  </strong>
-                </p>
-              )}
+              <Label>Total Price</Label>
+              <div className="border rounded-lg p-2 mt-1 bg-gray-50">
+                ₹{calculateTotal().toLocaleString()}
+              </div>
             </div>
 
-            {/* Payment button */}
+            {/* Payment Button */}
             <Button
               className="w-full bg-black hover:bg-black text-white py-3"
               disabled={loading}

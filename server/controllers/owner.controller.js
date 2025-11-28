@@ -459,6 +459,31 @@ export const createOfflineBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: "Check-in & check-out required" });
     }
 
+    const property = await Property.findById(propertyId).lean();
+    if (!property) {
+      return res.status(404).json({ success: false, message: "Property not found" });
+    }
+
+    const weekdayPrice = Number(property.pricingPerNightWeekdays || 0);
+    const weekendPrice = Number(property.pricingPerNightWeekend || 0);
+
+    let backendTotal = 0;
+    let d = new Date(checkIn);
+    const end = new Date(checkOut);
+
+    while (d < end) {
+      const day = d.getDay();
+      const isWeekend = day === 0 || day === 6;
+      backendTotal += isWeekend ? weekendPrice : weekdayPrice;
+      d.setDate(d.getDate() + 1);
+    }
+    if (backendTotal !== Number(totalAmount)) {
+      return res.status(400).json({
+        success: false,
+        message: "Price mismatch! Please refresh and try again."
+      });
+    }
+
     if (!totalAmount || Number(totalAmount) <= 0) {
       return res.status(400).json({ success: false, message: "Invalid amount" });
     }
@@ -577,7 +602,7 @@ export const checkOwnerByMobile = async (req, res) => {
 
     const owner = await User.findOne({
       mobile: normalized,
-      role: { $in: ["resortOwner", "owner", "propertyOwner", "admin"] }  
+      role: { $in: ["resortOwner", "owner", "propertyOwner", "admin"] }
     });
 
     if (owner) {
@@ -604,7 +629,7 @@ export const getBookedDates = async (req, res) => {
 
     const bookings = await Booking.find({
       propertyId: id,
-      paymentStatus: "paid", 
+      paymentStatus: "paid",
     }).select("checkIn checkOut");
 
     const formatted = bookings.map((b) => ({
