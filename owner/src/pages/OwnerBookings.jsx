@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -17,6 +18,7 @@ export default function OwnerBookings() {
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const navigate = useNavigate();
 
   const [invoiceData, setInvoiceData] = useState(null);
   const invoiceRef = useRef(null);
@@ -237,7 +239,7 @@ export default function OwnerBookings() {
                         {b.paymentStatus === "paid" ? (
                           <>
                             <DropdownMenuItem
-                              onSelect={() => window.open(`/owner/invoice/${b._id}`)}
+                              onSelect={() => navigate(`/owner/invoice/${b._id}`)}
                             >
                               View Invoice
                             </DropdownMenuItem>
