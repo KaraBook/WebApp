@@ -211,7 +211,13 @@ export const updateOwnerProperty = async (req, res) => {
       updatedData.galleryPhotos = existingProperty.galleryPhotos;
     }
 
+    if (body.removedCoverImage === "true") {
+      updatedData.coverImage = "";
+    }
 
+    if (body.removedShopAct === "true") {
+      updatedData.shopAct = "";
+    }
 
     if (files.coverImage?.[0]) {
       const processed = await prepareImage(files.coverImage[0].buffer);

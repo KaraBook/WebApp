@@ -35,7 +35,6 @@ const FileUploadsSection = ({
   const galleryInputRef = useRef(null);
   const shopActInputRef = useRef(null);
 
-  // -------- Cover Image ----------
   const handleCoverImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;

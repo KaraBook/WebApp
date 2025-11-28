@@ -13,12 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-
-import {
-    foodOptions,
-    amenitiesOptions,
-    petFriendlyOptions,
-} from "../constants/dropdownOptions";
+import { foodOptions, amenitiesOptions, petFriendlyOptions } from "../constants/dropdownOptions";
 
 const EditProperty = () => {
     const { id } = useParams();
@@ -27,7 +22,6 @@ const EditProperty = () => {
     const [fetching, setFetching] = useState(true);
     const [loading, setLoading] = useState(false);
 
-    // File uploads
     const [coverImageFile, setCoverImageFile] = useState(null);
     const [galleryImageFiles, setGalleryImageFiles] = useState([]);
     const [coverImagePreview, setCoverImagePreview] = useState(null);
@@ -123,6 +117,14 @@ const EditProperty = () => {
 
             if (coverImageFile) data.append("coverImage", coverImageFile);
             if (shopActFile) data.append("shopAct", shopActFile);
+
+            if (!coverImagePreview && !coverImageFile) {
+                data.append("removedCoverImage", "true");
+            }
+
+            if (!shopActPreview && !shopActFile) {
+                data.append("removedShopAct", "true");
+            }
 
             removedGalleryImages.forEach(url =>
                 data.append("removedGalleryImages[]", url)
