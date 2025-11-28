@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const firebaseConfig = {
@@ -8,36 +8,27 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FB_APP_ID,
 };
 
-let app;
-try {
-  app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-} catch (err) {
-  console.warn("Firebase already initialized:", err.message);
-}
+const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 export const buildRecaptcha = () => {
-  return new Promise((resolve, reject) => {
-    try {
-      if (window.recaptchaVerifier) {
-        return resolve(window.recaptchaVerifier);
-      }
+  if (window.recaptchaVerifier) {
+    try { window.recaptchaVerifier.clear(); } catch {}
+    window.recaptchaVerifier = null;
+  }
 
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        "recaptcha-container",
-        {
-          size: "invisible",
-        },
-        auth
-      );
+  window.recaptchaVerifier = new RecaptchaVerifier(
+    "recaptcha-container",
+    {
+      size: "invisible",
+      callback: () => console.log("reCAPTCHA success"),
+    },
+    auth
+  );
 
-      window.recaptchaVerifier.render();
-      resolve(window.recaptchaVerifier);
-    } catch (e) {
-      reject(e);
-    }
+  return window.recaptchaVerifier.render().then(() => {
+    return window.recaptchaVerifier;
   });
 };
-
 
 export { signInWithPhoneNumber };

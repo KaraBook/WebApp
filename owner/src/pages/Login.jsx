@@ -43,49 +43,32 @@ export default function Login() {
 
 
  const sendOtp = async () => {
-  const ten = mobile.replace(/\D/g, "");
-  if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
+  if (phone.length !== 10) return;
 
-  if (!canResend) {
-    return toast.error(`Please wait ${timer}s before requesting a new OTP`);
-  }
-
-  setLoading(true);
+  setSending(true);
 
   try {
-    const check = await api.post(SummaryApi.ownerPrecheck.url, { mobile: ten });
-    if (!check.data?.success) {
-      toast.error(check.data.message);
-      setLoading(false);
-      return;
-    }
+    try { await auth.signOut(); } catch {}
 
-    if (canResend) {
-      try {
-        await auth.signOut();
-      } catch (err) {
-        console.warn("signOut ignored:", err);
-      }
-    }
+    const verifier = await buildRecaptcha();
 
-    const verifier = window.recaptchaVerifier;
-    const confirmation = await signInWithPhoneNumber(auth, `+91${ten}`, verifier);
-    setConfirmRes(confirmation);
+    const confirmation = await signInWithPhoneNumber(
+      auth,
+      `+91${phone}`,
+      verifier
+    );
 
-    setPhase("verify");
-    toast.success("OTP sent successfully");
-    setCanResend(false);
-    setTimer(90);
-
-  } catch (e) {
-    console.error("sendOtp error:", e);
-    toast.error(e.response?.data?.message || "Failed to send OTP. Try again.");
+    setConfirmResult(confirmation);
+    setStep("otp");
+    setTimer(60);
+    toast.success("OTP Sent");
+  } catch (err) {
+    console.error("sendOtp error", err);
+    toast.error(err?.message || "OTP failed");
   } finally {
-    setLoading(false);
+    setSending(false);
   }
 };
-
-
 
 
   useEffect(() => {
@@ -98,7 +81,6 @@ export default function Login() {
   }, [timer, canResend]);
 
 
-  /* ---------------- VERIFY OTP ---------------- */
   const verifyOtp = async () => {
     if (!confirmRes) return;
     if (otp.length < 6) return toast.error("Enter the 6-digit OTP");
