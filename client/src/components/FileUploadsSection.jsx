@@ -17,14 +17,13 @@ const FileUploadsSection = ({
   shopActPreview,
   setShopActPreview,
 
-  // gallery
-  existingGallery,
-  setExistingGallery,
-  newGalleryFiles,
-  setNewGalleryFiles,
-  newGalleryPreviews,
-  setNewGalleryPreviews,
-
+  // gallery (with safe defaults so shop-act-only usage doesn't break)
+  existingGallery = [],
+  setExistingGallery = () => {},
+  newGalleryFiles = [],
+  setNewGalleryFiles = () => {},
+  newGalleryPreviews = [],
+  setNewGalleryPreviews = () => {},
 
   // visibility
   showFields = { coverImage: true, shopAct: true, galleryPhotos: true },
@@ -44,15 +43,15 @@ const FileUploadsSection = ({
 
     if (coverImagePreview) URL.revokeObjectURL(coverImagePreview);
 
-    setCoverImageFile(file);
-    setCoverImagePreview(URL.createObjectURL(file));
+    setCoverImageFile && setCoverImageFile(file);
+    setCoverImagePreview && setCoverImagePreview(URL.createObjectURL(file));
     if (coverInputRef.current) coverInputRef.current.value = "";
   };
 
   const handleRemoveCoverImage = () => {
     if (coverImagePreview) URL.revokeObjectURL(coverImagePreview);
-    setCoverImageFile(null);
-    setCoverImagePreview(null);
+    setCoverImageFile && setCoverImageFile(null);
+    setCoverImagePreview && setCoverImagePreview(null);
     if (coverInputRef.current) coverInputRef.current.value = "";
   };
 
@@ -63,15 +62,15 @@ const FileUploadsSection = ({
 
     if (shopActPreview) URL.revokeObjectURL(shopActPreview);
 
-    setShopActFile(file);
-    setShopActPreview(URL.createObjectURL(file));
+    setShopActFile && setShopActFile(file);
+    setShopActPreview && setShopActPreview(URL.createObjectURL(file));
     if (shopActInputRef.current) shopActInputRef.current.value = "";
   };
 
   const handleRemoveShopAct = () => {
     if (shopActPreview) URL.revokeObjectURL(shopActPreview);
-    setShopActFile(null);
-    setShopActPreview(null);
+    setShopActFile && setShopActFile(null);
+    setShopActPreview && setShopActPreview(null);
     if (shopActInputRef.current) shopActInputRef.current.value = "";
   };
 
@@ -80,8 +79,10 @@ const FileUploadsSection = ({
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    if (existingGallery.length + newGalleryFiles.length + files.length > maxGallery) {
+    const totalCount = existingGallery.length + newGalleryFiles.length + files.length;
+    if (totalCount > maxGallery) {
       alert(`Max ${maxGallery} images allowed`);
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
       return;
     }
 
@@ -89,17 +90,24 @@ const FileUploadsSection = ({
 
     setNewGalleryFiles((prev) => [...prev, ...files]);
     setNewGalleryPreviews((prev) => [...prev, ...previews]);
+
+    if (galleryInputRef.current) galleryInputRef.current.value = "";
   };
 
-
-  const removeExisting = (i) =>
-    setExistingGallery(existingGallery.filter((_, x) => x !== i));
-
-  const removeNew = (i) => {
-    URL.revokeObjectURL(newGalleryPreviews[i]);
-    setNewGalleryPreviews(newGalleryPreviews.filter((_, x) => x !== i));
-    setNewGalleryFiles(newGalleryFiles.filter((_, x) => x !== i));
+  const removeExisting = (index) => {
+    const updated = existingGallery.filter((_, i) => i !== index);
+    setExistingGallery(updated);
   };
+
+  const removeNew = (index) => {
+    const preview = newGalleryPreviews[index];
+    if (preview) URL.revokeObjectURL(preview);
+
+    setNewGalleryPreviews((prev) => prev.filter((_, i) => i !== index));
+    setNewGalleryFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const totalGalleryCount = existingGallery.length + newGalleryFiles.length;
 
   return (
     <div className="mt-2 w-full flex justify-between gap-4">
@@ -119,7 +127,11 @@ const FileUploadsSection = ({
               ref={coverInputRef}
               className="hidden"
             />
-            <Button type="button" className="bg-[#e5e7eb] text-black hover:bg-[#e5e7eb]" onClick={() => coverInputRef.current?.click()}>
+            <Button
+              type="button"
+              className="bg-[#e5e7eb] text-black hover:bg-[#e5e7eb]"
+              onClick={() => coverInputRef.current?.click()}
+            >
               Choose File
             </Button>
             <span className="text-sm text-gray-600 truncate max-w-[150px]">
@@ -164,7 +176,11 @@ const FileUploadsSection = ({
               ref={shopActInputRef}
               className="hidden"
             />
-            <Button type="button" className="bg-[#e5e7eb] text-black hover:bg-[#e5e7eb]" onClick={() => shopActInputRef.current?.click()}>
+            <Button
+              type="button"
+              className="bg-[#e5e7eb] text-black hover:bg-[#e5e7eb]"
+              onClick={() => shopActInputRef.current?.click()}
+            >
               Choose File
             </Button>
             <span className="text-sm text-gray-600 truncate max-w-[150px]">
@@ -210,38 +226,64 @@ const FileUploadsSection = ({
               ref={galleryInputRef}
               className="hidden"
             />
-            <Button type="button" className="bg-[#e5e7eb] text-black hover:bg-[#e5e7eb]" onClick={() => galleryInputRef.current?.click()}>
+            <Button
+              type="button"
+              className="bg-[#e5e7eb] text-black hover:bg-[#e5e7eb]"
+              onClick={() => galleryInputRef.current?.click()}
+            >
               Choose Files
             </Button>
             <span className="text-sm text-gray-600 truncate max-w-[200px]">
-              {galleryImageFiles.length > 0
-                ? `${galleryImageFiles.length} file(s) selected`
+              {totalGalleryCount > 0
+                ? `${totalGalleryCount} file(s) selected`
                 : "No files chosen"}
             </span>
           </div>
 
-          {galleryImagePreviews.length > 0 && (
+          {(existingGallery.length > 0 || newGalleryPreviews.length > 0) && (
             <div className="flex flex-wrap gap-3 mt-3">
-              {galleryImagePreviews.map((src, index) => (
-                <div key={src} className="relative w-20 h-20">
+              {/* Existing from backend */}
+              {existingGallery.map((src, index) => (
+                <div key={`existing-${index}`} className="relative w-20 h-20">
                   <img
                     src={src}
-                    alt={`Gallery ${index}`}
+                    alt={`Existing ${index}`}
                     className="w-full h-full object-cover rounded"
                   />
                   <Button
                     type="button"
                     size="icon"
                     variant="destructive"
-                    onClick={() => handleRemoveGalleryImage(index)}
+                    onClick={() => removeExisting(index)}
                     className="absolute top-1 right-1 p-1 h-5 w-5"
                     title="Remove"
                   >
                     <RxCross2 size={12} />
                   </Button>
-                  {galleryImageFiles[index]?.name && (
+                </div>
+              ))}
+
+              {/* Newly added in this session */}
+              {newGalleryPreviews.map((src, index) => (
+                <div key={`new-${index}`} className="relative w-20 h-20">
+                  <img
+                    src={src}
+                    alt={`New ${index}`}
+                    className="w-full h-full object-cover rounded"
+                  />
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="destructive"
+                    onClick={() => removeNew(index)}
+                    className="absolute top-1 right-1 p-1 h-5 w-5"
+                    title="Remove"
+                  >
+                    <RxCross2 size={12} />
+                  </Button>
+                  {newGalleryFiles[index]?.name && (
                     <div className="absolute -bottom-5 left-0 right-0 text-[10px] text-center truncate">
-                      {galleryImageFiles[index].name}
+                      {newGalleryFiles[index].name}
                     </div>
                   )}
                 </div>
