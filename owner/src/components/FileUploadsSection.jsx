@@ -22,6 +22,7 @@ const FileUploadsSection = ({
   galleryImageFiles = [],
   galleryImagePreviews = [],
   setGalleryImagePreviews,
+  setRemovedGalleryImages,
 
   // visibility
   showFields = { coverImage: true, shopAct: true, galleryPhotos: true },
@@ -96,11 +97,16 @@ const FileUploadsSection = ({
     const previewToRemove = galleryImagePreviews[index];
     if (previewToRemove) URL.revokeObjectURL(previewToRemove);
 
+    if (typeof galleryImagePreviews[index] === "string") {
+      setRemovedGalleryImages((prev) => [...prev, galleryImagePreviews[index]]);
+    }
+
     const newFiles = galleryImageFiles.filter((_, i) => i !== index);
     const newPreviews = galleryImagePreviews.filter((_, i) => i !== index);
 
     setGalleryImageFiles(newFiles);
     setGalleryImagePreviews(newPreviews);
+
   };
 
   return (

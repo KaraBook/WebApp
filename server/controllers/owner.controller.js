@@ -190,6 +190,17 @@ export const updateOwnerProperty = async (req, res) => {
 
     const files = req.files || {};
 
+    if (body["removedGalleryImages[]"]) {
+      let removed = body["removedGalleryImages[]"];
+
+      if (!Array.isArray(removed)) removed = [removed];
+
+      existingProperty.galleryPhotos =
+        existingProperty.galleryPhotos.filter((img) => !removed.includes(img));
+
+      updatedData.galleryPhotos = existingProperty.galleryPhotos;
+    }
+
     if (files.coverImage?.[0]) {
       const processed = await prepareImage(files.coverImage[0].buffer);
       const result = await uploadBuffer(processed, { folder: "properties" });

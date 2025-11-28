@@ -34,6 +34,8 @@ const EditProperty = () => {
     const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
     const [shopActFile, setShopActFile] = useState(null);
     const [shopActPreview, setShopActPreview] = useState(null);
+    const [removedGalleryImages, setRemovedGalleryImages] = useState([]);
+
 
     const [formData, setFormData] = useState({
         description: "",
@@ -122,7 +124,10 @@ const EditProperty = () => {
             if (coverImageFile) data.append("coverImage", coverImageFile);
             if (shopActFile) data.append("shopAct", shopActFile);
 
-           galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
+            removedGalleryImages.forEach(url =>
+                data.append("removedGalleryImages[]", url)
+            );
+            galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
 
             await api.put(SummaryApi.updateOwnerProperty(id).url, data, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -262,6 +267,7 @@ const EditProperty = () => {
                         setGalleryImageFiles={setGalleryImageFiles}
                         galleryImagePreviews={galleryImagePreviews}
                         setGalleryImagePreviews={setGalleryImagePreviews}
+                        setRemovedGalleryImages={setRemovedGalleryImages}
                         showFields={{ coverImage: true, galleryPhotos: true, shopAct: true }}
                         shopActFile={shopActFile}
                         setShopActFile={setShopActFile}
