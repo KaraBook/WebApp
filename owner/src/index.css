@@ -67,17 +67,18 @@
   }
 }
 
-.rdrDayDisabled {
-   background-color: #e1e1e1!important;
-   border-radius: 20px!important;
-   height: 2.3em!important;
-   margin-top: 2px!important;
-   margin-bottom: 2px!important;
-   margin-left: 2px!important;
-   margin-right: 2px!important;
+/* remove global spacing */
+.rdrDay {
+  margin: 0 !important;
 }
-.rdrDay{
-  margin: 0!important;
+
+/* apply spacing ONLY to disabled dates */
+.rdrDay.rdrDayDisabled {
+  background-color: #e1e1e1 !important;
+  border-radius: 20px !important;
+
+  margin: 2px !important;
+  height: 2.3em !important;
 }
 
 
