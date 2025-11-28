@@ -222,7 +222,7 @@ export default function OwnerBookings() {
                     {formatCurrency(b.totalAmount)}
                   </td>
 
-                  <td className="py-3 px-4">{getStatusChip(b.paymentStatus)}</td>
+                  <td className="py-3 px-6">{getStatusChip(b.paymentStatus)}</td>
 
                   <td className="py-3 px-4 text-xs text-gray-500">
                     {formatDate(b.createdAt)}

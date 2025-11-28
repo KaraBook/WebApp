@@ -48,7 +48,7 @@ export default function Dashboard() {
         <StatCard
           label="Total Revenue"
           value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
-          color="text-[#094da5]"
+          color="text-[#0a5870]"
         />
       </div>
 
