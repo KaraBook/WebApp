@@ -18,10 +18,13 @@ const FileUploadsSection = ({
   setShopActPreview,
 
   // gallery
-  setGalleryImageFiles,
-  galleryImageFiles = [],
-  galleryImagePreviews = [],
-  setGalleryImagePreviews,
+  existingGallery,
+  setExistingGallery,
+  newGalleryFiles,
+  setNewGalleryFiles,
+  newGalleryPreviews,
+  setNewGalleryPreviews,
+
 
   // visibility
   showFields = { coverImage: true, shopAct: true, galleryPhotos: true },
@@ -74,33 +77,28 @@ const FileUploadsSection = ({
 
   // -------- Gallery ----------------
   const handleGalleryImagesChange = (e) => {
-    const newFiles = Array.from(e.target.files || []);
-    if (!newFiles.length) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
-    const combinedCount = galleryImageFiles.length + newFiles.length;
-    if (combinedCount > maxGallery) {
-      alert(`You can upload max ${maxGallery} images. You already have ${galleryImageFiles.length}.`);
-      if (galleryInputRef.current) galleryInputRef.current.value = "";
+    if (existingGallery.length + newGalleryFiles.length + files.length > maxGallery) {
+      alert(`Max ${maxGallery} images allowed`);
       return;
     }
 
-    const newPreviews = newFiles.map((f) => URL.createObjectURL(f));
+    const previews = files.map((f) => URL.createObjectURL(f));
 
-    setGalleryImageFiles([...galleryImageFiles, ...newFiles]);
-    setGalleryImagePreviews([...galleryImagePreviews, ...newPreviews]);
-
-    if (galleryInputRef.current) galleryInputRef.current.value = "";
+    setNewGalleryFiles((prev) => [...prev, ...files]);
+    setNewGalleryPreviews((prev) => [...prev, ...previews]);
   };
 
-  const handleRemoveGalleryImage = (index) => {
-    const previewToRemove = galleryImagePreviews[index];
-    if (previewToRemove) URL.revokeObjectURL(previewToRemove);
 
-    const newFiles = galleryImageFiles.filter((_, i) => i !== index);
-    const newPreviews = galleryImagePreviews.filter((_, i) => i !== index);
+  const removeExisting = (i) =>
+    setExistingGallery(existingGallery.filter((_, x) => x !== i));
 
-    setGalleryImageFiles(newFiles);
-    setGalleryImagePreviews(newPreviews);
+  const removeNew = (i) => {
+    URL.revokeObjectURL(newGalleryPreviews[i]);
+    setNewGalleryPreviews(newGalleryPreviews.filter((_, x) => x !== i));
+    setNewGalleryFiles(newGalleryFiles.filter((_, x) => x !== i));
   };
 
   return (

@@ -40,14 +40,15 @@ const EditProperty = () => {
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
-
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [shopActFile, setShopActFile] = useState(null);
-  const [galleryImageFiles, setGalleryImageFiles] = useState([]);
-
   const [coverImagePreview, setCoverImagePreview] = useState(null);
   const [shopActPreview, setShopActPreview] = useState(null);
-  const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
+  const [existingGallery, setExistingGallery] = useState([]);
+  const [newGalleryFiles, setNewGalleryFiles] = useState([]);
+  const [newGalleryPreviews, setNewGalleryPreviews] = useState([]);
+
+
 
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -167,10 +168,9 @@ const EditProperty = () => {
           internalNotes: prop.internalNotes || "",
         });
 
-        // image previews
         setCoverImagePreview(prop.coverImage || null);
         setShopActPreview(prop.shopAct || null);
-        setGalleryImagePreviews(Array.isArray(prop.galleryPhotos) ? prop.galleryPhotos : []);
+        setExistingGallery(Array.isArray(prop.galleryPhotos) ? prop.galleryPhotos : []);
 
       } catch (err) {
         console.error(err);
@@ -219,10 +219,10 @@ const EditProperty = () => {
         data.append("shopAct", shopActFile);
       }
 
-      data.append("existingGallery", JSON.stringify(galleryImagePreviews));
-      if (galleryImageFiles.length > 0) {
-        galleryImageFiles.forEach((file) => data.append("galleryPhotos", file));
-      }
+      data.append("existingGallery", JSON.stringify(existingGallery));
+      newGalleryFiles.forEach((file) => {
+        data.append("galleryPhotos", file);
+      });
 
 
       const response = await Axios.put(SummaryApi.editProperty(id).url, data, {
@@ -891,16 +891,12 @@ const EditProperty = () => {
         {currentStep === 6 && (
           <>
             <FileUploadsSection
-              // cover
-              setCoverImageFile={setCoverImageFile}
-              coverImageFile={coverImageFile}
-              coverImagePreview={coverImagePreview}
-              setCoverImagePreview={setCoverImagePreview}
-              // gallery
-              setGalleryImageFiles={setGalleryImageFiles}
-              galleryImageFiles={galleryImageFiles}
-              galleryImagePreviews={galleryImagePreviews}
-              setGalleryImagePreviews={setGalleryImagePreviews}
+              existingGallery={existingGallery}
+              setExistingGallery={setExistingGallery}
+              newGalleryFiles={newGalleryFiles}
+              setNewGalleryFiles={setNewGalleryFiles}
+              newGalleryPreviews={newGalleryPreviews}
+              setNewGalleryPreviews={setNewGalleryPreviews}
               showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
             />
 
