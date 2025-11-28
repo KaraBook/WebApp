@@ -234,9 +234,41 @@ export default function OwnerBookings() {
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent className="w-48">
-                        <DropdownMenuItem onSelect={() => window.open(`/owner/invoice/${b._id}`, "_blank")}>
-                          View Invoice
-                        </DropdownMenuItem>
+                        {b.paymentStatus === "paid" ? (
+                          <>
+                            <DropdownMenuItem
+                              onSelect={() => window.open(`/owner/invoice/${b._id}`, "_blank")}
+                            >
+                              View Invoice
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem onSelect={() => openConfirm("invoice", b)}>
+                              Download Invoice
+                            </DropdownMenuItem>
+                          </>
+                        ) : (
+                          <>
+                            <DropdownMenuItem
+                              onSelect={() =>
+                                toast.error(
+                                  `Please rebook the resort. Your payment is ${b.paymentStatus}.`
+                                )
+                              }
+                            >
+                              View Invoice
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onSelect={() =>
+                                toast.error(
+                                  `Please rebook the resort. Your payment is ${b.paymentStatus}.`
+                                )
+                              }
+                            >
+                              Download Invoice
+                            </DropdownMenuItem>
+                          </>
+                        )}
 
                         <DropdownMenuItem onSelect={() => handleCopy(b.userId.email, "Email")}>
                           Copy Email
@@ -257,10 +289,6 @@ export default function OwnerBookings() {
                           }
                         >
                           WhatsApp Chat
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem onSelect={() => openConfirm("invoice", b)}>
-                          Download Invoice
                         </DropdownMenuItem>
 
                         <DropdownMenuItem onSelect={() => openConfirm("resend", b)}>
