@@ -154,10 +154,10 @@ function StatCard({ label, value, color }) {
 
 function StatusChip({ status }) {
   const styles = {
-    paid: "bg-green-100 text-green-700 border-green-300",
-    pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
-    initiated: "bg-gray-100 text-gray-600 border-gray-300",
-    failed: "bg-red-100 text-red-700 border-red-300",
+    paid: "px-6 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700",
+    pending: "px-6 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800",
+    initiated: "px-6 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 ",
+    failed: "px-6 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700",
   };
 
   return (
