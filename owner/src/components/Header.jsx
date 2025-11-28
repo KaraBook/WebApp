@@ -32,10 +32,7 @@ export default function Header() {
     <header className="w-full bg-white/90 backdrop-blur border-b border-gray-200 px-8 py-3 flex items-center justify-between">
       {/* LEFT — LOGO */}
       <div className="flex items-center gap-2">
-        <img src="/KarabookLogo.png" alt="logo" className="h-8 w-8 object-cover" />
-        <span className="font-semibold text-[18px] text-gray-800">
-          KaraBook
-        </span>
+        <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[125px] object-cover" />
       </div>
 
       {/* CENTER — NAVIGATION */}
