@@ -60,116 +60,100 @@ export default function Properties() {
 }
 
 function PropertyCard({ property }) {
-  const cover = property.coverImage || "https://via.placeholder.com/400x250?text=No+Image";
+  const cover =
+    property.coverImage ||
+    "https://via.placeholder.com/400x250?text=No+Image";
+
   const statusColor = property.isBlocked
     ? "bg-red-100 text-red-600"
     : property.isDraft
-    ? "bg-yellow-100 text-yellow-600"
+    ? "bg-yellow-100 text-yellow-700"
     : "bg-green-100 text-green-700";
 
-  const [showDialog, setShowDialog] = useState(false);
-
-  const handleEditClick = (e) => {
-    if (property.isDraft || property.isBlocked) {
-      e.preventDefault();
-      setShowDialog(true);
-    }
-  };
-
   return (
-    <>
-      <Card className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200 relative">
-        {/* Image */}
-        <div className="relative h-48 bg-gray-100 overflow-hidden">
+    <Card className="rounded-xl border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden bg-white">
+      
+      {/* Image (clickable) */}
+      <Link to={`/view-property/${property._id}`}>
+        <div className="relative h-48 overflow-hidden group cursor-pointer">
           <img
             src={cover}
             alt={property.propertyName}
-            className="h-full w-full object-cover pointer-events-none"
+            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <Badge className={`absolute top-2 right-2 z-10 ${statusColor}`}>
-            {property.isBlocked ? "Blocked" : property.isDraft ? "Draft" : "Published"}
+
+          <Badge
+            className={`absolute top-3 right-3 text-xs px-2 py-0.5 rounded-md ${statusColor}`}
+          >
+            {property.isBlocked
+              ? "Blocked"
+              : property.isDraft
+              ? "Draft"
+              : "Published"}
           </Badge>
         </div>
+      </Link>
 
-        <CardHeader className="pb-1">
-          <CardTitle className="text-lg font-semibold line-clamp-1">
+      {/* Content */}
+      <div className="p-4 space-y-2">
+
+        {/* Title (clickable) */}
+        <Link to={`/view-property/${property._id}`}>
+          <h2 className="text-lg font-semibold text-gray-800 hover:text-black transition-colors duration-200 line-clamp-1 cursor-pointer">
             {property.propertyName}
-          </CardTitle>
-        </CardHeader>
+          </h2>
+        </Link>
 
-        <CardContent className="text-sm text-gray-600 space-y-1">
+        {/* Info rows */}
+        <div className="text-sm text-gray-600 space-y-1">
+
           <p className="flex items-center gap-2">
-            <Home className="w-4 h-4 text-emerald-600" />
+            <Home className="w-4 h-4 text-[#444]" />
             {property.propertyType || "Villa"}
           </p>
+
           <p className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-emerald-600" />
+            <MapPin className="w-4 h-4 text-[#444]" />
             {property.city}, {property.state}
           </p>
+
           <p className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-emerald-600" />
-            {property.totalRooms} rooms, {property.maxGuests} guests
+            <Users className="w-4 h-4 text-[#444]" />
+            {property.totalRooms} rooms · {property.maxGuests} guests
           </p>
-        </CardContent>
 
-        <CardFooter className="flex justify-between items-center border-t pt-3 relative z-20">
-          <Button asChild variant="outline" size="sm">
-            <Link to={`/view-property/${property._id}`}>View</Link>
-          </Button>
+        </div>
+      </div>
 
-          <Button
-            asChild
-            variant="secondary"
-            size="sm"
-            onClick={handleEditClick}
+      {/* Footer buttons */}
+      <div className="border-t p-4 flex justify-between">
+
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="rounded-md"
+        >
+          <Link to={`/view-property/${property._id}`}>View</Link>
+        </Button>
+
+        <Button
+          asChild
+          size="sm"
+          className="rounded-md bg-black text-white hover:bg-black/90"
+        >
+          <Link
+            to={
+              property.isDraft || property.isBlocked
+                ? "#"
+                : `/edit-property/${property._id}`
+            }
           >
-            <Link
-              to={
-                property.isDraft || property.isBlocked
-                  ? "#"
-                  : `/edit-property/${property._id}`
-              }
-            >
-              Edit
-            </Link>
-          </Button>
-        </CardFooter>
-      </Card>
+            Edit
+          </Link>
+        </Button>
 
-      {/* 🧩 Restriction Dialog */}
-      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="text-yellow-500 w-6 h-6" />
-              <AlertDialogTitle className="text-lg font-semibold">
-                Edit Restricted
-              </AlertDialogTitle>
-            </div>
-            <AlertDialogDescription className="text-gray-600 mt-2">
-              {property.isBlocked
-                ? "This property has been blocked by the Admin and cannot be edited."
-                : "Your property is currently in Draft mode. Please contact the Admin to make it live before editing."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <AlertDialogFooter className="flex justify-end space-x-2">
-            <AlertDialogCancel>Close</AlertDialogCancel>
-            <AlertDialogAction
-              asChild
-              className="bg-black text-white"
-            >
-              <a
-                href="mailto:support@karabook.com?subject=Property%20Approval%20Request"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Contact Admin
-              </a>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+      </div>
+    </Card>
   );
 }
