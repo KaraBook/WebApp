@@ -239,7 +239,7 @@ export default function OwnerBookings() {
                         {b.paymentStatus === "paid" ? (
                           <>
                             <DropdownMenuItem
-                              onSelect={() => navigate(`/owner/invoice/${b._id}`)}
+                              onSelect={() => navigate(`/invoice/${b._id}`)}
                             >
                               View Invoice
                             </DropdownMenuItem>
