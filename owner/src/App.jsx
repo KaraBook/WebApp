@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./auth/ProtectedRoute";
-import OwnerLayout from "./pages/OwnerLayout"; 
 import Properties from "./pages/Properties";
 import ViewProperty from "./pages/ViewProperty";
 import EditProperty from "./pages/EditProperty";
@@ -14,21 +13,20 @@ import ViewInvoice from "./pages/ViewInvoice";
 export default function App() {
   return (
     <Routes>
-
       <Route path="/login" element={<Login />} />
 
       <Route
         path="/"
         element={
           <ProtectedRoute>
-            <OwnerLayout /> 
+            <MainContainer /> 
           </ProtectedRoute>
         }
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="properties" element={<Properties />} />
-        <Route path="view-property/:id" element={<ViewProperty />} /> 
+        <Route path="view-property/:id" element={<ViewProperty />} />
         <Route path="edit-property/:id" element={<EditProperty />} />
         <Route path="offline-booking/:id" element={<OfflineBooking />} />
         <Route path="bookings" element={<OwnerBookings />} />
@@ -36,8 +34,22 @@ export default function App() {
         <Route path="invoice/:id" element={<ViewInvoice />} />
       </Route>
 
-      {/* Fallback */}
+      {/* FALLBACK */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
+  );
+}
+
+import { Outlet } from "react-router-dom";
+import Header from "./components/Header";
+
+function MainContainer() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <main className="p-6">
+        <Outlet />
+      </main>
+    </div>
   );
 }
