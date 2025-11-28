@@ -431,7 +431,7 @@ export default function OfflineBooking() {
               <Button
                 onClick={verifyMobile}
                 disabled={checking || traveller.mobile.length !== 10}
-                className="bg-[#233b19] hover:bg-[#1b2e13] text-white"
+                className="bg-[#000] hover:bg-black text-white"
               >
                 {checking ? "Checking..." : "Verify"}
               </Button>
