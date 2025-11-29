@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { toast } from "react-hot-toast";
 import {
   Loader2,
   CheckCircle2,
@@ -123,7 +125,7 @@ export default function Dashboard() {
     })();
   }, []);
 
- 
+
   useEffect(() => {
     (async () => {
       try {
@@ -170,7 +172,7 @@ export default function Dashboard() {
     currentPage * rowsPerPage
   );
 
- 
+
   const today = new Date();
   const monthLabel = today.toLocaleString("en-US", {
     month: "long",
@@ -275,9 +277,61 @@ export default function Dashboard() {
                         </td>
 
                         <td className="py-3 px-6">
-                          <button className="p-2 hover:bg-gray-100 rounded-lg">
-                            <MoreVertical className="w-4 h-4 text-gray-600" />
-                          </button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <MoreVertical className="w-5 h-5 cursor-pointer text-gray-600" />
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent className="w-48">
+
+                              {/* View Invoice */}
+                              <DropdownMenuItem
+                                onSelect={() => navigate(`/invoice/${b._id}`)}
+                              >
+                                View Invoice
+                              </DropdownMenuItem>
+
+                              {/* Copy Email */}
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  navigator.clipboard.writeText(b?.userId?.email || "")
+                                }
+                              >
+                                Copy Email
+                              </DropdownMenuItem>
+
+                              {/* Copy Phone */}
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  navigator.clipboard.writeText(b?.userId?.mobile || "")
+                                }
+                              >
+                                Copy Phone
+                              </DropdownMenuItem>
+
+                              {/* WhatsApp Chat */}
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  window.open(
+                                    `https://wa.me/${b?.userId?.mobile}?text=${encodeURIComponent(
+                                      `Hello ${b?.userId?.firstName},\nYour booking ${b._id}...`
+                                    )}`,
+                                    "_blank"
+                                  )
+                                }
+                              >
+                                WhatsApp Chat
+                              </DropdownMenuItem>
+
+                              {/* Resend Links */}
+                              <DropdownMenuItem
+                                onSelect={() => toast.success("Resend to traveller triggered")}
+                              >
+                                Resend Links (WA + Email)
+                              </DropdownMenuItem>
+
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </td>
                       </tr>
                     ))
