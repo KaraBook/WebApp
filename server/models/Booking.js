@@ -7,7 +7,11 @@ const bookingSchema = new mongoose.Schema(
 
     checkIn: Date,
     checkOut: Date,
-    guests: Number,
+    guests: {
+      adults: { type: Number, default: 1 },
+      children: { type: Number, default: 0 },
+      infants: { type: Number, default: 0 }
+    },
     totalNights: Number,
     totalAmount: Number,
 

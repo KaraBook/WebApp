@@ -606,7 +606,8 @@ export const getPublishedProperties = async (req, res) => {
     if (city) filter.city = new RegExp(`^${city}$`, "i");
 
     // optional: if you store maxGuests or capacity field
-    if (guests) filter.maxGuests = { $gte: Number(guests) };
+    const totalGuests = (guests?.adults || 0) + (guests?.children || 0);
+    if (guests) filter.maxGuests = { $gte: totalGuests };
 
     // optional: date range availability filter (only if you store bookedDates array)
     // if (checkIn && checkOut) {

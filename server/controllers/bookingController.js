@@ -30,7 +30,11 @@ export const createOrder = async (req, res) => {
       propertyId,
       checkIn,
       checkOut,
-      guests,
+      guests: {
+        adults: guests.adults,
+        children: guests.children,
+        infants: guests.infants,
+      },
       totalNights: Math.ceil(
         (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
       ),

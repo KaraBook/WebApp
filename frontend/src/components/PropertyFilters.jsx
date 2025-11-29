@@ -13,6 +13,12 @@ export default function PropertyFilters({ onFilter }) {
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const [guestCount, setGuestCount] = useState(1);
+    const [guests, setGuests] = useState({
+        adults: 1,
+        children: 0,
+        infants: 0
+    });
+    const [showGuestBox, setShowGuestBox] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
     const calendarRef = useRef(null);
     const [dateRange, setDateRange] = useState([
@@ -60,7 +66,7 @@ export default function PropertyFilters({ onFilter }) {
             city: selectedCity?.value || "",
             checkIn: dateRange[0].startDate,
             checkOut: dateRange[0].endDate,
-            guests: guestCount,
+            guests,
         });
     };
 
@@ -119,7 +125,7 @@ export default function PropertyFilters({ onFilter }) {
                     menuPlacement="bottom"
                     menuShouldScrollIntoView={false}
                     className="mt-1 text-sm"
-                    classNamePrefix="react-select" 
+                    classNamePrefix="react-select"
                     theme={(theme) => ({
                         ...theme,
                         colors: {
@@ -147,7 +153,7 @@ export default function PropertyFilters({ onFilter }) {
                     menuPlacement="bottom"
                     menuShouldScrollIntoView={false}
                     className="mt-1 text-sm"
-                    classNamePrefix="react-select" 
+                    classNamePrefix="react-select"
                     theme={(theme) => ({
                         ...theme,
                         colors: {
@@ -221,16 +227,87 @@ export default function PropertyFilters({ onFilter }) {
             </div>
 
             {/* Guests */}
-            <div className="flex-1 min-w-[150px]">
-                <label className="text-[14px] text-black uppercase ml-1">Traveller</label>
-                <input
-                    type="number"
-                    min={1}
-                    value={guestCount}
-                    onChange={(e) => setGuestCount(Number(e.target.value))}
-                    className="border text-sm border-gray-300 hover:border-black px-4 py-2 mt-1 w-full text-gray-700 focus:outline-none focus:ring-1 focus:ring-black transition-all duration-200"
-                />
+            <div className="flex-1 min-w-[180px] relative">
+                <label className="text-[14px] text-black uppercase ml-1">Travellers</label>
+
+                <div
+                    onClick={() => setShowGuestBox(!showGuestBox)}
+                    className="border text-sm border-gray-300 hover:border-black px-4 py-2 mt-1 cursor-pointer flex items-center justify-between"
+                >
+                    <span>{guests.adults + guests.children} guests</span>
+                </div>
+
+                {showGuestBox && (
+                    <div className="absolute z-[99999] bg-white shadow-xl border p-4 mt-2 w-[260px]">
+                        {/* Adults */}
+                        <div className="flex justify-between items-center py-2">
+                            <div>
+                                <p className="font-medium">Adults</p>
+                                <p className="text-xs text-gray-500">Age 13+</p>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                                    onClick={() => setGuests(g => ({ ...g, adults: Math.max(1, g.adults - 1) }))}
+                                >−</button>
+
+                                <span>{guests.adults}</span>
+
+                                <button
+                                    className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                                    onClick={() => setGuests(g => ({ ...g, adults: g.adults + 1 }))}
+                                >+</button>
+                            </div>
+                        </div>
+
+                        {/* Children */}
+                        <div className="flex justify-between items-center py-2">
+                            <div>
+                                <p className="font-medium">Children</p>
+                                <p className="text-xs text-gray-500">Ages 2–12</p>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                                    onClick={() => setGuests(g => ({ ...g, children: Math.max(0, g.children - 1) }))}
+                                >−</button>
+
+                                <span>{guests.children}</span>
+
+                                <button
+                                    className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                                    onClick={() => setGuests(g => ({ ...g, children: g.children + 1 }))}
+                                >+</button>
+                            </div>
+                        </div>
+
+                        {/* Infants */}
+                        <div className="flex justify-between items-center py-2">
+                            <div>
+                                <p className="font-medium">Infants</p>
+                                <p className="text-xs text-gray-500">Under 2</p>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                                    onClick={() => setGuests(g => ({ ...g, infants: Math.max(0, g.infants - 1) }))}
+                                >−</button>
+
+                                <span>{guests.infants}</span>
+
+                                <button
+                                    className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                                    onClick={() => setGuests(g => ({ ...g, infants: g.infants + 1 }))}
+                                >+</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
+
 
             {/* Search Button */}
             <button
