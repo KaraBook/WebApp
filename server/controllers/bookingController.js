@@ -114,7 +114,12 @@ Your stay at *${booking.propertyId.propertyName}* is confirmed!
 
 📅 *Check-in:* ${new Date(booking.checkIn).toLocaleDateString("en-IN")}
 📅 *Check-out:* ${new Date(booking.checkOut).toLocaleDateString("en-IN")}
-🧍‍♂️ *Guests:* ${booking.guests}
+🧍‍♂️ *Guests:* ${
+  typeof booking.guests === "number"
+    ? booking.guests
+    : `${booking.guests.adults + booking.guests.children} Guests` +
+      (booking.guests.infants ? ` + ${booking.guests.infants} Infants` : "")
+}
 💰 *Amount Paid:* ₹${booking.totalAmount.toLocaleString("en-IN")}
 📍 *Location:* ${booking.propertyId.city}, ${booking.propertyId.state}
 

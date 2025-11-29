@@ -290,7 +290,11 @@ const BookingsPage = () => {
                 `Dear ${traveller}, your stay at *${prop}* is confirmed.`,
                 `Check-in: ${formatDateLong(b.checkIn)}`,
                 `Check-out: ${formatDateLong(b.checkOut)}`,
-                `Guests: ${b.guests || 1}`,
+                `Guests: ${typeof b.guests === "number"
+                    ? b.guests
+                    : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                    }`
+                }`,
                 `Amount: ${formatCurrency(b.totalAmount)}`,
             ];
             const waText = lines.join("\n");
@@ -413,7 +417,23 @@ const BookingsPage = () => {
                                                 <TableCell>{formatDate(b.checkIn)}</TableCell>
                                                 <TableCell>{formatDate(b.checkOut)}</TableCell>
                                                 <TableCell>{b.totalNights || "—"}</TableCell>
-                                                <TableCell>{b.guests || 1}</TableCell>
+                                                <TableCell>
+                                                    {typeof b.guests === "number" ? (
+                                                        `${b.guests} Guests`
+                                                    ) : (
+                                                        <div className="flex flex-col leading-tight">
+                                                            <span>
+                                                                {b.guests.adults} Adults
+                                                                {b.guests.children ? `, ${b.guests.children} Children` : ""}
+                                                                {b.guests.infants ? `, ${b.guests.infants} Infants` : ""}
+                                                            </span>
+                                                            <span className="text-xs text-gray-500">
+                                                                Total: {(b.guests.adults + b.guests.children)} Guests
+                                                                {b.guests.infants ? ` + ${b.guests.infants} Infants` : ""}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </TableCell>
                                                 <TableCell>{formatCurrency(b.totalAmount)}</TableCell>
 
                                                 <TableCell>
