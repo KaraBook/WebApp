@@ -118,7 +118,7 @@ export default function Dashboard() {
 
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-8 py-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* TITLE */}
         <div>
           <h1 className="text-[26px] font-semibold text-gray-900">Dashboard</h1>
