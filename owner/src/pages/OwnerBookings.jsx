@@ -15,8 +15,6 @@ import {
 import {
   MoreVertical,
   Search,
-  RotateCcw,
-  CalendarDays,
   IndianRupee,
   Phone,
 } from "lucide-react";
@@ -32,12 +30,17 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 import { format } from "date-fns";
 import { toast } from "sonner";
 
-import { DateRange } from "react-date-range";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
@@ -45,22 +48,20 @@ import InvoicePreview from "@/components/InvoicePreview";
 export default function OwnerBookings() {
   const [bookings, setBookings] = useState([]);
   const [filtered, setFiltered] = useState([]);
-
   const [query, setQuery] = useState("");
 
   const [paymentFilter, setPaymentFilter] = useState("all");
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
 
   const pageSize = 10;
   const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
 
+  // INVOICE
   const [invoiceData, setInvoiceData] = useState(null);
   const invoiceRef = useRef(null);
 
+  // CONFIRM DIALOG
   const [confirm, setConfirm] = useState({
     open: false,
     type: "",
@@ -73,6 +74,7 @@ export default function OwnerBookings() {
   const openConfirm = (type, booking) =>
     setConfirm({ open: true, type, booking });
 
+  // FETCH BOOKINGS
   useEffect(() => {
     fetchBookings();
   }, []);
@@ -91,11 +93,10 @@ export default function OwnerBookings() {
     }
   };
 
-  // FILTERING LOGIC
+  // FILTER LOGIC
   useEffect(() => {
     let data = [...bookings];
 
-    // SEARCH FILTER
     const q = query.toLowerCase();
     data = data.filter(
       (b) =>
@@ -106,23 +107,22 @@ export default function OwnerBookings() {
         b.propertyId?.propertyName?.toLowerCase().includes(q)
     );
 
-    // PAYMENT FILTER
     if (paymentFilter !== "all") {
       data = data.filter((b) => b.paymentStatus === paymentFilter);
     }
-
 
     setFiltered(data);
     setPage(1);
   }, [query, paymentFilter, bookings]);
 
-  // PAGINATION LOGIC
+  // PAGINATION
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginatedData = filtered.slice(
     (page - 1) * pageSize,
     page * pageSize
   );
 
+  // STATUS CHIP
   const getStatusChip = (status) => {
     const base =
       "px-3 py-1 rounded-full text-xs font-medium border inline-block";
@@ -135,9 +135,7 @@ export default function OwnerBookings() {
       );
     if (status === "pending")
       return (
-        <span
-          className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}
-        >
+        <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
           Pending
         </span>
       );
@@ -150,22 +148,91 @@ export default function OwnerBookings() {
 
   const shortId = (id) => `#${String(id).slice(-6).toUpperCase()}`;
   const formatCurrency = (n) => `₹${Number(n).toLocaleString()}`;
-  const formatDate = (d) => format(new Date(d), "d MMM yy");
+  const formatDate = (d) => format(new Date(d), "dd MMM yyyy");
+
+  // 🧾 DOWNLOAD INVOICE FUNCTION
+  const downloadInvoicePDF = async (booking) => {
+    try {
+      if (booking.paymentStatus !== "paid") {
+        return toast.error("Invoice can only be downloaded for paid bookings.");
+      }
+
+      toast.info("Generating Invoice…");
+
+      const res = await api.get(
+        SummaryApi.ownerGetInvoice.url(booking._id)
+      );
+
+      if (!res.data.success) {
+        return toast.error("Invoice not found.");
+      }
+
+      setInvoiceData(res.data.data);
+
+      // Wait for the preview to render
+      await new Promise((r) => setTimeout(r, 250));
+
+      const element = invoiceRef.current;
+      const canvas = await html2canvas(element, { scale: 2 });
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        pdf.addPage();
+        position = heightLeft - imgHeight;
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`Invoice_${booking._id}.pdf`);
+      toast.success("Invoice downloaded!");
+
+      setTimeout(() => setInvoiceData(null), 300);
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to generate invoice.");
+    }
+  };
+
+  const handleConfirmAction = async () => {
+    const b = confirm.booking;
+
+    if (!b) return;
+
+    if (confirm.type === "invoice") {
+      await downloadInvoicePDF(b);
+    }
+
+    if (confirm.type === "resend") {
+      // TODO: later if needed
+    }
+
+    closeConfirm();
+  };
 
   return (
     <>
       <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
         <div className="max-w-6xl mx-auto space-y-8">
-          {/* HEADER */}
+
+          {/* PAGE HEADER */}
           <div className="flex items-center justify-between">
-            <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3">
-              Bookings
-            </h1>
+            <h1 className="text-[26px] font-bold text-gray-900">Bookings</h1>
           </div>
 
           {/* FILTER BAR */}
           <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
-
             {/* Search */}
             <div className="flex items-center gap-3 flex-1">
               <Search className="w-5 h-5 text-gray-500" />
@@ -177,7 +244,7 @@ export default function OwnerBookings() {
               />
             </div>
 
-            {/* Payment Filter — SHADCN SELECT */}
+            {/* Payment Filter */}
             <Select value={paymentFilter} onValueChange={setPaymentFilter}>
               <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Payment" />
@@ -189,7 +256,6 @@ export default function OwnerBookings() {
                 <SelectItem value="failed">Failed</SelectItem>
               </SelectContent>
             </Select>
-          
           </div>
 
           {/* TABLE */}
@@ -223,13 +289,14 @@ export default function OwnerBookings() {
                           {b?.userId?.firstName} {b?.userId?.lastName}
                         </div>
                         <div className="text-xs text-gray-500 flex items-center gap-1">
-                          <Phone size={12} /> {b.userId?.mobile}
+                          <Phone size={12} /> {b?.userId?.mobile}
                         </div>
                       </td>
 
                       {/* Property */}
                       <td className="py-3 px-4">{b.propertyId?.propertyName}</td>
 
+                      {/* Dates */}
                       <td className="py-3 px-4">{formatDate(b.checkIn)}</td>
                       <td className="py-3 px-4">{formatDate(b.checkOut)}</td>
 
@@ -241,7 +308,7 @@ export default function OwnerBookings() {
                           : `${b.guests.adults + b.guests.children} Guests`}
                       </td>
 
-                      <td className="py-3 px-4 font-medium flex items-center gap-1">
+                      <td className="py-3 px-4 flex items-center gap-1 font-medium">
                         <IndianRupee size={14} className="text-primary" />
                         {formatCurrency(b.totalAmount)}
                       </td>
@@ -250,7 +317,7 @@ export default function OwnerBookings() {
                         {getStatusChip(b.paymentStatus)}
                       </td>
 
-                      <td className="py-3 px-4 text-gray-500 text-xs">
+                      <td className="py-3 px-4 text-xs text-gray-500">
                         {formatDate(b.createdAt)}
                       </td>
 
@@ -261,6 +328,7 @@ export default function OwnerBookings() {
                           </DropdownMenuTrigger>
 
                           <DropdownMenuContent className="w-48">
+
                             <DropdownMenuItem
                               onSelect={() => navigate(`/invoice/${b._id}`)}
                             >
@@ -289,11 +357,6 @@ export default function OwnerBookings() {
                               Copy Phone
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                              onSelect={() => openConfirm("resend", b)}
-                            >
-                              Resend Links (WA + Email)
-                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
@@ -352,24 +415,24 @@ export default function OwnerBookings() {
             <AlertDialogDescription>
               {confirm.type === "invoice"
                 ? "A PDF invoice will be generated."
-                : "Resend booking confirmation to traveller."}
+                : "Send booking confirmation."}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {}}>
+            <AlertDialogAction onClick={handleConfirmAction}>
               {confirm.type === "invoice" ? "Download" : "Send Now"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Hidden Invoice */}
+      {/* Hidden Invoice for PDF capture */}
       {invoiceData && (
         <div
           ref={invoiceRef}
-          className="absolute left-[-9999px] top-0 w-[794px] bg-white p-8"
+          className="absolute left-[-9999px] top-0 w-[794px] p-8 bg-white"
         >
           <InvoicePreview invoice={invoiceData} />
         </div>
