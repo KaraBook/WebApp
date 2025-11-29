@@ -11,6 +11,11 @@ export default function Properties() {
 
   const fetchProperties = async (filters = {}) => {
     setLoading(true);
+
+    if (filters.guests) {
+      filters.guests = JSON.stringify(filters.guests);
+    }
+
     try {
       const res = await Axios.get(SummaryApi.getPublishedProperties.url, {
         params: filters,
@@ -23,6 +28,7 @@ export default function Properties() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchProperties();

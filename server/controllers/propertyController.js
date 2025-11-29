@@ -599,22 +599,29 @@ export const togglePublishProperty = async (req, res) => {
 
 export const getPublishedProperties = async (req, res) => {
   try {
-    const { state, city, checkIn, checkOut, guests } = req.query;
+    const { state, city, checkIn, checkOut } = req.query;
     const filter = { isDraft: false, publishNow: true };
 
     if (state) filter.state = new RegExp(`^${state}$`, "i");
     if (city) filter.city = new RegExp(`^${city}$`, "i");
 
-    // optional: if you store maxGuests or capacity field
-    const totalGuests = (guests?.adults || 0) + (guests?.children || 0);
-    if (guests) filter.maxGuests = { $gte: totalGuests };
+    let totalGuests = 0;
 
-    // optional: date range availability filter (only if you store bookedDates array)
-    // if (checkIn && checkOut) {
-    //   filter.bookedDates = {
-    //     $not: { $elemMatch: { $gte: new Date(checkIn), $lt: new Date(checkOut) } },
-    //   };
-    // }
+    if (req.query.guests) {
+      try {
+        const g = typeof req.query.guests === "string"
+          ? JSON.parse(req.query.guests)
+          : req.query.guests;
+
+        totalGuests = (Number(g.adults) || 0) + (Number(g.children) || 0);
+      } catch (err) {
+        console.log("Guest parse error:", err);
+      }
+    }
+
+    if (totalGuests > 0) {
+      filter.maxGuests = { $gte: totalGuests };
+    }
 
     const properties = await Property.find(filter).sort({ createdAt: -1 });
     res.json({ success: true, data: properties });
@@ -623,6 +630,7 @@ export const getPublishedProperties = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch published properties" });
   }
 };
+
 
 
 export const getPropertyBlockedDatesPublic = async (req, res) => {
