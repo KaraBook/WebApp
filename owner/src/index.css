@@ -68,59 +68,49 @@
 }
 
 /* -------------------------------------------
-   FIX 1: Add spacing between calendar cells 
-   WITHOUT breaking selected range background
+   SAFE DAY SPACING (doesn't break selection)
 -------------------------------------------- */
-.rdrDays {
-  gap: 6px !important;        /* spacing between days */
-  display: grid !important;
-  grid-template-columns: repeat(7, 1fr) !important;
-}
-
-.rdrDay {
-  margin: 0 !important;       /* prevent breaking selection bar */
-  padding: 0 !important;
-}
-
 .rdrDayNumber span {
-  border-radius: 10px !important;
-  width: 34px !important;
-  height: 34px !important;
-  line-height: 34px !important;
+  padding: 6px !important;               /* internal padding */
+  border-radius: 8px !important;
+  transition: all 0.15s ease;
 }
 
-/* -------------------------------------------
-   FIX 2: Selection bar smoothed and rounded
--------------------------------------------- */
-.rdrSelected,
-.rdrInRange,
-.rdrStartEdge,
-.rdrEndEdge {
-  border-radius: 10px !important;
-}
-
-/* -------------------------------------------
-   FIX 3: Disabled dates styling
--------------------------------------------- */
-.rdrDayDisabled .rdrDayNumber span {
-  background-color: #e5e5e5 !important;
-  color: #a3a3a3 !important;
-  border-radius: 10px !important;
-}
-
-/* -------------------------------------------
-   FIX 4: Black theme for selected range
--------------------------------------------- */
-.rdrDayNumber span.rdrSelected {
-  background: #000 !important;
+/* Selected Range */
+.rdrDayNumber span.rdrInRange,
+.rdrDayNumber span.rdrStartEdge,
+.rdrDayNumber span.rdrEndEdge {
+  background-color: #000 !important;
   color: #fff !important;
 }
 
-/* -------------------------------------------
-   FIX 5: Hover effect consistent with theme
--------------------------------------------- */
+/* Middle of selected range */
+.rdrInRange ~ .rdrDayNumber span {
+  background-color: #00000025 !important;
+  color: #000 !important;
+}
+
+/* Hover */
 .rdrDay:not(.rdrDayPassive):hover .rdrDayNumber span {
   background: #00000015 !important;
+}
+
+/* Disabled */
+.rdrDayDisabled .rdrDayNumber span {
+  background-color: #e6e6e6 !important;
+  color: #9b9b9b !important;
+  border-radius: 8px !important;
+}
+
+/* Month & Header styling */
+.rdrMonthName {
+  color: #333 !important;
+  font-weight: 600 !important;
+}
+
+.rdrWeekDay {
+  color: #666 !important;
+  font-size: 12px !important;
 }
 
 
