@@ -1,22 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Loader2, MapPin, Home, Users, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Loader2, Home, MapPin, Users } from "lucide-react";
 
 export default function Properties() {
   const [properties, setProperties] = useState([]);
@@ -37,14 +23,14 @@ export default function Properties() {
 
   if (loading)
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-[60vh]">
         <Loader2 className="animate-spin text-gray-600 w-8 h-8" />
       </div>
     );
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-800">My Properties</h1>
+      <h1 className="text-[26px] font-semibold text-gray-900">My Properties</h1>
 
       {properties.length === 0 ? (
         <div className="text-center text-gray-500 mt-10">No properties found.</div>
@@ -59,101 +45,104 @@ export default function Properties() {
   );
 }
 
+/* ---------------------------------------------------
+   PROPERTY CARD — Dashboard UI Matching
+--------------------------------------------------- */
 function PropertyCard({ property }) {
   const cover =
     property.coverImage ||
     "https://via.placeholder.com/400x250?text=No+Image";
 
-  const statusColor = property.isBlocked
-    ? "bg-red-100 text-red-600"
+  const statusMap = {
+    blocked: { text: "Blocked", class: "bg-red-50 text-red-600 border-red-100" },
+    draft: { text: "Draft", class: "bg-yellow-50 text-yellow-700 border-yellow-100" },
+    published: { text: "Published", class: "bg-emerald-50 text-emerald-700 border-emerald-100" }
+  };
+
+  const status = property.isBlocked
+    ? statusMap.blocked
     : property.isDraft
-    ? "bg-yellow-100 text-yellow-700"
-    : "bg-green-100 text-green-700";
+    ? statusMap.draft
+    : statusMap.published;
 
   return (
-    <Card className="rounded-xl border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden bg-white">
-      
-      {/* Image (clickable) */}
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all overflow-hidden group">
+
+      {/* Image */}
       <Link to={`/view-property/${property._id}`}>
-        <div className="relative h-48 overflow-hidden group cursor-pointer">
+        <div className="h-48 overflow-hidden relative cursor-pointer">
           <img
             src={cover}
             alt={property.propertyName}
-            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
 
-          <Badge
-            className={`absolute top-3 right-3 text-xs px-2 py-0.5 rounded-md ${statusColor}`}
+          {/* STATUS CHIP */}
+          <span
+            className={`absolute top-3 right-3 px-3 py-1 rounded-full text-[11px] font-medium border ${status.class}`}
           >
-            {property.isBlocked
-              ? "Blocked"
-              : property.isDraft
-              ? "Draft"
-              : "Published"}
-          </Badge>
+            {status.text}
+          </span>
         </div>
       </Link>
 
       {/* Content */}
-      <div className="p-4 space-y-2">
+      <div className="p-5 space-y-3">
 
-        {/* Title (clickable) */}
+        {/* Title */}
         <Link to={`/view-property/${property._id}`}>
-          <h2 className="text-lg font-semibold text-gray-800 hover:text-black transition-colors duration-200 line-clamp-1 cursor-pointer">
+          <h2 className="text-[18px] font-semibold text-gray-900 hover:text-primary transition-colors line-clamp-1 cursor-pointer">
             {property.propertyName}
           </h2>
         </Link>
 
-        {/* Info rows */}
-        <div className="text-sm text-gray-600 space-y-1">
+        {/* Meta */}
+        <div className="space-y-1 text-[14px] text-gray-600">
 
-          <p className="flex items-center gap-2">
-            <Home className="w-4 h-4 text-[#444]" />
+          <div className="flex items-center gap-2">
+            <Home className="w-4 h-4 text-gray-500" />
             {property.propertyType || "Villa"}
-          </p>
+          </div>
 
-          <p className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-[#444]" />
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-gray-500" />
             {property.city}, {property.state}
-          </p>
+          </div>
 
-          <p className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#444]" />
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-gray-500" />
             {property.totalRooms} rooms · {property.maxGuests} guests
-          </p>
+          </div>
 
         </div>
       </div>
 
-      {/* Footer buttons */}
-      <div className="border-t p-4 flex justify-between">
+      {/* Footer Buttons */}
+      <div className="border-t bg-gray-50 px-5 py-4 flex justify-between">
 
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="rounded-md px-8"
+        <Link
+          to={`/view-property/${property._id}`}
+          className="px-6 py-2 rounded-lg border text-[14px] font-medium text-gray-700 hover:bg-gray-100 transition"
         >
-          <Link to={`/view-property/${property._id}`}>View</Link>
-        </Button>
+          View
+        </Link>
 
-        <Button
-          asChild
-          size="sm"
-          className="rounded-md bg-black text-white px-8 hover:bg-black/90"
+        <Link
+          to={
+            property.isDraft || property.isBlocked
+              ? "#"
+              : `/edit-property/${property._id}`
+          }
+          className={`px-6 py-2 rounded-lg text-[14px] font-medium text-white transition 
+            ${property.isDraft || property.isBlocked
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-primary/90"
+            }`}
         >
-          <Link
-            to={
-              property.isDraft || property.isBlocked
-                ? "#"
-                : `/edit-property/${property._id}`
-            }
-          >
-            Edit
-          </Link>
-        </Button>
+          Edit
+        </Link>
 
       </div>
-    </Card>
+    </div>
   );
 }
