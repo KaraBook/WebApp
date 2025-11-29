@@ -9,6 +9,21 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
     ? invoice.priceBreakdown
     : [];
 
+  const formatGuests = (g) => {
+  if (!g) return "-";
+
+  if (typeof g === "number") return `${g} Guests`;
+
+  const adults = g.adults || 0;
+  const children = g.children || 0;
+  const infants = g.infants || 0;
+
+  const total = adults + children;
+
+  return `${total} Guests${infants ? ` + ${infants} Infants` : ""} 
+(${adults} Adults${children ? `, ${children} Children` : ""}${infants ? `, ${infants} Infants` : ""})`;
+};
+
   return (
     <div
       ref={ref}
@@ -43,7 +58,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
             {invoice.checkOut ? format(new Date(invoice.checkOut), "dd MMM yyyy") : "-"}
           </p>
           <p><strong>Nights:</strong> {invoice.nights ?? "-"}</p>
-          <p><strong>Guests:</strong> {invoice.guests ?? "-"}</p>
+          <p><strong>Guests:</strong> {formatGuests(invoice.guests)}</p>
         </div>
         <div>
           <p>
