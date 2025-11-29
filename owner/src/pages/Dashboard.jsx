@@ -5,14 +5,8 @@ import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import {
-  Loader2,
-  CheckCircle2,
-  CalendarCheck,
-  Clock,
-  IndianRupee,
-  MoreVertical,
-} from "lucide-react";
+import { Loader2, CheckCircle2, CalendarCheck, Clock, IndianRupee, MoreVertical } from "lucide-react";
+
 
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
@@ -103,10 +97,14 @@ export default function Dashboard() {
 
   const [propertyId, setPropertyId] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
+  const [bookedDates, setBookedDates] = useState([]);
+
 
   const rowsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [openGuestRow, setOpenGuestRow] = useState(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     (async () => {
@@ -127,6 +125,19 @@ export default function Dashboard() {
 
 
   useEffect(() => {
+    const close = (e) => {
+      if (!e.target.closest(".guest-dropdown-btn")) {
+        setOpenGuestRow(null);
+      }
+    };
+
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, []);
+
+
+
+  useEffect(() => {
     (async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerProperties.url);
@@ -143,13 +154,24 @@ export default function Dashboard() {
         const res = await api.get(
           SummaryApi.getPropertyBlockedDates.url(propertyId)
         );
+        const booked = await api.get(SummaryApi.getBookedDates.url(propertyId));
+        setBookedDates(booked.data.dates || []);
+
         setBlockedDates(res.data.dates || []);
       } catch { }
     })();
+
   }, [propertyId]);
 
   const isDateBlocked = (date) =>
     blockedDates.some((range) => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      return date >= start && date <= end;
+    });
+
+  const isDateBooked = (date) =>
+    bookedDates.some((range) => {
       const start = new Date(range.start);
       const end = new Date(range.end);
       return date >= start && date <= end;
@@ -266,7 +288,26 @@ export default function Dashboard() {
                           })}
                         </td>
                         <td className="py-3 px-6">{b.totalNights}</td>
-                        <td className="py-3 px-6">{b.guests}</td>
+                        <td className="py-3 px-6 relative">
+                          <button
+                            className="guest-dropdown-btn text-gray-900 font-medium"
+                            onClick={(e) => {
+                              if (typeof b.guests === "object") {
+                                const rect = e.target.getBoundingClientRect();
+                                setDropdownPosition({
+                                  top: rect.bottom + window.scrollY + 6,
+                                  left: rect.left + rect.width / 2 - 80,
+                                });
+                                setOpenGuestRow(openGuestRow === b._id ? null : b._id);
+                              }
+                            }}
+                          >
+                            {typeof b.guests === "number"
+                              ? `${b.guests} Guests`
+                              : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                              }`}
+                          </button>
+                        </td>
 
                         <td className="py-3 px-6 font-semibold text-gray-900">
                           ₹{b.totalAmount?.toLocaleString("en-IN")}
@@ -379,12 +420,16 @@ export default function Dashboard() {
                 let cls =
                   "h-9 w-9 flex items-center justify-center rounded-full text-xs transition";
 
-                if (blocked)
+                if (isDateBooked(day)) {
+                  cls += " bg-red-200 text-red-700";
+                } else if (blocked) {
                   cls += " bg-gray-200 text-gray-500";
-                else if (isToday)
+                } else if (isToday) {
                   cls += " border border-primary text-primary font-semibold";
-                else
+                } else {
                   cls += " text-gray-700 hover:bg-gray-100";
+                }
+
 
                 return (
                   <div key={i} className="flex justify-center">
@@ -403,6 +448,42 @@ export default function Dashboard() {
           </div>
 
         </div>
+
+        {openGuestRow && (
+          <div
+            className="fixed bg-white border shadow-lg rounded-md p-3 w-40 z-[9999]"
+            style={{
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+            }}
+          >
+            {(() => {
+              const booking = paginatedRows.find((b) => b._id === openGuestRow);
+              if (!booking || typeof booking.guests !== "object") return null;
+
+              const g = booking.guests;
+              return (
+                <>
+                  <div className="flex justify-between py-1 text-sm">
+                    <span>Adults</span>
+                    <span className="font-semibold">{g.adults}</span>
+                  </div>
+
+                  <div className="flex justify-between py-1 text-sm">
+                    <span>Children</span>
+                    <span className="font-semibold">{g.children}</span>
+                  </div>
+
+                  <div className="flex justify-between py-1 text-sm">
+                    <span>Infants</span>
+                    <span className="font-semibold">{g.infants}</span>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
+
       </div>
     </div>
   );
