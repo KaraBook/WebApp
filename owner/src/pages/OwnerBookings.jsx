@@ -58,15 +58,15 @@ export default function OwnerBookings() {
   }, []);
 
   useEffect(() => {
-  const handleClick = (e) => {
-    if (!e.target.closest(".guest-dropdown-cell")) {
-      setOpenGuestRow(null);
-    }
-  };
+    const handleClick = (e) => {
+      if (!e.target.closest(".guest-dropdown-cell")) {
+        setOpenGuestRow(null);
+      }
+    };
 
-  document.addEventListener("mousedown", handleClick);
-  return () => document.removeEventListener("mousedown", handleClick);
-}, []);
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
 
   useEffect(() => {
@@ -193,198 +193,200 @@ export default function OwnerBookings() {
         </div>
 
         <div className="border rounded-xl overflow-x-auto">
-          <table className="min-w-full text-sm bg-white">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="py-3 px-4 text-left font-medium">Traveller</th>
-                <th className="py-3 px-4 text-left font-medium">Property</th>
-                <th className="py-3 px-4 text-left font-medium">Check-in</th>
-                <th className="py-3 px-4 text-left font-medium">Check-out</th>
-                <th className="py-3 px-4 text-left font-medium">Nights</th>
-                <th className="py-3 px-4 text-left font-medium">Guests</th>
-                <th className="py-3 px-4 text-left font-medium">Amount</th>
-                <th className="py-3 px-4 text-left font-medium">Payment</th>
-                <th className="py-3 px-4 text-left font-medium">Created</th>
-                <th className="py-3 px-4 text-left font-medium">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filtered.map((b) => (
-                <tr key={b._id} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-4">
-                    <div className="font-semibold">
-                      {(b?.userId?.firstName || "") + " " + (b?.userId?.lastName || "")}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {b?.userId?.mobile || "—"}
-                    </div>
-                  </td>
-
-                  <td className="py-3 px-4">
-                    {b.propertyId?.propertyName}
-                  </td>
-
-                  <td className="py-3 px-4">{formatDate(b.checkIn)}</td>
-                  <td className="py-3 px-4">{formatDate(b.checkOut)}</td>
-
-                  <td className="py-3 px-4">{b.totalNights}</td>
-                  <td className="py-3 px-6 relative guest-dropdown-cell">
-                    <button
-                      onClick={() =>
-                        setOpenGuestRow(openGuestRow === b._id ? null : b._id)
-                      }
-                      className="text-gray-900 font-medium"
-                    >
-                      {typeof b.guests === "number"
-                        ? `${b.guests} Guests`
-                        : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
-                        }`}
-                    </button>
-
-                    {/* Dropdown */}
-                    {openGuestRow === b._id && typeof b.guests !== "number" && (
-                      <div className="absolute left-1/2 -translate-x-1/2 top-10 w-40 bg-white border shadow-lg rounded-md p-3 text-left z-50">
-                        <div className="text-sm py-1 flex justify-between">
-                          <span>Adults</span>
-                          <span className="font-semibold">{b.guests.adults}</span>
-                        </div>
-
-                        <div className="text-sm py-1 flex justify-between">
-                          <span>Children</span>
-                          <span className="font-semibold">{b.guests.children}</span>
-                        </div>
-
-                        <div className="text-sm py-1 flex justify-between">
-                          <span>Infants</span>
-                          <span className="font-semibold">{b.guests.infants}</span>
-                        </div>
-                      </div>
-                    )}
-                  </td>
-
-                  <td className="py-3 px-4 font-medium">
-                    {formatCurrency(b.totalAmount)}
-                  </td>
-
-                  <td className="py-3 px-6">{getStatusChip(b.paymentStatus)}</td>
-
-                  <td className="py-3 px-4 text-xs text-gray-500">
-                    {formatDate(b.createdAt)}
-                  </td>
-
-                  {/* ACTIONS */}
-                  <td className="py-3 px-4">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <MoreVertical className="h-5 w-5 cursor-pointer text-gray-600" />
-                      </DropdownMenuTrigger>
-
-                      <DropdownMenuContent className="w-48">
-                        {b.paymentStatus === "paid" ? (
-                          <>
-                            <DropdownMenuItem
-                              onSelect={() => navigate(`/invoice/${b._id}`)}
-                            >
-                              View Invoice
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem onSelect={() => openConfirm("invoice", b)}>
-                              Download Invoice
-                            </DropdownMenuItem>
-                          </>
-                        ) : (
-                          <>
-                            <DropdownMenuItem
-                              onSelect={() =>
-                                toast.error(
-                                  `Please rebook the resort. Your payment is ${b.paymentStatus}.`
-                                )
-                              }
-                            >
-                              View Invoice
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                              onSelect={() =>
-                                toast.error(
-                                  `Please rebook the resort. Your payment is ${b.paymentStatus}.`
-                                )
-                              }
-                            >
-                              Download Invoice
-                            </DropdownMenuItem>
-                          </>
-                        )}
-
-                        <DropdownMenuItem onSelect={() => handleCopy(b.userId.email, "Email")}>
-                          Copy Email
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem onSelect={() => handleCopy(b.userId.mobile, "Phone")}>
-                          Copy Phone
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem
-                          onSelect={() =>
-                            openWhatsApp(
-                              b.userId.mobile,
-                              `Hello ${b.userId.firstName},\nYour booking (${shortId(
-                                b._id
-                              )}) at ${b.propertyId.propertyName}.`
-                            )
-                          }
-                        >
-                          WhatsApp Chat
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem onSelect={() => openConfirm("resend", b)}>
-                          Resend Links (WA + Email)
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </td>
+          <div className="overflow-visible">
+            <table className="min-w-full text-sm bg-white">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="py-3 px-4 text-left font-medium">Traveller</th>
+                  <th className="py-3 px-4 text-left font-medium">Property</th>
+                  <th className="py-3 px-4 text-left font-medium">Check-in</th>
+                  <th className="py-3 px-4 text-left font-medium">Check-out</th>
+                  <th className="py-3 px-4 text-left font-medium">Nights</th>
+                  <th className="py-3 px-4 text-left font-medium">Guests</th>
+                  <th className="py-3 px-4 text-left font-medium">Amount</th>
+                  <th className="py-3 px-4 text-left font-medium">Payment</th>
+                  <th className="py-3 px-4 text-left font-medium">Created</th>
+                  <th className="py-3 px-4 text-left font-medium">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
 
-          {filtered.length === 0 && (
-            <div className="text-center py-10 text-gray-500">No bookings found.</div>
-          )}
+              <tbody>
+                {filtered.map((b) => (
+                  <tr key={b._id} className="border-b hover:bg-gray-50 relative overflow-visible">
+                    <td className="py-3 px-4">
+                      <div className="font-semibold">
+                        {(b?.userId?.firstName || "") + " " + (b?.userId?.lastName || "")}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {b?.userId?.mobile || "—"}
+                      </div>
+                    </td>
+
+                    <td className="py-3 px-4">
+                      {b.propertyId?.propertyName}
+                    </td>
+
+                    <td className="py-3 px-4">{formatDate(b.checkIn)}</td>
+                    <td className="py-3 px-4">{formatDate(b.checkOut)}</td>
+
+                    <td className="py-3 px-4">{b.totalNights}</td>
+                    <td className="py-3 px-6 relative guest-dropdown-cell">
+                      <button
+                        onClick={() =>
+                          setOpenGuestRow(openGuestRow === b._id ? null : b._id)
+                        }
+                        className="text-gray-900 font-medium"
+                      >
+                        {typeof b.guests === "number"
+                          ? `${b.guests} Guests`
+                          : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                          }`}
+                      </button>
+
+                      {/* Dropdown */}
+                      {openGuestRow === b._id && typeof b.guests !== "number" && (
+                        <div className="absolute left-1/2 -translate-x-1/2 top-10 w-40 bg-white border shadow-lg rounded-md p-3 text-left z-50">
+                          <div className="text-sm py-1 flex justify-between">
+                            <span>Adults</span>
+                            <span className="font-semibold">{b.guests.adults}</span>
+                          </div>
+
+                          <div className="text-sm py-1 flex justify-between">
+                            <span>Children</span>
+                            <span className="font-semibold">{b.guests.children}</span>
+                          </div>
+
+                          <div className="text-sm py-1 flex justify-between">
+                            <span>Infants</span>
+                            <span className="font-semibold">{b.guests.infants}</span>
+                          </div>
+                        </div>
+                      )}
+                    </td>
+
+                    <td className="py-3 px-4 font-medium">
+                      {formatCurrency(b.totalAmount)}
+                    </td>
+
+                    <td className="py-3 px-6">{getStatusChip(b.paymentStatus)}</td>
+
+                    <td className="py-3 px-4 text-xs text-gray-500">
+                      {formatDate(b.createdAt)}
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="py-3 px-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <MoreVertical className="h-5 w-5 cursor-pointer text-gray-600" />
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent className="w-48">
+                          {b.paymentStatus === "paid" ? (
+                            <>
+                              <DropdownMenuItem
+                                onSelect={() => navigate(`/invoice/${b._id}`)}
+                              >
+                                View Invoice
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem onSelect={() => openConfirm("invoice", b)}>
+                                Download Invoice
+                              </DropdownMenuItem>
+                            </>
+                          ) : (
+                            <>
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  toast.error(
+                                    `Please rebook the resort. Your payment is ${b.paymentStatus}.`
+                                  )
+                                }
+                              >
+                                View Invoice
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  toast.error(
+                                    `Please rebook the resort. Your payment is ${b.paymentStatus}.`
+                                  )
+                                }
+                              >
+                                Download Invoice
+                              </DropdownMenuItem>
+                            </>
+                          )}
+
+                          <DropdownMenuItem onSelect={() => handleCopy(b.userId.email, "Email")}>
+                            Copy Email
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem onSelect={() => handleCopy(b.userId.mobile, "Phone")}>
+                            Copy Phone
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            onSelect={() =>
+                              openWhatsApp(
+                                b.userId.mobile,
+                                `Hello ${b.userId.firstName},\nYour booking (${shortId(
+                                  b._id
+                                )}) at ${b.propertyId.propertyName}.`
+                              )
+                            }
+                          >
+                            WhatsApp Chat
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem onSelect={() => openConfirm("resend", b)}>
+                            Resend Links (WA + Email)
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {filtered.length === 0 && (
+              <div className="text-center py-10 text-gray-500">No bookings found.</div>
+            )}
+          </div>
         </div>
-      </div>
-
-      <AlertDialog open={confirm.open} onOpenChange={(o) => !o && closeConfirm()}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {confirm.type === "invoice" ? "Download Invoice" : "Resend to Traveller"}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {confirm.type === "invoice"
-                ? "A PDF invoice will be generated."
-                : "Send booking confirmation to the traveller."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirm}>
-              {confirm.type === "invoice" ? "Download" : "Send Now"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {invoiceData && (
-        <div
-          ref={invoiceRef}
-          className="absolute left-[-9999px] top-0 w-[794px] bg-white p-8"
-        >
-          <InvoicePreview invoice={invoiceData} />
         </div>
-      )}
-    </>
-  );
+
+        <AlertDialog open={confirm.open} onOpenChange={(o) => !o && closeConfirm()}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {confirm.type === "invoice" ? "Download Invoice" : "Resend to Traveller"}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {confirm.type === "invoice"
+                  ? "A PDF invoice will be generated."
+                  : "Send booking confirmation to the traveller."}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={onConfirm}>
+                {confirm.type === "invoice" ? "Download" : "Send Now"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {invoiceData && (
+          <div
+            ref={invoiceRef}
+            className="absolute left-[-9999px] top-0 w-[794px] bg-white p-8"
+          >
+            <InvoicePreview invoice={invoiceData} />
+          </div>
+        )}
+      </>
+      );
 }
