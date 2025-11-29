@@ -20,7 +20,6 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
 
   return (
     <div className="flex items-center gap-2 px-6 py-4 border-t bg-white">
-      {/* Previous */}
       <button
         disabled={currentPage === 1}
         onClick={() => setCurrentPage((p) => p - 1)}
@@ -47,7 +46,6 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
         </button>
       ))}
 
-      {/* Next */}
       <button
         disabled={currentPage === totalPages}
         onClick={() => setCurrentPage((p) => p + 1)}
@@ -79,6 +77,7 @@ function StatCard({
       <div className={`h-8 w-8 rounded-full ${iconBg} flex items-center justify-center`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
       </div>
+
       <p className="text-xs text-gray-500">{label}</p>
       <p className="text-[24px] font-semibold text-gray-900 leading-tight">
         {value ?? 0}
@@ -115,67 +114,62 @@ export default function Dashboard() {
   const [propertyId, setPropertyId] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
 
-  // Pagination
+  // pagination
   const rowsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
-  /* ------------------- Fetch Dashboard Stats ------------------- */
+  /* ------------------ Fetch Dashboard ------------------ */
   useEffect(() => {
     (async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerDashboard.url);
+
         const sorted = [...res.data.data.bookings].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
+
         setData({ ...res.data.data, bookings: sorted });
-      } catch (err) {
-        console.error(err);
+      } catch {
       } finally {
         setLoadingDashboard(false);
       }
     })();
   }, []);
 
-  /* ------------------- Fetch Owner Property ------------------- */
+  /* ------------------ Fetch Owner Property ------------------ */
   useEffect(() => {
     const loadProperty = async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerProperties.url);
-        const list = res.data?.data || [];
-        if (list.length > 0) setPropertyId(list[0]._id);
-      } catch (err) {
-        console.error(err);
-      }
+        if (res.data?.data?.length) setPropertyId(res.data.data[0]._id);
+      } catch {}
     };
     loadProperty();
   }, []);
 
-  /* ------------------- Fetch Blocked Dates ------------------- */
+  /* ------------------ Fetch Blocked Dates ------------------ */
   useEffect(() => {
     if (!propertyId) return;
-    const loadDates = async () => {
+    (async () => {
       try {
-        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
+        const res = await api.get(
+          SummaryApi.getPropertyBlockedDates.url(propertyId)
+        );
         setBlockedDates(res.data.dates || []);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    loadDates();
+      } catch {}
+    })();
   }, [propertyId]);
 
-  /* ------------------- Calendar Helpers ------------------- */
-  const isDateBlocked = (date) => {
-    return blockedDates.some((range) => {
+  const isDateBlocked = (date) =>
+    blockedDates.some((range) => {
       const start = new Date(range.start);
       const end = new Date(range.end);
       return date >= start && date <= end;
     });
-  };
 
   if (loadingDashboard) {
     return (
-      <div className="flex items-center justify-center h-[60vh] bg-[#f5f5f7]">
+      <div className="flex items-center justify-center h-[60vh]">
         <Loader2 className="animate-spin w-8 h-8 text-gray-500" />
       </div>
     );
@@ -183,14 +177,14 @@ export default function Dashboard() {
 
   const { stats, bookings } = data || {};
 
-  /* ------------------- Pagination Logic ------------------- */
+  /* ------------------ Pagination Calc ------------------ */
   const totalPages = Math.ceil((bookings?.length || 0) / rowsPerPage);
   const paginatedRows = bookings?.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
 
-  /* ------------------- Calendar Grid ------------------- */
+  /* ------------------ Calendar ------------------ */
   const today = new Date();
   const monthLabel = today.toLocaleString("en-US", {
     month: "long",
@@ -200,22 +194,23 @@ export default function Dashboard() {
   const calendarDays = useMemo(() => {
     const year = today.getFullYear();
     const month = today.getMonth();
-
     const first = new Date(year, month, 1);
     const last = new Date(year, month + 1, 0);
 
     const arr = [];
     for (let i = 0; i < first.getDay(); i++) arr.push(null);
-    for (let d = 1; d <= last.getDate(); d++) arr.push(new Date(year, month, d));
-
+    for (let d = 1; d <= last.getDate(); d++)
+      arr.push(new Date(year, month, d));
     return arr;
   }, [blockedDates]);
 
-  /* ------------------- RETURN UI ------------------- */
+  /* ---------------------------------------------------
+          FINAL UI
+  --------------------------------------------------- */
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-8 py-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* HEADER */}
+        {/* TITLE */}
         <div>
           <h1 className="text-[26px] font-semibold text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-500">
@@ -228,20 +223,20 @@ export default function Dashboard() {
           <StatCard icon={CheckCircle2} label="Total Bookings" value={stats?.totalBookings} caption="All bookings so far" />
           <StatCard icon={CalendarCheck} label="Confirmed" value={stats?.confirmed} caption="Ready to check-in" iconBg="bg-emerald-50" iconColor="text-emerald-600" />
           <StatCard icon={Clock} label="Pending" value={stats?.pending} caption="Awaiting confirmation" iconBg="bg-amber-50" iconColor="text-amber-600" />
-          <StatCard icon={IndianRupee} label="Total Revenue" value={`₹${stats?.totalRevenue?.toLocaleString("en-IN") || 0}`} caption="From all bookings" iconBg="bg-indigo-50" iconColor="text-indigo-600" />
+          <StatCard icon={IndianRupee} label="Total Revenue" value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`} caption="From all bookings" iconBg="bg-indigo-50" iconColor="text-indigo-600" />
         </div>
 
-        {/* GRID: BOOKINGS + CALENDAR */}
+        {/* GRID — BOOKINGS + CALENDAR */}
         <div className="grid grid-cols-[2.7fr_1fr] gap-6 items-start">
-          {/* BOOKINGS TABLE */}
+
+          {/* BOOKINGS */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="px-6 pt-5 pb-3">
               <h2 className="text-sm font-semibold text-gray-900">Last bookings</h2>
             </div>
 
-            {/* Horizontal scroll */}
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1100px] text-sm">
+              <table className="w-full min-w-[1200px] text-sm">
                 <thead className="bg-gray-50 text-gray-500 border-y border-gray-100">
                   <tr>
                     <th className="py-3 px-6">Traveller</th>
@@ -268,8 +263,14 @@ export default function Dashboard() {
                         </td>
 
                         <td className="py-3 px-6">{b.propertyId?.propertyName}</td>
-                        <td className="py-3 px-6">{new Date(b.checkIn).toLocaleDateString("en-IN")}</td>
-                        <td className="py-3 px-6">{new Date(b.checkOut).toLocaleDateString("en-IN")}</td>
+
+                        <td className="py-3 px-6">
+                          {new Date(b.checkIn).toLocaleDateString("en-IN")}
+                        </td>
+
+                        <td className="py-3 px-6">
+                          {new Date(b.checkOut).toLocaleDateString("en-IN")}
+                        </td>
 
                         <td className="py-3 px-6">{b.totalNights}</td>
                         <td className="py-3 px-6">{b.guests}</td>
@@ -300,7 +301,7 @@ export default function Dashboard() {
               </table>
             </div>
 
-            {/* Pagination inside card */}
+            {/* Pagination */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -308,7 +309,7 @@ export default function Dashboard() {
             />
           </div>
 
-          {/* RIGHT — Calendar */}
+          {/* CALENDAR */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <h3 className="text-sm font-semibold text-gray-900">This month calendar</h3>
             <p className="text-xs text-gray-500">Blocked dates are greyed out</p>
@@ -316,8 +317,8 @@ export default function Dashboard() {
             <div className="mt-4 text-sm font-medium text-gray-800">{monthLabel}</div>
 
             <div className="grid grid-cols-7 text-[11px] text-gray-400 mt-2 mb-1 text-center">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((x) => (
-                <div key={x}>{x}</div>
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                <div key={d}>{d}</div>
               ))}
             </div>
 
@@ -351,6 +352,7 @@ export default function Dashboard() {
               View full calendar
             </button>
           </div>
+
         </div>
       </div>
     </div>
