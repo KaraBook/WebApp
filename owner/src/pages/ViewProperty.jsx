@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+
 import {
   Loader2,
   MapPin,
@@ -18,6 +18,7 @@ import {
   ArrowLeft,
   AlertTriangle,
 } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -70,13 +71,14 @@ export default function ViewProperty() {
     );
 
   const cover =
-    property.coverImage || "https://via.placeholder.com/800x400?text=No+Cover+Image";
+    property.coverImage || "https://via.placeholder.com/900x450?text=No+Cover+Image";
   const gallery = property.galleryPhotos || [];
+
   const statusColor = property.isBlocked
-    ? "bg-red-100 text-red-600"
+    ? "bg-red-50 text-red-600 border border-red-100"
     : property.isDraft
-    ? "bg-yellow-100 text-yellow-600"
-    : "bg-green-100 text-green-700";
+    ? "bg-yellow-50 text-yellow-700 border border-yellow-100"
+    : "bg-emerald-50 text-emerald-700 border border-emerald-100";
 
   const handleEditClick = (e) => {
     if (property.isDraft || property.isBlocked || !property.publishNow) {
@@ -88,184 +90,207 @@ export default function ViewProperty() {
   };
 
   return (
-    <div className="space-y-8 p-3 w-full mx-auto">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-            {property.propertyName}
-            <Badge className={statusColor}>
-              {property.isBlocked
-                ? "Blocked"
-                : property.isDraft
-                ? "Draft"
-                : "Published"}
-            </Badge>
-          </h1>
-          <p className="flex items-center gap-2 text-sm text-gray-600 mt-1">
-            <MapPin className="w-4 h-4 text-emerald-600" />
-            {property.city}, {property.state}
-          </p>
+    <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
+      <div className="max-w-6xl mx-auto space-y-8">
+
+        {/* PAGE HEADER */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-[26px] font-semibold text-gray-900 flex items-center gap-3">
+              {property.propertyName}
+              <Badge className={`${statusColor} rounded-lg px-3 py-1`}>
+                {property.isBlocked
+                  ? "Blocked"
+                  : property.isDraft
+                  ? "Draft"
+                  : "Published"}
+              </Badge>
+            </h1>
+
+            <p className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+              <MapPin className="w-4 h-4 text-primary" />
+              {property.city}, {property.state}
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            </Button>
+
+            <Button
+              onClick={handleEditClick}
+              className="bg-primary hover:bg-primary/90 text-white px-6"
+            >
+              Edit Property
+            </Button>
+          </div>
         </div>
 
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
-          </Button>
-
-          {/* ✅ Fixed edit button — now triggers popup correctly */}
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleEditClick}
-            className="bg-black text-white hover:bg-gray-800"
-          >
-            Edit Property
-          </Button>
+        {/* COVER IMAGE */}
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+          <img
+            src={cover}
+            alt="Cover"
+            className="w-full h-[420px] object-cover"
+          />
         </div>
-      </div>
 
-      {/* Cover Image */}
-      <Card className="overflow-hidden">
-        <img src={cover} alt="Cover" className="w-full h-[400px] object-cover rounded-t-md" />
-      </Card>
+        {/* OVERVIEW SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <Home className="w-4 h-4 text-primary" />
+            <h2 className="text-[18px] font-semibold text-gray-900">Overview</h2>
+          </div>
 
-      {/* Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Home className="w-4 h-4 text-emerald-600" /> Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-gray-700 space-y-3">
-          <p>{property.description || "No description available."}</p>
           <Separator />
-          <div className="grid sm:grid-cols-2 gap-4">
+
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {property.description || "No description available."}
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-4 text-sm mt-2">
             <p><strong>Type:</strong> {property.propertyType}</p>
-            <p><strong>Address:</strong> {property.addressLine1}, {property.city}</p>
-            <p><strong>Rooms:</strong> {property.totalRooms} total</p>
+            <p><strong>Address:</strong> {property.addressLine1}</p>
+            <p><strong>Rooms:</strong> {property.totalRooms}</p>
             <p><strong>Max Guests:</strong> {property.maxGuests}</p>
+
             <p className="flex items-center gap-2">
-              <PawPrint className="w-4 h-4 text-emerald-600" />
+              <PawPrint className="w-4 h-4 text-primary" />
               <strong>Pet Friendly:</strong> {property.petFriendly ? "Yes" : "No"}
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Pricing */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <IndianRupee className="w-4 h-4 text-emerald-600" /> Pricing & Stay
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
-          <p><strong>Weekdays:</strong> ₹{property.pricingPerNightWeekdays}</p>
-          <p><strong>Weekend:</strong> ₹{property.pricingPerNightWeekend}</p>
-          <p><strong>Extra Guest Charge:</strong> {property.extraGuestCharge ? `₹${property.extraGuestCharge}` : "N/A"}</p>
-          <p><strong>Min Stay Nights:</strong> {property.minStayNights}</p>
-          <p className="flex items-center gap-2">
-            <CalendarClock className="w-4 h-4 text-emerald-600" />
-            <strong>Check-In:</strong> {property.checkInTime}
-          </p>
-          <p><strong>Check-Out:</strong> {property.checkOutTime}</p>
-        </CardContent>
-      </Card>
+        {/* PRICING SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <IndianRupee className="w-4 h-4 text-primary" />
+            <h2 className="text-[18px] font-semibold text-gray-900">
+              Pricing & Stay
+            </h2>
+          </div>
 
-      {/* Amenities */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <Users className="w-4 h-4 text-emerald-600" /> Amenities & Food
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm">
+          <Separator />
+
+          <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
+            <p><strong>Weekdays:</strong> ₹{property.pricingPerNightWeekdays}</p>
+            <p><strong>Weekend:</strong> ₹{property.pricingPerNightWeekend}</p>
+            <p>
+              <strong>Extra Guest Charge:</strong>{" "}
+              {property.extraGuestCharge ? `₹${property.extraGuestCharge}` : "N/A"}
+            </p>
+            <p><strong>Minimum Nights:</strong> {property.minStayNights}</p>
+
+            <p className="flex items-center gap-2">
+              <CalendarClock className="w-4 h-4 text-primary" />
+              <strong>Check-In:</strong> {property.checkInTime}
+            </p>
+
+            <p><strong>Check-Out:</strong> {property.checkOutTime}</p>
+          </div>
+        </div>
+
+        {/* AMENITIES SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-primary" />
+            <h2 className="text-[18px] font-semibold text-gray-900">
+              Amenities & Food
+            </h2>
+          </div>
+
+          <Separator />
+
           <div>
-            <h4 className="font-semibold mb-1">Food Availability</h4>
+            <h4 className="font-semibold text-sm mb-2">Food Availability</h4>
             <div className="flex flex-wrap gap-2">
               {property.foodAvailability?.length ? (
                 property.foodAvailability.map((f, i) => (
-                  <Badge key={i} variant="secondary" className="capitalize">
+                  <Badge key={i} className="capitalize bg-gray-100 text-gray-700">
                     {f}
                   </Badge>
                 ))
               ) : (
-                <span className="text-gray-500">Not specified</span>
+                <p className="text-gray-500 text-sm">Not specified</p>
               )}
             </div>
           </div>
+
           <div>
-            <h4 className="font-semibold mb-1">Amenities</h4>
+            <h4 className="font-semibold text-sm mb-2">Amenities</h4>
             <div className="flex flex-wrap gap-2">
               {property.amenities?.length ? (
                 property.amenities.map((a, i) => (
-                  <Badge key={i} variant="secondary" className="capitalize">
+                  <Badge key={i} className="capitalize bg-gray-100 text-gray-700">
                     {a}
                   </Badge>
                 ))
               ) : (
-                <span className="text-gray-500">Not specified</span>
+                <p className="text-gray-500 text-sm">Not specified</p>
               )}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Gallery */}
-      {gallery.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold flex items-center gap-2">
-              <ImageIcon className="w-4 h-4 text-emerald-600" /> Gallery ({gallery.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {gallery.map((url, idx) => (
+        {/* GALLERY SECTION */}
+        {gallery.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ImageIcon className="w-4 h-4 text-primary" />
+              <h2 className="text-[18px] font-semibold text-gray-900">
+                Gallery ({gallery.length})
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {gallery.map((img, idx) => (
                 <img
                   key={idx}
-                  src={url}
-                  alt={`Gallery ${idx + 1}`}
-                  className="rounded-lg h-36 w-full object-cover border hover:opacity-90 transition"
+                  src={img}
+                  className="rounded-xl h-36 w-full object-cover border border-gray-200 hover:opacity-90 transition"
+                  alt="Gallery"
                 />
               ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        )}
 
-      {/* Popup Alert */}
-      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="text-yellow-500 w-6 h-6" />
-              <AlertDialogTitle>Edit Restricted</AlertDialogTitle>
-            </div>
-            <AlertDialogDescription className="text-gray-600 mt-2">
-              {property.isBlocked
-                ? "This property has been blocked by the admin and cannot be edited."
-                : "Your property is currently in Draft mode. Please contact the admin to make it live before editing."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex justify-end space-x-2">
-            <AlertDialogCancel>Close</AlertDialogCancel>
-            <AlertDialogAction
-              asChild
-              className="bg-black text-white"
-            >
-              <a
-                href="mailto:support@karabook.com?subject=Property%20Approval%20Request"
-                target="_blank"
-                rel="noopener noreferrer"
+        {/* RESTRICTED EDIT POPUP */}
+        <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+          <AlertDialogContent className="max-w-md">
+            <AlertDialogHeader>
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="text-yellow-500 w-6 h-6" />
+                <AlertDialogTitle>Edit Restricted</AlertDialogTitle>
+              </div>
+
+              <AlertDialogDescription className="text-gray-600 mt-2">
+                {property.isBlocked
+                  ? "This property has been blocked by the admin and cannot be edited."
+                  : "Your property is currently in Draft mode. Please contact admin to make it live before editing."}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter className="flex justify-end gap-2">
+              <AlertDialogCancel>Close</AlertDialogCancel>
+
+              <AlertDialogAction
+                asChild
+                className="bg-primary hover:bg-primary/90 text-white"
               >
-                Contact Admin
-              </a>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+                <a
+                  href="mailto:support@karabook.com?subject=Property%20Approval%20Request"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Contact Admin
+                </a>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   );
 }
