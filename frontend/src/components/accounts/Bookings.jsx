@@ -16,6 +16,8 @@ import { Link } from "react-router-dom";
 export default function Bookings() {
   const { accessToken } = useAuthStore();
   const [bookings, setBookings] = useState([]);
+  const [openGuestRow, setOpenGuestRow] = useState(null);
+
 
   useEffect(() => {
     (async () => {
@@ -29,6 +31,18 @@ export default function Bookings() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+  const handleClick = (e) => {
+    if (!e.target.closest(".guest-dropdown-cell")) {
+      setOpenGuestRow(null);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClick);
+  return () => document.removeEventListener("mousedown", handleClick);
+}, []);
+
 
   const statusDot = (status) => {
     switch (status) {
@@ -115,11 +129,34 @@ export default function Bookings() {
 
                     <td className="px-4 py-3 text-center">{nights}</td>
 
-                    <td className="px-4 py-3 text-center">
-                      {typeof b.guests === "number"
-                        ? `${b.guests} Guests`
-                        : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
-                        }`}
+                    <td className="px-4 py-3 text-center relative guest-dropdown-cell">
+                      <button
+                        onClick={() => setOpenGuestRow(openGuestRow === b._id ? null : b._id)}
+                        className="underline text-[#233b19] font-medium"
+                      >
+                        {typeof b.guests === "number"
+                          ? `${b.guests} Guests`
+                          : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                          }`}
+                      </button>
+
+                      {/* Dropdown */}
+                      {openGuestRow === b._id && typeof b.guests !== "number" && (
+                        <div className="absolute left-1/2 -translate-x-1/2 top-10 w-40 bg-white border shadow-lg rounded-md p-3 text-left z-50">
+                          <div className="text-sm py-1 flex justify-between">
+                            <span>Adults</span>
+                            <span className="font-semibold">{b.guests.adults}</span>
+                          </div>
+                          <div className="text-sm py-1 flex justify-between">
+                            <span>Children</span>
+                            <span className="font-semibold">{b.guests.children}</span>
+                          </div>
+                          <div className="text-sm py-1 flex justify-between">
+                            <span>Infants</span>
+                            <span className="font-semibold">{b.guests.infants}</span>
+                          </div>
+                        </div>
+                      )}
                     </td>
 
                     <td className="px-4 py-3 font-semibold">
