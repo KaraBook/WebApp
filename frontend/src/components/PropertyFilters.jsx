@@ -13,6 +13,7 @@ export default function PropertyFilters({ onFilter }) {
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const [guestCount, setGuestCount] = useState(1);
+    const guestRef = useRef(null);
     const [guests, setGuests] = useState({
         adults: 1,
         children: 0,
@@ -52,11 +53,12 @@ export default function PropertyFilters({ onFilter }) {
 
     useEffect(() => {
         const handleClickOutside = (e) => {
-            if (calendarRef.current && !calendarRef.current.contains(e.target)) {
-                setShowCalendar(false);
+            if (guestRef.current && !guestRef.current.contains(e.target)) {
+                setShowGuestBox(false);
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
+
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
@@ -227,7 +229,7 @@ export default function PropertyFilters({ onFilter }) {
             </div>
 
             {/* Guests */}
-            <div className="flex-1 min-w-[180px] relative">
+            <div className="flex-1 min-w-[180px] relative" ref={guestRef}>
                 <label className="text-[14px] text-black uppercase ml-1">Travellers</label>
 
                 <div
