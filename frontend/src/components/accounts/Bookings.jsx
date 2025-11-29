@@ -115,7 +115,12 @@ export default function Bookings() {
 
                     <td className="px-4 py-3 text-center">{nights}</td>
 
-                    <td className="px-4 py-3 text-center">{b.guests}</td>
+                    <td className="px-4 py-3 text-center">
+                      {typeof b.guests === "number"
+                        ? `${b.guests} Guests`
+                        : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                        }`}
+                    </td>
 
                     <td className="px-4 py-3 font-semibold">
                       ₹{b.totalAmount.toLocaleString()}
