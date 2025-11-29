@@ -42,7 +42,7 @@ export default function Header() {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `text-[14px] leading-none px-3 py-2 rounded-[10px] transition ${
+              `text-[14px] leading-none px-3 py-3 rounded-[8px] transition ${
                 isActive
                   ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
