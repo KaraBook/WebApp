@@ -48,18 +48,11 @@ export default function OwnerBookings() {
 
   const [query, setQuery] = useState("");
 
-  // Filters
   const [paymentFilter, setPaymentFilter] = useState("all");
-  const [dateRange, setDateRange] = useState([
-    {
-      startDate: null,
-      endDate: null,
-      key: "selection",
-    },
-  ]);
+
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Pagination
+
   const pageSize = 10;
   const [page, setPage] = useState(1);
 
@@ -118,20 +111,10 @@ export default function OwnerBookings() {
       data = data.filter((b) => b.paymentStatus === paymentFilter);
     }
 
-    // DATE RANGE FILTER
-    if (dateRange[0].startDate && dateRange[0].endDate) {
-      data = data.filter((b) => {
-        const created = new Date(b.createdAt);
-        return (
-          created >= dateRange[0].startDate &&
-          created <= dateRange[0].endDate
-        );
-      });
-    }
 
     setFiltered(data);
     setPage(1);
-  }, [query, paymentFilter, dateRange, bookings]);
+  }, [query, paymentFilter, bookings]);
 
   // PAGINATION LOGIC
   const totalPages = Math.ceil(filtered.length / pageSize);
@@ -178,15 +161,6 @@ export default function OwnerBookings() {
             <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3">
               Bookings
             </h1>
-
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={fetchBookings}
-            >
-              <RotateCcw size={16} />
-              Refresh
-            </Button>
           </div>
 
           {/* FILTER BAR */}
@@ -215,30 +189,7 @@ export default function OwnerBookings() {
                 <SelectItem value="failed">Failed</SelectItem>
               </SelectContent>
             </Select>
-
-            {/* Date filter */}
-            <div className="relative">
-              <Button
-                variant="outline"
-                onClick={() => setShowDatePicker((p) => !p)}
-                className="flex items-center gap-2 border-gray-300"
-              >
-                <CalendarDays size={15} /> Date Range
-              </Button>
-
-              {showDatePicker && (
-                <div className="absolute right-0 mt-2 z-50 shadow-2xl border bg-white rounded-xl">
-                  <DateRange
-                    editableDateInputs={true}
-                    moveRangeOnFirstSelection={false}
-                    ranges={dateRange}
-                    onChange={(item) => setDateRange([item.selection])}
-                    rangeColors={["#0ea5e9"]}
-                    className="p-3 rounded-xl border border-gray-100 shadow-lg"
-                  />
-                </div>
-              )}
-            </div>
+          
           </div>
 
           {/* TABLE */}
