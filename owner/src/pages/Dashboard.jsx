@@ -4,7 +4,7 @@ import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import {
   Loader2,
   CheckCircle2,
