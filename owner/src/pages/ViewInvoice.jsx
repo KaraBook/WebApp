@@ -112,7 +112,7 @@ export default function ViewInvoice() {
 
           <button
             onClick={downloadPDF}
-            className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg shadow hover:bg-gray-900 transition"
+            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-primary transition"
           >
             <Download size={18} />
             Download Invoice
