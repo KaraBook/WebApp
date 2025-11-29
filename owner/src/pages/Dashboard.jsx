@@ -88,6 +88,13 @@ function PaymentChip({ status }) {
 }
 
 
+const normalizeDay = (d) => {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+};
+
+
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -171,11 +178,14 @@ export default function Dashboard() {
     });
 
   const isDateBooked = (date) =>
-    bookedDates.some((range) => {
-      const start = new Date(range.start);
-      const end = new Date(range.end);
-      return date >= start && date <= end;
-    });
+  bookedDates.some((range) => {
+    const start = normalizeDay(range.start);
+    const end = normalizeDay(range.end);
+    end.setDate(end.getDate() - 1);
+    const d = normalizeDay(date);
+    return d >= start && d <= end;
+  });
+
 
   if (loadingDashboard) {
     return (
