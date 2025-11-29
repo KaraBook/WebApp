@@ -67,51 +67,6 @@
   }
 }
 
-/* -------------------------------------------
-   SAFE DAY SPACING (doesn't break selection)
--------------------------------------------- */
-.rdrDayNumber span {
-  padding: 6px !important;               /* internal padding */
-  border-radius: 8px !important;
-  transition: all 0.15s ease;
-}
-
-/* Selected Range */
-.rdrDayNumber span.rdrInRange,
-.rdrDayNumber span.rdrStartEdge,
-.rdrDayNumber span.rdrEndEdge {
-  background-color: #000 !important;
-  color: #fff !important;
-}
-
-/* Middle of selected range */
-.rdrInRange ~ .rdrDayNumber span {
-  background-color: #00000025 !important;
-  color: #000 !important;
-}
-
-/* Hover */
-.rdrDay:not(.rdrDayPassive):hover .rdrDayNumber span {
-  background: #00000015 !important;
-}
-
-/* Disabled */
-.rdrDayDisabled .rdrDayNumber span {
-  background-color: #e6e6e6 !important;
-  color: #9b9b9b !important;
-  border-radius: 8px !important;
-}
-
-/* Month & Header styling */
-.rdrMonthName {
-  color: #333 !important;
-  font-weight: 600 !important;
-}
-
-.rdrWeekDay {
-  color: #666 !important;
-  font-size: 12px !important;
-}
 
 
 
