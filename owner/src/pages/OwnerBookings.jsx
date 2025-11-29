@@ -233,29 +233,29 @@ export default function OwnerBookings() {
                     <td className="py-3 px-6 relative guest-dropdown-cell">
                       <button
                         onClick={() =>
-                          setOpenGuestRow(openGuestRow === b._id ? null : b._id)
+                          b.guests && typeof b.guests === "object"
+                            ? setOpenGuestRow(openGuestRow === b._id ? null : b._id)
+                            : null
                         }
                         className="text-gray-900 font-medium"
                       >
-                        {typeof b.guests === "number"
-                          ? `${b.guests} Guests`
-                          : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                        {typeof b.guests === "number" && `${b.guests} Guests`}
+
+                        {typeof b.guests === "object" &&
+                          `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
                           }`}
                       </button>
 
-                      {/* Dropdown */}
-                      {openGuestRow === b._id && typeof b.guests !== "number" && (
+                      {openGuestRow === b._id && typeof b.guests === "object" && (
                         <div className="absolute left-1/2 -translate-x-1/2 top-10 w-40 bg-white border shadow-lg rounded-md p-3 text-left z-50">
                           <div className="text-sm py-1 flex justify-between">
                             <span>Adults</span>
                             <span className="font-semibold">{b.guests.adults}</span>
                           </div>
-
                           <div className="text-sm py-1 flex justify-between">
                             <span>Children</span>
                             <span className="font-semibold">{b.guests.children}</span>
                           </div>
-
                           <div className="text-sm py-1 flex justify-between">
                             <span>Infants</span>
                             <span className="font-semibold">{b.guests.infants}</span>
@@ -355,38 +355,38 @@ export default function OwnerBookings() {
             )}
           </div>
         </div>
+      </div>
+
+      <AlertDialog open={confirm.open} onOpenChange={(o) => !o && closeConfirm()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirm.type === "invoice" ? "Download Invoice" : "Resend to Traveller"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirm.type === "invoice"
+                ? "A PDF invoice will be generated."
+                : "Send booking confirmation to the traveller."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirm}>
+              {confirm.type === "invoice" ? "Download" : "Send Now"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {invoiceData && (
+        <div
+          ref={invoiceRef}
+          className="absolute left-[-9999px] top-0 w-[794px] bg-white p-8"
+        >
+          <InvoicePreview invoice={invoiceData} />
         </div>
-
-        <AlertDialog open={confirm.open} onOpenChange={(o) => !o && closeConfirm()}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                {confirm.type === "invoice" ? "Download Invoice" : "Resend to Traveller"}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                {confirm.type === "invoice"
-                  ? "A PDF invoice will be generated."
-                  : "Send booking confirmation to the traveller."}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={onConfirm}>
-                {confirm.type === "invoice" ? "Download" : "Send Now"}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
-        {invoiceData && (
-          <div
-            ref={invoiceRef}
-            className="absolute left-[-9999px] top-0 w-[794px] bg-white p-8"
-          >
-            <InvoicePreview invoice={invoiceData} />
-          </div>
-        )}
-      </>
-      );
+      )}
+    </>
+  );
 }
