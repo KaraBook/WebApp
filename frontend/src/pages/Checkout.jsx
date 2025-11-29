@@ -22,6 +22,7 @@ export default function Checkout() {
     const [blockedDates, setBlockedDates] = useState([]);
     const guestRef = useRef(null);
 
+
     const normalizeRanges = (ranges) =>
         ranges.map((r) => {
             const start = new Date(r.start);
@@ -37,7 +38,12 @@ export default function Checkout() {
     };
 
     const { from, to, guests } = state || {};
-    const [guestCount, setGuestCount] = useState(guests || 1);
+    const [guestData, setGuestData] = useState(
+        guests || { adults: 1, children: 0, infants: 0 }
+    );
+
+    const totalMainGuests = guestData.adults + guestData.children;
+    const maxGuests = property?.maxGuests || 1;
     const [showCalendar, setShowCalendar] = useState(false);
     const [dateRange, setDateRange] = useState([
         {
@@ -124,7 +130,7 @@ export default function Checkout() {
                 totalAmount: total,
                 checkIn: startDate,
                 checkOut: endDate,
-                guests: guestCount,
+                guests: guestData,
                 contactNumber: contact,
             });
 
@@ -254,12 +260,11 @@ export default function Checkout() {
 
 
                     {/* GUESTS */}
+                    {/* GUESTS DROPDOWN */}
                     <div className="flex justify-between text-sm items-center relative" ref={guestRef}>
                         <div>
                             <span className="block text-gray-700 font-medium">Guests</span>
-                            <span>
-                                {guestCount} {guestCount > 1 ? "guests" : "guest"}
-                            </span>
+                            <span>{totalMainGuests} guests</span>
                         </div>
 
                         <button
@@ -270,22 +275,93 @@ export default function Checkout() {
                         </button>
 
                         {showGuestDropdown && (
-                            <div className="absolute right-0 top-8 bg-white border shadow-xl p-3 w-[50%] z-50">
-                                {Array.from({ length: property.maxGuests }).map((_, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => {
-                                            setGuestCount(i + 1);
-                                            setShowGuestDropdown(false);
-                                        }}
-                                        className={`block w-full text-left px-3 py-2 text-sm ${guestCount === i + 1
-                                                ? "bg-primary text-white font-semibold"
-                                                : "hover:bg-gray-100 text-gray-700"
-                                            }`}
-                                    >
-                                        {i + 1} {i === 0 ? "Guest" : "Guests"}
-                                    </button>
-                                ))}
+                            <div className="absolute right-0 top-8 bg-white border shadow-xl p-4 w-[55%] z-50">
+
+                                {/* Adults */}
+                                <div className="flex justify-between items-center py-2">
+                                    <div>
+                                        <p className="font-medium">Adults</p>
+                                        <p className="text-xs text-gray-500">Age 13+</p>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            className="border rounded-full w-7 h-7 flex items-center justify-center"
+                                            onClick={() =>
+                                                setGuestData((g) => ({ ...g, adults: Math.max(1, g.adults - 1) }))
+                                            }
+                                        >−</button>
+
+                                        <span>{guestData.adults}</span>
+
+                                        <button
+                                            className="border rounded-full w-7 h-7 flex items-center justify-center disabled:opacity-40"
+                                            disabled={totalMainGuests >= maxGuests}
+                                            onClick={() =>
+                                                setGuestData((g) => {
+                                                    if (g.adults + g.children >= maxGuests) return g;
+                                                    return { ...g, adults: g.adults + 1 };
+                                                })
+                                            }
+                                        >+</button>
+                                    </div>
+                                </div>
+
+                                {/* Children */}
+                                <div className="flex justify-between items-center py-2">
+                                    <div>
+                                        <p className="font-medium">Children</p>
+                                        <p className="text-xs text-gray-500">Age 2–12</p>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            className="border rounded-full w-7 h-7 flex items-center justify-center"
+                                            onClick={() =>
+                                                setGuestData((g) => ({ ...g, children: Math.max(0, g.children - 1) }))
+                                            }
+                                        >−</button>
+
+                                        <span>{guestData.children}</span>
+
+                                        <button
+                                            className="border rounded-full w-7 h-7 flex items-center justify-center disabled:opacity-40"
+                                            disabled={totalMainGuests >= maxGuests}
+                                            onClick={() =>
+                                                setGuestData((g) => {
+                                                    if (g.adults + g.children >= maxGuests) return g;
+                                                    return { ...g, children: g.children + 1 };
+                                                })
+                                            }
+                                        >+</button>
+                                    </div>
+                                </div>
+
+                                {/* Infants */}
+                                <div className="flex justify-between items-center py-2">
+                                    <div>
+                                        <p className="font-medium">Infants</p>
+                                        <p className="text-xs text-gray-500">Under 2</p>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            className="border rounded-full w-7 h-7 flex items-center justify-center"
+                                            onClick={() =>
+                                                setGuestData((g) => ({ ...g, infants: Math.max(0, g.infants - 1) }))
+                                            }
+                                        >−</button>
+
+                                        <span>{guestData.infants}</span>
+
+                                        <button
+                                            className="border rounded-full w-7 h-7 flex items-center justify-center"
+                                            onClick={() =>
+                                                setGuestData((g) => ({ ...g, infants: g.infants + 1 }))
+                                            }
+                                        >+</button>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
