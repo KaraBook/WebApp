@@ -97,7 +97,7 @@ export default function Header() {
             <NavLink
               key={item.path}
               to={item.path}
-              className={`text-[14px] px-3 py-3 rounded-[8px] transition ${
+              className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${
                 active
                   ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
