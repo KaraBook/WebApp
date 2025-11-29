@@ -19,6 +19,7 @@ export default function OwnerBookings() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const [openGuestRow, setOpenGuestRow] = useState(null);
 
   const [invoiceData, setInvoiceData] = useState(null);
   const invoiceRef = useRef(null);
@@ -55,6 +56,18 @@ export default function OwnerBookings() {
   useEffect(() => {
     fetchBookings();
   }, []);
+
+  useEffect(() => {
+  const handleClick = (e) => {
+    if (!e.target.closest(".guest-dropdown-cell")) {
+      setOpenGuestRow(null);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClick);
+  return () => document.removeEventListener("mousedown", handleClick);
+}, []);
+
 
   useEffect(() => {
     const q = query.toLowerCase();
@@ -216,7 +229,39 @@ export default function OwnerBookings() {
                   <td className="py-3 px-4">{formatDate(b.checkOut)}</td>
 
                   <td className="py-3 px-4">{b.totalNights}</td>
-                  <td className="py-3 px-4">{b.guests}</td>
+                  <td className="py-3 px-6 relative guest-dropdown-cell">
+                    <button
+                      onClick={() =>
+                        setOpenGuestRow(openGuestRow === b._id ? null : b._id)
+                      }
+                      className="text-gray-900 font-medium"
+                    >
+                      {typeof b.guests === "number"
+                        ? `${b.guests} Guests`
+                        : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                        }`}
+                    </button>
+
+                    {/* Dropdown */}
+                    {openGuestRow === b._id && typeof b.guests !== "number" && (
+                      <div className="absolute left-1/2 -translate-x-1/2 top-10 w-40 bg-white border shadow-lg rounded-md p-3 text-left z-50">
+                        <div className="text-sm py-1 flex justify-between">
+                          <span>Adults</span>
+                          <span className="font-semibold">{b.guests.adults}</span>
+                        </div>
+
+                        <div className="text-sm py-1 flex justify-between">
+                          <span>Children</span>
+                          <span className="font-semibold">{b.guests.children}</span>
+                        </div>
+
+                        <div className="text-sm py-1 flex justify-between">
+                          <span>Infants</span>
+                          <span className="font-semibold">{b.guests.infants}</span>
+                        </div>
+                      </div>
+                    )}
+                  </td>
 
                   <td className="py-3 px-4 font-medium">
                     {formatCurrency(b.totalAmount)}
