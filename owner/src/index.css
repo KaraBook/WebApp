@@ -67,11 +67,62 @@
   }
 }
 
-.rdrDayDisabled {
-   background-color: #e1e1e1!important;
-   border-radius: 20px!important;
-   height: 2.3em!important;
+/* -------------------------------------------
+   FIX 1: Add spacing between calendar cells 
+   WITHOUT breaking selected range background
+-------------------------------------------- */
+.rdrDays {
+  gap: 6px !important;        /* spacing between days */
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
 }
+
+.rdrDay {
+  margin: 0 !important;       /* prevent breaking selection bar */
+  padding: 0 !important;
+}
+
+.rdrDayNumber span {
+  border-radius: 10px !important;
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+}
+
+/* -------------------------------------------
+   FIX 2: Selection bar smoothed and rounded
+-------------------------------------------- */
+.rdrSelected,
+.rdrInRange,
+.rdrStartEdge,
+.rdrEndEdge {
+  border-radius: 10px !important;
+}
+
+/* -------------------------------------------
+   FIX 3: Disabled dates styling
+-------------------------------------------- */
+.rdrDayDisabled .rdrDayNumber span {
+  background-color: #e5e5e5 !important;
+  color: #a3a3a3 !important;
+  border-radius: 10px !important;
+}
+
+/* -------------------------------------------
+   FIX 4: Black theme for selected range
+-------------------------------------------- */
+.rdrDayNumber span.rdrSelected {
+  background: #000 !important;
+  color: #fff !important;
+}
+
+/* -------------------------------------------
+   FIX 5: Hover effect consistent with theme
+-------------------------------------------- */
+.rdrDay:not(.rdrDayPassive):hover .rdrDayNumber span {
+  background: #00000015 !important;
+}
+
 
 
 
