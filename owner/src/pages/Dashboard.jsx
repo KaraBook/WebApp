@@ -191,18 +191,21 @@ export default function Dashboard() {
     year: "numeric",
   });
 
-  const calendarDays = useMemo(() => {
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    const first = new Date(year, month, 1);
-    const last = new Date(year, month + 1, 0);
+  const getCalendarDays = () => {
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
 
-    const arr = [];
-    for (let i = 0; i < first.getDay(); i++) arr.push(null);
-    for (let d = 1; d <= last.getDate(); d++)
-      arr.push(new Date(year, month, d));
-    return arr;
-  }, [blockedDates]);
+  const arr = [];
+  for (let i = 0; i < first.getDay(); i++) arr.push(null);
+  for (let d = 1; d <= last.getDate(); d++) {
+    arr.push(new Date(year, month, d));
+  }
+  return arr;
+};
+
+const calendarDays = getCalendarDays();
 
   /* ---------------------------------------------------
           FINAL UI
