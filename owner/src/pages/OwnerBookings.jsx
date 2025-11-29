@@ -18,11 +18,7 @@ import {
   RotateCcw,
   CalendarDays,
   IndianRupee,
-  User,
   Phone,
-  Home,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 
 import {
@@ -35,6 +31,8 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -177,8 +175,7 @@ export default function OwnerBookings() {
         <div className="max-w-6xl mx-auto space-y-8">
           {/* HEADER */}
           <div className="flex items-center justify-between">
-            <h1 className="text-[26px] font-semibold text-gray-900 flex items-center gap-3">
-              <CalendarDays className="w-5 h-5 text-primary" />
+            <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3">
               Bookings
             </h1>
 
@@ -194,6 +191,7 @@ export default function OwnerBookings() {
 
           {/* FILTER BAR */}
           <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
+
             {/* Search */}
             <div className="flex items-center gap-3 flex-1">
               <Search className="w-5 h-5 text-gray-500" />
@@ -205,34 +203,38 @@ export default function OwnerBookings() {
               />
             </div>
 
-            {/* Payment Filter */}
-            <select
-              value={paymentFilter}
-              onChange={(e) => setPaymentFilter(e.target.value)}
-              className="px-4 py-2 border rounded-lg bg-gray-50"
-            >
-              <option value="all">Payment: All</option>
-              <option value="paid">Paid</option>
-              <option value="pending">Pending</option>
-              <option value="failed">Failed</option>
-            </select>
+            {/* Payment Filter — SHADCN SELECT */}
+            <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+              <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+                <SelectValue placeholder="Payment" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Payment: All</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
+              </SelectContent>
+            </Select>
 
             {/* Date filter */}
             <div className="relative">
               <Button
                 variant="outline"
                 onClick={() => setShowDatePicker((p) => !p)}
+                className="flex items-center gap-2 border-gray-300"
               >
-                Date Range
+                <CalendarDays size={15} /> Date Range
               </Button>
 
               {showDatePicker && (
-                <div className="absolute right-0 mt-2 z-50 shadow-xl">
+                <div className="absolute right-0 mt-2 z-50 shadow-2xl border bg-white rounded-xl">
                   <DateRange
                     editableDateInputs={true}
                     moveRangeOnFirstSelection={false}
                     ranges={dateRange}
                     onChange={(item) => setDateRange([item.selection])}
+                    rangeColors={["#0ea5e9"]}
+                    className="p-3 rounded-xl border border-gray-100 shadow-lg"
                   />
                 </div>
               )}
@@ -293,7 +295,9 @@ export default function OwnerBookings() {
                         {formatCurrency(b.totalAmount)}
                       </td>
 
-                      <td className="py-3 px-4">{getStatusChip(b.paymentStatus)}</td>
+                      <td className="py-3 px-4">
+                        {getStatusChip(b.paymentStatus)}
+                      </td>
 
                       <td className="py-3 px-4 text-gray-500 text-xs">
                         {formatDate(b.createdAt)}
@@ -319,13 +323,17 @@ export default function OwnerBookings() {
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                              onSelect={() => handleCopy(b.userId.email, "Email")}
+                              onSelect={() =>
+                                navigator.clipboard.writeText(b.userId.email)
+                              }
                             >
                               Copy Email
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
-                              onSelect={() => handleCopy(b.userId.mobile, "Phone")}
+                              onSelect={() =>
+                                navigator.clipboard.writeText(b.userId.mobile)
+                              }
                             >
                               Copy Phone
                             </DropdownMenuItem>
@@ -361,9 +369,7 @@ export default function OwnerBookings() {
                   variant="outline"
                   disabled={page === 1}
                   onClick={() => setPage(page - 1)}
-                  className="flex items-center gap-1"
                 >
-                  <ChevronLeft size={16} />
                   Prev
                 </Button>
 
@@ -371,10 +377,8 @@ export default function OwnerBookings() {
                   variant="outline"
                   disabled={page === totalPages}
                   onClick={() => setPage(page + 1)}
-                  className="flex items-center gap-1"
                 >
                   Next
-                  <ChevronRight size={16} />
                 </Button>
               </div>
             </div>
