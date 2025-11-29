@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
@@ -19,7 +19,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center gap-2 px-6 py-4 border-t bg-white">
+    <div className="flex justify-end items-center gap-2 px-6 py-4 border-t bg-white">
       <button
         disabled={currentPage === 1}
         onClick={() => setCurrentPage((p) => p - 1)}
@@ -62,7 +62,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
 }
 
 /* ---------------------------------------------------
-   STAT CARD COMPONENT
+   STAT CARD
 --------------------------------------------------- */
 function StatCard({
   icon: Icon,
@@ -73,7 +73,7 @@ function StatCard({
   iconColor = "text-gray-700",
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex flex-col gap-3">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 flex flex-col gap-3">
       <div className={`h-8 w-8 rounded-full ${iconBg} flex items-center justify-center`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
       </div>
@@ -102,7 +102,7 @@ function PaymentChip({ status }) {
 }
 
 /* ---------------------------------------------------
-   MAIN DASHBOARD COMPONENT
+   MAIN DASHBOARD
 --------------------------------------------------- */
 export default function Dashboard() {
   const { user } = useAuth();
@@ -118,7 +118,7 @@ export default function Dashboard() {
   const rowsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
-  /* ------------------ Fetch Dashboard ------------------ */
+  /* ------------------ Load Dashboard ------------------ */
   useEffect(() => {
     (async () => {
       try {
@@ -129,27 +129,27 @@ export default function Dashboard() {
         );
 
         setData({ ...res.data.data, bookings: sorted });
-      } catch {
-      } finally {
+      } catch {}
+      finally {
         setLoadingDashboard(false);
       }
     })();
   }, []);
 
-  /* ------------------ Fetch Owner Property ------------------ */
+  /* ------------------ Load Owner Property ------------------ */
   useEffect(() => {
-    const loadProperty = async () => {
+    (async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerProperties.url);
         if (res.data?.data?.length) setPropertyId(res.data.data[0]._id);
       } catch {}
-    };
-    loadProperty();
+    })();
   }, []);
 
-  /* ------------------ Fetch Blocked Dates ------------------ */
+  /* ------------------ Load Blocked Dates ------------------ */
   useEffect(() => {
     if (!propertyId) return;
+
     (async () => {
       try {
         const res = await api.get(
@@ -177,14 +177,14 @@ export default function Dashboard() {
 
   const { stats, bookings } = data || {};
 
-  /* ------------------ Pagination Calc ------------------ */
+  /* ------------- Pagination ------------- */
   const totalPages = Math.ceil((bookings?.length || 0) / rowsPerPage);
   const paginatedRows = bookings?.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
 
-  /* ------------------ Calendar ------------------ */
+  /* ------------- Calendar ------------- */
   const today = new Date();
   const monthLabel = today.toLocaleString("en-US", {
     month: "long",
@@ -192,28 +192,27 @@ export default function Dashboard() {
   });
 
   const getCalendarDays = () => {
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month + 1, 0);
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const first = new Date(year, month, 1);
+    const last = new Date(year, month + 1, 0);
 
-  const arr = [];
-  for (let i = 0; i < first.getDay(); i++) arr.push(null);
-  for (let d = 1; d <= last.getDate(); d++) {
-    arr.push(new Date(year, month, d));
-  }
-  return arr;
-};
+    const arr = [];
+    for (let i = 0; i < first.getDay(); i++) arr.push(null);
+    for (let d = 1; d <= last.getDate(); d++) arr.push(new Date(year, month, d));
+    return arr;
+  };
 
-const calendarDays = getCalendarDays();
+  const calendarDays = getCalendarDays();
 
   /* ---------------------------------------------------
-          FINAL UI
+       UI
   --------------------------------------------------- */
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-8 py-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* TITLE */}
+
+        {/* Title */}
         <div>
           <h1 className="text-[26px] font-semibold text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-500">
@@ -232,25 +231,25 @@ const calendarDays = getCalendarDays();
         {/* GRID — BOOKINGS + CALENDAR */}
         <div className="grid grid-cols-[2.7fr_1fr] gap-6 items-start">
 
-          {/* BOOKINGS */}
+          {/* BOOKINGS TABLE */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="px-6 pt-5 pb-3">
               <h2 className="text-sm font-semibold text-gray-900">Last bookings</h2>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1200px] text-sm">
+              <table className="w-full min-w-[1000px] text-sm">
                 <thead className="bg-gray-50 text-gray-500 border-y border-gray-100">
-                  <tr>
-                    <th className="py-3 px-6">Traveller</th>
-                    <th className="py-3 px-6">Property</th>
-                    <th className="py-3 px-6">Check-in</th>
-                    <th className="py-3 px-6">Check-out</th>
-                    <th className="py-3 px-6">Nights</th>
-                    <th className="py-3 px-6">Guests</th>
-                    <th className="py-3 px-6">Amount</th>
-                    <th className="py-3 px-6">Payment</th>
-                    <th className="py-3 px-6">Actions</th>
+                  <tr className="text-left">
+                    <th className="py-3 px-6 text-left">Traveller</th>
+                    <th className="py-3 px-6 text-left">Property</th>
+                    <th className="py-3 px-6 text-left">Check-in</th>
+                    <th className="py-3 px-6 text-left">Check-out</th>
+                    <th className="py-3 px-6 text-left">Nights</th>
+                    <th className="py-3 px-6 text-left">Guests</th>
+                    <th className="py-3 px-6 text-left">Amount</th>
+                    <th className="py-3 px-6 text-left">Payment</th>
+                    <th className="py-3 px-6 text-left">Actions</th>
                   </tr>
                 </thead>
 
@@ -266,14 +265,8 @@ const calendarDays = getCalendarDays();
                         </td>
 
                         <td className="py-3 px-6">{b.propertyId?.propertyName}</td>
-
-                        <td className="py-3 px-6">
-                          {new Date(b.checkIn).toLocaleDateString("en-IN")}
-                        </td>
-
-                        <td className="py-3 px-6">
-                          {new Date(b.checkOut).toLocaleDateString("en-IN")}
-                        </td>
+                        <td className="py-3 px-6">{new Date(b.checkIn).toLocaleDateString("en-IN")}</td>
+                        <td className="py-3 px-6">{new Date(b.checkOut).toLocaleDateString("en-IN")}</td>
 
                         <td className="py-3 px-6">{b.totalNights}</td>
                         <td className="py-3 px-6">{b.guests}</td>
@@ -304,7 +297,7 @@ const calendarDays = getCalendarDays();
               </table>
             </div>
 
-            {/* Pagination */}
+            {/* Pagination (Right Aligned) */}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -319,26 +312,30 @@ const calendarDays = getCalendarDays();
 
             <div className="mt-4 text-sm font-medium text-gray-800">{monthLabel}</div>
 
-            <div className="grid grid-cols-7 text-[11px] text-gray-400 mt-2 mb-1 text-center">
+            {/* WEEK DAYS */}
+            <div className="grid grid-cols-7 text-[11px] text-gray-400 mt-3 mb-2 text-center">
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
                 <div key={d}>{d}</div>
               ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-1 text-sm">
+            {/* DAYS */}
+            <div className="grid grid-cols-7 gap-1.5 text-sm">
               {calendarDays.map((day, i) => {
-                if (!day) return <div key={i} className="h-8" />;
+                if (!day) return <div key={i} className="h-9" />;
 
                 const isToday = day.toDateString() === today.toDateString();
                 const blocked = isDateBlocked(day);
 
                 let cls =
-                  "h-8 flex items-center justify-center rounded-full text-xs";
+                  "h-9 w-9 flex items-center justify-center rounded-full text-xs transition";
 
-                if (blocked) cls += " bg-gray-200 text-gray-500 line-through";
+                if (blocked)
+                  cls += " bg-gray-200 text-gray-500 line-through";
                 else if (isToday)
                   cls += " border border-indigo-500 text-indigo-600 font-semibold";
-                else cls += " text-gray-700 hover:bg-gray-100";
+                else
+                  cls += " text-gray-700 hover:bg-gray-100";
 
                 return (
                   <div key={i} className="flex justify-center">
