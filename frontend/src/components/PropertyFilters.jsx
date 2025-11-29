@@ -62,6 +62,18 @@ export default function PropertyFilters({ onFilter }) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+                setShowCalendar(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+
     const applyFilters = () => {
         onFilter({
             state: selectedState?.value || "",
