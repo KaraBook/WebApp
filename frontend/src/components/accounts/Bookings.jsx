@@ -18,7 +18,7 @@ export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [openGuestRow, setOpenGuestRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 10;
 
 
 
@@ -238,7 +238,7 @@ export default function Bookings() {
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1 border rounded disabled:opacity-50"
+                className="px-3 py-1 border disabled:opacity-50"
               >
                 Previous
               </button>
@@ -247,7 +247,7 @@ export default function Bookings() {
                 <button
                   key={index}
                   onClick={() => setCurrentPage(index + 1)}
-                  className={`px-3 py-1 border rounded ${currentPage === index + 1 ? "bg-primary text-white" : ""
+                  className={`px-3 py-1 border ${currentPage === index + 1 ? "bg-primary text-white" : ""
                     }`}
                 >
                   {index + 1}
@@ -257,7 +257,7 @@ export default function Bookings() {
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1 border rounded disabled:opacity-50"
+                className="px-3 py-1 border disabled:opacity-50"
               >
                 Next
               </button>
