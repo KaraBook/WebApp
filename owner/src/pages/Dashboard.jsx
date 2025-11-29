@@ -232,7 +232,7 @@ export default function Dashboard() {
         <div className="flex w-full justify-between gap-6 items-start">
 
           {/* BOOKINGS TABLE */}
-          <div className="w-[63%] bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="w-[65%] bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="px-6 pt-5 pb-3">
               <h2 className="text-sm font-semibold text-gray-900">Last bookings</h2>
             </div>
@@ -306,7 +306,7 @@ export default function Dashboard() {
           </div>
 
           {/* CALENDAR */}
-          <div className="w-[25%] bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div className="w-[28%] bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <h3 className="text-sm font-semibold text-gray-900">This month calendar</h3>
             <p className="text-xs text-gray-500">Blocked dates are greyed out</p>
 
