@@ -23,11 +23,10 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
       <button
         disabled={currentPage === 1}
         onClick={() => setCurrentPage((p) => p - 1)}
-        className={`px-4 py-1.5 rounded-lg border text-sm ${
-          currentPage === 1
-            ? "text-gray-300 border-gray-200"
-            : "text-gray-700 border-gray-300 hover:bg-gray-100"
-        }`}
+        className={`px-4 py-1.5 rounded-lg border text-sm ${currentPage === 1
+          ? "text-gray-300 border-gray-200"
+          : "text-gray-700 border-gray-300 hover:bg-gray-100"
+          }`}
       >
         Previous
       </button>
@@ -36,11 +35,10 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
         <button
           key={page}
           onClick={() => setCurrentPage(page)}
-          className={`px-3 py-1.5 rounded-lg border text-sm ${
-            page === currentPage
-              ? "bg-gray-900 text-white border-gray-900"
-              : "border-gray-300 text-gray-700 hover:bg-gray-100"
-          }`}
+          className={`px-3 py-1.5 rounded-lg border text-sm ${page === currentPage
+            ? "bg-gray-900 text-white border-gray-900"
+            : "border-gray-300 text-gray-700 hover:bg-gray-100"
+            }`}
         >
           {page}
         </button>
@@ -49,11 +47,10 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
       <button
         disabled={currentPage === totalPages}
         onClick={() => setCurrentPage((p) => p + 1)}
-        className={`px-4 py-1.5 rounded-lg border text-sm ${
-          currentPage === totalPages
-            ? "text-gray-300 border-gray-200"
-            : "text-gray-700 border-gray-300 hover:bg-gray-100"
-        }`}
+        className={`px-4 py-1.5 rounded-lg border text-sm ${currentPage === totalPages
+          ? "text-gray-300 border-gray-200"
+          : "text-gray-700 border-gray-300 hover:bg-gray-100"
+          }`}
       >
         Next
       </button>
@@ -129,7 +126,7 @@ export default function Dashboard() {
         );
 
         setData({ ...res.data.data, bookings: sorted });
-      } catch {}
+      } catch { }
       finally {
         setLoadingDashboard(false);
       }
@@ -142,7 +139,7 @@ export default function Dashboard() {
       try {
         const res = await api.get(SummaryApi.getOwnerProperties.url);
         if (res.data?.data?.length) setPropertyId(res.data.data[0]._id);
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -156,7 +153,7 @@ export default function Dashboard() {
           SummaryApi.getPropertyBlockedDates.url(propertyId)
         );
         setBlockedDates(res.data.dates || []);
-      } catch {}
+      } catch { }
     })();
   }, [propertyId]);
 
@@ -265,9 +262,20 @@ export default function Dashboard() {
                         </td>
 
                         <td className="py-3 px-6">{b.propertyId?.propertyName}</td>
-                        <td className="py-3 px-6">{new Date(b.checkIn).toLocaleDateString("en-IN")}</td>
-                        <td className="py-3 px-6">{new Date(b.checkOut).toLocaleDateString("en-IN")}</td>
-
+                        <td className="py-3 px-6">
+                          {new Date(b.checkIn).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="py-3 px-6">
+                          {new Date(b.checkOut).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
                         <td className="py-3 px-6">{b.totalNights}</td>
                         <td className="py-3 px-6">{b.guests}</td>
 
@@ -347,7 +355,7 @@ export default function Dashboard() {
 
             <button
               onClick={() => navigate("/calendar")}
-              className="mt-5 w-full bg-gray-900 hover:bg-gray-800 text-white rounded-xl py-2.5 text-xs font-medium"
+              className="mt-5 w-full bg-primary hover:bg-primary-800 text-white rounded-[10px] py-2.5 text-[14px] font-medium"
             >
               View full calendar
             </button>
