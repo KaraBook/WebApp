@@ -12,14 +12,11 @@ import {
   MoreVertical,
 } from "lucide-react";
 
-/* ---------------------------------------------------
-   PAGINATION COMPONENT
---------------------------------------------------- */
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex justify-end items-center gap-2 px-6 py-4 border-t bg-white">
+    <div className="flex rounded-b-xl justify-end items-center gap-2 px-6 py-4 border-t bg-white">
       <button
         disabled={currentPage === 1}
         onClick={() => setCurrentPage((p) => p - 1)}
@@ -58,9 +55,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
   );
 }
 
-/* ---------------------------------------------------
-   STAT CARD
---------------------------------------------------- */
+
 function StatCard({
   icon: Icon,
   label,
@@ -84,9 +79,7 @@ function StatCard({
   );
 }
 
-/* ---------------------------------------------------
-   PAYMENT CHIP
---------------------------------------------------- */
+
 function PaymentChip({ status }) {
   const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
   const map = {
@@ -98,9 +91,7 @@ function PaymentChip({ status }) {
   return <span className={map[status] || base}>{status}</span>;
 }
 
-/* ---------------------------------------------------
-   MAIN DASHBOARD
---------------------------------------------------- */
+
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -111,11 +102,10 @@ export default function Dashboard() {
   const [propertyId, setPropertyId] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
 
-  // pagination
   const rowsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
-  /* ------------------ Load Dashboard ------------------ */
+
   useEffect(() => {
     (async () => {
       try {
@@ -133,7 +123,7 @@ export default function Dashboard() {
     })();
   }, []);
 
-  /* ------------------ Load Owner Property ------------------ */
+ 
   useEffect(() => {
     (async () => {
       try {
@@ -143,7 +133,6 @@ export default function Dashboard() {
     })();
   }, []);
 
-  /* ------------------ Load Blocked Dates ------------------ */
   useEffect(() => {
     if (!propertyId) return;
 
@@ -174,14 +163,14 @@ export default function Dashboard() {
 
   const { stats, bookings } = data || {};
 
-  /* ------------- Pagination ------------- */
+
   const totalPages = Math.ceil((bookings?.length || 0) / rowsPerPage);
   const paginatedRows = bookings?.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
 
-  /* ------------- Calendar ------------- */
+ 
   const today = new Date();
   const monthLabel = today.toLocaleString("en-US", {
     month: "long",
@@ -202,9 +191,7 @@ export default function Dashboard() {
 
   const calendarDays = getCalendarDays();
 
-  /* ---------------------------------------------------
-       UI
-  --------------------------------------------------- */
+
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-8 py-6">
       <div className="max-w-7xl mx-auto space-y-6">
