@@ -12,6 +12,99 @@ import {
   MoreVertical,
 } from "lucide-react";
 
+/* ---------------------------------------------------
+   PAGINATION COMPONENT
+--------------------------------------------------- */
+function Pagination({ currentPage, totalPages, setCurrentPage }) {
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="flex items-center gap-2 px-6 py-4 border-t bg-white">
+      {/* Previous */}
+      <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((p) => p - 1)}
+        className={`px-4 py-1.5 rounded-lg border text-sm ${
+          currentPage === 1
+            ? "text-gray-300 border-gray-200"
+            : "text-gray-700 border-gray-300 hover:bg-gray-100"
+        }`}
+      >
+        Previous
+      </button>
+
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        <button
+          key={page}
+          onClick={() => setCurrentPage(page)}
+          className={`px-3 py-1.5 rounded-lg border text-sm ${
+            page === currentPage
+              ? "bg-gray-900 text-white border-gray-900"
+              : "border-gray-300 text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          {page}
+        </button>
+      ))}
+
+      {/* Next */}
+      <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage((p) => p + 1)}
+        className={`px-4 py-1.5 rounded-lg border text-sm ${
+          currentPage === totalPages
+            ? "text-gray-300 border-gray-200"
+            : "text-gray-700 border-gray-300 hover:bg-gray-100"
+        }`}
+      >
+        Next
+      </button>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------
+   STAT CARD COMPONENT
+--------------------------------------------------- */
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  caption,
+  iconBg = "bg-gray-100",
+  iconColor = "text-gray-700",
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex flex-col gap-3">
+      <div className={`h-8 w-8 rounded-full ${iconBg} flex items-center justify-center`}>
+        <Icon className={`w-4 h-4 ${iconColor}`} />
+      </div>
+      <p className="text-xs text-gray-500">{label}</p>
+      <p className="text-[24px] font-semibold text-gray-900 leading-tight">
+        {value ?? 0}
+      </p>
+      {caption && <p className="text-[11px] text-gray-400">{caption}</p>}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------
+   PAYMENT CHIP
+--------------------------------------------------- */
+function PaymentChip({ status }) {
+  const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
+  const map = {
+    paid: `${base} bg-emerald-50 text-emerald-700`,
+    pending: `${base} bg-amber-50 text-amber-700`,
+    initiated: `${base} bg-gray-100 text-gray-600`,
+    failed: `${base} bg-red-50 text-red-600`,
+  };
+  return <span className={map[status] || base}>{status}</span>;
+}
+
+/* ---------------------------------------------------
+   MAIN DASHBOARD COMPONENT
+--------------------------------------------------- */
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -22,20 +115,18 @@ export default function Dashboard() {
   const [propertyId, setPropertyId] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
 
-  // Pagination states
-  const rowsPerPage = 5; // OPTION A
+  // Pagination
+  const rowsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
-  // FETCH DASHBOARD DATA
+  /* ------------------- Fetch Dashboard Stats ------------------- */
   useEffect(() => {
     (async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerDashboard.url);
-
         const sorted = [...res.data.data.bookings].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
-
         setData({ ...res.data.data, bookings: sorted });
       } catch (err) {
         console.error(err);
@@ -45,7 +136,7 @@ export default function Dashboard() {
     })();
   }, []);
 
-  // FETCH PROPERTY ID
+  /* ------------------- Fetch Owner Property ------------------- */
   useEffect(() => {
     const loadProperty = async () => {
       try {
@@ -59,22 +150,21 @@ export default function Dashboard() {
     loadProperty();
   }, []);
 
-  // FETCH BLOCKED DATES
+  /* ------------------- Fetch Blocked Dates ------------------- */
   useEffect(() => {
     if (!propertyId) return;
-    const loadBlocked = async () => {
+    const loadDates = async () => {
       try {
-        const res = await api.get(
-          SummaryApi.getPropertyBlockedDates.url(propertyId)
-        );
+        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
         setBlockedDates(res.data.dates || []);
       } catch (err) {
         console.error(err);
       }
     };
-    loadBlocked();
+    loadDates();
   }, [propertyId]);
 
+  /* ------------------- Calendar Helpers ------------------- */
   const isDateBlocked = (date) => {
     return blockedDates.some((range) => {
       const start = new Date(range.start);
@@ -93,14 +183,14 @@ export default function Dashboard() {
 
   const { stats, bookings } = data || {};
 
-  // PAGINATION CALCULATION
+  /* ------------------- Pagination Logic ------------------- */
   const totalPages = Math.ceil((bookings?.length || 0) / rowsPerPage);
   const paginatedRows = bookings?.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
 
-  // MONTH CALENDAR
+  /* ------------------- Calendar Grid ------------------- */
   const today = new Date();
   const monthLabel = today.toLocaleString("en-US", {
     month: "long",
@@ -110,76 +200,48 @@ export default function Dashboard() {
   const calendarDays = useMemo(() => {
     const year = today.getFullYear();
     const month = today.getMonth();
+
     const first = new Date(year, month, 1);
     const last = new Date(year, month + 1, 0);
 
-    const days = [];
-    for (let i = 0; i < first.getDay(); i++) days.push(null);
+    const arr = [];
+    for (let i = 0; i < first.getDay(); i++) arr.push(null);
+    for (let d = 1; d <= last.getDate(); d++) arr.push(new Date(year, month, d));
 
-    for (let d = 1; d <= last.getDate(); d++) {
-      days.push(new Date(year, month, d));
-    }
-    return days;
+    return arr;
   }, [blockedDates]);
 
+  /* ------------------- RETURN UI ------------------- */
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-8 py-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* TITLE */}
+        {/* HEADER */}
         <div>
           <h1 className="text-[26px] font-semibold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500">
             Welcome back{user?.firstName ? `, ${user.firstName}` : ""}.
           </p>
         </div>
 
-        {/* STATS ROW */}
+        {/* STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            icon={CheckCircle2}
-            label="Total Bookings"
-            value={stats?.totalBookings}
-            caption="All bookings so far"
-          />
-          <StatCard
-            icon={CalendarCheck}
-            label="Confirmed"
-            value={stats?.confirmed}
-            caption="Ready to check-in"
-            iconBg="bg-emerald-50"
-            iconColor="text-emerald-600"
-          />
-          <StatCard
-            icon={Clock}
-            label="Pending"
-            value={stats?.pending}
-            caption="Awaiting confirmation"
-            iconBg="bg-amber-50"
-            iconColor="text-amber-600"
-          />
-          <StatCard
-            icon={IndianRupee}
-            label="Total Revenue"
-            value={`₹${stats?.totalRevenue?.toLocaleString("en-IN") || 0}`}
-            caption="From all bookings"
-            iconBg="bg-indigo-50"
-            iconColor="text-indigo-600"
-          />
+          <StatCard icon={CheckCircle2} label="Total Bookings" value={stats?.totalBookings} caption="All bookings so far" />
+          <StatCard icon={CalendarCheck} label="Confirmed" value={stats?.confirmed} caption="Ready to check-in" iconBg="bg-emerald-50" iconColor="text-emerald-600" />
+          <StatCard icon={Clock} label="Pending" value={stats?.pending} caption="Awaiting confirmation" iconBg="bg-amber-50" iconColor="text-amber-600" />
+          <StatCard icon={IndianRupee} label="Total Revenue" value={`₹${stats?.totalRevenue?.toLocaleString("en-IN") || 0}`} caption="From all bookings" iconBg="bg-indigo-50" iconColor="text-indigo-600" />
         </div>
 
-        {/* MAIN GRID */}
+        {/* GRID: BOOKINGS + CALENDAR */}
         <div className="grid grid-cols-[2.7fr_1fr] gap-6 items-start">
-          {/* LAST BOOKINGS */}
+          {/* BOOKINGS TABLE */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="px-6 pt-5 pb-3">
-              <h2 className="text-sm font-semibold text-gray-900">
-                Last bookings
-              </h2>
+              <h2 className="text-sm font-semibold text-gray-900">Last bookings</h2>
             </div>
 
-            {/* TABLE WRAPPER */}
+            {/* Horizontal scroll */}
             <div className="overflow-x-auto">
-              <table className="w-full text-sm min-w-[1100px]">
+              <table className="w-full min-w-[1100px] text-sm">
                 <thead className="bg-gray-50 text-gray-500 border-y border-gray-100">
                   <tr>
                     <th className="py-3 px-6">Traveller</th>
@@ -197,28 +259,17 @@ export default function Dashboard() {
                 <tbody>
                   {paginatedRows?.length ? (
                     paginatedRows.map((b) => (
-                      <tr
-                        key={b._id}
-                        className="border-b hover:bg-gray-50/60 transition"
-                      >
+                      <tr key={b._id} className="border-b hover:bg-gray-50/60 transition">
                         <td className="py-3 px-6">
                           <div className="font-medium text-gray-900">
                             {b.userId?.firstName} {b.userId?.lastName}
                           </div>
-                          <div className="text-xs text-gray-500">
-                            {b.userId?.mobile}
-                          </div>
+                          <div className="text-xs text-gray-500">{b.userId?.mobile}</div>
                         </td>
 
                         <td className="py-3 px-6">{b.propertyId?.propertyName}</td>
-
-                        <td className="py-3 px-6">
-                          {new Date(b.checkIn).toLocaleDateString("en-IN")}
-                        </td>
-
-                        <td className="py-3 px-6">
-                          {new Date(b.checkOut).toLocaleDateString("en-IN")}
-                        </td>
+                        <td className="py-3 px-6">{new Date(b.checkIn).toLocaleDateString("en-IN")}</td>
+                        <td className="py-3 px-6">{new Date(b.checkOut).toLocaleDateString("en-IN")}</td>
 
                         <td className="py-3 px-6">{b.totalNights}</td>
                         <td className="py-3 px-6">{b.guests}</td>
@@ -231,7 +282,6 @@ export default function Dashboard() {
                           <PaymentChip status={b.paymentStatus} />
                         </td>
 
-                        {/* ACTION MENU */}
                         <td className="py-3 px-6">
                           <button className="p-2 hover:bg-gray-100 rounded-lg">
                             <MoreVertical className="w-4 h-4 text-gray-600" />
@@ -241,7 +291,7 @@ export default function Dashboard() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="10" className="py-10 text-center text-gray-500">
+                      <td colSpan="9" className="py-10 text-center text-gray-500">
                         No bookings found.
                       </td>
                     </tr>
@@ -250,35 +300,27 @@ export default function Dashboard() {
               </table>
             </div>
 
-            {/* PAGINATION — OUTSIDE SCROLL */}
+            {/* Pagination inside card */}
             <Pagination
-              totalPages={totalPages}
               currentPage={currentPage}
+              totalPages={totalPages}
               setCurrentPage={setCurrentPage}
             />
           </div>
 
-          {/* CALENDAR */}
+          {/* RIGHT — Calendar */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-            <h3 className="text-sm font-semibold text-gray-900">
-              This month calendar
-            </h3>
-            <p className="text-xs text-gray-500 mt-1">
-              Blocked dates are greyed out
-            </p>
+            <h3 className="text-sm font-semibold text-gray-900">This month calendar</h3>
+            <p className="text-xs text-gray-500">Blocked dates are greyed out</p>
 
-            <div className="mt-4 text-sm font-medium text-gray-800">
-              {monthLabel}
-            </div>
+            <div className="mt-4 text-sm font-medium text-gray-800">{monthLabel}</div>
 
-            {/* Weekdays */}
             <div className="grid grid-cols-7 text-[11px] text-gray-400 mt-2 mb-1 text-center">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-                <div key={d}>{d}</div>
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((x) => (
+                <div key={x}>{x}</div>
               ))}
             </div>
 
-            {/* Days */}
             <div className="grid grid-cols-7 gap-1 text-sm">
               {calendarDays.map((day, i) => {
                 if (!day) return <div key={i} className="h-8" />;
@@ -286,21 +328,17 @@ export default function Dashboard() {
                 const isToday = day.toDateString() === today.toDateString();
                 const blocked = isDateBlocked(day);
 
-                let classes =
+                let cls =
                   "h-8 flex items-center justify-center rounded-full text-xs";
 
-                if (blocked) {
-                  classes += " bg-gray-200 text-gray-500 line-through";
-                } else if (isToday) {
-                  classes +=
-                    " border border-indigo-500 text-indigo-600 font-semibold";
-                } else {
-                  classes += " text-gray-700 hover:bg-gray-100";
-                }
+                if (blocked) cls += " bg-gray-200 text-gray-500 line-through";
+                else if (isToday)
+                  cls += " border border-indigo-500 text-indigo-600 font-semibold";
+                else cls += " text-gray-700 hover:bg-gray-100";
 
                 return (
                   <div key={i} className="flex justify-center">
-                    <div className={classes}>{day.getDate()}</div>
+                    <div className={cls}>{day.getDate()}</div>
                   </div>
                 );
               })}
@@ -317,88 +355,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}
-
-/* COMPONENTS */
-
-function Pagination({ currentPage, totalPages, setCurrentPage }) {
-  if (totalPages <= 1) return null;
-
-  return (
-    <div className="flex items-center gap-2 px-6 py-4 border-t bg-white">
-      {/* Previous */}
-      <button
-        disabled={currentPage === 1}
-        className={`px-4 py-1.5 rounded-lg border text-sm ${
-          currentPage === 1
-            ? "text-gray-300 border-gray-200"
-            : "hover:bg-gray-100 border-gray-300 text-gray-700"
-        }`}
-        onClick={() => setCurrentPage((p) => p - 1)}
-      >
-        Previous
-      </button>
-
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-        <button
-          key={p}
-          onClick={() => setCurrentPage(p)}
-          className={`px-3 py-1.5 rounded-lg border text-sm ${
-            p === currentPage
-              ? "bg-gray-900 text-white border-gray-900"
-              : "border-gray-300 text-gray-700 hover:bg-gray-100"
-          }`}
-        >
-          {p}
-        </button>
-      ))}
-
-      {/* Next */}
-      <button
-        disabled={currentPage === totalPages}
-        className={`px-4 py-1.5 rounded-lg border text-sm ${
-          currentPage === totalPages
-            ? "text-gray-300 border-gray-200"
-            : "hover:bg-gray-100 border-gray-300 text-gray-700"
-        }`}
-        onClick={() => setCurrentPage((p) => p + 1)}
-      >
-        Next
-      </button>
-    </div>
-  );
-}
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  caption,
-  iconBg = "bg-gray-100",
-  iconColor = "text-gray-700",
-}) {
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 py-4 flex flex-col gap-3">
-      <div className={`h-8 w-8 rounded-full ${iconBg} flex items-center justify-center`}>
-        <Icon className={`w-4 h-4 ${iconColor}`} />
-      </div>
-
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className="text-[24px] font-semibold text-gray-900 leading-tight">
-        {value ?? 0}
-      </p>
-      {caption && <p className="text-[11px] text-gray-400">{caption}</p>}
-    </div>
-  );
-}
-
-function PaymentChip({ status }) {
-  const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
-  const map = {
-    paid: `${base} bg-emerald-50 text-emerald-700`,
-    pending: `${base} bg-amber-50 text-amber-700`,
-    initiated: `${base} bg-gray-100 text-gray-600`,
-    failed: `${base} bg-red-50 text-red-600`,
-  };
-  return <span className={map[status] || base}>{status}</span>;
 }
