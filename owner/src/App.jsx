@@ -3,7 +3,6 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import Properties from "./pages/Properties";
-import ViewProperty from "./pages/ViewProperty";
 import EditProperty from "./pages/EditProperty";
 import OfflineBooking from "./pages/OfflineBooking";
 import Calendar from "./pages/Calendar";
@@ -25,8 +24,7 @@ export default function App() {
       >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="properties" element={<Properties />} />
-        <Route path="view-property/:id" element={<ViewProperty />} />
+        <Route path="view-property/:id" element={<Properties />} />
         <Route path="edit-property/:id" element={<EditProperty />} />
         <Route path="offline-booking/:id" element={<OfflineBooking />} />
         <Route path="bookings" element={<OwnerBookings />} />
