@@ -132,7 +132,7 @@ export default function Bookings() {
                     <td className="px-4 py-3 text-center relative guest-dropdown-cell">
                       <button
                         onClick={() => setOpenGuestRow(openGuestRow === b._id ? null : b._id)}
-                        className="underline text-[#233b19] font-medium"
+                        className="text-[#233b19] font-medium"
                       >
                         {typeof b.guests === "number"
                           ? `${b.guests} Guests`

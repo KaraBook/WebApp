@@ -48,7 +48,7 @@ export default function InvoicePage() {
     const imgData = canvas.toDataURL("image/png");
 
     const pdf = new jsPDF("p", "mm", "a4");
-    const imgWidth = 210; 
+    const imgWidth = 210;
     const pageHeight = 297;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     let heightLeft = imgHeight;
@@ -101,7 +101,23 @@ export default function InvoicePage() {
             <p><strong>Check-in:</strong> {format(new Date(invoice.checkIn), "dd MMM yyyy")}</p>
             <p><strong>Check-out:</strong> {format(new Date(invoice.checkOut), "dd MMM yyyy")}</p>
             <p><strong>Nights:</strong> {invoice.nights}</p>
-            <p><strong>Guests:</strong> {invoice.guests}</p>
+            <div>
+              <p><strong>Guests:</strong></p>
+
+              {typeof invoice.guests === "number" ? (
+                <p>{invoice.guests} Guests</p>
+              ) : (
+                <div className="ml-3 text-sm">
+                  <p>Adults: {invoice.guests.adults}</p>
+                  <p>Children: {invoice.guests.children}</p>
+                  <p>Infants: {invoice.guests.infants}</p>
+                  <p className="font-medium mt-1">
+                    Total: {invoice.guests.adults + invoice.guests.children} Guests
+                    {invoice.guests.infants ? ` + ${invoice.guests.infants} Infants` : ""}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
           <div>
             <p><strong>Booking Date:</strong> {format(new Date(invoice.bookingDate), "dd MMM yyyy")}</p>
