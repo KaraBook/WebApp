@@ -172,8 +172,7 @@ export default function EditProperty() {
 
         {/* HEADER */}
         <div className="flex items-center justify-between">
-          <h1 className="text-[26px] font-semibold text-gray-900 flex items-center gap-3">
-            <Home className="w-5 h-5 text-primary" />
+          <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3">
             Edit Property
           </h1>
 
@@ -380,7 +379,7 @@ export default function EditProperty() {
           <div className="flex justify-end">
             <Button
               type="submit"
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-2 rounded-xl"
+              className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-[10px]"
               disabled={loading}
             >
               {loading ? "Updating..." : "Update Property"}

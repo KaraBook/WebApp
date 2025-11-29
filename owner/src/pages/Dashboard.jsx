@@ -200,7 +200,7 @@ export default function Dashboard() {
 
         {/* Title */}
         <div>
-          <h1 className="text-[26px] font-semibold text-gray-900">Dashboard</h1>
+          <h1 className="text-[26px] font-bold text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-500">
             Welcome back{user?.firstName ? `, ${user.firstName}` : ""}.
           </p>

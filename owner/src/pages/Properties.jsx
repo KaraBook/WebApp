@@ -96,7 +96,7 @@ export default function Properties() {
         {/* PAGE HEADER */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-[26px] font-semibold text-gray-900 flex items-center gap-3">
+            <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3">
               {property.propertyName}
               <Badge className={`${statusColor} rounded-lg px-3 py-1`}>
                 {property.isBlocked
