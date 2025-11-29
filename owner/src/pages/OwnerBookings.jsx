@@ -1,14 +1,45 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useNavigate } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
-import { MoreVertical } from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+
+import {
+  MoreVertical,
+  Search,
+  RotateCcw,
+  CalendarDays,
+  IndianRupee,
+  User,
+  Phone,
+  Home,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+
 import { format } from "date-fns";
 import { toast } from "sonner";
+
+import { DateRange } from "react-date-range";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
@@ -16,10 +47,25 @@ import InvoicePreview from "@/components/InvoicePreview";
 export default function OwnerBookings() {
   const [bookings, setBookings] = useState([]);
   const [filtered, setFiltered] = useState([]);
-  const [loading, setLoading] = useState(true);
+
   const [query, setQuery] = useState("");
+
+  // Filters
+  const [paymentFilter, setPaymentFilter] = useState("all");
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: null,
+      endDate: null,
+      key: "selection",
+    },
+  ]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Pagination
+  const pageSize = 10;
+  const [page, setPage] = useState(1);
+
   const navigate = useNavigate();
-  const [openGuestRow, setOpenGuestRow] = useState(null);
 
   const [invoiceData, setInvoiceData] = useState(null);
   const invoiceRef = useRef(null);
@@ -30,355 +76,341 @@ export default function OwnerBookings() {
     booking: null,
   });
 
-  const closeConfirm = () => setConfirm({ open: false, type: "", booking: null });
-  const openConfirm = (type, booking) => {
+  const closeConfirm = () =>
+    setConfirm({ open: false, type: "", booking: null });
+
+  const openConfirm = (type, booking) =>
     setConfirm({ open: true, type, booking });
-  };
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
   const fetchBookings = async () => {
     try {
-      setLoading(true);
       const res = await api.get(SummaryApi.getOwnerBookings.url);
       const sorted = res.data.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
       setBookings(sorted);
       setFiltered(sorted);
-      setBookings(res.data.data);
-      setFiltered(res.data.data);
+      setPage(1);
     } catch (err) {
-      console.error("Failed to fetch bookings");
-    } finally {
-      setLoading(false);
+      toast.error("Failed to fetch bookings");
     }
   };
 
+  // FILTERING LOGIC
   useEffect(() => {
-    fetchBookings();
-  }, []);
+    let data = [...bookings];
 
-  useEffect(() => {
-    const handleClick = (e) => {
-      if (!e.target.closest(".guest-dropdown-cell")) {
-        setOpenGuestRow(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-
-  useEffect(() => {
+    // SEARCH FILTER
     const q = query.toLowerCase();
-    const result = bookings.filter((b) => {
-      return (
+    data = data.filter(
+      (b) =>
         b._id?.toLowerCase().includes(q) ||
         b?.userId?.firstName?.toLowerCase().includes(q) ||
         b.userId?.lastName?.toLowerCase().includes(q) ||
-        b.propertyId?.propertyName?.toLowerCase().includes(q) ||
-        b.userId?.mobile?.includes(q)
-      );
-    });
-    setFiltered(result);
-  }, [query, bookings]);
+        b.userId?.mobile?.includes(q) ||
+        b.propertyId?.propertyName?.toLowerCase().includes(q)
+    );
+
+    // PAYMENT FILTER
+    if (paymentFilter !== "all") {
+      data = data.filter((b) => b.paymentStatus === paymentFilter);
+    }
+
+    // DATE RANGE FILTER
+    if (dateRange[0].startDate && dateRange[0].endDate) {
+      data = data.filter((b) => {
+        const created = new Date(b.createdAt);
+        return (
+          created >= dateRange[0].startDate &&
+          created <= dateRange[0].endDate
+        );
+      });
+    }
+
+    setFiltered(data);
+    setPage(1);
+  }, [query, paymentFilter, dateRange, bookings]);
+
+  // PAGINATION LOGIC
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const paginatedData = filtered.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
 
   const getStatusChip = (status) => {
-    const base = "px-6 py-1 rounded-full text-xs font-medium";
+    const base =
+      "px-3 py-1 rounded-full text-xs font-medium border inline-block";
+
     if (status === "paid")
-      return <span className={`${base} bg-green-100 text-green-700`}>Paid</span>;
+      return (
+        <span className={`${base} bg-green-50 border-green-200 text-green-700`}>
+          Paid
+        </span>
+      );
     if (status === "pending")
-      return <span className={`${base} bg-yellow-100 text-yellow-800`}>Pending</span>;
-    return <span className={`${base} bg-red-100 text-red-700`}>Failed</span>;
+      return (
+        <span
+          className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}
+        >
+          Pending
+        </span>
+      );
+    return (
+      <span className={`${base} bg-red-50 border-red-200 text-red-700`}>
+        Failed
+      </span>
+    );
   };
 
   const shortId = (id) => `#${String(id).slice(-6).toUpperCase()}`;
   const formatCurrency = (n) => `₹${Number(n).toLocaleString()}`;
   const formatDate = (d) => format(new Date(d), "d MMM yy");
-  const formatDateLong = (d) => format(new Date(d), "d MMMM yyyy");
-
-  const handleCopy = async (text, label) => {
-    await navigator.clipboard.writeText(text || "");
-    toast.success(`${label} copied`);
-  };
-
-  const openWhatsApp = (phone, text) => {
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-    window.open(url, "_blank");
-  };
-
-  const downloadInvoicePDF = async (bookingId) => {
-    try {
-      toast.info("Generating Invoice…");
-
-      const res = await api.get(`${SummaryApi.ownerGetInvoice.url(bookingId)}`);
-      if (!res.data.success) return toast.error("Invoice not found");
-
-      setInvoiceData(res.data.data);
-
-      await new Promise((r) => requestAnimationFrame(r));
-      await new Promise((r) => requestAnimationFrame(r));
-
-      const element = invoiceRef.current;
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
-
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      const imgWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        pdf.addPage();
-        position = heightLeft - imgHeight;
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save(`Invoice_${bookingId}.pdf`);
-      toast.success("Invoice downloaded!");
-    } catch (err) {
-      toast.error("Failed to generate invoice");
-    } finally {
-      setTimeout(() => setInvoiceData(null), 300);
-    }
-  };
-
-  const onConfirm = async () => {
-    const b = confirm.booking;
-    closeConfirm();
-
-    if (confirm.type === "invoice") {
-      await downloadInvoicePDF(b._id);
-    }
-
-    if (confirm.type === "resend") {
-      const lines = [
-        `🎉 Booking Confirmed!`,
-        ``,
-        `Your booking ${shortId(b._id)} is confirmed.`,
-        `Property: ${b.propertyId.propertyName}`,
-        `Check-in: ${formatDateLong(b.checkIn)}`,
-        `Check-out: ${formatDateLong(b.checkOut)}`,
-        `Guests: ${b.guests}`,
-        `Amount: ${formatCurrency(b.totalAmount)}`,
-      ];
-
-      const waText = lines.join("\n");
-      openWhatsApp(b.userId.mobile, waText);
-    }
-  };
 
   return (
     <>
-      <div className="p-2">
-        <h1 className="text-2xl font-semibold mb-6">Bookings</h1>
+      <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* HEADER */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-[26px] font-semibold text-gray-900 flex items-center gap-3">
+              <CalendarDays className="w-5 h-5 text-primary" />
+              Bookings
+            </h1>
 
-        <div className="flex items-center justify-between mb-4">
-          <Input
-            placeholder="Search booking / traveller / phone / property"
-            className="w-80 bg-white"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={fetchBookings}
+            >
+              <RotateCcw size={16} />
+              Refresh
+            </Button>
+          </div>
 
-          <Button onClick={fetchBookings}>Refresh</Button>
-        </div>
+          {/* FILTER BAR */}
+          <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
+            {/* Search */}
+            <div className="flex items-center gap-3 flex-1">
+              <Search className="w-5 h-5 text-gray-500" />
+              <Input
+                placeholder="Search booking, traveller, phone, property"
+                className="bg-transparent border-none focus-visible:ring-0"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
 
-        <div className="border rounded-xl overflow-x-auto">
-          <div className="overflow-visible">
-            <table className="min-w-full text-sm bg-white">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="py-3 px-4 text-left font-medium">Traveller</th>
-                  <th className="py-3 px-4 text-left font-medium">Property</th>
-                  <th className="py-3 px-4 text-left font-medium">Check-in</th>
-                  <th className="py-3 px-4 text-left font-medium">Check-out</th>
-                  <th className="py-3 px-4 text-left font-medium">Nights</th>
-                  <th className="py-3 px-4 text-left font-medium">Guests</th>
-                  <th className="py-3 px-4 text-left font-medium">Amount</th>
-                  <th className="py-3 px-4 text-left font-medium">Payment</th>
-                  <th className="py-3 px-4 text-left font-medium">Created</th>
-                  <th className="py-3 px-4 text-left font-medium">Actions</th>
-                </tr>
-              </thead>
+            {/* Payment Filter */}
+            <select
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+              className="px-4 py-2 border rounded-lg bg-gray-50"
+            >
+              <option value="all">Payment: All</option>
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+              <option value="failed">Failed</option>
+            </select>
 
-              <tbody>
-                {filtered.map((b) => (
-                  <tr key={b._id} className="border-b hover:bg-gray-50 relative overflow-visible">
-                    <td className="py-3 px-4">
-                      <div className="font-semibold">
-                        {(b?.userId?.firstName || "") + " " + (b?.userId?.lastName || "")}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {b?.userId?.mobile || "—"}
-                      </div>
-                    </td>
+            {/* Date filter */}
+            <div className="relative">
+              <Button
+                variant="outline"
+                onClick={() => setShowDatePicker((p) => !p)}
+              >
+                Date Range
+              </Button>
 
-                    <td className="py-3 px-4">
-                      {b.propertyId?.propertyName}
-                    </td>
+              {showDatePicker && (
+                <div className="absolute right-0 mt-2 z-50 shadow-xl">
+                  <DateRange
+                    editableDateInputs={true}
+                    moveRangeOnFirstSelection={false}
+                    ranges={dateRange}
+                    onChange={(item) => setDateRange([item.selection])}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
 
-                    <td className="py-3 px-4">{formatDate(b.checkIn)}</td>
-                    <td className="py-3 px-4">{formatDate(b.checkOut)}</td>
-
-                    <td className="py-3 px-4">{b.totalNights}</td>
-                    <td className="py-3 px-6 relative guest-dropdown-cell">
-                      <button
-                        onClick={() =>
-                          b.guests && typeof b.guests === "object"
-                            ? setOpenGuestRow(openGuestRow === b._id ? null : b._id)
-                            : null
-                        }
-                        className="text-gray-900 font-medium"
-                      >
-                        {typeof b.guests === "number" && `${b.guests} Guests`}
-
-                        {typeof b.guests === "object" &&
-                          `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
-                          }`}
-                      </button>
-
-                      {openGuestRow === b._id && typeof b.guests === "object" && (
-                        <div className="absolute left-1/2 -translate-x-1/2 top-10 w-40 bg-white border shadow-lg rounded-md p-3 text-left z-50">
-                          <div className="text-sm py-1 flex justify-between">
-                            <span>Adults</span>
-                            <span className="font-semibold">{b.guests.adults}</span>
-                          </div>
-                          <div className="text-sm py-1 flex justify-between">
-                            <span>Children</span>
-                            <span className="font-semibold">{b.guests.children}</span>
-                          </div>
-                          <div className="text-sm py-1 flex justify-between">
-                            <span>Infants</span>
-                            <span className="font-semibold">{b.guests.infants}</span>
-                          </div>
-                        </div>
-                      )}
-                    </td>
-
-                    <td className="py-3 px-4 font-medium">
-                      {formatCurrency(b.totalAmount)}
-                    </td>
-
-                    <td className="py-3 px-6">{getStatusChip(b.paymentStatus)}</td>
-
-                    <td className="py-3 px-4 text-xs text-gray-500">
-                      {formatDate(b.createdAt)}
-                    </td>
-
-                    {/* ACTIONS */}
-                    <td className="py-3 px-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <MoreVertical className="h-5 w-5 cursor-pointer text-gray-600" />
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent className="w-48">
-                          {b.paymentStatus === "paid" ? (
-                            <>
-                              <DropdownMenuItem
-                                onSelect={() => navigate(`/invoice/${b._id}`)}
-                              >
-                                View Invoice
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem onSelect={() => openConfirm("invoice", b)}>
-                                Download Invoice
-                              </DropdownMenuItem>
-                            </>
-                          ) : (
-                            <>
-                              <DropdownMenuItem
-                                onSelect={() =>
-                                  toast.error(
-                                    `Please rebook the resort. Your payment is ${b.paymentStatus}.`
-                                  )
-                                }
-                              >
-                                View Invoice
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                onSelect={() =>
-                                  toast.error(
-                                    `Please rebook the resort. Your payment is ${b.paymentStatus}.`
-                                  )
-                                }
-                              >
-                                Download Invoice
-                              </DropdownMenuItem>
-                            </>
-                          )}
-
-                          <DropdownMenuItem onSelect={() => handleCopy(b.userId.email, "Email")}>
-                            Copy Email
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem onSelect={() => handleCopy(b.userId.mobile, "Phone")}>
-                            Copy Phone
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem
-                            onSelect={() =>
-                              openWhatsApp(
-                                b.userId.mobile,
-                                `Hello ${b.userId.firstName},\nYour booking (${shortId(
-                                  b._id
-                                )}) at ${b.propertyId.propertyName}.`
-                              )
-                            }
-                          >
-                            WhatsApp Chat
-                          </DropdownMenuItem>
-
-                          <DropdownMenuItem onSelect={() => openConfirm("resend", b)}>
-                            Resend Links (WA + Email)
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
+          {/* TABLE */}
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="py-3 px-4 text-left">Traveller</th>
+                    <th className="py-3 px-4 text-left">Property</th>
+                    <th className="py-3 px-4 text-left">Check-in</th>
+                    <th className="py-3 px-4 text-left">Check-out</th>
+                    <th className="py-3 px-4 text-left">Nights</th>
+                    <th className="py-3 px-4 text-left">Guests</th>
+                    <th className="py-3 px-4 text-left">Amount</th>
+                    <th className="py-3 px-4 text-left">Payment</th>
+                    <th className="py-3 px-4 text-left">Created</th>
+                    <th className="py-3 px-4 text-left">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
 
-            {filtered.length === 0 && (
-              <div className="text-center py-10 text-gray-500">No bookings found.</div>
-            )}
+                <tbody>
+                  {paginatedData.map((b) => (
+                    <tr
+                      key={b._id}
+                      className="border-b hover:bg-gray-50 transition"
+                    >
+                      {/* Traveller */}
+                      <td className="py-3 px-4">
+                        <div className="font-semibold">
+                          {b?.userId?.firstName} {b?.userId?.lastName}
+                        </div>
+                        <div className="text-xs text-gray-500 flex items-center gap-1">
+                          <Phone size={12} /> {b.userId?.mobile}
+                        </div>
+                      </td>
+
+                      {/* Property */}
+                      <td className="py-3 px-4">{b.propertyId?.propertyName}</td>
+
+                      <td className="py-3 px-4">{formatDate(b.checkIn)}</td>
+                      <td className="py-3 px-4">{formatDate(b.checkOut)}</td>
+
+                      <td className="py-3 px-4">{b.totalNights}</td>
+
+                      <td className="py-3 px-4">
+                        {typeof b.guests === "number"
+                          ? `${b.guests} Guests`
+                          : `${b.guests.adults + b.guests.children} Guests`}
+                      </td>
+
+                      <td className="py-3 px-4 font-medium flex items-center gap-1">
+                        <IndianRupee size={14} className="text-primary" />
+                        {formatCurrency(b.totalAmount)}
+                      </td>
+
+                      <td className="py-3 px-4">{getStatusChip(b.paymentStatus)}</td>
+
+                      <td className="py-3 px-4 text-gray-500 text-xs">
+                        {formatDate(b.createdAt)}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
+                          </DropdownMenuTrigger>
+
+                          <DropdownMenuContent className="w-48">
+                            <DropdownMenuItem
+                              onSelect={() => navigate(`/invoice/${b._id}`)}
+                            >
+                              View Invoice
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onSelect={() => openConfirm("invoice", b)}
+                            >
+                              Download Invoice
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onSelect={() => handleCopy(b.userId.email, "Email")}
+                            >
+                              Copy Email
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onSelect={() => handleCopy(b.userId.mobile, "Phone")}
+                            >
+                              Copy Phone
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onSelect={() => openConfirm("resend", b)}
+                            >
+                              Resend Links (WA + Email)
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {filtered.length === 0 && (
+                <div className="text-center py-14 text-gray-500">
+                  No bookings found.
+                </div>
+              )}
+            </div>
+
+            {/* PAGINATION */}
+            <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t">
+              <span className="text-sm text-gray-600">
+                Page {page} of {totalPages || 1}
+              </span>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                  className="flex items-center gap-1"
+                >
+                  <ChevronLeft size={16} />
+                  Prev
+                </Button>
+
+                <Button
+                  variant="outline"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(page + 1)}
+                  className="flex items-center gap-1"
+                >
+                  Next
+                  <ChevronRight size={16} />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <AlertDialog open={confirm.open} onOpenChange={(o) => !o && closeConfirm()}>
+      {/* CONFIRM MODAL */}
+      <AlertDialog
+        open={confirm.open}
+        onOpenChange={(o) => !o && closeConfirm()}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirm.type === "invoice" ? "Download Invoice" : "Resend to Traveller"}
+              {confirm.type === "invoice"
+                ? "Download Invoice"
+                : "Resend Booking Details"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirm.type === "invoice"
                 ? "A PDF invoice will be generated."
-                : "Send booking confirmation to the traveller."}
+                : "Resend booking confirmation to traveller."}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirm}>
+            <AlertDialogAction onClick={() => {}}>
               {confirm.type === "invoice" ? "Download" : "Send Now"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Hidden Invoice */}
       {invoiceData && (
         <div
           ref={invoiceRef}
