@@ -31,16 +31,18 @@ export default function PropertyDetails() {
     rating: 0,
     comment: "",
   });
-  const totalMainGuests = guests.adults + guests.children;
-  const maxGuests = property?.maxGuests || 1;
-  const [bookedDates, setBookedDates] = useState([]);
-  const [blockedDates, setBlockedDates] = useState([]);
-
   const [guests, setGuests] = useState({
     adults: 1,
     children: 0,
     infants: 0,
   });
+
+  const totalMainGuests = guests.adults + guests.children;
+  const maxGuests = property?.maxGuests || 1;
+
+  const [bookedDates, setBookedDates] = useState([]);
+  const [blockedDates, setBlockedDates] = useState([]);
+
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
 
