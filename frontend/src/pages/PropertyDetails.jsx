@@ -31,7 +31,8 @@ export default function PropertyDetails() {
     rating: 0,
     comment: "",
   });
-
+  const totalMainGuests = guests.adults + guests.children;
+  const maxGuests = property?.maxGuests || 1;
   const [bookedDates, setBookedDates] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
 
@@ -614,13 +615,19 @@ export default function PropertyDetails() {
                         <span>{guests.adults}</span>
 
                         <button
-                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg
+    disabled:opacity-40 disabled:cursor-not-allowed"
+                          disabled={totalMainGuests >= maxGuests}
                           onClick={() =>
-                            setGuests((g) => ({ ...g, adults: g.adults + 1 }))
+                            setGuests((g) => {
+                              if (g.adults + g.children >= maxGuests) return g;
+                              return { ...g, adults: g.adults + 1 };
+                            })
                           }
                         >
                           +
                         </button>
+
                       </div>
                     </div>
 
@@ -644,9 +651,14 @@ export default function PropertyDetails() {
                         <span>{guests.children}</span>
 
                         <button
-                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg
+    disabled:opacity-40 disabled:cursor-not-allowed"
+                          disabled={totalMainGuests >= maxGuests}
                           onClick={() =>
-                            setGuests((g) => ({ ...g, children: g.children + 1 }))
+                            setGuests((g) => {
+                              if (g.adults + g.children >= maxGuests) return g;
+                              return { ...g, children: g.children + 1 };
+                            })
                           }
                         >
                           +
