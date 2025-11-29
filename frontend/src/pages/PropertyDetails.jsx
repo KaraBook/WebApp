@@ -35,7 +35,11 @@ export default function PropertyDetails() {
   const [bookedDates, setBookedDates] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
 
-  const [guestCount, setGuestCount] = useState(1);
+  const [guests, setGuests] = useState({
+    adults: 1,
+    children: 0,
+    infants: 0,
+  });
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
 
@@ -182,7 +186,7 @@ export default function PropertyDetails() {
     if (!startDate || !endDate) return toast.error("Please select your stay dates");
 
     navigate(`/checkout/${property._id}`, {
-      state: { from: startDate, to: endDate, guests: guestCount },
+      state: { from: startDate, to: endDate, guests },
     });
   };
 
@@ -582,30 +586,107 @@ export default function PropertyDetails() {
                   className="flex justify-between items-center cursor-pointer mt-1"
                 >
                   <span className="text-sm font-medium text-gray-900">
-                    {guestCount} {guestCount > 1 ? "guests" : "guest"}
+                    {guests.adults + guests.children} guests
                   </span>
                   <ChevronDown className="w-4 h-4 text-gray-600" />
                 </div>
 
                 {showGuestDropdown && (
-                  <div className="absolute left-0 w-full bg-white border shadow-xl p-3 mt-2 z-[999]">
-                    {Array.from({ length: property.maxGuests }).map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => {
-                          setGuestCount(i + 1);
-                          setShowGuestDropdown(false);
-                        }}
-                        className={`block w-full text-left px-3 py-2 text-sm ${guestCount === i + 1
-                          ? "bg-primary text-white font-semibold"
-                          : "hover:bg-gray-100 text-gray-700"
-                          }`}
-                      >
-                        {i + 1} {i === 0 ? "Guest" : "Guests"}
-                      </button>
-                    ))}
+                  <div className="absolute left-0 w-full bg-white border shadow-xl p-4 mt-2 z-[999]">
+
+                    {/* Adults */}
+                    <div className="flex justify-between items-center py-2">
+                      <div>
+                        <p className="font-medium">Adults</p>
+                        <p className="text-xs text-gray-500">Age 13+</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                          onClick={() =>
+                            setGuests((g) => ({ ...g, adults: Math.max(1, g.adults - 1) }))
+                          }
+                        >
+                          −
+                        </button>
+
+                        <span>{guests.adults}</span>
+
+                        <button
+                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                          onClick={() =>
+                            setGuests((g) => ({ ...g, adults: g.adults + 1 }))
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Children */}
+                    <div className="flex justify-between items-center py-2">
+                      <div>
+                        <p className="font-medium">Children</p>
+                        <p className="text-xs text-gray-500">Age 2–12</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                          onClick={() =>
+                            setGuests((g) => ({ ...g, children: Math.max(0, g.children - 1) }))
+                          }
+                        >
+                          −
+                        </button>
+
+                        <span>{guests.children}</span>
+
+                        <button
+                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                          onClick={() =>
+                            setGuests((g) => ({ ...g, children: g.children + 1 }))
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Infants */}
+                    <div className="flex justify-between items-center py-2">
+                      <div>
+                        <p className="font-medium">Infants</p>
+                        <p className="text-xs text-gray-500">Under 2</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                          onClick={() =>
+                            setGuests((g) => ({ ...g, infants: Math.max(0, g.infants - 1) }))
+                          }
+                        >
+                          −
+                        </button>
+
+                        <span>{guests.infants}</span>
+
+                        <button
+                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
+                          onClick={() =>
+                            setGuests((g) => ({ ...g, infants: g.infants + 1 }))
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
                   </div>
                 )}
+
               </div>
 
 
