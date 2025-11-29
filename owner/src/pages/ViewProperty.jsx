@@ -207,7 +207,7 @@ export default function ViewProperty() {
             <div className="flex flex-wrap gap-2">
               {property.foodAvailability?.length ? (
                 property.foodAvailability.map((f, i) => (
-                  <Badge key={i} className="capitalize bg-gray-100 text-gray-700">
+                  <Badge key={i} className="capitalize bg-gray-100 text-gray-700 hover:text-white ">
                     {f}
                   </Badge>
                 ))
@@ -222,7 +222,7 @@ export default function ViewProperty() {
             <div className="flex flex-wrap gap-2">
               {property.amenities?.length ? (
                 property.amenities.map((a, i) => (
-                  <Badge key={i} className="capitalize bg-gray-100 text-gray-700">
+                  <Badge key={i} className="capitalize bg-gray-100 text-gray-700 hover:text-white ">
                     {a}
                   </Badge>
                 ))
