@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
 export default function Header() {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const location = useLocation();
 
   const fullName =
     `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
@@ -22,55 +23,58 @@ export default function Header() {
 
   const navItems = [
     { label: "Dashboard", path: "/dashboard" },
-    { label: "Property", path: "/properties" },
+    { label: "Property", path: "/view-property/:id" },
     { label: "Bookings", path: "/bookings" },
     { label: "Calendar", path: "/calendar" },
     { label: "Customize", path: "/customize" },
   ];
 
+  const isPropertyActive =
+    location.pathname.startsWith("/view-property") ||
+    location.pathname.startsWith("/edit-property");
+
   return (
     <header className="w-full bg-white/90 backdrop-blur border-b border-gray-200 px-8 py-3 flex items-center justify-between">
-      {/* LEFT — LOGO */}
-      <div className="flex items-center gap-2">
-        <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[150px] object-cover" />
-      </div>
+      {/* LOGO */}
+      <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[150px]" />
 
-      {/* CENTER — NAVIGATION */}
+      {/* NAV */}
       <nav className="hidden md:flex items-center gap-6">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `text-[14px] leading-none px-3 py-3 rounded-[8px] transition ${
+        {navItems.map((item) => {
+          const isActive =
+            item.label === "Property"
+              ? isPropertyActive
+              : location.pathname === item.path;
+
+          const targetPath =
+            item.label === "Property"
+              ? `/view-property/${user?.propertyId ?? ""}`
+              : item.path;
+
+          return (
+            <NavLink
+              key={item.path}
+              to={targetPath}
+              className={`text-[14px] px-3 py-3 rounded-[8px] transition ${
                 isActive
                   ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`
-            }
-          >
-            {item.label}
-          </NavLink>
-        ))}
+              }`}
+            >
+              {item.label}
+            </NavLink>
+          );
+        })}
       </nav>
 
-      {/* RIGHT — USER PROFILE */}
+      {/* PROFILE DROPDOWN */}
       <div className="relative flex items-center gap-3">
-        {user?.profilePhoto ? (
-          <img
-            src={user.profilePhoto}
-            alt="profile"
-            className="h-9 w-9 rounded-full border object-cover cursor-pointer"
-            onClick={() => setDropdownOpen((p) => !p)}
-          />
-        ) : (
-          <div
-            onClick={() => setDropdownOpen((p) => !p)}
-            className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-sm cursor-pointer border"
-          >
-            {avatarInitial}
-          </div>
-        )}
+        <div
+          onClick={() => setDropdownOpen((p) => !p)}
+          className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-sm cursor-pointer border"
+        >
+          {avatarInitial}
+        </div>
 
         <span
           onClick={() => setDropdownOpen((p) => !p)}
@@ -81,9 +85,7 @@ export default function Header() {
 
         {dropdownOpen && (
           <div className="absolute right-0 top-11 bg-white border border-gray-200 shadow-lg rounded-xl w-44 py-2 z-50">
-            <button
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] w-full text-left text-gray-700"
-            >
+            <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] w-full text-left text-gray-700">
               <User size={16} /> My Profile
             </button>
 
