@@ -339,9 +339,9 @@ export default function Dashboard() {
                   "h-9 w-9 flex items-center justify-center rounded-full text-xs transition";
 
                 if (blocked)
-                  cls += " bg-gray-200 text-gray-500 line-through";
+                  cls += " bg-gray-200 text-gray-500";
                 else if (isToday)
-                  cls += " border border-indigo-500 text-indigo-600 font-semibold";
+                  cls += " border border-primary text-primary font-semibold";
                 else
                   cls += " text-gray-700 hover:bg-gray-100";
 
