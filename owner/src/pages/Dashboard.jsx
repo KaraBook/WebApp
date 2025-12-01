@@ -177,14 +177,26 @@ export default function Dashboard() {
       return date >= start && date <= end;
     });
 
-  const isDateBooked = (date) =>
-    bookedDates.some((range) => {
-      const start = new Date(range.start.split("T")[0]);
-      const end = new Date(range.end.split("T")[0]);
-      end.setDate(end.getDate() - 1);
-      const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      return d >= start && d <= end;
+  const isDateBooked = (date) => {
+    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+
+    return bookedDates.some((range) => {
+      if (!range.start || !range.end) return false;
+
+      let current = new Date(range.start);
+      let end = new Date(range.end);
+
+      current = new Date(current.getFullYear(), current.getMonth(), current.getDate());
+      end = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+
+      while (current.getTime() <= end.getTime()) {
+        if (current.getTime() === target) return true;
+        current.setDate(current.getDate() + 1);
+      }
+
+      return false;
     });
+  };
 
 
   if (loadingDashboard) {
