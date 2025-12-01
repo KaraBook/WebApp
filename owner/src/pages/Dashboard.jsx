@@ -182,12 +182,22 @@ export default function Dashboard() {
 
   return bookedDates.some((range) => {
     if (!range.start || !range.end) return false;
+    const startLocal = new Date(range.start);
+    const endLocal = new Date(range.end);
 
-    const startOnly = range.start.split("T")[0];
-    const endOnly = range.end.split("T")[0];
+    const start = new Date(
+      startLocal.getFullYear(),
+      startLocal.getMonth(),
+      startLocal.getDate()
+    );
 
-    let current = new Date(startOnly + "T00:00:00");
-    let end = new Date(endOnly + "T00:00:00");
+    const end = new Date(
+      endLocal.getFullYear(),
+      endLocal.getMonth(),
+      endLocal.getDate()
+    );
+
+    let current = new Date(start);
 
     while (current.getTime() <= end.getTime()) {
       if (current.getTime() === target) return true;
@@ -197,6 +207,7 @@ export default function Dashboard() {
     return false;
   });
 };
+
 
 
   if (loadingDashboard) {
