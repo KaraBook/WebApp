@@ -66,7 +66,6 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/offline-booking/create-order`,
         method: "POST",
     },
-
     ownerVerifyPayment: {
         url: `${BASE_URL}/api/owner/offline-booking/verify`,
         method: "POST",
@@ -87,8 +86,6 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/check-owner-mobile`,
         method: "POST",
     },
-
-
 
 };
 
