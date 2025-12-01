@@ -93,9 +93,9 @@ export default function OfflineBooking() {
   ]);
 
   const nights = Math.ceil(
-  (normalize(dateRange[0].endDate) - normalize(dateRange[0].startDate)) /
-  (1000 * 60 * 60 * 24)
-);
+    (normalize(dateRange[0].endDate) - normalize(dateRange[0].startDate)) /
+    (1000 * 60 * 60 * 24)
+  );
 
 
   useEffect(() => {
@@ -177,23 +177,23 @@ export default function OfflineBooking() {
   };
 
   const handleDateSelection = (item) => {
-  const { startDate, endDate } = item.selection;
-  const days = eachDayOfInterval({ start: startDate, end: endDate });
+    const { startDate, endDate } = item.selection;
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-  for (const day of days) {
-    if (isDateDisabled(day)) {
-      toast.error("Selected dates include unavailable days.");
-      return;
+    for (const day of days) {
+      if (isDateDisabled(day)) {
+        toast.error("Selected dates include unavailable days.");
+        return;
+      }
     }
-  }
-  setDateRange([
-    {
-      startDate,
-      endDate,
-      key: "selection",
-    },
-  ]);
-};
+    setDateRange([
+      {
+        startDate,
+        endDate,
+        key: "selection",
+      },
+    ]);
+  };
 
 
   useEffect(() => {
@@ -650,7 +650,6 @@ export default function OfflineBooking() {
                     className="absolute mt-2 bg-white shadow-xl border border-gray-200 rounded-2xl z-50 p-3"
                   >
                     <DateRange
-                      key={disabledDays.length}
                       ranges={dateRange}
                       onChange={handleDateSelection}
                       minDate={new Date()}
