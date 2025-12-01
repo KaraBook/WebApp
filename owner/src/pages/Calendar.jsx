@@ -223,7 +223,7 @@ export default function OwnerCalendar() {
                       variant="outline"
                       disabled={loading}
                       onClick={() => handleUnblockSingle(range)}
-                      className="border-primary-500 text-primary-600 hover:bg-primary-50 px-3"
+                      className="border-primary text-primary px-3"
                     >
                       Unblock
                     </Button>
