@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
@@ -9,11 +9,11 @@ export default function Header() {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [propertyId, setPropertyId] = useState(null);
+  const dropdownRef = useRef(null);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ⭐ Fetch owner property id automatically
   useEffect(() => {
     (async () => {
       try {
@@ -27,7 +27,18 @@ export default function Header() {
     })();
   }, []);
 
-  // Name / initials
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+
   const fullName =
     `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
     user?.name ||
@@ -41,7 +52,6 @@ export default function Header() {
 
   const avatarInitial = getInitials(fullName);
 
-  // ⭐ ACTIVE STATE DETECTOR FOR PROPERTY PAGE
   const isPropertyActive =
     location.pathname.startsWith("/view-property") ||
     location.pathname.startsWith("/edit-property");
@@ -135,6 +145,7 @@ export default function Header() {
             >
               <User size={16} /> My Profile
             </Link>
+
             <button
               onClick={logout}
               className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] text-red-600 w-full text-left"
