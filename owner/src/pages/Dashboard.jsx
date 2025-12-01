@@ -178,13 +178,13 @@ export default function Dashboard() {
     });
 
   const isDateBooked = (date) =>
-  bookedDates.some((range) => {
-    const start = normalizeDay(range.start);
-    const end = normalizeDay(range.end);
-    end.setDate(end.getDate() - 1);
-    const d = normalizeDay(date);
-    return d >= start && d <= end;
-  });
+    bookedDates.some((range) => {
+      const start = new Date(range.start.split("T")[0]);
+      const end = new Date(range.end.split("T")[0]);
+      end.setDate(end.getDate() - 1);
+      const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      return d >= start && d <= end;
+    });
 
 
   if (loadingDashboard) {
