@@ -181,7 +181,7 @@ export default function OwnerCalendar() {
               <Button
                 onClick={handleBlockDates}
                 disabled={loading}
-                className="bg-black text-white px-6 hover:bg-gray-900"
+                className="bg-primary text-white px-6"
               >
                 Block Selected Dates
               </Button>
@@ -223,7 +223,7 @@ export default function OwnerCalendar() {
                       variant="outline"
                       disabled={loading}
                       onClick={() => handleUnblockSingle(range)}
-                      className="border-red-500 text-red-600 hover:bg-red-50 px-3"
+                      className="border-primary-500 text-primary-600 hover:bg-primary-50 px-3"
                     >
                       Unblock
                     </Button>
