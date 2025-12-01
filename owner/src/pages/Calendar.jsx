@@ -15,6 +15,8 @@ export default function OwnerCalendar() {
   const [propertyId, setPropertyId] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [bookedDates, setBookedDates] = useState([]);
+
 
   const [dateRange, setDateRange] = useState([
     {
@@ -44,19 +46,23 @@ export default function OwnerCalendar() {
 
   // LOAD BLOCKED DATES
   useEffect(() => {
-    if (!propertyId) return;
+  if (!propertyId) return;
 
-    const fetchBlockedDates = async () => {
-      try {
-        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
-        setBlockedDates(res.data.dates || []);
-      } catch (err) {
-        toast.error("Failed to load blocked dates");
-      }
-    };
+  const fetchBlockedDates = async () => {
+    try {
+      const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
+      const booked = await api.get(SummaryApi.getBookedDates.url(propertyId));
 
-    fetchBlockedDates();
-  }, [propertyId]);
+      setBlockedDates(res.data.dates || []);
+      setBookedDates(booked.data.dates || []);
+    } catch (err) {
+      toast.error("Failed to load dates");
+    }
+  };
+
+  fetchBlockedDates();
+}, [propertyId]);
+
 
   // BLOCK DATE RANGE
   const handleBlockDates = async () => {
@@ -110,6 +116,15 @@ export default function OwnerCalendar() {
     });
   };
 
+  const isDateBooked = (date) => {
+  return bookedDates.some((range) => {
+    const start = new Date(range.start);
+    const end = new Date(range.end);
+    return date >= start && date <= end;
+  });
+};
+
+
   return (
     <div className="bg-[#f5f5f7] min-h-screen px-8 py-8">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -157,7 +172,7 @@ export default function OwnerCalendar() {
                 showDateDisplay={false}
                 months={1}
                 direction="horizontal"
-                disabledDay={isDateBlocked}
+                disabledDay={(date) => isDateBlocked(date) || isDateBooked(date)}
               />
             </div>
 
