@@ -51,7 +51,7 @@ export default function Header() {
     { label: "Property", path: `/view-property/${propertyId ?? ""}` },
     { label: "Bookings", path: "/bookings" },
     { label: "Calendar", path: "/calendar" },
-    { label: "Customize", path: "/customize" },
+    { label: "Customize", path: "/offline-booking/:id" },
   ];
 
   const handlePropertyClick = (e) => {
