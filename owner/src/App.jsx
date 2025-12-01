@@ -14,6 +14,7 @@ import api from "./api/axios";
 import SummaryApi from "./common/SummaryApi";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
+import MyProfile from "./pages/MyProfile";
 
 
 function AutoPropertyRedirect() {
@@ -78,6 +79,7 @@ export default function App() {
         <Route path="offline-booking/:id" element={<OfflineBooking />} />
         <Route path="bookings" element={<OwnerBookings />} />
         <Route path="calendar" element={<Calendar />} />
+        <Route path="my-profile" element={<MyProfile />} />
         <Route path="invoice/:id" element={<ViewInvoice />} />
       </Route>
 

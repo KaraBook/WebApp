@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { User, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
@@ -87,8 +87,8 @@ export default function Header() {
                 key={item.label}
                 onClick={handlePropertyClick}
                 className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
-                    ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
               >
                 Property
@@ -101,8 +101,8 @@ export default function Header() {
               key={item.path}
               to={item.path}
               className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
-                  ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
             >
               {item.label}
@@ -129,10 +129,12 @@ export default function Header() {
 
         {dropdownOpen && (
           <div className="absolute right-0 top-11 bg-white border border-gray-200 shadow-lg rounded-xl w-44 py-2 z-50">
-            <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] w-full text-left text-gray-700">
+            <Link
+              to="/owner/my-profile"
+              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] w-full text-gray-700"
+            >
               <User size={16} /> My Profile
-            </button>
-
+            </Link>
             <button
               onClick={logout}
               className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] text-red-600 w-full text-left"
