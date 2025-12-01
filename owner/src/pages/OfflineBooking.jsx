@@ -47,6 +47,9 @@ export default function OfflineBooking() {
     children: 0,
     infants: 0,
   });
+  const [showGuestDropdown, setShowGuestDropdown] = useState(false);
+  const guestRef = useRef(null);
+
 
 
   const [price, setPrice] = useState({ weekday: 0, weekend: 0 });
@@ -93,6 +96,17 @@ export default function OfflineBooking() {
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
+
+  useEffect(() => {
+    const close = (e) => {
+      if (guestRef.current && !guestRef.current.contains(e.target)) {
+        setShowGuestDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
 
   useEffect(() => {
     if (!id || id.length < 10) {
@@ -349,9 +363,9 @@ export default function OfflineBooking() {
         checkIn: checkInStr,
         checkOut: checkOutStr,
         guests: {
-          adults: guestCount,
-          children: 0,
-          infants: 0,
+          adults: guestCount.adults,
+          children: guestCount.children,
+          infants: guestCount.infants,
         },
         totalAmount,
       });
@@ -642,59 +656,128 @@ export default function OfflineBooking() {
               </div>
 
               {/* Guests */}
-              <div className="space-y-2">
+              {/* Guests */}
+              <div className="relative" ref={guestRef}>
                 <Label>Guests</Label>
 
-                <div className="flex items-center justify-between border rounded-lg p-2">
-                  <span>Adults</span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setGuestCount((g) => ({ ...g, adults: Math.max(1, g.adults - 1) }))}
-                    >-</Button>
-                    <span>{guestCount.adults}</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setGuestCount((g) => ({ ...g, adults: g.adults + 1 }))}
-                    >+</Button>
-                  </div>
+                {/* Collapsed Box */}
+                <div
+                  className="border rounded-lg p-2 cursor-pointer mt-1 bg-white"
+                  onClick={() => setShowGuestDropdown(!showGuestDropdown)}
+                >
+                  {guestCount.adults + guestCount.children + guestCount.infants} guests
                 </div>
 
-                <div className="flex items-center justify-between border rounded-lg p-2">
-                  <span>Children</span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setGuestCount((g) => ({ ...g, children: Math.max(0, g.children - 1) }))}
-                    >-</Button>
-                    <span>{guestCount.children}</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setGuestCount((g) => ({ ...g, children: g.children + 1 }))}
-                    >+</Button>
-                  </div>
-                </div>
+                {/* Dropdown */}
+                {showGuestDropdown && (
+                  <div className="absolute w-full bg-white shadow-xl border rounded-xl mt-2 z-50 p-4 space-y-4">
 
-                <div className="flex items-center justify-between border rounded-lg p-2">
-                  <span>Infants</span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setGuestCount((g) => ({ ...g, infants: Math.max(0, g.infants - 1) }))}
-                    >-</Button>
-                    <span>{guestCount.infants}</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setGuestCount((g) => ({ ...g, infants: g.infants + 1 }))}
-                    >+</Button>
+                    {/* Adults */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Adults</p>
+                        <p className="text-xs text-gray-500">Age 13+</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setGuestCount((g) => ({
+                              ...g,
+                              adults: Math.max(1, g.adults - 1),
+                            }))
+                          }
+                        >
+                          -
+                        </Button>
+
+                        <span className="w-6 text-center">{guestCount.adults}</span>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setGuestCount((g) => ({ ...g, adults: g.adults + 1 }))
+                          }
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Children */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Children</p>
+                        <p className="text-xs text-gray-500">Age 2–12</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setGuestCount((g) => ({
+                              ...g,
+                              children: Math.max(0, g.children - 1),
+                            }))
+                          }
+                        >
+                          -
+                        </Button>
+
+                        <span className="w-6 text-center">{guestCount.children}</span>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setGuestCount((g) => ({ ...g, children: g.children + 1 }))
+                          }
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Infants */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">Infants</p>
+                        <p className="text-xs text-gray-500">Under 2</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setGuestCount((g) => ({
+                              ...g,
+                              infants: Math.max(0, g.infants - 1),
+                            }))
+                          }
+                        >
+                          -
+                        </Button>
+
+                        <span className="w-6 text-center">{guestCount.infants}</span>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            setGuestCount((g) => ({ ...g, infants: g.infants + 1 }))
+                          }
+                        >
+                          +
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Total */}
