@@ -43,7 +43,21 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
             {invoice.checkOut ? format(new Date(invoice.checkOut), "dd MMM yyyy") : "-"}
           </p>
           <p><strong>Nights:</strong> {invoice.nights ?? "-"}</p>
-          <p><strong>Guests:</strong> {invoice.guests ?? "-"}</p>
+          <p>
+            <strong>Guests:</strong>{" "}
+            {typeof invoice.guests === "number"
+              ? invoice.guests
+              : invoice.guests.adults + invoice.guests.children}
+          </p>
+
+
+          {typeof invoice.guests === "object" && (
+            <div className="mt-2 text-gray-700 space-y-1 pl-1">
+              <p>• Adults: <strong>{invoice.guests.adults}</strong></p>
+              <p>• Children: <strong>{invoice.guests.children}</strong></p>
+              <p>• Infants: <strong>{invoice.guests.infants}</strong></p>
+            </div>
+          )}
         </div>
         <div>
           <p>
