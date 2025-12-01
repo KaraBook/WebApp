@@ -509,8 +509,8 @@ export default function OfflineBooking() {
 
   return (
     <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
-    <div className="max-w-6xl p-2">
-      <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3">Create Offline Booking</h1>
+    <div className="max-w-6xl p-2 mx-auto">
+      <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3 mb-2">Create Offline Booking</h1>
 
       {!propertyId ? (
         <div className="flex items-center justify-center py-10">
