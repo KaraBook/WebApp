@@ -8,20 +8,17 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
 
-  /* --------------------------- AUTO LOGIN ON LOAD --------------------------- */
   useEffect(() => {
     const access = localStorage.getItem("owner_access");
     const expiry = parseInt(localStorage.getItem("owner_access_expiry"), 10);
 
-    // if token missing or expired → logout
     if (!access || !expiry || Date.now() > expiry) {
       console.log("Session expired or not found — forcing logout");
-      logout(false); // silent logout (no redirect loop)
+      logout(false); 
       setReady(true);
       return;
     }
 
-    // auto-login with existing tokens
     (async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerProfile.url);
@@ -37,11 +34,10 @@ export function AuthProvider({ children }) {
     })();
   }, []);
 
-  /* --------------------------- LOGIN HANDLER --------------------------- */
   const loginWithTokens = (payload) => {
     const now = Date.now();
-    const accessExpiry = now + 30 * 60 * 1000; // 30 minutes
-    const refreshExpiry = now + 24 * 60 * 60 * 1000; // 24 hours
+    const accessExpiry = now + 30 * 60 * 1000; 
+    const refreshExpiry = now + 24 * 60 * 60 * 1000; 
 
     localStorage.setItem("owner_access", payload.accessToken);
     localStorage.setItem("owner_refresh", payload.refreshToken);
@@ -52,7 +48,6 @@ export function AuthProvider({ children }) {
     setUser(payload.user);
   };
 
-  /* --------------------------- LOGOUT HANDLER --------------------------- */
   const logout = (redirect = true) => {
     localStorage.removeItem("owner_access");
     localStorage.removeItem("owner_refresh");
@@ -63,7 +58,6 @@ export function AuthProvider({ children }) {
     if (redirect) window.location.href = "/owner/login";
   };
 
-  /* --------------------------- AUTO LOGOUT ON EXPIRY --------------------------- */
   useEffect(() => {
     const checkExpiry = () => {
       const expiry = parseInt(localStorage.getItem("owner_access_expiry"), 10);
@@ -77,11 +71,10 @@ export function AuthProvider({ children }) {
       }
     };
 
-    const interval = setInterval(checkExpiry, 60 * 1000); // check every 1 minute
+    const interval = setInterval(checkExpiry, 60 * 1000); 
     return () => clearInterval(interval);
   }, []);
 
-  /* --------------------------- IDLE TIMEOUT (15 min) --------------------------- */
   useEffect(() => {
     let timer;
     const resetTimer = () => {
@@ -89,7 +82,7 @@ export function AuthProvider({ children }) {
       timer = setTimeout(() => {
         console.log("🕒 Auto-logout due to inactivity");
         logout();
-      }, 15 * 60 * 1000); // 15 min idle timeout
+      }, 15 * 60 * 1000); 
     };
 
     window.addEventListener("mousemove", resetTimer);
@@ -103,7 +96,6 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  /* --------------------------- SILENT TOKEN REFRESH --------------------------- */
   useEffect(() => {
     const interval = setInterval(async () => {
       const expiry = parseInt(localStorage.getItem("owner_access_expiry"), 10);
@@ -111,7 +103,6 @@ export function AuthProvider({ children }) {
       const refresh = localStorage.getItem("owner_refresh");
       if (!expiry || !refreshExpiry || !refresh) return;
 
-      // If within 2 min of access expiry and refresh still valid
       if (Date.now() > expiry - 2 * 60 * 1000 && Date.now() < refreshExpiry) {
         try {
           console.log("🔁 Refreshing access token silently...");
@@ -131,11 +122,10 @@ export function AuthProvider({ children }) {
           logout();
         }
       }
-    }, 60 * 1000); // every minute
+    }, 60 * 1000); 
     return () => clearInterval(interval);
   }, []);
 
-  /* --------------------------- VALUE --------------------------- */
   const value = useMemo(
     () => ({ user, ready, loginWithTokens, logout }),
     [user, ready]
