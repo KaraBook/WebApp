@@ -67,27 +67,58 @@
   }
 }
 
-.rdrDayNumber span {
-  border-radius: 6px !important;
-  width: 32px !important;
-  height: 32px !important;
+/* Make every day cell square with smooth UI */
+.rdrDay {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.rdrDayInRange .rdrDayNumber span,
-.rdrDayStartPreview .rdrDayNumber span,
-.rdrDayEndPreview .rdrDayNumber span,
-.rdrDaySelected .rdrDayNumber span {
-  background: #0097a7 !important; 
+/* Day number inside */
+.rdrDayNumber span {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+/* Selected range (blue background) */
+.rdrInRange, 
+.rdrStartEdge, 
+.rdrEndEdge, 
+.rdrDaySelected {
+  background: #0097a7 !important;
   color: white !important;
+  border-radius: 8px !important;
+}
+
+/* Fix the rounded edges of start/end */
+.rdrStartEdge {
+  border-top-left-radius: 8px !important;
+  border-bottom-left-radius: 8px !important;
+}
+
+.rdrEndEdge {
+  border-top-right-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+}
+
+/* Disabled days (blocked or booked) */
+.rdrDayDisabled {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  border-radius: 8px !important;
+  cursor: not-allowed;
 }
 
 .rdrDayDisabled .rdrDayNumber span {
-  background: #e5e7eb !important;
   color: #9ca3af !important;
-  border-radius: 6px !important;
+}
+
+/* Remove default range-preview bubble */
+.rdrDayHovered .rdrDayNumber span {
+  background: none !important;
 }
 
 
