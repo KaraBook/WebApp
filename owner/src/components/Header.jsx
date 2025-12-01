@@ -122,7 +122,8 @@ export default function Header() {
       </nav>
 
       {/* PROFILE */}
-      <div className="relative flex items-center gap-3">
+      {/* PROFILE */}
+      <div className="relative flex items-center gap-3" ref={dropdownRef}>
         <div
           onClick={() => setDropdownOpen((p) => !p)}
           className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-sm cursor-pointer border"
