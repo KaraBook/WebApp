@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { DateRange } from "react-date-range";
 import { format, eachDayOfInterval } from "date-fns";
 import { toast } from "sonner";
+
 import {
   Dialog,
   DialogContent,
@@ -10,10 +11,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+
 import {
   Select,
   SelectContent,
@@ -21,10 +24,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
-import { useAuth } from "../auth/AuthContext";
 
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -69,12 +72,11 @@ export default function OfflineBooking() {
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
-      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      endDate: new Date(Date.now() + 86400000),
       key: "selection",
     },
   ]);
 
-  // Calculate number of nights
   const nights = Math.max(
     1,
     Math.ceil(
@@ -87,13 +89,12 @@ export default function OfflineBooking() {
     setStates(getIndianStates());
   }, []);
 
-  // Load Property Price + Blocked Dates + Booked Dates
+  // Load property details + blocked & booked dates
   useEffect(() => {
     if (!propertyId) return;
 
     const loadData = async () => {
       try {
-        // 1️⃣ Load property details for price
         const propRes = await api.get(
           SummaryApi.getSingleProperty(propertyId).url
         );
@@ -106,7 +107,6 @@ export default function OfflineBooking() {
           });
         }
 
-        // 2️⃣ Load blocked & booked dates
         const blockedRes = await api.get(
           SummaryApi.getPropertyBlockedDates.url(propertyId)
         );
@@ -131,7 +131,7 @@ export default function OfflineBooking() {
         });
 
         setDisabledDays(fullList);
-      } catch (err) {
+      } catch {
         toast.error("Failed to load property data");
       }
     };
@@ -139,28 +139,26 @@ export default function OfflineBooking() {
     loadData();
   }, [propertyId]);
 
-  const isDateDisabled = (date) => {
-    return disabledDays.some(
+  const isDateDisabled = (date) =>
+    disabledDays.some(
       (d) => d.toDateString() === new Date(date).toDateString()
     );
-  };
 
+  // Safe selection handler
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
 
-    let d = new Date(startDate);
-    while (d <= endDate) {
-      if (isDateDisabled(d)) {
-        toast.error("Selected range contains unavailable dates.");
-        return;
-      }
-      d.setDate(d.getDate() + 1);
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
+
+    if (days.some((d) => isDateDisabled(d))) {
+      toast.error("Selected range contains unavailable dates.");
+      return;
     }
 
     setDateRange([item.selection]);
   };
 
-  // Auto-close Calendar
+  // Close calendar when clicking outside
   useEffect(() => {
     const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -171,12 +169,10 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  // Handle Traveller Field Change
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  // Verify Mobile Number
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10)
       return toast.error("Invalid mobile number");
@@ -190,7 +186,7 @@ export default function OfflineBooking() {
         setAllowForm(false);
         setPopupTitle("Not Allowed");
         setPopupMsg(
-          "This mobile belongs to a Resort Owner. Owners cannot be booked as travellers."
+          "This mobile belongs to a Resort Owner and cannot be used."
         );
         setShowPopup(true);
         return;
@@ -198,6 +194,7 @@ export default function OfflineBooking() {
     } catch {}
 
     setChecking(true);
+
     try {
       const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
         mobile: traveller.mobile,
@@ -265,7 +262,6 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  // 🔥 AUTO CALCULATE TOTAL
   const calculateTotal = () => {
     let total = 0;
 
@@ -273,20 +269,14 @@ export default function OfflineBooking() {
     const end = new Date(dateRange[0].endDate);
 
     while (d < end) {
-      const day = d.getDay(); // 0 Sunday, 6 Saturday
-      const isWeekend = day === 0 || day === 6;
-
-      total += isWeekend
-        ? Number(price.weekend)
-        : Number(price.weekday);
-
+      const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+      total += isWeekend ? price.weekend : price.weekday;
       d.setDate(d.getDate() + 1);
     }
 
     return total;
   };
 
-  // Handle Booking
   const handleBooking = async () => {
     const required = [
       "firstName",
@@ -305,14 +295,11 @@ export default function OfflineBooking() {
     }
 
     const totalAmount = calculateTotal();
-
-    if (totalAmount <= 0)
-      return toast.error("Invalid total amount");
+    if (totalAmount <= 0) return toast.error("Invalid total amount");
 
     setLoading(true);
 
     try {
-      // 1️⃣ Create booking
       const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
@@ -327,22 +314,15 @@ export default function OfflineBooking() {
 
       toast.success("Booking created! Opening payment...");
 
-      // 2️⃣ Create Razorpay order
-      const orderRes = await api.post(
-        SummaryApi.ownerCreateOrder.url,
-        {
-          bookingId: bId,
-          amount: totalAmount,
-        }
-      );
+      const orderRes = await api.post(SummaryApi.ownerCreateOrder.url, {
+        bookingId: bId,
+        amount: totalAmount,
+      });
 
       const { order } = orderRes.data;
 
       const load = await loadRazorpayScript();
-      if (!load) {
-        toast.error("Razorpay failed to load");
-        return;
-      }
+      if (!load) return toast.error("Razorpay failed to load");
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -378,7 +358,7 @@ export default function OfflineBooking() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch {
-      toast.error("Failed to create booking");
+      toast.error("Booking failed");
     } finally {
       setLoading(false);
     }
@@ -404,7 +384,7 @@ export default function OfflineBooking() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* LEFT */}
-        <Card>
+        <Card className="shadow-sm rounded-2xl">
           <CardHeader>
             <CardTitle>Traveller Details</CardTitle>
           </CardHeader>
@@ -431,7 +411,7 @@ export default function OfflineBooking() {
               <Button
                 onClick={verifyMobile}
                 disabled={checking || traveller.mobile.length !== 10}
-                className="bg-[#000] hover:bg-black text-white"
+                className="bg-black hover:bg-black text-white"
               >
                 {checking ? "Checking..." : "Verify"}
               </Button>
@@ -568,7 +548,7 @@ export default function OfflineBooking() {
         </Card>
 
         {/* RIGHT */}
-        <Card>
+        <Card className="shadow-sm rounded-2xl">
           <CardHeader>
             <CardTitle>Booking Details</CardTitle>
           </CardHeader>
@@ -578,7 +558,7 @@ export default function OfflineBooking() {
             <div className="relative">
               <Label>Dates</Label>
               <div
-                className="border rounded-lg p-2 cursor-pointer mt-1"
+                className="border rounded-lg p-2 cursor-pointer mt-1 bg-white"
                 onClick={() => setShowCalendar(!showCalendar)}
               >
                 {format(dateRange[0].startDate, "dd MMM")} –{" "}
@@ -595,13 +575,19 @@ export default function OfflineBooking() {
                     ranges={dateRange}
                     onChange={handleDateSelection}
                     minDate={new Date()}
-                    disabledDates={disabledDays}
                     moveRangeOnFirstSelection={false}
                     showSelectionPreview={false}
                     showDateDisplay={false}
                     months={1}
                     direction="horizontal"
-                    rangeColors={["#000000"]}
+                    rangeColors={["#0097A7"]}
+                    disabledDay={(date) =>
+                      disabledDays.some(
+                        (d) =>
+                          d.toDateString() ===
+                          new Date(date).toDateString()
+                      )
+                    }
                   />
                 </div>
               )}
@@ -621,7 +607,7 @@ export default function OfflineBooking() {
               />
             </div>
 
-            {/* Total Price (Auto) */}
+            {/* Total Price */}
             <div>
               <Label>Total Price</Label>
               <div className="border rounded-lg p-2 mt-1 bg-gray-50">
