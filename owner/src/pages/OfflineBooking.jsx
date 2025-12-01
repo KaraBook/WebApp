@@ -508,8 +508,9 @@ export default function OfflineBooking() {
   // ---------- RENDER ----------
 
   return (
-    <div className="max-w-5xl p-2">
-      <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
+    <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
+    <div className="max-w-6xl p-2">
+      <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3">Create Offline Booking</h1>
 
       {!propertyId ? (
         <div className="flex items-center justify-center py-10">
@@ -542,7 +543,7 @@ export default function OfflineBooking() {
                 <Button
                   onClick={verifyMobile}
                   disabled={checking || traveller.mobile.length !== 10}
-                  className="bg-black text-white"
+                  className="bg-primary text-white"
                 >
                   {checking ? "Checking..." : "Verify"}
                 </Button>
@@ -708,7 +709,7 @@ export default function OfflineBooking() {
                       showDateDisplay={false}
                       months={1}
                       direction="horizontal"
-                      rangeColors={["#000"]}
+                      rangeColors={["#0097A7"]}
                     />
                   </div>
                 )}
@@ -864,7 +865,7 @@ export default function OfflineBooking() {
               </div>
 
               <Button
-                className="w-full bg-black text-white py-3"
+                className="w-full bg-primary text-white py-3"
                 disabled={loading}
                 onClick={handleBooking}
               >
@@ -887,6 +888,7 @@ export default function OfflineBooking() {
           </Button>
         </DialogContent>
       </Dialog>
+    </div>
     </div>
   );
 }
