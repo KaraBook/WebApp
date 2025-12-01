@@ -31,6 +31,13 @@ import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
+const normalize = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+
 export default function OfflineBooking() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -85,13 +92,11 @@ export default function OfflineBooking() {
     },
   ]);
 
-  const nights = Math.max(
-    1,
-    Math.ceil(
-      (dateRange[0].endDate - dateRange[0].startDate) /
-      (1000 * 60 * 60 * 24)
-    )
-  );
+  const nights = Math.ceil(
+  (normalize(dateRange[0].endDate) - normalize(dateRange[0].startDate)) /
+  (1000 * 60 * 60 * 24)
+);
+
 
   useEffect(() => {
     setStates(getIndianStates());
@@ -294,8 +299,8 @@ export default function OfflineBooking() {
   const calculateTotal = () => {
     let total = 0;
 
-    let d = new Date(dateRange[0].startDate);
-    const end = new Date(dateRange[0].endDate);
+    let d = normalize(dateRange[0].startDate);
+    const end = normalize(dateRange[0].endDate);
 
     while (d < end) {
       const day = d.getDay();

@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useNavigate } from "react-router-dom";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,14 +10,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-
 import {
   MoreVertical,
   Search,
   IndianRupee,
   Phone,
 } from "lucide-react";
-
 import {
   AlertDialog,
   AlertDialogContent,
@@ -44,6 +41,7 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
+
 
 export default function OwnerBookings() {
   const [bookings, setBookings] = useState([]);
