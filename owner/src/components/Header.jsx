@@ -87,8 +87,8 @@ export default function Header() {
                 key={item.label}
                 onClick={handlePropertyClick}
                 className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
-                  ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
               >
                 Property
@@ -96,9 +96,9 @@ export default function Header() {
             );
           }
 
-          return item.path ? (
+          return (
             <NavLink
-              key={item.label}
+              key={item.path}
               to={item.path}
               className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
                   ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
@@ -107,13 +107,6 @@ export default function Header() {
             >
               {item.label}
             </NavLink>
-          ) : (
-            <span
-              key={item.label}
-              className="text-[14px] px-3 py-2.5 rounded-[8px] text-gray-400 cursor-not-allowed"
-            >
-              {item.label}
-            </span>
           );
         })}
       </nav>
