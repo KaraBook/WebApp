@@ -37,6 +37,15 @@ const normalize = (date) => {
   return d;
 };
 
+// 👉 IMPORTANT: LOCAL DATE STRING (no toISOString – avoids -1 day bug in IST)
+const formatLocalDateString = (date) => {
+  const d = new Date(date);
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, "0"),
+    String(d.getDate()).padStart(2, "0"),
+  ].join("-");
+};
 
 export default function OfflineBooking() {
   const { id } = useParams();
@@ -56,8 +65,6 @@ export default function OfflineBooking() {
   });
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const guestRef = useRef(null);
-
-
 
   const [price, setPrice] = useState({ weekday: 0, weekend: 0 });
 
@@ -92,11 +99,51 @@ export default function OfflineBooking() {
     },
   ]);
 
-  const nights = Math.ceil(
-    (normalize(dateRange[0].endDate) - normalize(dateRange[0].startDate)) /
-    (1000 * 60 * 60 * 24)
-  );
+  // ---------- DERIVED HELPERS ----------
 
+  const getNights = () => {
+    const start = normalize(dateRange[0].startDate);
+    const end = normalize(dateRange[0].endDate);
+    if (!start || !end || end <= start) return 0;
+
+    const diffMs = end - start;
+    return Math.round(diffMs / (1000 * 60 * 60 * 24));
+  };
+
+  const calculateTotal = () => {
+    let total = 0;
+    let d = normalize(dateRange[0].startDate);
+    const end = normalize(dateRange[0].endDate);
+
+    while (d < end) {
+      const day = d.getDay();
+      const isWeekend = day === 0 || day === 6;
+
+      total += isWeekend ? Number(price.weekend) : Number(price.weekday);
+      d.setDate(d.getDate() + 1);
+    }
+
+    return total;
+  };
+
+  // Same logic as backend – for sanity verification before API call
+  const verifyBackendStyleTotal = () => {
+    let backendTotal = 0;
+
+    let d = new Date(formatLocalDateString(dateRange[0].startDate));
+    const end = new Date(formatLocalDateString(dateRange[0].endDate));
+
+    while (d < end) {
+      const day = d.getDay();
+      const isWeekend = day === 0 || day === 6;
+      backendTotal += isWeekend ? Number(price.weekend) : Number(price.weekday);
+      d.setDate(d.getDate() + 1);
+    }
+
+    return backendTotal;
+  };
+
+  // ---------- EFFECTS ----------
 
   useEffect(() => {
     setStates(getIndianStates());
@@ -111,7 +158,6 @@ export default function OfflineBooking() {
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, []);
-
 
   useEffect(() => {
     if (!id || id.length < 10) {
@@ -170,33 +216,6 @@ export default function OfflineBooking() {
     loadData();
   }, [propertyId]);
 
-  const isDateDisabled = (date) => {
-    return disabledDays.some(
-      (d) => d.toDateString() === new Date(date).toDateString()
-    );
-  };
-
-  const handleDateSelection = (item) => {
-  const { startDate, endDate } = item.selection;
-
-  console.log("SELECTED START:", startDate);
-  console.log("SELECTED END:", endDate);
-
-  setDateRange([
-    {
-      startDate,
-      endDate,
-      key: "selection",
-    },
-  ]);
-
-  setTimeout(() => {
-    console.log("STATE START:", dateRange[0].startDate);
-    console.log("STATE END:", dateRange[0].endDate);
-  }, 300);
-};
-
-
   useEffect(() => {
     const close = (e) => {
       if (
@@ -212,6 +231,35 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
+  // ---------- DATE HANDLING ----------
+
+  const isDateDisabled = (date) => {
+    return disabledDays.some(
+      (d) => d.toDateString() === new Date(date).toDateString()
+    );
+  };
+
+  const handleDateSelection = (item) => {
+    const { startDate, endDate } = item.selection;
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
+
+    for (const day of days) {
+      if (isDateDisabled(day)) {
+        toast.error("Selected dates include unavailable days.");
+        return;
+      }
+    }
+
+    setDateRange([
+      {
+        startDate,
+        endDate,
+        key: "selection",
+      },
+    ]);
+  };
+
+  // ---------- FORM HANDLERS ----------
 
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
@@ -223,10 +271,9 @@ export default function OfflineBooking() {
     }
 
     try {
-      const ownerCheck = await api.post(
-        SummaryApi.checkOwnerByMobile.url,
-        { mobile: traveller.mobile }
-      );
+      const ownerCheck = await api.post(SummaryApi.checkOwnerByMobile.url, {
+        mobile: traveller.mobile,
+      });
 
       if (ownerCheck.data.exists) {
         setAllowForm(false);
@@ -235,15 +282,16 @@ export default function OfflineBooking() {
         setShowPopup(true);
         return;
       }
-    } catch { }
+    } catch {
+      // ignore owner check failure
+    }
 
     setChecking(true);
 
     try {
-      const res = await api.post(
-        SummaryApi.checkTravellerByMobile.url,
-        { mobile: traveller.mobile }
-      );
+      const res = await api.post(SummaryApi.checkTravellerByMobile.url, {
+        mobile: traveller.mobile,
+      });
 
       setAllowForm(true);
 
@@ -308,26 +356,6 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  const calculateTotal = () => {
-    let total = 0;
-
-    let d = normalize(dateRange[0].startDate);
-    const end = normalize(dateRange[0].endDate);
-
-    while (d < end) {
-      const day = d.getDay();
-      const isWeekend = day === 0 || day === 6;
-
-      total += isWeekend
-        ? Number(price.weekend)
-        : Number(price.weekday);
-
-      d.setDate(d.getDate() + 1);
-    }
-
-    return total;
-  };
-
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       if (window.Razorpay) return resolve(true);
@@ -339,6 +367,8 @@ export default function OfflineBooking() {
       document.body.appendChild(script);
     });
   };
+
+  // ---------- BOOKING ----------
 
   const handleBooking = async () => {
     if (!allowForm) return toast.error("Please verify mobile first");
@@ -361,19 +391,49 @@ export default function OfflineBooking() {
       }
     }
 
+    const nights = getNights();
+    if (nights <= 0) {
+      return toast.error("Please select a valid date range");
+    }
+
     const totalAmount = calculateTotal();
     if (totalAmount <= 0) return toast.error("Invalid booking amount");
+
+    // Extra safety: recalc total using backend-style logic
+    const backendStyleTotal = verifyBackendStyleTotal();
+    if (backendStyleTotal !== totalAmount) {
+      console.error("⚠️ Frontend total vs backend-style total mismatch", {
+        frontendTotal: totalAmount,
+        backendStyleTotal,
+      });
+      return toast.error(
+        "Internal price calculation mismatch. Please contact support."
+      );
+    }
 
     const checkIn = dateRange[0].startDate;
     const checkOut = dateRange[0].endDate;
 
-    // 👇 convert to "YYYY-MM-DD"
-    const checkInStr = checkIn.toISOString().split("T")[0];
-    const checkOutStr = checkOut.toISOString().split("T")[0];
+    // LOCAL YYYY-MM-DD (no timezone shift)
+    const checkInStr = formatLocalDateString(checkIn);
+    const checkOutStr = formatLocalDateString(checkOut);
+
+    // Debug log – mirrors backend computation context
+    console.log("📘 OFFLINE BOOKING DEBUG", {
+      rawStart: checkIn,
+      rawEnd: checkOut,
+      checkInStr,
+      checkOutStr,
+      nights,
+      price,
+      totalAmount,
+      backendStyleTotal,
+    });
 
     setLoading(true);
 
     try {
+      // 1) Create offline booking (server will recompute and validate price)
       const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
@@ -390,6 +450,7 @@ export default function OfflineBooking() {
 
       const bId = res.data.booking._id;
 
+      // 2) Create Razorpay order
       const orderRes = await api.post(SummaryApi.ownerCreateOrder.url, {
         bookingId: bId,
         amount: totalAmount,
@@ -444,12 +505,11 @@ export default function OfflineBooking() {
     }
   };
 
+  // ---------- RENDER ----------
 
   return (
     <div className="max-w-5xl p-2">
-      <h1 className="text-2xl font-semibold mb-8">
-        Create Offline Booking
-      </h1>
+      <h1 className="text-2xl font-semibold mb-8">Create Offline Booking</h1>
 
       {!propertyId ? (
         <div className="flex items-center justify-center py-10">
@@ -471,10 +531,7 @@ export default function OfflineBooking() {
                   <Input
                     value={traveller.mobile}
                     onChange={(e) =>
-                      handleChange(
-                        "mobile",
-                        e.target.value.replace(/\D/g, "")
-                      )
+                      handleChange("mobile", e.target.value.replace(/\D/g, ""))
                     }
                     maxLength={10}
                     placeholder="10-digit number"
@@ -484,9 +541,7 @@ export default function OfflineBooking() {
 
                 <Button
                   onClick={verifyMobile}
-                  disabled={
-                    checking || traveller.mobile.length !== 10
-                  }
+                  disabled={checking || traveller.mobile.length !== 10}
                   className="bg-black text-white"
                 >
                   {checking ? "Checking..." : "Verify"}
@@ -537,10 +592,7 @@ export default function OfflineBooking() {
                         type="date"
                         value={traveller.dateOfBirth}
                         onChange={(e) =>
-                          handleChange(
-                            "dateOfBirth",
-                            e.target.value
-                          )
+                          handleChange("dateOfBirth", e.target.value)
                         }
                         className="mt-1"
                       />
@@ -584,10 +636,7 @@ export default function OfflineBooking() {
                         </SelectTrigger>
                         <SelectContent>
                           {states.map((s) => (
-                            <SelectItem
-                              key={s.isoCode}
-                              value={s.isoCode}
-                            >
+                            <SelectItem key={s.isoCode} value={s.isoCode}>
                               {s.name}
                             </SelectItem>
                           ))}
@@ -599,9 +648,7 @@ export default function OfflineBooking() {
                       <Label>City</Label>
                       <Select
                         value={traveller.city}
-                        onValueChange={(v) =>
-                          handleChange("city", v)
-                        }
+                        onValueChange={(v) => handleChange("city", v)}
                         disabled={!cities.length}
                       >
                         <SelectTrigger>
@@ -615,10 +662,7 @@ export default function OfflineBooking() {
                         </SelectTrigger>
                         <SelectContent>
                           {cities.map((c) => (
-                            <SelectItem
-                              key={c.name}
-                              value={c.name}
-                            >
+                            <SelectItem key={c.name} value={c.name}>
                               {c.name}
                             </SelectItem>
                           ))}
@@ -643,8 +687,7 @@ export default function OfflineBooking() {
                 <Label>Dates</Label>
                 <div
                   className="border rounded-lg p-2 cursor-pointer mt-1 date-input"
-                  onClick={() => setShowCalendar(true)
-                  }
+                  onClick={() => setShowCalendar(true)}
                 >
                   {format(dateRange[0].startDate, "dd MMM")} –{" "}
                   {format(dateRange[0].endDate, "dd MMM")}
@@ -672,7 +715,6 @@ export default function OfflineBooking() {
               </div>
 
               {/* Guests */}
-              {/* Guests */}
               <div className="relative" ref={guestRef}>
                 <Label>Guests</Label>
 
@@ -681,13 +723,15 @@ export default function OfflineBooking() {
                   className="border rounded-lg p-2 cursor-pointer mt-1 bg-white"
                   onClick={() => setShowGuestDropdown(!showGuestDropdown)}
                 >
-                  {guestCount.adults + guestCount.children + guestCount.infants} guests
+                  {guestCount.adults +
+                    guestCount.children +
+                    guestCount.infants}{" "}
+                  guests
                 </div>
 
                 {/* Dropdown */}
                 {showGuestDropdown && (
                   <div className="absolute w-full bg-white shadow-xl border rounded-xl mt-2 z-50 p-4 space-y-4">
-
                     {/* Adults */}
                     <div className="flex items-center justify-between">
                       <div>
@@ -709,13 +753,18 @@ export default function OfflineBooking() {
                           -
                         </Button>
 
-                        <span className="w-6 text-center">{guestCount.adults}</span>
+                        <span className="w-6 text-center">
+                          {guestCount.adults}
+                        </span>
 
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            setGuestCount((g) => ({ ...g, adults: g.adults + 1 }))
+                            setGuestCount((g) => ({
+                              ...g,
+                              adults: g.adults + 1,
+                            }))
                           }
                         >
                           +
@@ -744,13 +793,18 @@ export default function OfflineBooking() {
                           -
                         </Button>
 
-                        <span className="w-6 text-center">{guestCount.children}</span>
+                        <span className="w-6 text-center">
+                          {guestCount.children}
+                        </span>
 
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            setGuestCount((g) => ({ ...g, children: g.children + 1 }))
+                            setGuestCount((g) => ({
+                              ...g,
+                              children: g.children + 1,
+                            }))
                           }
                         >
                           +
@@ -779,13 +833,18 @@ export default function OfflineBooking() {
                           -
                         </Button>
 
-                        <span className="w-6 text-center">{guestCount.infants}</span>
+                        <span className="w-6 text-center">
+                          {guestCount.infants}
+                        </span>
 
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            setGuestCount((g) => ({ ...g, infants: g.infants + 1 }))
+                            setGuestCount((g) => ({
+                              ...g,
+                              infants: g.infants + 1,
+                            }))
                           }
                         >
                           +
@@ -823,10 +882,7 @@ export default function OfflineBooking() {
             <DialogTitle>{popupTitle}</DialogTitle>
             <DialogDescription>{popupMsg}</DialogDescription>
           </DialogHeader>
-          <Button
-            onClick={() => setShowPopup(false)}
-            className="mt-4"
-          >
+          <Button onClick={() => setShowPopup(false)} className="mt-4">
             Close
           </Button>
         </DialogContent>
