@@ -69,8 +69,8 @@
 
 /* Make every day cell square with smooth UI */
 .rdrDay {
-  width: 40px !important;
-  height: 40px !important;
+  width: 35px !important;
+  height: 38px !important;
   border-radius: 8px !important;
   display: flex;
   align-items: center;
