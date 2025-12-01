@@ -177,34 +177,41 @@ export default function OfflineBooking() {
   };
 
   const handleDateSelection = (item) => {
-    const { startDate, endDate } = item.selection;
-    const days = eachDayOfInterval({ start: startDate, end: endDate });
+  const { startDate, endDate } = item.selection;
 
-    for (const day of days) {
-      if (isDateDisabled(day)) {
-        toast.error("Selected dates include unavailable days.");
-        return;
-      }
-    }
-    setDateRange([
-      {
-        startDate,
-        endDate,
-        key: "selection",
-      },
-    ]);
-  };
+  console.log("SELECTED START:", startDate);
+  console.log("SELECTED END:", endDate);
+
+  setDateRange([
+    {
+      startDate,
+      endDate,
+      key: "selection",
+    },
+  ]);
+
+  setTimeout(() => {
+    console.log("STATE START:", dateRange[0].startDate);
+    console.log("STATE END:", dateRange[0].endDate);
+  }, 300);
+};
 
 
   useEffect(() => {
     const close = (e) => {
-      if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(e.target) &&
+        !e.target.closest(".date-input")
+      ) {
         setShowCalendar(false);
       }
     };
+
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, []);
+
 
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
@@ -635,9 +642,8 @@ export default function OfflineBooking() {
               <div className="relative">
                 <Label>Dates</Label>
                 <div
-                  className="border rounded-lg p-2 cursor-pointer mt-1"
-                  onClick={() =>
-                    setShowCalendar(!showCalendar)
+                  className="border rounded-lg p-2 cursor-pointer mt-1 date-input"
+                  onClick={() => setShowCalendar(true)
                   }
                 >
                   {format(dateRange[0].startDate, "dd MMM")} –{" "}
