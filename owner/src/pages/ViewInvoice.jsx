@@ -98,7 +98,7 @@ export default function ViewInvoice() {
 
   return (
     <div className="bg-[#f5f5f7] min-h-screen px-6 py-10">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-3xl mx-auto">
 
         {/* TOP BAR */}
         <div className="flex justify-between items-center mb-6">
