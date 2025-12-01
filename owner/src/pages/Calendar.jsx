@@ -167,7 +167,7 @@ export default function OwnerCalendar() {
                 ranges={dateRange}
                 onChange={(item) => setDateRange([item.selection])}
                 minDate={new Date()}
-                rangeColors={["#000000"]}
+                rangeColors={["#0097a7"]}
                 moveRangeOnFirstSelection={false}
                 showDateDisplay={false}
                 months={1}

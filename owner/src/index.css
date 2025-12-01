@@ -67,6 +67,28 @@
   }
 }
 
+.rdrDayNumber span {
+  border-radius: 6px !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rdrDayInRange .rdrDayNumber span,
+.rdrDayStartPreview .rdrDayNumber span,
+.rdrDayEndPreview .rdrDayNumber span,
+.rdrDaySelected .rdrDayNumber span {
+  background: #0097a7 !important; 
+  color: white !important;
+}
+
+.rdrDayDisabled .rdrDayNumber span {
+  background: #e5e7eb !important;
+  color: #9ca3af !important;
+  border-radius: 6px !important;
+}
 
 
 
