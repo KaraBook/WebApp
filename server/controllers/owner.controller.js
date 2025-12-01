@@ -502,8 +502,8 @@ export const createOfflineBooking = async (req, res) => {
       return res.status(404).json({ success: false, message: "Property not found" });
     }
 
-    const weekdayPrice = Number(property.pricing?.perNight || 0);
-    const weekendPrice = Number(property.pricing?.weekend || weekdayPrice);
+    const weekdayPrice = Number(property.pricingPerNightWeekdays || 0);
+    const weekendPrice = Number(property.pricingPerNightWeekend || weekdayPrice);
 
     let backendTotal = 0;
 
@@ -513,10 +513,10 @@ export const createOfflineBooking = async (req, res) => {
     while (d < end) {
       const day = d.getDay();
       const isWeekend = day === 0 || day === 6;
-
       backendTotal += isWeekend ? weekendPrice : weekdayPrice;
       d.setDate(d.getDate() + 1);
     }
+
     if (backendTotal !== Number(totalAmount)) {
       return res.status(400).json({
         success: false,
