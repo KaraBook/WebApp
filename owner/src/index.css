@@ -66,61 +66,60 @@
     @apply bg-background text-foreground;
   }
 }
-
-/* Make every day cell square with smooth UI */
-.rdrDay {
-  width: 38px !important;
-  height: 38px !important;
+/* --- BASE DAY CELL SIZE & CENTERING --- */
+.rdrDayNumber {
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   border-radius: 8px !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0 auto !important;
 }
 
-/* Day number inside */
+/* Day number text */
 .rdrDayNumber span {
   font-size: 13px !important;
   font-weight: 500 !important;
 }
 
-/* Selected range (blue background) */
-.rdrInRange, 
-.rdrStartEdge, 
-.rdrEndEdge, 
-.rdrDaySelected {
-  background: #0097a7 !important;
-  color: white !important;
+/* --- SELECTED RANGE --- */
+.rdrInRange .rdrDayNumber,
+.rdrStartEdge .rdrDayNumber,
+.rdrEndEdge .rdrDayNumber,
+.rdrDaySelected .rdrDayNumber {
+  background-color: #0097a7 !important;
+  color: #fff !important;
   border-radius: 8px !important;
 }
 
-/* Fix the rounded edges of start/end */
-.rdrStartEdge {
+/* Rounded edge fixes */
+.rdrStartEdge .rdrDayNumber {
   border-top-left-radius: 8px !important;
   border-bottom-left-radius: 8px !important;
 }
 
-.rdrEndEdge {
+.rdrEndEdge .rdrDayNumber {
   border-top-right-radius: 8px !important;
   border-bottom-right-radius: 8px !important;
 }
 
-/* Disabled days (blocked or booked) */
-.rdrDayDisabled {
+/* --- DISABLED (blocked or booked) --- */
+.rdrDayDisabled .rdrDayNumber {
   background: #e5e7eb !important;
   color: #9ca3af !important;
   border-radius: 8px !important;
-  cursor: not-allowed;
+  opacity: 1 !important;
 }
 
 .rdrDayDisabled .rdrDayNumber span {
   color: #9ca3af !important;
 }
 
-/* Remove default range-preview bubble */
-.rdrDayHovered .rdrDayNumber span {
-  background: none !important;
+/* --- HOVER PREVIEW FIX --- */
+.rdrDayHovered .rdrDayNumber {
+  background: transparent !important;
 }
-
 
 
 
