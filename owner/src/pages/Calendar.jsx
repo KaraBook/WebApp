@@ -46,22 +46,22 @@ export default function OwnerCalendar() {
 
   // LOAD BLOCKED DATES
   useEffect(() => {
-  if (!propertyId) return;
+    if (!propertyId) return;
 
-  const fetchBlockedDates = async () => {
-    try {
-      const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
-      const booked = await api.get(SummaryApi.getBookedDates.url(propertyId));
+    const fetchBlockedDates = async () => {
+      try {
+        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
+        const booked = await api.get(SummaryApi.getBookedDates.url(propertyId));
 
-      setBlockedDates(res.data.dates || []);
-      setBookedDates(booked.data.dates || []);
-    } catch (err) {
-      toast.error("Failed to load dates");
-    }
-  };
+        setBlockedDates(res.data.dates || []);
+        setBookedDates(booked.data.dates || []);
+      } catch (err) {
+        toast.error("Failed to load dates");
+      }
+    };
 
-  fetchBlockedDates();
-}, [propertyId]);
+    fetchBlockedDates();
+  }, [propertyId]);
 
 
   // BLOCK DATE RANGE
@@ -117,18 +117,18 @@ export default function OwnerCalendar() {
   };
 
   const isDateBooked = (date) => {
-  return bookedDates.some((range) => {
-    const start = new Date(range.start);
-    const end = new Date(range.end);
-    return date >= start && date <= end;
-  });
-};
+    return bookedDates.some((range) => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      return date >= start && date <= end;
+    });
+  };
 
 
   return (
     <div className="bg-[#f5f5f7] min-h-screen px-8 py-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        
+
         {/* HEADER */}
         <div className="flex items-center justify-between">
           <h1 className="text-[26px] font-semibold text-gray-900">Calendar</h1>
@@ -148,7 +148,7 @@ export default function OwnerCalendar() {
 
           {/* LEFT SIDE – CALENDAR */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 w-full lg:w-1/2">
-            
+
             <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
               Select Dates to Block
             </h2>
@@ -167,12 +167,13 @@ export default function OwnerCalendar() {
                 ranges={dateRange}
                 onChange={(item) => setDateRange([item.selection])}
                 minDate={new Date()}
-                rangeColors={["#0097a7"]}
-                moveRangeOnFirstSelection={false}
-                showDateDisplay={false}
                 months={1}
                 direction="horizontal"
-                disabledDay={(date) => isDateBlocked(date) || isDateBooked(date)}
+                showDateDisplay={false}
+                moveRangeOnFirstSelection={false}
+                rangeColors={["#0097A7"]}
+                dragSelectionEnabled={true}
+                disabledDay={(date) => isDateBooked(date) || isDateBlocked(date)}
               />
             </div>
 
@@ -190,7 +191,7 @@ export default function OwnerCalendar() {
 
           {/* RIGHT SIDE – BLOCKED LIST */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 w-full lg:w-1/2 max-h-[550px] overflow-y-auto">
-            
+
             <h3 className="text-xl font-semibold text-gray-800 mb-4">
               Blocked Date Ranges
             </h3>
