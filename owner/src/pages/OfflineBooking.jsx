@@ -177,19 +177,24 @@ export default function OfflineBooking() {
   };
 
   const handleDateSelection = (item) => {
-    const { startDate, endDate } = item.selection;
+  const { startDate, endDate } = item.selection;
+  const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-    let d = new Date(startDate);
-    while (d <= endDate) {
-      if (isDateDisabled(d)) {
-        toast.error("Selected dates include unavailable days.");
-        return;
-      }
-      d.setDate(d.getDate() + 1);
+  for (const day of days) {
+    if (isDateDisabled(day)) {
+      toast.error("Selected dates include unavailable days.");
+      return;
     }
+  }
+  setDateRange([
+    {
+      startDate,
+      endDate,
+      key: "selection",
+    },
+  ]);
+};
 
-    setDateRange([item.selection]);
-  };
 
   useEffect(() => {
     const close = (e) => {
