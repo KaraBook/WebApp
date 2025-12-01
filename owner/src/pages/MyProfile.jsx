@@ -239,7 +239,7 @@ export default function MyProfile() {
           {/* Save Button */}
           <div className="pt-4">
             <Button
-              className="bg-black text-white px-6"
+              className="bg-primary text-white px-6"
               disabled={saving}
               onClick={handleSave}
             >
