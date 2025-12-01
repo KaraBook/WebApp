@@ -120,7 +120,7 @@ export default function ViewInvoice() {
         </div>
 
         {/* INVOICE CARD */}
-        <div className="bg-white shadow-lg rounded-xl p-6 border border-gray-100">
+        <div className="bg-white shadow-lg rounded-xl max-w-3xl p-6 border border-gray-100">
           <div ref={invoiceRef}>
             <InvoicePreview invoice={invoice} />
           </div>
