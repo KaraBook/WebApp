@@ -35,7 +35,6 @@ export default function OfflineBooking() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Always use propertyId from route param
   const [propertyId, setPropertyId] = useState(null);
 
   const [states, setStates] = useState([]);
@@ -43,7 +42,12 @@ export default function OfflineBooking() {
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
   const [disabledDays, setDisabledDays] = useState([]);
-  const [guestCount, setGuestCount] = useState(1);
+  const [guestCount, setGuestCount] = useState({
+    adults: 1,
+    children: 0,
+    infants: 0,
+  });
+
 
   const [price, setPrice] = useState({ weekday: 0, weekend: 0 });
 
@@ -70,7 +74,6 @@ export default function OfflineBooking() {
     city: "",
   });
 
-  // Default date range
   const [dateRange, setDateRange] = useState([
     {
       startDate: new Date(),
@@ -79,21 +82,18 @@ export default function OfflineBooking() {
     },
   ]);
 
-  // Nights calculated live
   const nights = Math.max(
     1,
     Math.ceil(
       (dateRange[0].endDate - dateRange[0].startDate) /
-        (1000 * 60 * 60 * 24)
+      (1000 * 60 * 60 * 24)
     )
   );
 
-  // Load states at start
   useEffect(() => {
     setStates(getIndianStates());
   }, []);
 
-  // Ensure propertyId is valid
   useEffect(() => {
     if (!id || id.length < 10) {
       toast.error("Invalid property.");
@@ -102,13 +102,11 @@ export default function OfflineBooking() {
     setPropertyId(id);
   }, [id]);
 
-  // Load pricing + blocked/booked dates
   useEffect(() => {
     if (!propertyId) return;
 
     const loadData = async () => {
       try {
-        // 1. Property Details
         const propRes = await api.get(
           SummaryApi.getSingleProperty(propertyId).url
         );
@@ -121,13 +119,11 @@ export default function OfflineBooking() {
           });
         }
 
-        // 2. Blocked Dates
         const blockedRes = await api.get(
           SummaryApi.getPropertyBlockedDates.url(propertyId)
         );
         const blocked = blockedRes.data?.dates || [];
 
-        // 3. Booked Dates
         const bookedRes = await api.get(
           SummaryApi.getBookedDates.url(propertyId)
         );
@@ -155,14 +151,12 @@ export default function OfflineBooking() {
     loadData();
   }, [propertyId]);
 
-  // Disable booked/blocked days
   const isDateDisabled = (date) => {
     return disabledDays.some(
       (d) => d.toDateString() === new Date(date).toDateString()
     );
   };
 
-  // Handle date range selection
   const handleDateSelection = (item) => {
     const { startDate, endDate } = item.selection;
 
@@ -178,7 +172,6 @@ export default function OfflineBooking() {
     setDateRange([item.selection]);
   };
 
-  // Auto-close calendar
   useEffect(() => {
     const close = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -189,12 +182,10 @@ export default function OfflineBooking() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  // Handle form field change
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
   };
 
-  // Verify traveller mobile
   const verifyMobile = async () => {
     if (traveller.mobile.length !== 10) {
       return toast.error("Invalid mobile number");
@@ -213,7 +204,7 @@ export default function OfflineBooking() {
         setShowPopup(true);
         return;
       }
-    } catch {}
+    } catch { }
 
     setChecking(true);
 
@@ -272,7 +263,6 @@ export default function OfflineBooking() {
     }
   };
 
-  // Handle state change
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
 
@@ -287,7 +277,6 @@ export default function OfflineBooking() {
     setCities(getCitiesByState(code));
   };
 
-  // Calculate total amount
   const calculateTotal = () => {
     let total = 0;
 
@@ -308,7 +297,6 @@ export default function OfflineBooking() {
     return total;
   };
 
-  // Load Razorpay script
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
       if (window.Razorpay) return resolve(true);
@@ -321,10 +309,8 @@ export default function OfflineBooking() {
     });
   };
 
-  // Handle booking + payment
   const handleBooking = async () => {
-    if (!allowForm)
-      return toast.error("Please verify mobile first");
+    if (!allowForm) return toast.error("Please verify mobile first");
 
     const required = [
       "firstName",
@@ -345,34 +331,37 @@ export default function OfflineBooking() {
     }
 
     const totalAmount = calculateTotal();
+    if (totalAmount <= 0) return toast.error("Invalid booking amount");
 
-    if (totalAmount <= 0)
-      return toast.error("Invalid booking amount");
+    const checkIn = dateRange[0].startDate;
+    const checkOut = dateRange[0].endDate;
+
+    // 👇 convert to "YYYY-MM-DD"
+    const checkInStr = checkIn.toISOString().split("T")[0];
+    const checkOutStr = checkOut.toISOString().split("T")[0];
 
     setLoading(true);
 
     try {
-      // 1. Create booking
-      const res = await api.post(
-        SummaryApi.ownerOfflineBooking.url,
-        {
-          traveller,
-          propertyId,
-          checkIn: dateRange[0].startDate,
-          checkOut: dateRange[0].endDate,
-          guests: guestCount,
-          nights,
-          totalAmount,
-        }
-      );
+      const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
+        traveller,
+        propertyId,
+        checkIn: checkInStr,
+        checkOut: checkOutStr,
+        guests: {
+          adults: guestCount,
+          children: 0,
+          infants: 0,
+        },
+        totalAmount,
+      });
 
       const bId = res.data.booking._id;
 
-      // 2. Create order in backend
-      const orderRes = await api.post(
-        SummaryApi.ownerCreateOrder.url,
-        { bookingId: bId, amount: totalAmount }
-      );
+      const orderRes = await api.post(SummaryApi.ownerCreateOrder.url, {
+        bookingId: bId,
+        amount: totalAmount,
+      });
 
       const { order } = orderRes.data;
 
@@ -389,18 +378,14 @@ export default function OfflineBooking() {
         name: "Booking Payment",
         description: "Offline Booking Payment",
         order_id: order.id,
-
         handler: async function (response) {
           try {
-            await api.post(
-              SummaryApi.ownerVerifyPayment.url,
-              {
-                bookingId: bId,
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-              }
-            );
+            await api.post(SummaryApi.ownerVerifyPayment.url, {
+              bookingId: bId,
+              orderId: response.razorpay_order_id,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+            });
 
             toast.success("Payment successful!");
             navigate("/bookings");
@@ -408,10 +393,8 @@ export default function OfflineBooking() {
             toast.error("Payment verification failed");
           }
         },
-
         prefill: {
-          name:
-            traveller.firstName + " " + traveller.lastName,
+          name: traveller.firstName + " " + traveller.lastName,
           email: traveller.email,
           contact: traveller.mobile,
         },
@@ -420,12 +403,15 @@ export default function OfflineBooking() {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      console.log("Booking Error:", err);
-      toast.error("Failed to create booking");
+      console.log("Booking Error:", err.response?.data || err);
+      toast.error(
+        err.response?.data?.message || "Failed to create booking"
+      );
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="max-w-5xl p-2">
@@ -656,17 +642,59 @@ export default function OfflineBooking() {
               </div>
 
               {/* Guests */}
-              <div>
+              <div className="space-y-2">
                 <Label>Guests</Label>
-                <Input
-                  type="number"
-                  value={guestCount}
-                  onChange={(e) =>
-                    setGuestCount(Number(e.target.value))
-                  }
-                  min={1}
-                  className="mt-1"
-                />
+
+                <div className="flex items-center justify-between border rounded-lg p-2">
+                  <span>Adults</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setGuestCount((g) => ({ ...g, adults: Math.max(1, g.adults - 1) }))}
+                    >-</Button>
+                    <span>{guestCount.adults}</span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setGuestCount((g) => ({ ...g, adults: g.adults + 1 }))}
+                    >+</Button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border rounded-lg p-2">
+                  <span>Children</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setGuestCount((g) => ({ ...g, children: Math.max(0, g.children - 1) }))}
+                    >-</Button>
+                    <span>{guestCount.children}</span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setGuestCount((g) => ({ ...g, children: g.children + 1 }))}
+                    >+</Button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border rounded-lg p-2">
+                  <span>Infants</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setGuestCount((g) => ({ ...g, infants: Math.max(0, g.infants - 1) }))}
+                    >-</Button>
+                    <span>{guestCount.infants}</span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setGuestCount((g) => ({ ...g, infants: g.infants + 1 }))}
+                    >+</Button>
+                  </div>
+                </div>
               </div>
 
               {/* Total */}
