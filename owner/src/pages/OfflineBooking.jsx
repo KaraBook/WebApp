@@ -362,6 +362,7 @@ export default function OfflineBooking() {
         propertyId,
         checkIn: checkInStr,
         checkOut: checkOutStr,
+        nights,
         guests: {
           adults: guestCount.adults,
           children: guestCount.children,
