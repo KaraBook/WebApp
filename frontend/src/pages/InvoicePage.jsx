@@ -20,9 +20,12 @@ export default function InvoicePage() {
 
   const fetchInvoice = async () => {
     try {
-      const res = await Axios.get(SummaryApi.getInvoice.url(id), {
+      const res = await Axios.get(SummaryApi.getInvoice.url(id) + `?t=${Date.now()}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+          Expires: "0",
         },
       });
       if (res.data.success) setInvoice(res.data.data);
