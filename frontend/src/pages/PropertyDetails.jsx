@@ -373,52 +373,6 @@ export default function PropertyDetails() {
                 <Star className="w-5 h-5 text-black fill-black" /> Reviews
               </h2>
 
-              {/* Submit Review Section FIRST */}
-              {user ? (
-                <div className="mt-5 p-4 border bg-white shadow-sm">
-                  <p className="font-semibold mb-2">Write a Review</p>
-
-                  <div className="flex gap-2 mb-3">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`w-4 h-4 cursor-pointer ${star <= newReview.rating
-                          ? "text-black fill-black"
-                          : "text-gray-400"
-                          }`}
-                        onClick={() =>
-                          setNewReview((prev) => ({ ...prev, rating: star }))
-                        }
-                      />
-                    ))}
-                  </div>
-
-                  <textarea
-                    className="w-full border p-3"
-                    rows="3"
-                    placeholder="Write your experience..."
-                    value={newReview.comment}
-                    onChange={(e) =>
-                      setNewReview((prev) => ({ ...prev, comment: e.target.value }))
-                    }
-                  />
-
-                  <Button
-                    className="mt-3 bg-primary rounded-[0] text-white hover:bg-primary/80"
-                    onClick={submitReview}
-                  >
-                    Submit Review
-                  </Button>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600 mt-3">
-                  <button className="underline font-semibold" onClick={showAuthModal}>
-                    Login
-                  </button>{" "}
-                  to write a review.
-                </p>
-              )}
-
               {/* Carousel AFTER review form */}
               <div className="mt-8">
                 {reviews.length === 0 ? (

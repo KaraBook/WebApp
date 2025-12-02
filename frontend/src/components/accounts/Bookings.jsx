@@ -173,7 +173,7 @@ export default function Bookings() {
                       ₹{b.totalAmount.toLocaleString()}
                     </td>
 
-                   <td className="px-4 py-3 relative group cursor-default flex justify-center">
+                    <td className="px-4 py-3 relative group cursor-default flex justify-center">
                       <span
                         className={`inline-block w-3 h-3 rounded-full ${statusDot(
                           b.paymentStatus
@@ -215,6 +215,11 @@ export default function Bookings() {
                                 <FileDown size={16} /> View Invoice
                               </div>
                             </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setSelectedBooking({ ...b, rateMode: true })}>
+                            <div className="flex items-center gap-2">
+                              ⭐ Rate this Resort
+                            </div>
                           </DropdownMenuItem>
 
                           <DropdownMenuItem
@@ -383,6 +388,79 @@ export default function Bookings() {
 
                 </div>
 
+              </DialogContent>
+            </Dialog>
+          )}
+
+
+          {/* RATING POPUP */}
+          {selectedBooking?.rateMode && (
+            <Dialog open={true} onOpenChange={() => setSelectedBooking(null)}>
+              <DialogContent className="max-w-md p-6 rounded-none mt-[2rem]">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold">Rate this Resort</DialogTitle>
+                </DialogHeader>
+
+                <div className="mt-4 space-y-4">
+                  {/* STAR SELECTION */}
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-6 h-6 cursor-pointer ${star <= (selectedBooking.rating || 0)
+                            ? "text-black fill-black"
+                            : "text-gray-400"
+                          }`}
+                        onClick={() =>
+                          setSelectedBooking((sb) => ({ ...sb, rating: star }))
+                        }
+                      />
+                    ))}
+                  </div>
+
+                  {/* COMMENT BOX */}
+                  <textarea
+                    className="w-full border p-3"
+                    rows="3"
+                    placeholder="Write your review..."
+                    onChange={(e) =>
+                      setSelectedBooking((sb) => ({
+                        ...sb,
+                        comment: e.target.value,
+                      }))
+                    }
+                  />
+
+                  {/* SUBMIT BTN */}
+                  <button
+                    className="w-full bg-primary text-white py-3 rounded-none"
+                    onClick={async () => {
+                      try {
+                        await Axios.post(
+                          SummaryApi.addReview.url,
+                          {
+                            propertyId: selectedBooking.property?._id,
+                            bookingId: selectedBooking._id,
+                            rating: selectedBooking.rating,
+                            comment: selectedBooking.comment,
+                          },
+                          {
+                            headers: { Authorization: `Bearer ${accessToken}` },
+                          }
+                        );
+
+                        toast.success("Review submitted!");
+                        setSelectedBooking(null);
+                      } catch (err) {
+                        toast.error(
+                          err.response?.data?.message || "Failed to submit review"
+                        );
+                      }
+                    }}
+                  >
+                    Submit Review
+                  </button>
+                </div>
               </DialogContent>
             </Dialog>
           )}

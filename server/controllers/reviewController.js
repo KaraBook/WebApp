@@ -1,17 +1,42 @@
 import Review from "../models/Review.js";
 import Property from "../models/Property.js";
+import Booking from "../models/Booking.js";
 
 export const addReview = async (req, res) => {
   try {
-    const { propertyId, rating, comment } = req.body;
+    const { propertyId, bookingId, rating, comment } = req.body;
     const userId = req.user.id;
 
-    const existing = await Review.findOne({ propertyId, userId });
-    if (existing) {
-      return res.status(400).json({ message: "You already reviewed this property." });
+    if (!bookingId) {
+      return res.status(400).json({ message: "Booking ID is required" });
     }
 
-    const review = await Review.create({ propertyId, userId, rating, comment });
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      property: propertyId,
+      user: userId,
+    });
+
+    if (!booking) {
+      return res.status(403).json({
+        message: "You cannot review this property because you have not booked it.",
+      });
+    }
+
+    const existingReview = await Review.findOne({ bookingId });
+    if (existingReview) {
+      return res.status(400).json({
+        message: "You already submitted a review for this booking.",
+      });
+    }
+
+    const review = await Review.create({
+      propertyId,
+      userId,
+      bookingId,
+      rating,
+      comment,
+    });
 
     const allReviews = await Review.find({ propertyId });
     const avgRating =
@@ -20,6 +45,7 @@ export const addReview = async (req, res) => {
     await Property.findByIdAndUpdate(propertyId, { averageRating: avgRating });
 
     res.status(201).json({ success: true, data: review });
+
   } catch (err) {
     console.error("Add review error:", err);
     res.status(500).json({ message: "Failed to add review" });
