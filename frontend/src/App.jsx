@@ -30,22 +30,22 @@ export default function App() {
   });
 
 
-  useEffect(() => {
-    const run = () => {
-      init().finally(() => {
-        if (!useAuthStore.getState().user) {
-          showAuthModal();
-        }
-      });
-    };
+useEffect(() => {
+  const run = () => {
+    init().finally(() => {
+      const { user } = useAuthStore.getState();
+      const alreadyShown = localStorage.getItem("loginPromptShown");
+      if (!user && !alreadyShown) {
+        showAuthModal();
+        localStorage.setItem("loginPromptShown", "true");
+      }
+    });
+  };
+  const unsub = useAuthStore.persist?.onFinishHydration?.(() => run()) || null;
+  run();
+  return () => unsub?.();
+}, []);
 
-    const unsub =
-      useAuthStore.persist?.onFinishHydration?.(() => run()) || null;
-
-    run();
-
-    return () => unsub?.();
-  }, [init, showAuthModal]);
 
   return (
     <div className="min-h-screen flex flex-col">
