@@ -77,7 +77,6 @@ export default function InvoicePage() {
     : [];
 
   const rawSubtotal = Number(invoice.totalAmount);
-
   const tax = Math.round(rawSubtotal * 0.10);
   const grandTotal = rawSubtotal + tax;
 

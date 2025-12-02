@@ -21,24 +21,20 @@ export const createOrder = async (req, res) => {
     const weekday = Number(property.pricingPerNightWeekdays);
     const weekend = Number(property.pricingPerNightWeekend || weekday);
 
-    let backendTotal = 0;
-    let d = new Date(checkIn);
-    const end = new Date(checkOut);
-
+    let baseTotal = 0;
     while (d < end) {
       const day = d.getDay();
       const isWeekend = day === 0 || day === 6;
-      let todayPrice = isWeekend ? weekend : weekday;
-      const totalGuests = guests.adults + guests.children;
-      const allowedGuests = property.defaultGuests || 2;
-      const extraGuests = Math.max(0, totalGuests - allowedGuests);
-      const extraCharge = extraGuests * (property.extraGuestCharge || 0);
-      backendTotal += todayPrice + extraCharge;
+      const todayPrice = isWeekend ? weekend : weekday;
+      baseTotal += todayPrice;
       d.setDate(d.getDate() + 1);
     }
 
+    const tax = Math.round(baseTotal * 0.10);
+    const grandTotal = baseTotal + tax;
+
     const options = {
-      amount: backendTotal * 100,
+      amount: grandTotal * 100,  
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
     };
@@ -58,7 +54,7 @@ export const createOrder = async (req, res) => {
       totalNights: Math.ceil(
         (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
       ),
-      totalAmount: backendTotal,
+      totalAmount: baseTotal,
       orderId: order.id,
       contactNumber,
     });
