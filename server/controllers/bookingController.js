@@ -38,7 +38,7 @@ export const createOrder = async (req, res) => {
     const grandTotal = baseTotal + tax;
 
     const options = {
-      amount: grandTotal * 100,  
+      amount: grandTotal * 100,
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
     };
@@ -59,10 +59,10 @@ export const createOrder = async (req, res) => {
         (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
       ),
 
-      totalAmount: baseTotal,   
+      totalAmount: baseTotal,
 
-      taxAmount: tax,          
-      grandTotal: grandTotal,  
+      taxAmount: tax,
+      grandTotal: grandTotal,
 
       orderId: order.id,
       contactNumber,
@@ -249,7 +249,9 @@ export const getBookingInvoice = async (req, res) => {
       booking.propertyId.pricingPerNightWeekend || weekdayPrice
     );
 
-    const subtotal = Number(booking.totalAmount);
+    const subtotal = Number(booking.totalAmount);              // room-only
+    const taxAmount = Number(booking.taxAmount ?? Math.round(subtotal * 0.10));
+    const grandTotal = Number(booking.grandTotal ?? subtotal + taxAmount);
     const perNight = Math.floor(subtotal / booking.totalNights);
 
     const invoiceData = {
@@ -262,7 +264,9 @@ export const getBookingInvoice = async (req, res) => {
       checkOut: booking.checkOut,
       nights: booking.totalNights,
       guests: booking.guests,
-      totalAmount: booking.totalAmount,
+      totalAmount: subtotal,
+      taxAmount,
+      grandTotal,
       paymentStatus: booking.paymentStatus,
       bookingDate: booking.createdAt,
       user: {

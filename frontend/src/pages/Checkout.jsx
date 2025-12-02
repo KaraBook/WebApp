@@ -110,9 +110,28 @@ export default function Checkout() {
     const nights =
         Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))) || 1;
 
-    const basePrice = property.pricingPerNightWeekdays * nights;
-    const tax = Math.round(basePrice * 0.05);
+    const weekday = Number(property.pricingPerNightWeekdays);
+    const weekend = Number(property.pricingPerNightWeekend || weekday);
+
+    const calcBasePrice = () => {
+        let d = new Date(startDate);
+        const end = new Date(endDate);
+        let total = 0;
+
+        while (d < end) {
+            const day = d.getDay();
+            const isWeekend = day === 0 || day === 6;
+            total += isWeekend ? weekend : weekday;
+            d.setDate(d.getDate() + 1);
+        }
+
+        return total;
+    };
+
+    const basePrice = calcBasePrice();
+    const tax = Math.round(basePrice * 0.10);
     const total = basePrice + tax;
+
 
     const handleContactChange = (e) => {
         const value = e.target.value.replace(/\D/g, "");
@@ -411,14 +430,16 @@ export default function Checkout() {
                     <div className="border-t pt-3 mt-3 text-sm space-y-2">
                         <div className="flex justify-between">
                             <span>
-                                {nights} nights × ₹{property.pricingPerNightWeekdays.toLocaleString()}
+                                Room charges ({nights} {nights === 1 ? "night" : "nights"})
                             </span>
                             <span>₹{basePrice.toLocaleString()}</span>
                         </div>
+
                         <div className="flex justify-between">
-                            <span>Taxes</span>
+                            <span>Taxes (10%)</span>
                             <span>₹{tax.toLocaleString()}</span>
                         </div>
+
                         <div className="border-t pt-2 flex justify-between font-semibold text-base">
                             <span>Total (INR)</span>
                             <span>₹{total.toLocaleString()}</span>
