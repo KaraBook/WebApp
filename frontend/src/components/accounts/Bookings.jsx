@@ -240,111 +240,108 @@ export default function Bookings() {
           {/* BOOKING DETAILS POPUP */}
           {selectedBooking && (
             <Dialog open={true} onOpenChange={() => setSelectedBooking(null)}>
-              <DialogContent className="max-w-lg p-6 rounded-none">
+              <DialogContent className="max-w-3xl p-6 rounded-none">
 
                 <DialogHeader>
-                  <DialogTitle className="text-xl font-semibold">
-                    Booking Details
-                  </DialogTitle>
+                  <DialogTitle className="text-xl font-semibold">Booking Details</DialogTitle>
                 </DialogHeader>
 
-                {/* PROPERTY INFO */}
-                <div className="flex gap-4 items-center border-b pb-4">
-                  <img
-                    src={selectedBooking.property?.coverImage}
-                    alt="property"
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <div>
-                    <p className="font-semibold text-lg">
-                      {selectedBooking.property?.propertyName}
-                    </p>
-                    <p className="text-gray-600 text-sm">
-                      {selectedBooking.property?.city}, {selectedBooking.property?.state}
-                    </p>
+                {/* GRID LAYOUT — LEFT + RIGHT */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                  {/* LEFT SIDE — DETAILS */}
+                  <div className="md:col-span-2 space-y-6">
+
+                    {/* PROPERTY */}
+                    <div className="flex gap-4 items-center border-b pb-4">
+                      <img
+                        src={selectedBooking.property?.coverImage}
+                        className="w-20 h-20 object-cover rounded"
+                      />
+                      <div>
+                        <p className="font-semibold text-lg">{selectedBooking.property?.propertyName}</p>
+                        <p className="text-gray-600 text-sm">
+                          {selectedBooking.property?.city}, {selectedBooking.property?.state}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* BOOKING DETAILS */}
+                    <div className="bg-gray-50 p-4 rounded-md border">
+                      <h4 className="font-semibold mb-3">Stay Details</h4>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+
+                        <div>
+                          <p className="text-gray-500 text-xs uppercase">Check-in</p>
+                          <p className="text-base mt-1 font-medium">
+                            {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-gray-500 text-xs uppercase">Check-out</p>
+                          <p className="text-base mt-1 font-medium">
+                            {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-gray-500 text-xs uppercase">Nights</p>
+                          <p className="text-base mt-1 font-semibold text-[#233b19]">
+                            {selectedBooking.totalNights}
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-gray-500 text-xs uppercase">Payment</p>
+                          <span className={`inline-block mt-1 px-2 py-1 text-xs font-semibold rounded
+              ${selectedBooking.paymentStatus === "paid"
+                              ? "bg-green-100 text-green-700"
+                              : selectedBooking.paymentStatus === "pending"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-red-100 text-red-700"
+                            }
+            `}>
+                            {selectedBooking.paymentStatus.toUpperCase()}
+                          </span>
+                        </div>
+
+                        <div>
+                          <p className="text-gray-500 text-xs uppercase">Booking Date</p>
+                          <p className="text-base mt-1 font-medium">
+                            {format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* GUESTS */}
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
+                      <div className="bg-white border rounded-md p-4 text-sm space-y-1">
+                        <p>Adults: {selectedBooking.guests.adults}</p>
+                        <p>Children: {selectedBooking.guests.children}</p>
+                        <p>Infants: {selectedBooking.guests.infants}</p>
+                      </div>
+                    </div>
+
+                    {/* TRAVELLER DETAILS */}
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
+                      <div className="bg-white border rounded-md p-4 text-sm space-y-1">
+                        <p>Name: {selectedBooking.user?.fullName || "—"}</p>
+                        <p>Phone: {selectedBooking.user?.phone || "—"}</p>
+                        <p>Email: {selectedBooking.user?.email || "—"}</p>
+                      </div>
+                    </div>
+
                   </div>
-                </div>
 
-                {/* DETAILS GRID */}
-                <div className="mt-2 bg-gray-50 p-4 rounded-md border">
+                  {/* RIGHT SIDE — PRICE BREAKDOWN */}
+                  <div className="bg-white border rounded-md h-fit p-4 space-y-4 shadow-sm">
 
-                  <div className="grid grid-cols-2 gap-6 text-sm">
-
-                    {/* Check-in */}
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase tracking-wide">Check-in</p>
-                      <p className="text-base font-medium mt-1">
-                        {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
-                      </p>
-                    </div>
-
-                    {/* Check-out */}
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase tracking-wide">Check-out</p>
-                      <p className="text-base font-medium mt-1">
-                        {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
-                      </p>
-                    </div>
-
-                    {/* Nights */}
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase tracking-wide">Nights</p>
-                      <p className="text-base mt-1 font-semibold text-[#233b19]">
-                        {selectedBooking.totalNights}
-                      </p>
-                    </div>
-
-                    {/* Payment Status */}
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase tracking-wide">Payment</p>
-                      <span
-                        className={`
-          inline-block mt-1 px-2 py-1 text-xs font-semibold rounded 
-          ${selectedBooking.paymentStatus === "paid"
-                            ? "bg-green-100 text-green-700"
-                            : selectedBooking.paymentStatus === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"}
-        `}
-                      >
-                        {selectedBooking.paymentStatus.toUpperCase()}
-                      </span>
-                    </div>
-
-                    {/* Booking Date */}
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase tracking-wide">Booking Date</p>
-                      <p className="text-base font-medium mt-1">
-                        {format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}
-                      </p>
-                    </div>
-
-                    {/* Amount */}
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase tracking-wide">Amount</p>
-                      <p className="text-base font-semibold text-[#233b19] mt-1">
-                        ₹{selectedBooking.totalAmount.toLocaleString()}
-                      </p>
-                    </div>
-
-                  </div>
-                </div>
-
-                {/* GUESTS */}
-                <div className="mt-2">
-                  <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
-                  <div className="bg-white border rounded-md p-4 text-sm space-y-1">
-                    <p> Adults: {selectedBooking.guests.adults}</p>
-                    <p> Children: {selectedBooking.guests.children}</p>
-                    <p> Infants: {selectedBooking.guests.infants}</p>
-                  </div>
-                </div>
-
-                {/* PRICE BREAKDOWN */}
-                <div className="mt-6">
-                  <h4 className="font-semibold text-gray-800 mb-2">Price Breakdown</h4>
-
-                  <div className="bg-white border rounded-md p-4 text-sm space-y-3">
+                    <h4 className="font-semibold text-gray-800">Price Breakdown</h4>
 
                     {/* Subtotal */}
                     <div className="flex justify-between">
@@ -356,9 +353,7 @@ export default function Bookings() {
 
                     {/* Tax */}
                     <div className="flex justify-between">
-                      <span className="text-gray-600">
-                        Tax (10%)
-                      </span>
+                      <span className="text-gray-600">Tax (10%)</span>
                       <span className="font-medium">
                         ₹{Math.round(selectedBooking.totalAmount * 0.10).toLocaleString()}
                       </span>
@@ -366,12 +361,14 @@ export default function Bookings() {
 
                     <div className="border-t pt-3"></div>
 
-                    {/* Grand Total */}
-                    <div className="flex justify-between text-base font-semibold">
+                    {/* Total */}
+                    <div className="flex justify-between text-lg font-semibold text-[#233b19]">
                       <span>Total</span>
-                      <span className="text-[#233b19]">
-                        ₹{(selectedBooking.totalAmount + Math.round(selectedBooking.totalAmount * 0.10))
-                          .toLocaleString()}
+                      <span>
+                        ₹{(
+                          selectedBooking.totalAmount +
+                          Math.round(selectedBooking.totalAmount * 0.10)
+                        ).toLocaleString()}
                       </span>
                     </div>
 
