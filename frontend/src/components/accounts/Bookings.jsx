@@ -432,7 +432,7 @@ export default function Bookings() {
                         await Axios.post(
                           SummaryApi.addReview.url,
                           {
-                            propertyId: ratingBooking.property?._id,
+                            propertyId: ratingBooking.property?._id || ratingBooking.property,
                             bookingId: ratingBooking._id,
                             rating: ratingBooking.rating,
                             comment: ratingBooking.comment,
