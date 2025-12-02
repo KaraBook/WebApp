@@ -125,8 +125,8 @@ export default function Bookings() {
                       #{b._id.slice(-5)}
                     </td>
 
-                    <td className="px-4 py-3">
-                      <span onClick={() => setSelectedBooking(b)} className="pointer">{b.property?.propertyName || "—"}</span>
+                    <td className="px-4 py-3 cursor-pointer">
+                      <span onClick={() => setSelectedBooking(b)} className="cursor-pointer">{b.property?.propertyName || "—"}</span>
                     </td>
 
                     <td className="px-4 py-3">
