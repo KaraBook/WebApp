@@ -17,6 +17,7 @@ export default function Bookings() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [ratingBooking, setRatingBooking] = useState(null);
 
 
 
@@ -216,12 +217,11 @@ export default function Bookings() {
                               </div>
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setSelectedBooking({ ...b, rateMode: true })}>
+                          <DropdownMenuItem onClick={() => setRatingBooking(b)}>
                             <div className="flex items-center gap-2">
                               ⭐ Rate this Resort
                             </div>
                           </DropdownMenuItem>
-
                           <DropdownMenuItem
                             onClick={() =>
                               window.open(`tel:${b.property?.contactNumber}`)
@@ -393,45 +393,38 @@ export default function Bookings() {
           )}
 
 
-          {/* RATING POPUP */}
-          {selectedBooking?.rateMode && (
-            <Dialog open={true} onOpenChange={() => setSelectedBooking(null)}>
+          {ratingBooking && (
+            <Dialog open={true} onOpenChange={() => setRatingBooking(null)}>
               <DialogContent className="max-w-md p-6 rounded-none mt-[2rem]">
                 <DialogHeader>
                   <DialogTitle className="text-xl font-semibold">Rate this Resort</DialogTitle>
                 </DialogHeader>
 
                 <div className="mt-4 space-y-4">
-                  {/* STAR SELECTION */}
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className={`w-6 h-6 cursor-pointer ${star <= (selectedBooking.rating || 0)
-                            ? "text-black fill-black"
-                            : "text-gray-400"
+                        className={`w-6 h-6 cursor-pointer ${star <= (ratingBooking.rating || 0)
+                          ? "text-black fill-black"
+                          : "text-gray-400"
                           }`}
                         onClick={() =>
-                          setSelectedBooking((sb) => ({ ...sb, rating: star }))
+                          setRatingBooking((rb) => ({ ...rb, rating: star }))
                         }
                       />
                     ))}
                   </div>
 
-                  {/* COMMENT BOX */}
                   <textarea
                     className="w-full border p-3"
                     rows="3"
                     placeholder="Write your review..."
                     onChange={(e) =>
-                      setSelectedBooking((sb) => ({
-                        ...sb,
-                        comment: e.target.value,
-                      }))
+                      setRatingBooking((rb) => ({ ...rb, comment: e.target.value }))
                     }
                   />
 
-                  {/* SUBMIT BTN */}
                   <button
                     className="w-full bg-primary text-white py-3 rounded-none"
                     onClick={async () => {
@@ -439,22 +432,18 @@ export default function Bookings() {
                         await Axios.post(
                           SummaryApi.addReview.url,
                           {
-                            propertyId: selectedBooking.property?._id,
-                            bookingId: selectedBooking._id,
-                            rating: selectedBooking.rating,
-                            comment: selectedBooking.comment,
+                            propertyId: ratingBooking.property?._id,
+                            bookingId: ratingBooking._id,
+                            rating: ratingBooking.rating,
+                            comment: ratingBooking.comment,
                           },
-                          {
-                            headers: { Authorization: `Bearer ${accessToken}` },
-                          }
+                          { headers: { Authorization: `Bearer ${accessToken}` } }
                         );
 
                         toast.success("Review submitted!");
-                        setSelectedBooking(null);
+                        setRatingBooking(null);
                       } catch (err) {
-                        toast.error(
-                          err.response?.data?.message || "Failed to submit review"
-                        );
+                        toast.error(err.response?.data?.message || "Failed to submit review");
                       }
                     }}
                   >
