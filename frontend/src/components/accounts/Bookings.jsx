@@ -2,16 +2,13 @@ import { useEffect, useState } from "react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import { Phone, MoreVertical, Download, FileDown } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
+import { Phone, MoreVertical, Download, FileDown, Eye } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent} from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 
 export default function Bookings() {
   const { accessToken } = useAuthStore();
@@ -19,6 +16,8 @@ export default function Bookings() {
   const [openGuestRow, setOpenGuestRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
 
 
 
@@ -205,6 +204,11 @@ export default function Bookings() {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent className="shadow-md border bg-white p-1">
+                          <DropdownMenuItem onClick={() => setSelectedBooking(b)}>
+                            <div className="flex items-center gap-2">
+                              <Eye size={16} /> View Booking
+                            </div>
+                          </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link to={`/account/invoice/${b._id}`}>
                               <div className="flex items-center gap-2">
@@ -232,6 +236,99 @@ export default function Bookings() {
               })}
             </tbody>
           </table>
+
+          {/* BOOKING DETAILS POPUP */}
+          {selectedBooking && (
+            <Dialog open={true} onOpenChange={() => setSelectedBooking(null)}>
+              <DialogContent className="max-w-lg p-6 rounded-none">
+
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold">
+                    Booking Details
+                  </DialogTitle>
+                </DialogHeader>
+
+                {/* PROPERTY INFO */}
+                <div className="flex gap-4 items-center border-b pb-4">
+                  <img
+                    src={selectedBooking.property?.coverImage}
+                    alt="property"
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                  <div>
+                    <p className="font-semibold text-lg">
+                      {selectedBooking.property?.propertyName}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      {selectedBooking.property?.city}, {selectedBooking.property?.state}
+                    </p>
+                  </div>
+                </div>
+
+                {/* DETAILS GRID */}
+                <div className="grid grid-cols-2 gap-4 text-sm mt-4">
+
+                  <div>
+                    <p className="font-medium">Check-in</p>
+                    <p className="text-gray-700">
+                      {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium">Check-out</p>
+                    <p className="text-gray-700">
+                      {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium">Nights</p>
+                    <p>{selectedBooking.totalNights}</p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium">Payment Status</p>
+                    <p className="capitalize">{selectedBooking.paymentStatus}</p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium">Booking Date</p>
+                    <p>{format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}</p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium">Amount</p>
+                    <p>₹{selectedBooking.totalAmount.toLocaleString()}</p>
+                  </div>
+
+                </div>
+
+                {/* GUESTS */}
+                <div className="mt-4 border-t pt-4 text-sm">
+                  <p className="font-medium mb-1">Guests</p>
+                  <ul className="space-y-1 ml-2">
+                    <li>Adults: {selectedBooking.guests.adults}</li>
+                    <li>Children: {selectedBooking.guests.children}</li>
+                    <li>Infants: {selectedBooking.guests.infants}</li>
+                  </ul>
+                </div>
+
+                {/* Close Button */}
+                <div className="mt-6 text-right">
+                  <button
+                    onClick={() => setSelectedBooking(null)}
+                    className="px-4 py-2 bg-primary text-white rounded-none"
+                  >
+                    Close
+                  </button>
+                </div>
+
+              </DialogContent>
+            </Dialog>
+          )}
+
+
           {/* PAGINATION */}
           {totalPages > 1 && (
             <div className="flex justify-end items-center my-4 gap-2 px-2">
