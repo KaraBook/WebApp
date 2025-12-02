@@ -313,6 +313,13 @@ export default function Bookings() {
                         </p>
                       </div>
 
+                      <div>
+                        <p className="text-gray-500 text-xs uppercase">SubTotal</p>
+                        <p className="text-base font-medium font-bold mt-1">
+                          ₹{selectedBooking.totalAmount.toLocaleString()}
+                        </p>
+                      </div>
+
                     </div>
                   </div>
 
