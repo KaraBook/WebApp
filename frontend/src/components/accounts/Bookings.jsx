@@ -239,7 +239,7 @@ export default function Bookings() {
 
           {/* BOOKING DETAILS POPUP */}
           {selectedBooking && (
-            <Dialog open={true} onOpenChange={() => setSelectedBooking(null)}>
+            <Dialog open={true} onOpenChange={() => setSelectedBooking(null)} className="mt-[2rem]">
               <DialogContent className="max-w-3xl p-6 rounded-none">
 
                 <DialogHeader>
@@ -315,7 +315,7 @@ export default function Bookings() {
 
                       <div>
                         <p className="text-gray-500 text-xs uppercase">SubTotal</p>
-                        <p className="text-base font-medium font-bold mt-1">
+                        <p className="text-base font-semibold mt-1">
                           ₹{selectedBooking.totalAmount.toLocaleString()}
                         </p>
                       </div>
