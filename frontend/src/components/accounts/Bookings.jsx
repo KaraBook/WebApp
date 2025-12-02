@@ -340,6 +340,44 @@ export default function Bookings() {
                   </div>
                 </div>
 
+                {/* PRICE BREAKDOWN */}
+                <div className="mt-6">
+                  <h4 className="font-semibold text-gray-800 mb-2">Price Breakdown</h4>
+
+                  <div className="bg-white border rounded-md p-4 text-sm space-y-3">
+
+                    {/* Subtotal */}
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="font-medium">
+                        ₹{selectedBooking.totalAmount.toLocaleString()}
+                      </span>
+                    </div>
+
+                    {/* Tax */}
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">
+                        Tax (10%)
+                      </span>
+                      <span className="font-medium">
+                        ₹{Math.round(selectedBooking.totalAmount * 0.10).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="border-t pt-3"></div>
+
+                    {/* Grand Total */}
+                    <div className="flex justify-between text-base font-semibold">
+                      <span>Total</span>
+                      <span className="text-[#233b19]">
+                        ₹{(selectedBooking.totalAmount + Math.round(selectedBooking.totalAmount * 0.10))
+                          .toLocaleString()}
+                      </span>
+                    </div>
+
+                  </div>
+                </div>
+
               </DialogContent>
             </Dialog>
           )}
