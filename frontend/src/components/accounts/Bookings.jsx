@@ -246,123 +246,97 @@ export default function Bookings() {
                   <DialogTitle className="text-xl font-semibold">Booking Details</DialogTitle>
                 </DialogHeader>
 
-                {/* GRID LAYOUT — LEFT + RIGHT */}
+                {/* PROPERTY DETAILS */}
+                <div className="flex gap-4 items-center border-b pb-4 mb-4">
+                  <img
+                    src={selectedBooking.property?.coverImage}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                  <div>
+                    <p className="font-semibold text-lg">{selectedBooking.property?.propertyName}</p>
+                    <p className="text-gray-600 text-sm">
+                      {selectedBooking.property?.city}, {selectedBooking.property?.state}
+                    </p>
+                  </div>
+                </div>
+
+                {/* ROW 1 — STAY DETAILS + PRICE BREAKDOWN */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                  {/* LEFT SIDE — DETAILS */}
-                  <div className="md:col-span-2 space-y-6">
+                  {/* LEFT SIDE — STAY DETAILS */}
+                  <div className="md:col-span-2 bg-gray-50 p-4 rounded-md border">
+                    <h4 className="font-semibold mb-3">Stay Details</h4>
 
-                    {/* PROPERTY */}
-                    <div className="flex gap-4 items-center border-b pb-4">
-                      <img
-                        src={selectedBooking.property?.coverImage}
-                        className="w-20 h-20 object-cover rounded"
-                      />
+                    <div className="grid grid-cols-2 gap-6 text-sm">
+
                       <div>
-                        <p className="font-semibold text-lg">{selectedBooking.property?.propertyName}</p>
-                        <p className="text-gray-600 text-sm">
-                          {selectedBooking.property?.city}, {selectedBooking.property?.state}
+                        <p className="text-gray-500 text-xs uppercase">Check-in</p>
+                        <p className="text-base font-medium mt-1">
+                          {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
                         </p>
                       </div>
-                    </div>
 
-                    {/* BOOKING DETAILS */}
-                    <div className="bg-gray-50 p-4 rounded-md border">
-                      <h4 className="font-semibold mb-3">Stay Details</h4>
+                      <div>
+                        <p className="text-gray-500 text-xs uppercase">Check-out</p>
+                        <p className="text-base font-medium mt-1">
+                          {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
+                        </p>
+                      </div>
 
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-500 text-xs uppercase">Nights</p>
+                        <p className="text-base mt-1 font-semibold text-[#233b19]">
+                          {selectedBooking.totalNights}
+                        </p>
+                      </div>
 
-                        <div>
-                          <p className="text-gray-500 text-xs uppercase">Check-in</p>
-                          <p className="text-base mt-1 font-medium">
-                            {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-gray-500 text-xs uppercase">Check-out</p>
-                          <p className="text-base mt-1 font-medium">
-                            {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-gray-500 text-xs uppercase">Nights</p>
-                          <p className="text-base mt-1 font-semibold text-[#233b19]">
-                            {selectedBooking.totalNights}
-                          </p>
-                        </div>
-
-                        <div>
-                          <p className="text-gray-500 text-xs uppercase">Payment</p>
-                          <span className={`inline-block mt-1 px-2 py-1 text-xs font-semibold rounded
+                      <div>
+                        <p className="text-gray-500 text-xs uppercase">Payment</p>
+                        <span
+                          className={`inline-block mt-1 px-2 py-1 text-xs font-semibold rounded
               ${selectedBooking.paymentStatus === "paid"
                               ? "bg-green-100 text-green-700"
                               : selectedBooking.paymentStatus === "pending"
                                 ? "bg-yellow-100 text-yellow-700"
                                 : "bg-red-100 text-red-700"
                             }
-            `}>
-                            {selectedBooking.paymentStatus.toUpperCase()}
-                          </span>
-                        </div>
-
-                        <div>
-                          <p className="text-gray-500 text-xs uppercase">Booking Date</p>
-                          <p className="text-base mt-1 font-medium">
-                            {format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}
-                          </p>
-                        </div>
+            `}
+                        >
+                          {selectedBooking.paymentStatus.toUpperCase()}
+                        </span>
                       </div>
-                    </div>
 
-                    {/* GUESTS */}
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
-                      <div className="bg-white border rounded-md p-4 text-sm space-y-1">
-                        <p>Adults: {selectedBooking.guests.adults}</p>
-                        <p>Children: {selectedBooking.guests.children}</p>
-                        <p>Infants: {selectedBooking.guests.infants}</p>
+                      <div>
+                        <p className="text-gray-500 text-xs uppercase">Booking Date</p>
+                        <p className="text-base font-medium mt-1">
+                          {format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}
+                        </p>
                       </div>
-                    </div>
 
-                    {/* TRAVELLER DETAILS */}
-                    <div>
-                      <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
-                      <div className="bg-white border rounded-md p-4 text-sm space-y-1">
-                        <p>Name: {selectedBooking.user?.fullName || "—"}</p>
-                        <p>Phone: {selectedBooking.user?.phone || "—"}</p>
-                        <p>Email: {selectedBooking.user?.email || "—"}</p>
-                      </div>
                     </div>
-
                   </div>
 
                   {/* RIGHT SIDE — PRICE BREAKDOWN */}
-                  <div className="bg-white border rounded-md h-fit p-4 space-y-4 shadow-sm">
+                  <div className="bg-white border rounded-md p-4 h-fit shadow-sm">
+                    <h4 className="font-semibold mb-2">Price Breakdown</h4>
 
-                    <h4 className="font-semibold text-gray-800">Price Breakdown</h4>
-
-                    {/* Subtotal */}
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Subtotal</span>
                       <span className="font-medium">
                         ₹{selectedBooking.totalAmount.toLocaleString()}
                       </span>
                     </div>
 
-                    {/* Tax */}
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-sm mt-2">
                       <span className="text-gray-600">Tax (10%)</span>
                       <span className="font-medium">
                         ₹{Math.round(selectedBooking.totalAmount * 0.10).toLocaleString()}
                       </span>
                     </div>
 
-                    <div className="border-t pt-3"></div>
+                    <div className="border-t my-3"></div>
 
-                    {/* Total */}
-                    <div className="flex justify-between text-lg font-semibold text-[#233b19]">
+                    <div className="flex justify-between text-base font-semibold text-[#233b19]">
                       <span>Total</span>
                       <span>
                         ₹{(
@@ -371,8 +345,35 @@ export default function Bookings() {
                         ).toLocaleString()}
                       </span>
                     </div>
-
                   </div>
+
+                </div>
+
+                {/* ROW 2 — GUESTS + TRAVELLER DETAILS */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+
+                  {/* LEFT — GUESTS */}
+                  <div className="md:col-span-2 bg-white border rounded-md p-4">
+                    <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
+
+                    <div className="text-sm space-y-1">
+                      <p>Adults: {selectedBooking.guests.adults}</p>
+                      <p>Children: {selectedBooking.guests.children}</p>
+                      <p>Infants: {selectedBooking.guests.infants}</p>
+                    </div>
+                  </div>
+
+                  {/* RIGHT — TRAVELLER DETAILS */}
+                  <div className="bg-white border rounded-md p-4">
+                    <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
+
+                    <div className="text-sm space-y-1">
+                      <p>Name: {selectedBooking.user?.fullName || "—"}</p>
+                      <p>Phone: {selectedBooking.user?.phone || "—"}</p>
+                      <p>Email: {selectedBooking.user?.email || "—"}</p>
+                    </div>
+                  </div>
+
                 </div>
 
               </DialogContent>
