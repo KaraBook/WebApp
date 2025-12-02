@@ -3,7 +3,7 @@ import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
 import { Phone, MoreVertical, Download, FileDown, Eye } from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
@@ -266,62 +266,78 @@ export default function Bookings() {
                 </div>
 
                 {/* DETAILS GRID */}
-                <div className="grid grid-cols-2 gap-4 text-sm mt-4">
+                <div className="mt-5 bg-gray-50 p-4 rounded-md border">
 
-                  <div>
-                    <p className="font-medium">Check-in</p>
-                    <p className="text-gray-700">
-                      {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
-                    </p>
+                  <div className="grid grid-cols-2 gap-6 text-sm">
+
+                    {/* Check-in */}
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase tracking-wide">Check-in</p>
+                      <p className="text-base font-medium mt-1">
+                        {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
+                      </p>
+                    </div>
+
+                    {/* Check-out */}
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase tracking-wide">Check-out</p>
+                      <p className="text-base font-medium mt-1">
+                        {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
+                      </p>
+                    </div>
+
+                    {/* Nights */}
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase tracking-wide">Nights</p>
+                      <p className="text-base mt-1 font-semibold text-[#233b19]">
+                        {selectedBooking.totalNights}
+                      </p>
+                    </div>
+
+                    {/* Payment Status */}
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase tracking-wide">Payment</p>
+                      <span
+                        className={`
+          inline-block mt-1 px-2 py-1 text-xs font-semibold rounded 
+          ${selectedBooking.paymentStatus === "paid"
+                            ? "bg-green-100 text-green-700"
+                            : selectedBooking.paymentStatus === "pending"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-700"}
+        `}
+                      >
+                        {selectedBooking.paymentStatus.toUpperCase()}
+                      </span>
+                    </div>
+
+                    {/* Booking Date */}
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase tracking-wide">Booking Date</p>
+                      <p className="text-base font-medium mt-1">
+                        {format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}
+                      </p>
+                    </div>
+
+                    {/* Amount */}
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase tracking-wide">Amount</p>
+                      <p className="text-base font-semibold text-[#233b19] mt-1">
+                        ₹{selectedBooking.totalAmount.toLocaleString()}
+                      </p>
+                    </div>
+
                   </div>
-
-                  <div>
-                    <p className="font-medium">Check-out</p>
-                    <p className="text-gray-700">
-                      {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="font-medium">Nights</p>
-                    <p>{selectedBooking.totalNights}</p>
-                  </div>
-
-                  <div>
-                    <p className="font-medium">Payment Status</p>
-                    <p className="capitalize">{selectedBooking.paymentStatus}</p>
-                  </div>
-
-                  <div>
-                    <p className="font-medium">Booking Date</p>
-                    <p>{format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}</p>
-                  </div>
-
-                  <div>
-                    <p className="font-medium">Amount</p>
-                    <p>₹{selectedBooking.totalAmount.toLocaleString()}</p>
-                  </div>
-
                 </div>
 
                 {/* GUESTS */}
-                <div className="mt-4 border-t pt-4 text-sm">
-                  <p className="font-medium mb-1">Guests</p>
-                  <ul className="space-y-1 ml-2">
-                    <li>Adults: {selectedBooking.guests.adults}</li>
-                    <li>Children: {selectedBooking.guests.children}</li>
-                    <li>Infants: {selectedBooking.guests.infants}</li>
-                  </ul>
-                </div>
-
-                {/* Close Button */}
-                <div className="mt-6 text-right">
-                  <button
-                    onClick={() => setSelectedBooking(null)}
-                    className="px-4 py-2 bg-primary text-white rounded-none"
-                  >
-                    Close
-                  </button>
+                <div className="mt-6">
+                  <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
+                  <div className="bg-white border rounded-md p-4 text-sm space-y-1">
+                    <p> Adults: {selectedBooking.guests.adults}</p>
+                    <p> Children: {selectedBooking.guests.children}</p>
+                    <p> Infants: {selectedBooking.guests.infants}</p>
+                  </div>
                 </div>
 
               </DialogContent>
