@@ -76,9 +76,7 @@ export default function InvoicePage() {
     ? invoice.priceBreakdown
     : [];
 
-  const rawSubtotal = breakdown.length > 0
-    ? Number(breakdown[0].total.replace(/₹|,/g, ""))
-    : Number(invoice.totalAmount || 0);
+  const rawSubtotal = Number(invoice.totalAmount);
 
   const tax = Math.round(rawSubtotal * 0.10);
   const grandTotal = rawSubtotal + tax;

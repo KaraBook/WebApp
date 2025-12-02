@@ -28,7 +28,12 @@ export const createOrder = async (req, res) => {
     while (d < end) {
       const day = d.getDay();
       const isWeekend = day === 0 || day === 6;
-      backendTotal += isWeekend ? weekend : weekday;
+      let todayPrice = isWeekend ? weekend : weekday;
+      const totalGuests = guests.adults + guests.children;
+      const allowedGuests = property.defaultGuests || 2;
+      const extraGuests = Math.max(0, totalGuests - allowedGuests);
+      const extraCharge = extraGuests * (property.extraGuestCharge || 0);
+      backendTotal += todayPrice + extraCharge;
       d.setDate(d.getDate() + 1);
     }
 
@@ -238,8 +243,7 @@ export const getBookingInvoice = async (req, res) => {
     );
 
     const subtotal = Number(booking.totalAmount);
-
-    const perNight = Math.round(subtotal / booking.totalNights);
+    const perNight = Math.floor(subtotal / booking.totalNights);
 
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
