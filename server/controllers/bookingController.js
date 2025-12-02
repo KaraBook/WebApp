@@ -53,7 +53,7 @@ export const createOrder = async (req, res) => {
       totalNights: Math.ceil(
         (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
       ),
-      totalAmount: backendTotal,  
+      totalAmount: backendTotal,
       orderId: order.id,
       contactNumber,
     });
@@ -130,12 +130,11 @@ Your stay at *${booking.propertyId.propertyName}* is confirmed!
 
 📅 *Check-in:* ${new Date(booking.checkIn).toLocaleDateString("en-IN")}
 📅 *Check-out:* ${new Date(booking.checkOut).toLocaleDateString("en-IN")}
-🧍‍♂️ *Guests:* ${
-  typeof booking.guests === "number"
-    ? booking.guests
-    : `${booking.guests.adults + booking.guests.children} Guests` +
-      (booking.guests.infants ? ` + ${booking.guests.infants} Infants` : "")
-}
+🧍‍♂️ *Guests:* ${typeof booking.guests === "number"
+            ? booking.guests
+            : `${booking.guests.adults + booking.guests.children} Guests` +
+            (booking.guests.infants ? ` + ${booking.guests.infants} Infants` : "")
+          }
 💰 *Amount Paid:* ₹${booking.totalAmount.toLocaleString("en-IN")}
 📍 *Location:* ${booking.propertyId.city}, ${booking.propertyId.state}
 
@@ -238,19 +237,7 @@ export const getBookingInvoice = async (req, res) => {
       booking.propertyId.pricingPerNightWeekend || weekdayPrice
     );
 
-    let subtotal = 0;
-
-    let d = new Date(booking.checkIn);
-    const end = new Date(booking.checkOut);
-
-    while (d < end) {
-      const day = d.getDay(); 
-      const isWeekend = day === 0 || day === 6;
-
-      subtotal += isWeekend ? weekendPrice : weekdayPrice;
-
-      d.setDate(d.getDate() + 1);
-    }
+    const subtotal = Number(booking.totalAmount);
 
     const perNight = Math.round(subtotal / booking.totalNights);
 
