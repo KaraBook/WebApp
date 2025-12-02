@@ -126,7 +126,7 @@ export default function Bookings() {
                     </td>
 
                     <td className="px-4 py-3">
-                      <span onClick={() => setSelectedBooking(b)}>{b.property?.propertyName || "—"}</span>
+                      <span onClick={() => setSelectedBooking(b)} className="pointer">{b.property?.propertyName || "—"}</span>
                     </td>
 
                     <td className="px-4 py-3">
@@ -173,7 +173,7 @@ export default function Bookings() {
                       ₹{b.totalAmount.toLocaleString()}
                     </td>
 
-                    <td className="px-4 py-3 relative group cursor-default">
+                   <td className="px-4 py-3 relative group cursor-default flex justify-center">
                       <span
                         className={`inline-block w-3 h-3 rounded-full ${statusDot(
                           b.paymentStatus
