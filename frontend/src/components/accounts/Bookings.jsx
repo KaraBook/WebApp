@@ -126,7 +126,7 @@ export default function Bookings() {
                     </td>
 
                     <td className="px-4 py-3">
-                      {b.property?.propertyName || "—"}
+                      <span onClick={() => setSelectedBooking(b)}>{b.property?.propertyName || "—"}</span>
                     </td>
 
                     <td className="px-4 py-3">
