@@ -14,11 +14,26 @@ const razorpay = new Razorpay({
 
 export const createOrder = async (req, res) => {
   try {
-    const { propertyId, totalAmount, checkIn, checkOut, guests, contactNumber } = req.body;
+    const { propertyId, checkIn, checkOut, guests, contactNumber } = req.body;
     const userId = req.user.id;
 
+    const property = await Property.findById(propertyId).lean();
+    const weekday = Number(property.pricingPerNightWeekdays);
+    const weekend = Number(property.pricingPerNightWeekend || weekday);
+
+    let backendTotal = 0;
+    let d = new Date(checkIn);
+    const end = new Date(checkOut);
+
+    while (d < end) {
+      const day = d.getDay();
+      const isWeekend = day === 0 || day === 6;
+      backendTotal += isWeekend ? weekend : weekday;
+      d.setDate(d.getDate() + 1);
+    }
+
     const options = {
-      amount: Math.round(totalAmount * 100),
+      amount: backendTotal * 100,
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
     };
@@ -38,7 +53,7 @@ export const createOrder = async (req, res) => {
       totalNights: Math.ceil(
         (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
       ),
-      totalAmount,
+      totalAmount: backendTotal,  
       orderId: order.id,
       contactNumber,
     });
@@ -49,6 +64,7 @@ export const createOrder = async (req, res) => {
     res.status(500).json({ success: false, message: "Order creation failed" });
   }
 };
+
 
 
 export const verifyPayment = async (req, res) => {
