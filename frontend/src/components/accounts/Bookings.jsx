@@ -266,7 +266,7 @@ export default function Bookings() {
                 </div>
 
                 {/* DETAILS GRID */}
-                <div className="mt-3 bg-gray-50 p-4 rounded-md border">
+                <div className="mt-2 bg-gray-50 p-4 rounded-md border">
 
                   <div className="grid grid-cols-2 gap-6 text-sm">
 
@@ -331,7 +331,7 @@ export default function Bookings() {
                 </div>
 
                 {/* GUESTS */}
-                <div className="mt-3">
+                <div className="mt-2">
                   <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
                   <div className="bg-white border rounded-md p-4 text-sm space-y-1">
                     <p> Adults: {selectedBooking.guests.adults}</p>
