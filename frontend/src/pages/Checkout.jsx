@@ -127,7 +127,6 @@ export default function Checkout() {
         try {
             const res = await Axios.post(SummaryApi.createBookingOrder.url, {
                 propertyId,
-                totalAmount: total,
                 checkIn: startDate,
                 checkOut: endDate,
                 guests: guestData,

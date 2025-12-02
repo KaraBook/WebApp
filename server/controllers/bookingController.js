@@ -21,7 +21,11 @@ export const createOrder = async (req, res) => {
     const weekday = Number(property.pricingPerNightWeekdays);
     const weekend = Number(property.pricingPerNightWeekend || weekday);
 
+    let d = new Date(checkIn);
+    const end = new Date(checkOut);
+
     let baseTotal = 0;
+
     while (d < end) {
       const day = d.getDay();
       const isWeekend = day === 0 || day === 6;
@@ -54,17 +58,24 @@ export const createOrder = async (req, res) => {
       totalNights: Math.ceil(
         (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
       ),
-      totalAmount: baseTotal,
+
+      totalAmount: baseTotal,   
+
+      taxAmount: tax,          
+      grandTotal: grandTotal,  
+
       orderId: order.id,
       contactNumber,
     });
 
     res.json({ success: true, order, booking });
+
   } catch (err) {
-    console.error(err);
+    console.error("❌ createOrder error:", err);
     res.status(500).json({ success: false, message: "Order creation failed" });
   }
 };
+
 
 
 
