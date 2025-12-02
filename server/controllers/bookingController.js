@@ -192,7 +192,10 @@ export const getBookingInvoice = async (req, res) => {
 
     const booking = await Booking.findById(bookingId)
       .populate("userId", "firstName lastName email mobile")
-      .populate("propertyId", "propertyName address city state ownerUserId resortOwner pricingPerNightWeekdays");
+      .populate(
+        "propertyId",
+        "propertyName address city state ownerUserId resortOwner pricingPerNightWeekdays pricingPerNightWeekend"
+      );
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
@@ -207,13 +210,33 @@ export const getBookingInvoice = async (req, res) => {
         property.resortOwner?.email === req.user.email;
 
       if (!isOwner) {
-        return res.status(403).json({ success: false, message: "Access denied — not your booking" });
+        return res.status(403).json({
+          success: false,
+          message: "Access denied — not your booking",
+        });
       }
     }
 
+    const weekdayPrice = Number(booking.propertyId.pricingPerNightWeekdays);
+    const weekendPrice = Number(
+      booking.propertyId.pricingPerNightWeekend || weekdayPrice
+    );
 
-    if (req.user.role === "traveller") {
+    let subtotal = 0;
+
+    let d = new Date(booking.checkIn);
+    const end = new Date(booking.checkOut);
+
+    while (d < end) {
+      const day = d.getDay(); 
+      const isWeekend = day === 0 || day === 6;
+
+      subtotal += isWeekend ? weekendPrice : weekdayPrice;
+
+      d.setDate(d.getDate() + 1);
     }
+
+    const perNight = Math.round(subtotal / booking.totalNights);
 
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
@@ -236,15 +259,18 @@ export const getBookingInvoice = async (req, res) => {
       priceBreakdown: [
         {
           description: "Room Charges",
-          rate: `₹${booking.propertyId.pricingPerNightWeekdays.toLocaleString()} × ${booking.totalNights} Nights`,
-          total: `₹${booking.totalAmount.toLocaleString()}`,
+          rate: `₹${perNight.toLocaleString()} × ${booking.totalNights} Nights`,
+          total: `₹${subtotal.toLocaleString()}`,
         },
       ],
     };
 
-    res.json({ success: true, data: invoiceData });
+    return res.json({ success: true, data: invoiceData });
   } catch (err) {
     console.error("Invoice error:", err);
-    res.status(500).json({ success: false, message: "Failed to generate invoice" });
+    res.status(500).json({
+      success: false,
+      message: "Failed to generate invoice",
+    });
   }
 };
