@@ -136,7 +136,9 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           </DialogTitle>
 
           <DialogDescription className="text-[14px] text-gray-600 mt-1">
-            Enter your mobile number to continue.
+            {step === "phone"
+              ? "Enter your mobile number to continue."
+              : `OTP sent to +91 ${phone}. Enter the OTP to continue.`}
           </DialogDescription>
         </DialogHeader>
 
