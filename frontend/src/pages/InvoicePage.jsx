@@ -69,6 +69,18 @@ export default function InvoicePage() {
 
   if (!invoice) return <p className="text-center py-20 text-gray-500">Loading...</p>;
 
+  const breakdown = Array.isArray(invoice.priceBreakdown)
+    ? invoice.priceBreakdown
+    : [];
+
+  const rawSubtotal = breakdown.length > 0
+    ? Number(breakdown[0].total.replace(/₹|,/g, ""))
+    : Number(invoice.totalAmount || 0);
+
+  const tax = Math.round(rawSubtotal * 0.10);
+  const grandTotal = rawSubtotal + tax;
+
+
   return (
     <div className="min-h-screen flex flex-col items-start py-4 px-4">
       <div className="max-w-3xl w-full py-4 flex items-start justify-between">
@@ -159,10 +171,10 @@ export default function InvoicePage() {
         </table>
 
         <div className="text-right text-sm">
-          <p><strong>SubTotal:</strong> ₹{invoice.totalAmount.toLocaleString()}</p>
-          <p><strong>Tax (10%):</strong> ₹{(invoice.totalAmount * 0.1).toLocaleString()}</p>
+          <p><strong>Sub Total:</strong> ₹{rawSubtotal.toLocaleString()}</p>
+          <p><strong>Tax (10%):</strong> ₹{tax.toLocaleString()}</p>
           <p className="text-lg font-semibold text-gray-900 mt-1">
-            Grand Total: ₹{(invoice.totalAmount * 1.1).toLocaleString()}
+            Grand Total: ₹{grandTotal.toLocaleString()}
           </p>
         </div>
 
