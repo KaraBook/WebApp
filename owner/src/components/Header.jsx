@@ -82,7 +82,6 @@ export default function Header() {
       {/* LOGO */}
       <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[150px]" />
 
-      {/* NAVIGATION */}
       <nav className="hidden md:flex items-center gap-6">
         {navItems.map((item) => {
           const active =
@@ -90,7 +89,6 @@ export default function Header() {
               ? isPropertyActive
               : location.pathname === item.path;
 
-          // Special handling for Property item
           if (item.label === "Property") {
             return (
               <button
@@ -121,7 +119,6 @@ export default function Header() {
         })}
       </nav>
 
-      {/* PROFILE */}
       {/* PROFILE */}
       <div className="relative flex items-center gap-3" ref={dropdownRef}>
         <div

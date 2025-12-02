@@ -307,7 +307,6 @@ export default function OwnerBookings() {
                       </td>
 
                       <td className="py-3 px-4 flex items-center gap-1 font-medium">
-                        <IndianRupee size={14} className="text-primary" />
                         {formatCurrency(b.totalAmount)}
                       </td>
 

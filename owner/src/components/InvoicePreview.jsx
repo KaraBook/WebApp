@@ -9,6 +9,14 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
     ? invoice.priceBreakdown
     : [];
 
+  const rawSubtotal = breakdown.length > 0
+    ? Number(breakdown[0].total.replace(/₹|,/g, ""))
+    : Number(invoice.totalAmount);
+
+  const tax = Math.round(rawSubtotal * 0.10);
+  const grandTotal = rawSubtotal + tax;
+
+
   return (
     <div
       ref={ref}
@@ -104,10 +112,10 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       </table>
 
       <div className="text-right text-sm">
-        <p><strong>Sub Total:</strong> ₹{invoice.totalAmount?.toLocaleString() || "0"}</p>
-        <p><strong>Tax (10%):</strong> ₹{(invoice.totalAmount * 0.1).toLocaleString()}</p>
+        <p><strong>Sub Total:</strong> ₹{rawSubtotal.toLocaleString()}</p>
+        <p><strong>Tax (10%):</strong> ₹{tax.toLocaleString()}</p>
         <p className="text-lg font-semibold mt-1">
-          Grand Total: ₹{(invoice.totalAmount * 1.1).toLocaleString()}
+          Grand Total: ₹{grandTotal.toLocaleString()}
         </p>
       </div>
 
