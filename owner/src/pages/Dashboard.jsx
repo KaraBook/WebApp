@@ -256,8 +256,8 @@ export default function Dashboard() {
         {/* Title */}
         <div>
           <h1 className="text-[26px] font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-500">
-            Welcome {user?.firstName ? `, ${user.firstName}` : ""} at {data?.propertyName || "your resort dashboard"}!
+          <p className="text-[16px] text-gray-500">
+            Welcome {user?.firstName ? `, ${user.firstName}` : ""} at {data?.property?.propertyName ?? "your resort dashboard"}!
           </p>
         </div>
 
