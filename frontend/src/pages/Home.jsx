@@ -78,7 +78,7 @@ export default function Home() {
       </section>
 
       {/* SECTION : Find Your Perfect Stay */}
-      <section className="w-full bg-[#faf7f4] py-[20px] md:py-[60px] mt-[250px] px-4 md:px-12">
+      <section className="w-full bg-[#faf7f4] py-[20px] md:py-[80px] mt-[200px] px-4 md:px-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10">
 
           {/* LEFT TEXT BLOCK */}
