@@ -9,9 +9,7 @@ import SummaryApi from "@/common/SummaryApi";
 import Axios from "@/utils/Axios";
 import { STATE_CODE_TO_NAME } from "@/utils/stateMap";
 
-
 export default function PropertyFilters({ onFilter, defaultValues = {} }) {
-
     const [locationTree, setLocationTree] = useState([]);
 
     const [states, setStates] = useState([]);
@@ -47,76 +45,25 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             try {
                 const res = await Axios.get(SummaryApi.getUniqueLocations.url);
                 const data = res.data.data;
+
                 setLocationTree(data);
-                const st = data.map((item) => ({
-                    value: item.state,
-                    label: STATE_CODE_TO_NAME[item.state] || item.state,
-                }));
-                setStates(st);
+
+                setStates(
+                    data.map((item) => ({
+                        value: item.state,
+                        label: STATE_CODE_TO_NAME[item.state] || item.state,
+                    }))
+                );
             } catch (err) {
-                console.error("Location load error", err);
+                console.error("Failed to load locations", err);
             }
         }
-
         loadLocations();
     }, []);
 
 
     useEffect(() => {
-        if (!locationTree.length || !defaultValues.state) return;
-        const stateObj = {
-            value: defaultValues.state,
-            label: STATE_CODE_TO_NAME[defaultValues.state] || defaultValues.state
-        };
-        setSelectedState(stateObj);
-
-        const stateData = locationTree.find(s => s.state === defaultValues.state);
-        if (!stateData) return;
-        const cityOptions = stateData.cities.map(c => ({
-            value: c.city,
-            label: c.city
-        }));
-        setCities(cityOptions);
-
-        if (defaultValues.city) {
-            const cityObj = { value: defaultValues.city, label: defaultValues.city };
-            setSelectedCity(cityObj);
-
-            const cityData = stateData.cities.find(c => c.city === defaultValues.city);
-            if (cityData) {
-                const areaOptions = cityData.areas.map(a => ({
-                    value: a,
-                    label: a
-                }));
-                setAreas(areaOptions);
-
-                if (defaultValues.area) {
-                    setSelectedArea({ value: defaultValues.area, label: defaultValues.area });
-                }
-            }
-        }
-
-        if (defaultValues.guests) {
-            setGuests(defaultValues.guests);
-        }
-        if (defaultValues.checkIn && defaultValues.checkOut) {
-            setDateRange([
-                {
-                    startDate: new Date(defaultValues.checkIn),
-                    endDate: new Date(defaultValues.checkOut),
-                    key: "selection",
-                },
-            ]);
-        }
-
-    }, [locationTree, defaultValues]);
-
-    useEffect(() => {
-        if (!selectedState) {
-            setCities([]);
-            setSelectedCity(null);
-            return;
-        }
+        if (!selectedState || !locationTree.length) return;
 
         const stateObj = locationTree.find((s) => s.state === selectedState.value);
         if (!stateObj) return;
@@ -129,36 +76,83 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
         setCities(cityOptions);
         setSelectedCity(null);
         setAreas([]);
+        setSelectedArea(null);
+    }, [selectedState, locationTree]);
 
-    }, [selectedState]);
-
- 
+  
     useEffect(() => {
-        if (!selectedState || !selectedCity) {
-            setAreas([]);
-            setSelectedArea(null);
-            return;
-        }
+        if (!selectedState || !selectedCity || !locationTree.length) return;
 
-        const stateObj = locationTree.find(s => s.state === selectedState.value);
-        const cityObj = stateObj?.cities.find(c => c.city === selectedCity.value);
+        const stateObj = locationTree.find((s) => s.state === selectedState.value);
+        const cityObj = stateObj?.cities.find((c) => c.city === selectedCity.value);
 
         if (!cityObj) return;
 
-        const areaOptions = cityObj.areas.map(a => ({
+        const areaOptions = cityObj.areas.map((a) => ({
             value: a,
-            label: a
+            label: a,
         }));
 
         setAreas(areaOptions);
+    }, [selectedCity, selectedState, locationTree]);
 
-    }, [selectedCity]);
+    useEffect(() => {
+        if (!locationTree.length || !defaultValues || !defaultValues.state) return;
+
+        const { state, city, area, guests: g, checkIn, checkOut } = defaultValues;
+
+        const foundState = locationTree.find((s) => s.state === state);
+        if (foundState) {
+            const stObj = {
+                value: foundState.state,
+                label: STATE_CODE_TO_NAME[foundState.state] || foundState.state,
+            };
+            setSelectedState(stObj);
+
+            const cityOptions = foundState.cities.map((c) => ({
+                value: c.city,
+                label: c.city,
+            }));
+            setCities(cityOptions);
+
+            if (city) {
+                const cityObj = { value: city, label: city };
+                setSelectedCity(cityObj);
+
+                const foundCity = foundState.cities.find((c) => c.city === city);
+
+                if (foundCity) {
+                    const areaOptions = foundCity.areas.map((a) => ({
+                        value: a,
+                        label: a,
+                    }));
+                    setAreas(areaOptions);
+
+                    if (area) {
+                        setSelectedArea({ value: area, label: area });
+                    }
+                }
+            }
+        }
+
+        if (g) setGuests(g);
+
+        if (checkIn && checkOut) {
+            setDateRange([
+                {
+                    startDate: new Date(checkIn),
+                    endDate: new Date(checkOut),
+                    key: "selection",
+                },
+            ]);
+        }
+    }, [defaultValues, locationTree]);
+
 
     useEffect(() => {
         const handler = (e) => {
-            if (!guestRef.current?.contains(e.target)) {
+            if (guestRef.current && !guestRef.current.contains(e.target))
                 setShowGuestBox(false);
-            }
         };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
@@ -166,15 +160,14 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
 
     useEffect(() => {
         const handler = (e) => {
-            if (!calendarRef.current?.contains(e.target)) {
+            if (calendarRef.current && !calendarRef.current.contains(e.target))
                 setShowCalendar(false);
-            }
         };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-  
+
     const applyFilters = () => {
         onFilter({
             state: selectedState?.value || "",
@@ -182,7 +175,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             area: selectedArea?.value || "",
             checkIn: dateRange[0].startDate,
             checkOut: dateRange[0].endDate,
-            guests
+            guests,
         });
     };
 
@@ -195,6 +188,21 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             paddingLeft: "8px",
             height: "40px",
             cursor: "pointer",
+            backgroundColor: "white",
+        }),
+        option: (provided, state) => ({
+            ...provided,
+            backgroundColor: state.isSelected
+                ? "#038ba0"
+                : state.isFocused
+                ? "#038ba02d"
+                : "white",
+            color: state.isSelected ? "#ffffff" : "#111827",
+            cursor: "pointer",
+        }),
+        menu: (provided) => ({
+            ...provided,
+            zIndex: 9999,
         }),
     };
 
