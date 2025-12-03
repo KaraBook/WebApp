@@ -243,7 +243,7 @@ export default function PropertyDetails() {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-[#233b19] font-sans">
+            <h1 className="text-3xl font-bold text-black font-sans">
               {property.propertyName}
             </h1>
 
@@ -418,7 +418,7 @@ export default function PropertyDetails() {
             <div className="sticky top-24 border shadow-xl p-6 bg-white">
 
               <div className="flex items-center justify-between">
-                <h3 className="text-3xl font-semibold text-[#233b19]">
+                <h3 className="text-3xl font-semibold text-black">
                   ₹{property.pricingPerNightWeekdays?.toLocaleString()}
                   <span className="text-sm text-gray-600 font-normal"> / night</span>
                 </h3>
