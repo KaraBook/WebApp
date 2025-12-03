@@ -90,6 +90,7 @@ const ViewProperty = () => {
     addressLine2,
     city,
     state,
+    area,
     pinCode,
     locationLink,
     roomBreakdown = { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
@@ -298,6 +299,7 @@ const ViewProperty = () => {
                 <Field label="City / State">
                   {city}, {state} {pinCode ? `- ${pinCode}` : ""}
                 </Field>
+                <Field label="Area">{area || "-"}</Field>
                 <Separator />
                 <Field label="Location Link">
                   {locationLink ? (
