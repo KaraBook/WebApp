@@ -101,6 +101,8 @@ export default function Dashboard() {
 
   const [data, setData] = useState(null);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
+  const [propertyName, setPropertyName] = useState("");
+
 
   const [propertyId, setPropertyId] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
@@ -127,6 +129,20 @@ export default function Dashboard() {
       finally {
         setLoadingDashboard(false);
       }
+    })();
+  }, []);
+
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get(SummaryApi.getOwnerProperties.url);
+        if (res.data?.data?.length) {
+          const firstProperty = res.data.data[0];
+          setPropertyId(firstProperty._id);
+          setPropertyName(firstProperty.propertyName);
+        }
+      } catch { }
     })();
   }, []);
 
@@ -178,35 +194,35 @@ export default function Dashboard() {
     });
 
   const isDateBooked = (date) => {
-  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
-  return bookedDates.some((range) => {
-    if (!range.start || !range.end) return false;
-    const startLocal = new Date(range.start);
-    const endLocal = new Date(range.end);
+    return bookedDates.some((range) => {
+      if (!range.start || !range.end) return false;
+      const startLocal = new Date(range.start);
+      const endLocal = new Date(range.end);
 
-    const start = new Date(
-      startLocal.getFullYear(),
-      startLocal.getMonth(),
-      startLocal.getDate()
-    );
+      const start = new Date(
+        startLocal.getFullYear(),
+        startLocal.getMonth(),
+        startLocal.getDate()
+      );
 
-    const end = new Date(
-      endLocal.getFullYear(),
-      endLocal.getMonth(),
-      endLocal.getDate()
-    );
+      const end = new Date(
+        endLocal.getFullYear(),
+        endLocal.getMonth(),
+        endLocal.getDate()
+      );
 
-    let current = new Date(start);
+      let current = new Date(start);
 
-    while (current.getTime() <= end.getTime()) {
-      if (current.getTime() === target) return true;
-      current.setDate(current.getDate() + 1);
-    }
+      while (current.getTime() <= end.getTime()) {
+        if (current.getTime() === target) return true;
+        current.setDate(current.getDate() + 1);
+      }
 
-    return false;
-  });
-};
+      return false;
+    });
+  };
 
 
 
@@ -257,7 +273,7 @@ export default function Dashboard() {
         <div>
           <h1 className="text-[26px] font-bold text-gray-900">Dashboard</h1>
           <p className="text-[16px] text-gray-500">
-            Welcome {user?.firstName ? `, ${user.firstName}` : ""} at {b.propertyId?.propertyName}!
+            Welcome {user?.firstName ? `, ${user.firstName}` : ""} at {propertyName}
           </p>
         </div>
 
