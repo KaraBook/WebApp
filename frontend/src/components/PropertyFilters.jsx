@@ -169,7 +169,7 @@ export default function PropertyFilters({ onFilter }) {
     return (
         <div className="w-full bg-white shadow-xl px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[20] border border-gray-100 overflow-visible">
             {/* State */}
-            <div className="flex-1 min-w-[180px] z-10">
+            <div className="flex-1 min-w-[150px] z-10">
                 <label className="text-[14px] text-black uppercase ml-1">State</label>
                 <Select
                     options={states}
@@ -196,7 +196,7 @@ export default function PropertyFilters({ onFilter }) {
             </div>
 
             {/* City */}
-            <div className="flex-1 min-w-[180px]">
+            <div className="flex-1 min-w-[150px]">
                 <label className="text-[14px] text-black uppercase ml-1">City</label>
                 <Select
                     options={cities}
@@ -224,7 +224,7 @@ export default function PropertyFilters({ onFilter }) {
             </div>
 
             {/* Area */}
-            <div className="flex-1 min-w-[180px]">
+            <div className="flex-1 min-w-[150px]">
                 <label className="text-[14px] text-black uppercase ml-1">Area</label>
                 <Select
                     options={areas}
@@ -242,7 +242,7 @@ export default function PropertyFilters({ onFilter }) {
             </div>
 
             {/* Date Range */}
-            <div className="flex-1 min-w-[220px] relative" ref={calendarRef}>
+            <div className="flex-1 min-w-[200px] relative" ref={calendarRef}>
                 <label className="text-[14px] text-black uppercase ml-1">Check-in - Check-out</label>
                 <div
                     className="flex items-center justify-between border border-gray-300 hover:border-primary px-4 py-2 mt-1 cursor-pointer transition-all duration-200"
