@@ -40,6 +40,10 @@ const baseFields = {
       "string.pattern.base":
         "Address Line 1 can include letters, numbers, spaces, and , . - # / &, but cannot be only digits or contain special symbols"
     }),
+  area: Joi.string().min(1).max(50).required()
+    .messages({
+      "string.empty": "Area is required"
+    }),
   addressLine2: Joi.string().max(100).allow(""),
   state: Joi.string()
     .pattern(/^[\p{L}]+(?:[\s][\p{L}]+)*$/u)

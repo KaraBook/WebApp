@@ -48,6 +48,11 @@ const propertySchema = new mongoose.Schema({
       "Address Line 1 can include letters, numbers, spaces, and , . - # / &, but cannot be only digits or contain special symbols"
     ]
   },
+  area: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   addressLine2: { type: String },
   state: {
     type: String,
@@ -115,13 +120,13 @@ const propertySchema = new mongoose.Schema({
     },
   },
   blockedDates: [
-  {
-    start: { type: Date, required: true },
-    end: { type: Date, required: true },
-    reason: { type: String, default: "" },
-    addedByOwner: { type: Boolean, default: true }
-  }
-],
+    {
+      start: { type: Date, required: true },
+      end: { type: Date, required: true },
+      reason: { type: String, default: "" },
+      addedByOwner: { type: Boolean, default: true }
+    }
+  ],
 
 
 }, { timestamps: true });

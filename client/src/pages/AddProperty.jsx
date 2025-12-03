@@ -54,6 +54,7 @@ const AddProperty = () => {
         propertyType: "",
         description: "",
         addressLine1: "",
+        area: "",
         addressLine2: "",
         state: "",
         city: "",
@@ -122,6 +123,7 @@ const AddProperty = () => {
             propertyType: formData.propertyType,
             description: formData.description,
             addressLine1: formData.addressLine1,
+            area: formData.area,
             addressLine2: formData.addressLine2 || undefined,
             state: formData.state,
             city: formData.city,
@@ -502,7 +504,7 @@ const AddProperty = () => {
                             />
                         </div>
 
-                        <div className="w-[48%]">
+                        <div className="w-[32%]">
                             <Label htmlFor="state" className="text-sm">
                                 State <span className="text-red-500">*</span>
                             </Label>
@@ -529,7 +531,7 @@ const AddProperty = () => {
                         </div>
 
 
-                        <div className="w-[48%]">
+                        <div className="w-[32%]">
                             <label className="block font-small mb-1">
                                 City <span className="text-red-500">*</span>
                             </label>
@@ -548,6 +550,25 @@ const AddProperty = () => {
                                     ))}
                                 </SelectContent>
                             </Select>
+                        </div>
+
+
+                        <div className="w-[32%]">
+                            <Label htmlFor="area" className="text-sm">
+                                Area <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="area" type="text" name="area" className="mt-2"
+                                value={formData.area}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        area: value,
+                                    }));
+                                }}
+                                required
+                            />
                         </div>
 
 
