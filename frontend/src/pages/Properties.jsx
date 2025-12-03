@@ -4,10 +4,13 @@ import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 import PropertyCard from "../components/PropertyCard";
 import PropertyFilters from "../components/PropertyFilters";
+import { useSearchParams } from "react-router-dom";
+
 
 export default function Properties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
 
   const fetchProperties = async (filters = {}) => {
     setLoading(true);
@@ -31,8 +34,34 @@ export default function Properties() {
 
 
   useEffect(() => {
-    fetchProperties();
-  }, []);
+  const state = searchParams.get("state") || "";
+  const city = searchParams.get("city") || "";
+  const area = searchParams.get("area") || "";
+  const guests = searchParams.get("guests") ? JSON.parse(searchParams.get("guests")) : null;
+  const checkIn = searchParams.get("checkIn");
+  const checkOut = searchParams.get("checkOut");
+  const filters = {
+    state,
+    city,
+    area,
+    guests,
+    checkIn,
+    checkOut,
+  };
+  fetchProperties(filters);
+}, [searchParams]);
+
+
+
+  const defaultValues = {
+  state: searchParams.get("state") || "",
+  city: searchParams.get("city") || "",
+  area: searchParams.get("area") || "",
+  guests: searchParams.get("guests") ? JSON.parse(searchParams.get("guests")) : null,
+  checkIn: searchParams.get("checkIn"),
+  checkOut: searchParams.get("checkOut"),
+};
+
 
   return (
     <div className="max-w-full mx-auto">
@@ -44,7 +73,7 @@ export default function Properties() {
           className="w-full h-72 object-cover"
         />
         <div className="absolute left-1/2 -translate-x-1/2 -mt-[10px] w-full max-w-6xl px-4 z-[9]">
-          <PropertyFilters onFilter={fetchProperties} />
+          <PropertyFilters onFilter={fetchProperties} defaultValues={defaultValues} />
         </div>
       </div>
 

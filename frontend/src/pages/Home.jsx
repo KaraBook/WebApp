@@ -33,15 +33,18 @@ export default function Home() {
   }, []);
 
   const handleFilter = (filters) => {
-    const query = new URLSearchParams({
-      state: filters.state,
-      city: filters.city,
-      guests: filters.guests,
-      checkIn: filters.checkIn.toISOString(),
-      checkOut: filters.checkOut.toISOString(),
-    }).toString();
-    navigate(`/properties?${query}`);
-  };
+  const query = new URLSearchParams({
+    state: filters.state || "",
+    city: filters.city || "",
+    area: filters.area || "",
+    guests: JSON.stringify(filters.guests || {}),
+    checkIn: filters.checkIn?.toISOString(),
+    checkOut: filters.checkOut?.toISOString(),
+  }).toString();
+
+  navigate(`/properties?${query}`);
+};
+
 
   return (
     <div className="flex flex-col min-h-screen relative">

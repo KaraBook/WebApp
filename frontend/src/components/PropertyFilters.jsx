@@ -9,7 +9,7 @@ import SummaryApi from "@/common/SummaryApi";
 import Axios from "@/utils/Axios";
 import { STATE_CODE_TO_NAME } from "@/utils/stateMap";
 
-export default function PropertyFilters({ onFilter }) {
+export default function PropertyFilters({ onFilter, defaultValues = {} }) {
     const [locationTree, setLocationTree] = useState([]);
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
@@ -165,6 +165,36 @@ export default function PropertyFilters({ onFilter }) {
             fontSize: "0.875rem",
         }),
     };
+
+
+    useEffect(() => {
+        if (!defaultValues) return;
+
+        if (defaultValues.state) {
+            const stObj = {
+                value: defaultValues.state,
+                label: STATE_CODE_TO_NAME[defaultValues.state] || defaultValues.state
+            };
+            setSelectedState(stObj);
+        }
+        if (defaultValues.city) {
+            setSelectedCity({ value: defaultValues.city, label: defaultValues.city });
+        }
+        if (defaultValues.area) {
+            setSelectedArea({ value: defaultValues.area, label: defaultValues.area });
+        }
+        if (defaultValues.guests) {
+            setGuests(defaultValues.guests);
+        }
+        if (defaultValues.checkIn && defaultValues.checkOut) {
+            setDateRange([{
+                startDate: new Date(defaultValues.checkIn),
+                endDate: new Date(defaultValues.checkOut),
+                key: "selection"
+            }]);
+        }
+    }, [defaultValues, locationTree]);
+
 
     return (
         <div className="w-full bg-white shadow-xl px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[20] border border-gray-100 overflow-visible">
