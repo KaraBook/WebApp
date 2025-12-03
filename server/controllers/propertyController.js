@@ -328,6 +328,10 @@ export const updateProperty = async (req, res) => {
     if (req.is("application/json")) {
       Object.assign(updatedData, req.body);
 
+      if (req.body.area) {
+        updatedData.area = req.body.area.trim();
+      }
+
       if (req.body.roomBreakdown) {
         let rb = req.body.roomBreakdown;
         if (typeof rb === "string") {
