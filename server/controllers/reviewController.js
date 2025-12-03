@@ -24,6 +24,12 @@ export const addReview = async (req, res) => {
       });
     }
 
+    if (booking.paymentStatus !== "paid") {
+      return res.status(403).json({
+        message: "You can review this property only after completing the payment.",
+      });
+    }
+
     const existingReview = await Review.findOne({ bookingId });
     if (existingReview) {
       return res.status(400).json({

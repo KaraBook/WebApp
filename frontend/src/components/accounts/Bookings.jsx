@@ -217,7 +217,15 @@ export default function Bookings() {
                               </div>
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setRatingBooking(b)}>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              if (b.paymentStatus !== "paid") {
+                                toast.error("You can rate only after payment is completed.");
+                                return;
+                              }
+                              setRatingBooking(b);
+                            }}
+                          >
                             <div className="flex items-center gap-2">
                               ⭐ Rate this Resort
                             </div>
