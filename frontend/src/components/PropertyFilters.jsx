@@ -5,13 +5,18 @@ import { format } from "date-fns";
 import { Calendar } from "lucide-react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
+import SummaryApi from "@/common/SummaryApi";
+import Axios from "@/utils/Axios";
 
 export default function PropertyFilters({ onFilter }) {
+    const [locationTree, setLocationTree] = useState([]);
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
+    const [areas, setAreas] = useState([]);
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
+    const [selectedArea, setSelectedArea] = useState(null);
+
     const [guestCount, setGuestCount] = useState(1);
     const guestRef = useRef(null);
     const [guests, setGuests] = useState({
@@ -30,26 +35,62 @@ export default function PropertyFilters({ onFilter }) {
         },
     ]);
 
-    useEffect(() => {
-        const st = getIndianStates().map((s) => ({
-            value: s.isoCode,
-            label: s.name,
-        }));
-        setStates(st);
-    }, []);
 
     useEffect(() => {
-        if (selectedState) {
-            const ct = getCitiesByState(selectedState.value).map((c) => ({
-                value: c.name,
-                label: c.name,
-            }));
-            setCities(ct);
-        } else {
+        async function loadLocations() {
+            try {
+                const res = await Axios.get(SummaryApi.getUniqueLocations.url);
+                const data = res.data.data;
+                setLocationTree(data);
+                const st = data.map(item => ({
+                    value: item.state,
+                    label: item.state
+                }));
+                setStates(st);
+            } catch (err) {
+                console.error("Failed to load locations", err);
+            }
+        }
+        loadLocations();
+    }, []);
+
+
+    useEffect(() => {
+        if (!selectedState) {
             setCities([]);
             setSelectedCity(null);
+            return;
         }
+        const stateObj = locationTree.find(s => s.state === selectedState.value);
+        if (!stateObj) return;
+        const cityOptions = stateObj.cities.map(c => ({
+            value: c.city,
+            label: c.city,
+        }));
+        setCities(cityOptions);
+        setSelectedCity(null);
+        setAreas([]);
     }, [selectedState]);
+
+
+    useEffect(() => {
+        if (!selectedState || !selectedCity) {
+            setAreas([]);
+            setSelectedArea(null);
+            return;
+        }
+        const stateObj = locationTree.find(s => s.state === selectedState.value);
+        const cityObj = stateObj?.cities.find(c => c.city === selectedCity.value);
+        if (!cityObj) return;
+        const areaOptions = cityObj.areas.map(a => ({
+            value: a,
+            label: a,
+        }));
+        setAreas(areaOptions);
+    }, [selectedCity]);
+
+
+
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -78,6 +119,7 @@ export default function PropertyFilters({ onFilter }) {
         onFilter({
             state: selectedState?.value || "",
             city: selectedCity?.value || "",
+            area: selectedArea?.value || "",
             checkIn: dateRange[0].startDate,
             checkOut: dateRange[0].endDate,
             guests,
@@ -177,6 +219,24 @@ export default function PropertyFilters({ onFilter }) {
                             primary50: "#038ba0",
                         },
                     })}
+                />
+            </div>
+
+            {/* Area */}
+            <div className="flex-1 min-w-[180px]">
+                <label className="text-[14px] text-black uppercase ml-1">Area</label>
+                <Select
+                    options={areas}
+                    placeholder="Select area"
+                    value={selectedArea}
+                    onChange={setSelectedArea}
+                    isDisabled={!selectedCity}
+                    styles={selectStyles}
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                    menuPlacement="bottom"
+                    className="mt-1 text-sm"
+                    classNamePrefix="react-select"
                 />
             </div>
 

@@ -81,6 +81,11 @@ const SummaryApi = {
   url: (id) => `/api/reviews/${id}`,
   method: "delete"
 },
+getUniqueLocations: {
+  url: "/api/location/unique",
+  method: "get",
+},
+
 
 };
 
