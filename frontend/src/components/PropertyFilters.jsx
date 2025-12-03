@@ -9,25 +9,31 @@ import SummaryApi from "@/common/SummaryApi";
 import Axios from "@/utils/Axios";
 import { STATE_CODE_TO_NAME } from "@/utils/stateMap";
 
+
 export default function PropertyFilters({ onFilter, defaultValues = {} }) {
+
     const [locationTree, setLocationTree] = useState([]);
+
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
     const [areas, setAreas] = useState([]);
+
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const [selectedArea, setSelectedArea] = useState(null);
 
-    const [guestCount, setGuestCount] = useState(1);
     const guestRef = useRef(null);
+    const calendarRef = useRef(null);
+
     const [guests, setGuests] = useState({
         adults: 1,
         children: 0,
         infants: 0
     });
+
     const [showGuestBox, setShowGuestBox] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
-    const calendarRef = useRef(null);
+
     const [dateRange, setDateRange] = useState([
         {
             startDate: new Date(),
@@ -36,25 +42,74 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
         },
     ]);
 
-
     useEffect(() => {
         async function loadLocations() {
             try {
                 const res = await Axios.get(SummaryApi.getUniqueLocations.url);
                 const data = res.data.data;
                 setLocationTree(data);
-                const st = data.map(item => ({
+                const st = data.map((item) => ({
                     value: item.state,
-                    label: STATE_CODE_TO_NAME[item.state] || item.state
+                    label: STATE_CODE_TO_NAME[item.state] || item.state,
                 }));
                 setStates(st);
             } catch (err) {
-                console.error("Failed to load locations", err);
+                console.error("Location load error", err);
             }
         }
+
         loadLocations();
     }, []);
 
+
+    useEffect(() => {
+        if (!locationTree.length || !defaultValues.state) return;
+        const stateObj = {
+            value: defaultValues.state,
+            label: STATE_CODE_TO_NAME[defaultValues.state] || defaultValues.state
+        };
+        setSelectedState(stateObj);
+
+        const stateData = locationTree.find(s => s.state === defaultValues.state);
+        if (!stateData) return;
+        const cityOptions = stateData.cities.map(c => ({
+            value: c.city,
+            label: c.city
+        }));
+        setCities(cityOptions);
+
+        if (defaultValues.city) {
+            const cityObj = { value: defaultValues.city, label: defaultValues.city };
+            setSelectedCity(cityObj);
+
+            const cityData = stateData.cities.find(c => c.city === defaultValues.city);
+            if (cityData) {
+                const areaOptions = cityData.areas.map(a => ({
+                    value: a,
+                    label: a
+                }));
+                setAreas(areaOptions);
+
+                if (defaultValues.area) {
+                    setSelectedArea({ value: defaultValues.area, label: defaultValues.area });
+                }
+            }
+        }
+
+        if (defaultValues.guests) {
+            setGuests(defaultValues.guests);
+        }
+        if (defaultValues.checkIn && defaultValues.checkOut) {
+            setDateRange([
+                {
+                    startDate: new Date(defaultValues.checkIn),
+                    endDate: new Date(defaultValues.checkOut),
+                    key: "selection",
+                },
+            ]);
+        }
+
+    }, [locationTree, defaultValues]);
 
     useEffect(() => {
         if (!selectedState) {
@@ -62,60 +117,64 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             setSelectedCity(null);
             return;
         }
-        const stateObj = locationTree.find(s => s.state === selectedState.value);
+
+        const stateObj = locationTree.find((s) => s.state === selectedState.value);
         if (!stateObj) return;
-        const cityOptions = stateObj.cities.map(c => ({
+
+        const cityOptions = stateObj.cities.map((c) => ({
             value: c.city,
             label: c.city,
         }));
+
         setCities(cityOptions);
         setSelectedCity(null);
         setAreas([]);
+
     }, [selectedState]);
 
-
+ 
     useEffect(() => {
         if (!selectedState || !selectedCity) {
             setAreas([]);
             setSelectedArea(null);
             return;
         }
+
         const stateObj = locationTree.find(s => s.state === selectedState.value);
         const cityObj = stateObj?.cities.find(c => c.city === selectedCity.value);
+
         if (!cityObj) return;
+
         const areaOptions = cityObj.areas.map(a => ({
             value: a,
-            label: a,
+            label: a
         }));
+
         setAreas(areaOptions);
+
     }, [selectedCity]);
 
-
-
-
     useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (guestRef.current && !guestRef.current.contains(e.target)) {
+        const handler = (e) => {
+            if (!guestRef.current?.contains(e.target)) {
                 setShowGuestBox(false);
             }
         };
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
     }, []);
 
     useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (calendarRef.current && !calendarRef.current.contains(e.target)) {
+        const handler = (e) => {
+            if (!calendarRef.current?.contains(e.target)) {
                 setShowCalendar(false);
             }
         };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
     }, []);
 
-
+  
     const applyFilters = () => {
         onFilter({
             state: selectedState?.value || "",
@@ -123,7 +182,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             area: selectedArea?.value || "",
             checkIn: dateRange[0].startDate,
             checkOut: dateRange[0].endDate,
-            guests,
+            guests
         });
     };
 
@@ -136,82 +195,9 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             paddingLeft: "8px",
             height: "40px",
             cursor: "pointer",
-            backgroundColor: "white",
-        }),
-        option: (provided, state) => ({
-            ...provided,
-            backgroundColor: state.isSelected
-                ? "#038ba0"
-                : state.isFocused
-                    ? "#038ba02d"
-                    : "white",
-            color: state.isSelected ? "#ffffff" : "#111827",
-            cursor: "pointer",
-        }),
-        placeholder: (provided) => ({
-            ...provided,
-            color: "#9ca3af",
-        }),
-        dropdownIndicator: (provided) => ({
-            ...provided,
-            color: "#6b7280",
-        }),
-        menu: (provided) => ({
-            ...provided,
-            borderRadius: "0rem",
-            overflow: "hidden",
-            zIndex: 9999,
-            width: "250px",
-            fontSize: "0.875rem",
         }),
     };
 
-
-    useEffect(() => {
-        if (!locationTree.length || !defaultValues) return;
-        if (defaultValues.state) {
-            const stateObj = {
-                value: defaultValues.state,
-                label: STATE_CODE_TO_NAME[defaultValues.state] || defaultValues.state,
-            };
-            setSelectedState(stateObj);
-            const stateData = locationTree.find(s => s.state === defaultValues.state);
-            if (stateData) {
-                const cityOptions = stateData.cities.map(c => ({
-                    value: c.city,
-                    label: c.city,
-                }));
-                setCities(cityOptions);
-                if (defaultValues.city) {
-                    const cityObj = { value: defaultValues.city, label: defaultValues.city };
-                    setSelectedCity(cityObj);
-                    const cityData = stateData.cities.find(c => c.city === defaultValues.city);
-                    if (cityData) {
-                        const areaOptions = cityData.areas.map(a => ({
-                            value: a,
-                            label: a,
-                        }));
-                        setAreas(areaOptions);
-                        if (defaultValues.area) {
-                            const areaObj = { value: defaultValues.area, label: defaultValues.area };
-                            setSelectedArea(areaObj);
-                        }
-                    }
-                }
-            }
-        }
-        if (defaultValues.guests) {
-            setGuests(defaultValues.guests);
-        }
-        if (defaultValues.checkIn && defaultValues.checkOut) {
-            setDateRange([{
-                startDate: new Date(defaultValues.checkIn),
-                endDate: new Date(defaultValues.checkOut),
-                key: "selection"
-            }]);
-        }
-
-    }, [defaultValues, locationTree]);
 
 
     return (
