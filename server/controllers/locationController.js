@@ -1,16 +1,16 @@
 export const getUniqueLocations = async (req, res) => {
   try {
     const properties = await Property.find(
-      { isDraft: false, publishNow: true }, 
+      { isDraft: false, publishNow: true },
       "state city area"
     );
 
     const stateMap = {};
 
-    properties.forEach(p => {
-      const state = p.state?.trim();
-      const city = p.city?.trim();
-      const area = p.area?.trim();
+    properties.forEach((p) => {
+      const state = (p.state || "").trim();
+      const city = (p.city || "").trim();
+      const area = (p.area || "").trim();  
 
       if (!state) return;
 
@@ -18,7 +18,7 @@ export const getUniqueLocations = async (req, res) => {
 
       if (city) {
         if (!stateMap[state][city]) stateMap[state][city] = new Set();
-        if (area) stateMap[state][city].add(area);
+        if (area) stateMap[state][city].add(area);  
       }
     });
 
@@ -26,14 +26,13 @@ export const getUniqueLocations = async (req, res) => {
       state,
       cities: Object.entries(cities).map(([city, areas]) => ({
         city,
-        areas: [...areas]
-      }))
+        areas: [...areas],
+      })),
     }));
 
-    res.json({ success: true, data: formatted });
-
+    return res.json({ success: true, data: formatted });
   } catch (err) {
     console.error("Location fetch error:", err);
-    res.status(500).json({ success: false, message: "Failed to load locations" });
+    return res.status(500).json({ success: false, message: "Failed to load locations" });
   }
 };
