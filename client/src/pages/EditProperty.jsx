@@ -481,7 +481,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="w-[32%]">
               <Label htmlFor="state" className="text-sm">
                 State <span className="text-red-500">*</span>
               </Label>
@@ -507,7 +507,7 @@ const EditProperty = () => {
               </Select>
             </div>
 
-            <div className="w-[48%]">
+            <div className="w-[32%]">
               <label className="block font-small mb-1">
                 City <span className="text-red-500">*</span>
               </label>
@@ -527,6 +527,23 @@ const EditProperty = () => {
                 </SelectContent>
               </Select>
             </div>
+
+
+            <div className="w-[32%]">
+              <Label htmlFor="area" className="text-sm">
+                Area <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="area"
+                name="area"
+                type="text"
+                className="mt-2"
+                value={formData.area}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
 
             <div className="w-[48%]">
               <Label htmlFor="pinCode" className="text-sm">
