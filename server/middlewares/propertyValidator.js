@@ -46,11 +46,12 @@ const baseFields = {
     }),
   addressLine2: Joi.string().max(100).allow(""),
   state: Joi.string()
-    .pattern(/^[\p{L}]+(?:[\s][\p{L}]+)*$/u)
-    .required()
-    .messages({
-      "string.pattern.base": "State must contain only letters and spaces (no leading/trailing whitespace)"
-    }),
+  .pattern(/^(?:[A-Z]{2}|[\p{L}]+(?:\s[\p{L}]+)*)$/u)
+  .required()
+  .messages({
+    "string.pattern.base":
+      "State must be a valid 2-letter code (MH) or full name (Maharashtra)"
+  }),
   city: Joi.string()
     .pattern(/^[\p{L}]+(?:[\s][\p{L}]+)*$/u)
     .required()

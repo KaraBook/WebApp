@@ -57,7 +57,10 @@ const propertySchema = new mongoose.Schema({
   state: {
     type: String,
     required: true,
-    match: [/^[\p{L}]+(?:[\s][\p{L}]+)*$/u, "State must contain only letters and spaces (no leading/trailing whitespace)"]
+    match: [
+      /^(?:[A-Z]{2}|[\p{L}]+(?:\s[\p{L}]+)*)$/u,
+      "State must be a valid 2-letter code (MH) or a full state name (Maharashtra)"
+    ]
   },
   city: {
     type: String,
