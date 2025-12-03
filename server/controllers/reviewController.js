@@ -11,18 +11,11 @@ export const addReview = async (req, res) => {
       return res.status(400).json({ message: "Booking ID is required" });
     }
 
-     console.log("bookingId:", bookingId);
-    console.log("propertyId:", propertyId);
-    console.log("req.user.id:", req.user.id);
-
-    const test = await Booking.findOne({ _id: bookingId });
-    console.log("Found Booking:", test);
-
 
     const booking = await Booking.findOne({
       _id: bookingId,
-      "property._id": propertyId,
-      user: req.user.id,
+      propertyId: propertyId,
+      userId: req.user.id,
     });
 
     if (!booking) {
