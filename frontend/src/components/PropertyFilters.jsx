@@ -168,20 +168,37 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
 
 
     useEffect(() => {
-        if (!defaultValues) return;
-
+        if (!locationTree.length || !defaultValues) return;
         if (defaultValues.state) {
-            const stObj = {
+            const stateObj = {
                 value: defaultValues.state,
-                label: STATE_CODE_TO_NAME[defaultValues.state] || defaultValues.state
+                label: STATE_CODE_TO_NAME[defaultValues.state] || defaultValues.state,
             };
-            setSelectedState(stObj);
-        }
-        if (defaultValues.city) {
-            setSelectedCity({ value: defaultValues.city, label: defaultValues.city });
-        }
-        if (defaultValues.area) {
-            setSelectedArea({ value: defaultValues.area, label: defaultValues.area });
+            setSelectedState(stateObj);
+            const stateData = locationTree.find(s => s.state === defaultValues.state);
+            if (stateData) {
+                const cityOptions = stateData.cities.map(c => ({
+                    value: c.city,
+                    label: c.city,
+                }));
+                setCities(cityOptions);
+                if (defaultValues.city) {
+                    const cityObj = { value: defaultValues.city, label: defaultValues.city };
+                    setSelectedCity(cityObj);
+                    const cityData = stateData.cities.find(c => c.city === defaultValues.city);
+                    if (cityData) {
+                        const areaOptions = cityData.areas.map(a => ({
+                            value: a,
+                            label: a,
+                        }));
+                        setAreas(areaOptions);
+                        if (defaultValues.area) {
+                            const areaObj = { value: defaultValues.area, label: defaultValues.area };
+                            setSelectedArea(areaObj);
+                        }
+                    }
+                }
+            }
         }
         if (defaultValues.guests) {
             setGuests(defaultValues.guests);
@@ -193,6 +210,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                 key: "selection"
             }]);
         }
+
     }, [defaultValues, locationTree]);
 
 
