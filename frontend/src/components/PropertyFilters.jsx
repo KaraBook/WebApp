@@ -7,6 +7,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import SummaryApi from "@/common/SummaryApi";
 import Axios from "@/utils/Axios";
+import { STATE_CODE_TO_NAME } from "@/utils/stateMap";
 
 export default function PropertyFilters({ onFilter }) {
     const [locationTree, setLocationTree] = useState([]);
@@ -44,7 +45,7 @@ export default function PropertyFilters({ onFilter }) {
                 setLocationTree(data);
                 const st = data.map(item => ({
                     value: item.state,
-                    label: item.state
+                    label: STATE_CODE_TO_NAME[item.state] || item.state
                 }));
                 setStates(st);
             } catch (err) {

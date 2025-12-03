@@ -1,0 +1,18 @@
+export const STATE_CODE_TO_NAME = {
+  MH: "Maharashtra",
+  KL: "Kerala",
+  GA: "Goa",
+  RJ: "Rajasthan",
+  KA: "Karnataka",
+  TN: "Tamil Nadu",
+  DL: "Delhi",
+  PB: "Punjab",
+  HR: "Haryana",
+  UP: "Uttar Pradesh",
+  UK: "Uttarakhand",
+  MP: "Madhya Pradesh",
+  GJ: "Gujarat",
+  WB: "West Bengal",
+  OR: "Odisha",
+  BR: "Bihar",
+};
