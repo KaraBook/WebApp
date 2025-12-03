@@ -1,4 +1,5 @@
-import { getUniqueLocations } from "../controllers/locationController";
+import { getUniqueLocations } from "../controllers/locationController.js";
+import express from "express";
 
 const router = express.Router();
 

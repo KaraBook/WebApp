@@ -11,6 +11,7 @@ import adminRoutes from "./routes/admin.js";
 import ownerRoutes from "./routes/owner.routes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 
+
 dotenv.config();
 const app = express();
 connectDB();
