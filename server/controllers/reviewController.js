@@ -14,7 +14,7 @@ export const addReview = async (req, res) => {
     const booking = await Booking.findOne({
       _id: bookingId,
       property: propertyId,
-      user: userId,
+      user: req.user.id,
     });
 
     if (!booking) {
