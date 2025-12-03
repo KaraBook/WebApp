@@ -62,6 +62,7 @@ const EditProperty = () => {
     propertyType: "",
     description: "",
     addressLine1: "",
+    area: "",
     addressLine2: "",
     state: "",
     petFriendly: false,
@@ -143,6 +144,7 @@ const EditProperty = () => {
           propertyType: prop.propertyType || "",
           description: prop.description || "",
           addressLine1: prop.addressLine1 || "",
+          area: prop.area || "",
           addressLine2: prop.addressLine2 || "",
           state: prop.state || "",
           petFriendly: !!prop.petFriendly,
@@ -543,7 +545,7 @@ const EditProperty = () => {
                 required
               />
             </div>
-            
+
 
             <div className="w-[48%]">
               <Label htmlFor="pinCode" className="text-sm">
