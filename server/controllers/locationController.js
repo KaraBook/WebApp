@@ -1,11 +1,9 @@
 export const getUniqueLocations = async (req, res) => {
   try {
     const properties = await Property.find(
-      { isDraft: false, $or: [{ publishNow: true }, { publishNow: { $exists: false } }] },
+      { isDraft: false, publishNow: true }, 
       "state city area"
     );
-
-    console.log("Loaded properties:", properties);
 
     const stateMap = {};
 
