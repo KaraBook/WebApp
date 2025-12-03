@@ -1,3 +1,6 @@
+import Property from "../models/Property.js";
+
+
 export const getUniqueLocations = async (req, res) => {
   try {
     const properties = await Property.find(
