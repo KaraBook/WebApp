@@ -3,22 +3,9 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuItem
-} from "@/components/ui/dropdown-menu";
-
-import {
-  ChevronRight,
-  CalendarCheck,
-  Heart,
-  User as UserIcon,
-  Star,
-  LifeBuoy,
-  LogOut,
-  Menu,
-  X
-} from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
+import { ChevronRight, CalendarCheck, Heart, User as UserIcon, Star,
+  LifeBuoy, LogOut, Menu, X} from "lucide-react";
 
 export default function Header({ onLoginClick }) {
   const { user, clearAuth } = useAuthStore();
@@ -28,7 +15,6 @@ export default function Header({ onLoginClick }) {
     <header className="sticky top-0 z-[9999999] w-full border-b bg-background">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
 
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <img
             src="/KarabookLogo.png"
@@ -37,7 +23,6 @@ export default function Header({ onLoginClick }) {
           />
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex gap-5">
           <Link to="/properties" className="tracking-[2px] uppercase md:text-[14px] font-medium">
             Explore
@@ -50,7 +35,6 @@ export default function Header({ onLoginClick }) {
           </Link>
         </div>
 
-        {/* Desktop Right Side */}
         <div className="hidden md:flex items-center gap-3">
           {user ? (
             <AccountDropdown user={user} clearAuth={clearAuth} />
@@ -61,10 +45,8 @@ export default function Header({ onLoginClick }) {
           )}
         </div>
 
-        {/* MOBILE RIGHT SIDE */}
         <div className="flex md:hidden items-center gap-3">
 
-          {/* Mobile Login Icon */}
           {!user && (
             <button
               onClick={onLoginClick}
@@ -74,7 +56,6 @@ export default function Header({ onLoginClick }) {
             </button>
           )}
 
-          {/* Mobile User Avatar (Triggers SAME DROPDOWN AS DESKTOP) */}
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -86,12 +67,10 @@ export default function Header({ onLoginClick }) {
                 </button>
               </DropdownMenuTrigger>
 
-              {/* SAME DESKTOP DROPDOWN ON MOBILE */}
               <AccountDropdownPanel user={user} clearAuth={clearAuth} />
             </DropdownMenu>
           )}
 
-          {/* Mobile Hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="p-1 text-white rounded-md bg-primary"
@@ -101,7 +80,6 @@ export default function Header({ onLoginClick }) {
         </div>
       </div>
 
-      {/* MOBILE MENU PANEL — ONLY NAVIGATION NOW */}
       {mobileOpen && (
         <div className="md:hidden bg-white border-t shadow-sm animate-slideDown">
           <div className="flex flex-col gap-4 px-4 py-4">
@@ -123,7 +101,6 @@ export default function Header({ onLoginClick }) {
   );
 }
 
-/* ---------------- DESKTOP DROPDOWN REUSED FOR MOBILE ---------------- */
 
 function AccountDropdown({ user, clearAuth }) {
   return (
@@ -148,7 +125,6 @@ function AccountDropdown({ user, clearAuth }) {
   );
 }
 
-/* SHARED DROPDOWN PANEL FOR BOTH MOBILE & DESKTOP */
 function AccountDropdownPanel({ user, clearAuth }) {
 
   const items = [
@@ -230,7 +206,6 @@ function AccountDropdownPanel({ user, clearAuth }) {
   );
 }
 
-/* slide animation */
 const style = document.createElement("style");
 style.innerHTML = `
 @keyframes slideDown {

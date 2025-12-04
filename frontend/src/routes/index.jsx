@@ -12,6 +12,7 @@ import Properties from "@/pages/Properties";
 import PropertyDetails from "@/pages/PropertyDetails";
 import Checkout from "@/pages/Checkout";
 import InvoicePage from "@/pages/InvoicePage";
+import Contact from "./pages/Contact";
 
 export default function AppRoutes() {
   return (
@@ -19,6 +20,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="properties" element={<Properties />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/properties/:id" element={<PropertyDetails />} />
       <Route path="/checkout/:propertyId" element={<Checkout />} />
 
