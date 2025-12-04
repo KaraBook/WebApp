@@ -6,35 +6,56 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import {
-  Card, CardContent, CardHeader, CardTitle,
-  CardDescription, CardFooter
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
-import {
-  Select, SelectContent, SelectItem,
-  SelectTrigger, SelectValue
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 const nameRegex = /^[a-zA-Z][a-zA-Z\s'.-]{1,49}$/;
 
 const schema = z.object({
-  firstName: z.string().min(2, "First name is too short").max(50).regex(nameRegex, "Only letters allowed"),
-  lastName: z.string().min(2, "Last name is too short").max(50).regex(nameRegex, "Only letters allowed"),
+  firstName: z.string()
+    .min(2, "First name is too short")
+    .max(50)
+    .regex(nameRegex, "Only letters allowed"),
+
+  lastName: z.string()
+    .min(2, "Last name is too short")
+    .max(50)
+    .regex(nameRegex, "Only letters allowed"),
+
   email: z.string().email("Enter a valid email"),
+
   state: z.string().min(2, "State is required"),
   city: z.string().min(2, "City is required"),
-  dateOfBirth: z.string().min(1, "Date of Birth is required"),
-  address: z.string().min(10, "Address is too short").max(200),
-  pinCode: z.string().regex(/^[1-9][0-9]{5}$/, "Enter valid 6-digit pin code"),
+
+  dateOfBirth: z.string()
+    .min(1, "Date of Birth is required")
+    .refine((val) => {
+      const dob = new Date(val);
+      const today = new Date();
+
+      if (dob > today) return false;
+
+      const age = today.getFullYear() - dob.getFullYear();
+      return age >= 18 && age <= 100;
+
+    }, "Age must be between 18 and 100"),
+
+  address: z.string()
+    .min(10, "Address is too short")
+    .max(200),
+
+  pinCode: z.string()
+    .regex(/^[1-9][0-9]{5}$/, "Enter valid 6-digit pin code"),
+
   image: z.any().optional(),
 });
 
-
 export default function Signup() {
+
   const { state } = useLocation();
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
@@ -63,6 +84,7 @@ export default function Signup() {
   };
 
   const onSubmit = async (values) => {
+
     try {
       const signupResp = await axios.post(
         baseURL + SummaryApi.travellerSignup.url,
@@ -101,6 +123,7 @@ export default function Signup() {
 
       setAuth({ user, accessToken, refreshToken });
       navigate("/");
+
     } catch (err) {
       alert(err?.response?.data?.message || "Signup failed");
     }
@@ -109,7 +132,7 @@ export default function Signup() {
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
-      <Card className="shadow-lg">
+      <Card className="shadow-lg border border-gray-200 rounded-none">
         <CardHeader>
           <CardTitle>Complete your signup</CardTitle>
           <CardDescription>
@@ -118,28 +141,59 @@ export default function Signup() {
         </CardHeader>
 
         <CardContent className="grid gap-4">
+          
+          {/* NAME ROW */}
           <div className="flex justify-between flex-wrap gap-2">
+            
             <div className="md:w-[48%] w-full">
               <Label htmlFor="firstName">First name</Label>
-              <Input id="firstName" className="mt-1" placeholder="John" {...register("firstName")} />
-              {errors.firstName && <p className="text-sm text-destructive">{errors.firstName.message}</p>}
+              <Input
+                id="firstName"
+                className="mt-1 rounded-none"
+                placeholder="John"
+                {...register("firstName")}
+              />
+              {errors.firstName && (
+                <p className="text-sm text-destructive">{errors.firstName.message}</p>
+              )}
             </div>
 
             <div className="md:w-[48%] w-full">
               <Label htmlFor="lastName">Last name</Label>
-              <Input id="lastName" placeholder="Doe" className="mt-1" {...register("lastName")} />
-              {errors.lastName && <p className="text-sm text-destructive">{errors.lastName.message}</p>}
+              <Input
+                id="lastName"
+                className="mt-1 rounded-none"
+                placeholder="Doe"
+                {...register("lastName")}
+              />
+              {errors.lastName && (
+                <p className="text-sm text-destructive">{errors.lastName.message}</p>
+              )}
             </div>
+
           </div>
 
+
+          {/* EMAIL */}
           <div className="grid gap-1">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" className="mt-1" placeholder="john@example.com" {...register("email")} />
-            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+            <Input
+              id="email"
+              type="email"
+              className="mt-1 rounded-none"
+              placeholder="john@example.com"
+              {...register("email")}
+            />
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
           </div>
 
+
+          {/* STATE + CITY + DOB */}
           <div className="flex justify-between flex-wrap gap-2">
-            {/* State Dropdown */}
+            
+            {/* State */}
             <div className="md:w-[48%] w-full">
               <Label htmlFor="state">State</Label>
               <Controller
@@ -150,7 +204,7 @@ export default function Signup() {
                     onValueChange={(val) => handleStateChange(val, onChange)}
                     value={states.find((s) => s.name === value)?.isoCode || ""}
                   >
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className="mt-1 rounded-none">
                       <SelectValue placeholder="Select State" />
                     </SelectTrigger>
                     <SelectContent>
@@ -163,10 +217,12 @@ export default function Signup() {
                   </Select>
                 )}
               />
-              {errors.state && <p className="text-sm text-destructive">{errors.state.message}</p>}
+              {errors.state && (
+                <p className="text-sm text-destructive">{errors.state.message}</p>
+              )}
             </div>
 
-            {/* City Dropdown */}
+            {/* City */}
             <div className="md:w-[48%] w-full">
               <Label htmlFor="city">City</Label>
               <Controller
@@ -174,7 +230,7 @@ export default function Signup() {
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Select onValueChange={onChange} value={value || ""}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className="mt-1 rounded-none">
                       <SelectValue placeholder="Select City" />
                     </SelectTrigger>
                     <SelectContent>
@@ -187,40 +243,88 @@ export default function Signup() {
                   </Select>
                 )}
               />
-              {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+              {errors.city && (
+                <p className="text-sm text-destructive">{errors.city.message}</p>
+              )}
             </div>
 
-            <div className="grid gap-1 mt-1">
+            {/* DOB */}
+            <div className="grid gap-1 mt-1 w-full">
               <Label htmlFor="dateOfBirth">Date of Birth</Label>
-              <Input id="dateOfBirth" type="date" className="mt-1" {...register("dateOfBirth")} />
-              {errors.dateOfBirth && <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>}
+              <Input
+                id="dateOfBirth"
+                type="date"
+                className="mt-1 rounded-none"
+                max={new Date().toISOString().split("T")[0]}
+                {...register("dateOfBirth")}
+              />
+              {errors.dateOfBirth && (
+                <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>
+              )}
             </div>
 
-            <div className="grid gap-1 mt-1">
+            {/* Address - 100% width + textarea */}
+            <div className="grid gap-1 mt-1 w-full">
               <Label htmlFor="address">Address</Label>
-              <Input id="address" placeholder="Full address" className="mt-1" {...register("address")} />
-              {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
+              <textarea
+                id="address"
+                placeholder="Full address"
+                className="mt-1 w-full h-24 border px-3 py-2 text-sm rounded-none"
+                {...register("address")}
+              />
+              {errors.address && (
+                <p className="text-sm text-destructive">{errors.address.message}</p>
+              )}
             </div>
 
-            <div className="grid gap-1 mt-1">
+            {/* Pin Code */}
+            <div className="grid gap-1 mt-1 w-full">
               <Label htmlFor="pinCode">Pin Code</Label>
-              <Input id="pinCode" placeholder="6-digit pin code" className="mt-1" maxLength={6} {...register("pinCode")} />
-              {errors.pinCode && <p className="text-sm text-destructive">{errors.pinCode.message}</p>}
+              <Input
+                id="pinCode"
+                maxLength={6}
+                placeholder="6-digit pin code"
+                className="mt-1 rounded-none"
+                {...register("pinCode")}
+              />
+              {errors.pinCode && (
+                <p className="text-sm text-destructive">{errors.pinCode.message}</p>
+              )}
             </div>
 
           </div>
 
+          {/* Image Upload */}
           <div className="grid gap-1">
             <Label htmlFor="image">Profile image (optional)</Label>
-            <Input id="image" type="file" className="mt-1" accept="image/*" {...register("image")} />
+            <Input
+              id="image"
+              type="file"
+              accept="image/*"
+              className="mt-1 rounded-none"
+              {...register("image")}
+            />
           </div>
+
         </CardContent>
 
         <CardFooter className="justify-end gap-2">
-          <Button variant="ghost" onClick={() => navigate("/")}>Cancel</Button>
-          <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
+          <Button
+            variant="ghost"
+            className="rounded-none"
+            onClick={() => navigate("/")}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            className="rounded-none"
+            onClick={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Creating..." : "Create account"}
           </Button>
+
         </CardFooter>
       </Card>
     </div>
