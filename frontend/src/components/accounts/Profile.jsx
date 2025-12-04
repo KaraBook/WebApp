@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth";
 
 export default function Profile() {
-  const { accessToken, logout } = useAuthStore();
+  const { accessToken, clearAuth } = useAuthStore();
   const [profile, setProfile] = useState(null);
   const [bookingCount, setBookingCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -126,7 +126,7 @@ export default function Profile() {
         </div>
 
         <Button
-          onClick={logout}
+          onClick={clearAuth}
           variant="outline"
           className="rounded-none border-gray-300 text-gray-800 hover:bg-gray-50 flex items-center gap-2"
         >

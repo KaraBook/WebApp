@@ -132,7 +132,7 @@ export default function Signup() {
 
   return (
     <div className="container mx-auto max-w-2xl p-6">
-      <Card className="shadow-lg border border-gray-200 rounded-none">
+      <Card className="shadow-lg mt-2 border border-gray-200 rounded-none">
         <CardHeader>
           <CardTitle>Complete your signup</CardTitle>
           <CardDescription>
