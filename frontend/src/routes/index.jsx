@@ -12,7 +12,7 @@ import Properties from "@/pages/Properties";
 import PropertyDetails from "@/pages/PropertyDetails";
 import Checkout from "@/pages/Checkout";
 import InvoicePage from "@/pages/InvoicePage";
-import Contact from "./pages/Contact";
+import Contact from "@/pages/Contact";
 
 export default function AppRoutes() {
   return (
