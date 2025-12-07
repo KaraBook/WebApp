@@ -90,6 +90,13 @@ const userSchema = new mongoose.Schema({
 
   avatarUrl: { type: String, default: "" },
 
+   password: {
+    type: String,
+    required: true,
+    minlength: 6,
+    select: false
+  },
+
   ownedProperties: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }]
 
 }, { timestamps: true });
