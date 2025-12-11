@@ -368,3 +368,30 @@ export const me = async (req, res) => {
   res.json({ user: publicUser(user), roleNotice: `Logged in as ${user.role}` });
 };
 
+
+export const managerPrecheck = async (req, res) => {
+  const { mobile } = req.body;
+  const user = await User.findOne({ mobile, role: "manager" });
+  if (!user) return res.status(404).json({ message: "Manager not found" });
+  res.json({ success: true });
+};
+
+
+export const managerLogin = async (req, res) => {
+  const firebaseUser = req.user;
+  const mobile = firebaseUser.phone_number.replace("+91", "");
+
+  const user = await User.findOne({ mobile, role: "manager" });
+  if (!user)
+    return res.status(401).json({ message: "Not authorized as manager" });
+
+  const { accessToken, refreshToken } = issueTokens(user);
+
+  res.json({
+    accessToken,
+    refreshToken,
+    user: publicUser(user),
+  });
+
+  res.json(tokens);
+};
