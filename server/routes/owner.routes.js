@@ -17,6 +17,7 @@ import {
   verifyRazorpayPayment,
 } from "../controllers/owner.controller.js";
 import { getBookingInvoice } from "../controllers/bookingController.js";
+import { createManager } from "../controllers/managerController.js";
 import upload from "../middlewares/multer.js";
 
 const router = express.Router();
@@ -45,6 +46,8 @@ router.post("/check-owner-mobile", requireAuth, checkOwnerByMobile);
 router.get("/property/:id/booked-dates", requireAuth, getBookedDates);
 router.post("/offline-booking/create-order", requireAuth, createRazorpayOrder);
 router.post("/offline-booking/verify", requireAuth, verifyRazorpayPayment);
+router.post("/manager/create", requireAuth, createManager);
+
 
 
 export default router;

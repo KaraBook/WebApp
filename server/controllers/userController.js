@@ -286,10 +286,10 @@ export const resortOwnerLogin = async (req, res) => {
       });
     }
 
-    if (!["admin", "resortOwner"].includes(user.role)) {
+    if (!["admin", "resortOwner", "manager"].includes(user.role)) {
       return res.status(403).json({
         message:
-          "Access denied. Only verified Resort Owners or Admins can use this portal.",
+          "Access denied. Only verified Resort Owners, Managers or Admins can use this portal.",
       });
     }
 
@@ -339,10 +339,10 @@ export const checkResortOwnerNumber = async (req, res) => {
       });
     }
 
-    if (!["resortOwner", "admin"].includes(user.role)) {
+    if (!["resortOwner", "admin", "manager"].includes(user.role)) {
       return res.status(403).json({
         success: false,
-        message: "Access denied. Only verified Resort Owners or Admins can log in here.",
+        message: "Access denied. Only Owners, Managers or Admins can log in here.",
       });
     }
 

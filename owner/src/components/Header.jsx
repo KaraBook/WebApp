@@ -14,6 +14,8 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isManager = user?.role === "manager";
+
   useEffect(() => {
     (async () => {
       try {
@@ -39,8 +41,9 @@ export default function Header() {
   }, []);
 
 
-  const fullName =
-    `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
+  const fullName = isManager
+  ? `${user?.firstName} (Manager)`
+  : `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
     user?.name ||
     "Owner";
 
@@ -56,17 +59,22 @@ export default function Header() {
     location.pathname.startsWith("/view-property") ||
     location.pathname.startsWith("/edit-property");
 
-  const navItems = [
-    { label: "Dashboard", path: "/dashboard" },
-    { label: "Property", path: `/view-property/${propertyId ?? ""}` },
-    { label: "Bookings", path: "/bookings" },
-    { label: "Calendar", path: "/calendar" },
-    {
-      label: "Customize",
-      path: propertyId ? `/offline-booking/${propertyId}` : null,
-    }
-    ,
-  ];
+  const navItems = isManager
+  ? [
+      { label: "Dashboard", path: "/manager/dashboard" },
+      { label: "Bookings", path: "/bookings" },
+      { label: "Calendar", path: "/calendar" },
+    ]
+  : [
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Property", path: `/view-property/${propertyId ?? ""}` },
+      { label: "Bookings", path: "/bookings" },
+      { label: "Calendar", path: "/calendar" },
+      {
+        label: "Customize",
+        path: propertyId ? `/offline-booking/${propertyId}` : null,
+      },
+    ];
 
   const handlePropertyClick = (e) => {
     if (!propertyId) {

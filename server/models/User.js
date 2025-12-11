@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
 
   role: {
     type: String,
-    enum: ["admin", "traveller", "resortOwner"],
+    enum: ["admin", "traveller", "resortOwner", "manager"],
     default: "traveller"
   },
 
@@ -90,7 +90,7 @@ const userSchema = new mongoose.Schema({
 
   avatarUrl: { type: String, default: "" },
 
-   password: {
+  password: {
     type: String,
     required: true,
     minlength: 6,

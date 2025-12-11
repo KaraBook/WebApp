@@ -4,6 +4,7 @@ import { auth, buildRecaptcha, signInWithPhoneNumber } from "../firebase";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { useAuth } from "../auth/AuthContext";
+
 import {
   Card,
   CardHeader,
@@ -17,122 +18,119 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-export default function Login() {
+export default function Login({ userType = "owner" }) {
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [phase, setPhase] = useState("enter");
   const [confirmRes, setConfirmRes] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { loginWithTokens } = useAuth();
   const [timer, setTimer] = useState(0);
   const [canResend, setCanResend] = useState(true);
+
+  const { loginWithTokens } = useAuth();
   const navigate = useNavigate();
 
+  /* -------------------- INIT RECAPTCHA -------------------- */
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setTimeout(() => {
-        try {
-          buildRecaptcha();
-        } catch (e) {
-          console.log(e.message);
-        }
-      }, 300);
-    }
+    setTimeout(() => {
+      try {
+        buildRecaptcha();
+      } catch (e) {
+        console.log("Recaptcha error:", e.message);
+      }
+    }, 300);
   }, []);
 
-
-
- const sendOtp = async () => {
-  const ten = mobile.replace(/\D/g, "");
-  if (ten.length !== 10) return toast.error("Enter valid 10-digit mobile number");
-
-  setLoading(true);
-
-  try {
-    try { await auth.signOut(); } catch {}
-
-    const verifier = await buildRecaptcha();
-
-    const confirmation = await signInWithPhoneNumber(
-      auth,
-      `+91${ten}`,
-      verifier
-    );
-
-    setConfirmRes(confirmation);
-    setPhase("verify");
-    setCanResend(false);
-    setTimer(90);
-
-    toast.success("OTP sent successfully");
-  } catch (err) {
-    console.error("sendOtp error:", err);
-    toast.error(err.message || "Failed to send OTP. Try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-  useEffect(() => {
-    if (!canResend && timer > 0) {
-      const countdown = setTimeout(() => setTimer((t) => t - 1), 1000);
-      return () => clearTimeout(countdown);
-    } else if (timer === 0 && !canResend) {
-      setCanResend(true);
-    }
-  }, [timer, canResend]);
-
-
-  const verifyOtp = async () => {
-    if (!confirmRes) return;
-    if (otp.length < 6) return toast.error("Enter the 6-digit OTP");
+  /* -------------------- SEND OTP -------------------- */
+  const sendOtp = async () => {
+    const num = mobile.replace(/\D/g, "");
+    if (num.length !== 10) return toast.error("Enter valid 10-digit number");
 
     setLoading(true);
+
     try {
-      const cred = await confirmRes.confirm(otp);
-      const idToken = await cred.user.getIdToken();
+      await auth.signOut();
+      const verifier = await buildRecaptcha();
 
-      const r = await api.post(SummaryApi.ownerLogin.url, null, {
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
+      // Select correct PRECHECK API
+      const precheckUrl =
+        userType === "manager"
+          ? SummaryApi.managerPrecheck?.url
+          : SummaryApi.ownerPrecheck?.url;
 
-      loginWithTokens(r.data);
-      toast.success("Login successful");
-      navigate("/dashboard", { replace: true });
-    } catch (e) {
-      console.error("verifyOtp error:", e);
-      if (e.code === "auth/invalid-verification-code") {
-        toast.error("Incorrect OTP. Please try again.");
-      } else if (e.code === "auth/session-expired") {
-        toast.error("OTP session expired. Please resend OTP.");
-        setPhase("enter");
-      } else {
-        toast.error(e.response?.data?.message || e.message || "OTP verification failed");
-      }
+      await api.post(precheckUrl, { mobile: num });
+
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        `+91${num}`,
+        verifier
+      );
+
+      setConfirmRes(confirmation);
+      setPhase("verify");
+      setCanResend(false);
+      setTimer(90);
+
+      toast.success("OTP sent successfully");
+    } catch (err) {
+      console.error("sendOtp error:", err);
+      toast.error(err?.response?.data?.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- ERROR MAPPER ---------------- */
-  function mapFirebasePhoneError(e) {
-    const c = e?.code || "";
-    if (c.includes("unauthorized-domain"))
-      return "Unauthorized domain. Add it under Firebase Auth settings.";
-    if (c.includes("invalid-app-credential"))
-      return "Invalid Firebase credentials or reCAPTCHA verification failed.";
-    if (c.includes("captcha-check-failed"))
-      return "reCAPTCHA verification failed. Disable ad blockers and retry.";
-    if (c.includes("too-many-requests"))
-      return "Too many OTP requests. Please wait and retry.";
-    if (c.includes("billing-not-enabled"))
-      return "App Check or billing issue in Firebase.";
-    return e?.message || "Couldn't send OTP. Please try again.";
-  }
+  /* -------------------- OTP TIMER -------------------- */
+  useEffect(() => {
+    if (!canResend && timer > 0) {
+      const timeout = setTimeout(() => setTimer((t) => t - 1), 1000);
+      return () => clearTimeout(timeout);
+    } else if (timer === 0 && !canResend) {
+      setCanResend(true);
+    }
+  }, [timer, canResend]);
 
-  /* ---------------- JSX ---------------- */
+  /* -------------------- VERIFY OTP -------------------- */
+  const verifyOtp = async () => {
+    if (!confirmRes) return toast.error("No OTP session found");
+    if (otp.length !== 6) return toast.error("Enter 6-digit OTP");
+
+    setLoading(true);
+
+    try {
+      const cred = await confirmRes.confirm(otp);
+      const idToken = await cred.user.getIdToken();
+
+      // Select correct LOGIN API
+      const loginUrl =
+        userType === "manager"
+          ? SummaryApi.managerLogin?.url
+          : SummaryApi.ownerLogin?.url;
+
+      const res = await api.post(loginUrl, null, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+
+      loginWithTokens(res.data);
+
+      toast.success(
+        userType === "manager" ? "Manager logged in!" : "Login successful"
+      );
+
+      // Redirect
+      navigate(
+        userType === "manager" ? "/manager/dashboard" : "/dashboard",
+        { replace: true }
+      );
+    } catch (e) {
+      console.error("OTP error:", e);
+      toast.error(e.response?.data?.message || "OTP verification failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* -------------------- JSX UI -------------------- */
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
       <Card className="w-full max-w-md border border-border shadow-sm">
@@ -143,17 +141,21 @@ export default function Login() {
               alt="BookMyStay"
               className="h-3 w-auto md:h-14 m-auto"
             />
-            Resort Owner Login
+            {userType === "manager" ? "Manager Login" : "Resort Owner Login"}
           </CardTitle>
           <CardDescription>
-            Sign in securely using your registered mobile number
+            {userType === "manager"
+              ? "Managers login using the number assigned by the owner"
+              : "Sign in securely using your registered mobile number"}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-5">
+          {/* ENTER MOBILE */}
           {phase === "enter" && (
             <div className="space-y-3">
               <Label htmlFor="mobile">Mobile Number</Label>
+
               <div className="flex gap-2">
                 <div className="px-3 py-2 rounded-md border bg-muted text-sm text-gray-700 select-none">
                   +91
@@ -163,56 +165,48 @@ export default function Login() {
                   placeholder="10-digit mobile"
                   value={mobile}
                   maxLength={10}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    if (value.length <= 10) setMobile(value);
-                  }}
+                  onChange={(e) =>
+                    setMobile(e.target.value.replace(/\D/g, ""))
+                  }
                 />
               </div>
+
               <Button
                 onClick={sendOtp}
                 disabled={loading || !canResend}
                 className="w-full"
               >
-                {loading ? "Sending OTP..." : canResend ? "Send OTP" : `Resend in ${timer}s`}
+                {loading
+                  ? "Sending OTP..."
+                  : canResend
+                  ? "Send OTP"
+                  : `Resend in ${timer}s`}
               </Button>
-
-              <p className="text-xs text-gray-500 text-center mt-1">
-                Use your registered mobile number associated with your property account.
-              </p>
             </div>
           )}
 
+          {/* VERIFY OTP */}
           {phase === "verify" && (
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="otp" className="text-sm font-medium">Enter OTP</Label>
-                {!canResend && (
-                  <span className="text-xs text-gray-500">
-                    Resend in {timer}s
-                  </span>
-                )}
-              </div>
-
+              <Label>Enter OTP</Label>
               <Input
-                id="otp"
                 placeholder="6-digit OTP"
                 maxLength={6}
                 value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                 className="text-center tracking-widest text-lg"
               />
 
-              <Button onClick={verifyOtp} disabled={loading} className="w-full">
+              <Button
+                onClick={verifyOtp}
+                disabled={loading}
+                className="w-full"
+              >
                 {loading ? "Verifying..." : "Verify & Continue"}
               </Button>
 
               {canResend ? (
-                <Button
-                  variant="outline"
-                  onClick={sendOtp}
-                  className="w-full"
-                >
+                <Button variant="outline" className="w-full" onClick={sendOtp}>
                   Resend OTP
                 </Button>
               ) : (
@@ -230,7 +224,6 @@ export default function Login() {
               </Button>
             </div>
           )}
-
         </CardContent>
 
         <CardFooter className="flex justify-center flex-col items-center gap-1">

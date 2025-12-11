@@ -60,7 +60,8 @@ export default function App() {
   return (
     <Routes>
       {/* LOGIN */}
-      <Route path="/login" element={<Login />} />
+      <Route path="/owner/login" element={<Login userType="owner" />} />
+      <Route path="/manager/login" element={<Login userType="manager" />} />
 
       <Route
         path="/"

@@ -86,6 +86,20 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/check-owner-mobile`,
         method: "POST",
     },
+    createManager: {
+        url: `${BASE_URL}/api/owner/manager/create`,
+        method: "POST",
+    },
+    managerLogin: {
+        url: `${BASE_URL}/api/auth/resort-owner/login`,
+        method: "POST",
+    },
+    managerPrecheck: {
+        url: `${BASE_URL}/api/auth/resort-owner/precheck`,
+        method: "POST",
+    },
+
+
 
 };
 
