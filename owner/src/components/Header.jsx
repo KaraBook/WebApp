@@ -42,8 +42,8 @@ export default function Header() {
 
 
   const fullName = isManager
-  ? `${user?.firstName} (Manager)`
-  : `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
+    ? `${user?.firstName} (Manager)`
+    : `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
     user?.name ||
     "Owner";
 
@@ -60,12 +60,12 @@ export default function Header() {
     location.pathname.startsWith("/edit-property");
 
   const navItems = isManager
-  ? [
+    ? [
       { label: "Dashboard", path: "/manager/dashboard" },
       { label: "Bookings", path: "/bookings" },
       { label: "Calendar", path: "/calendar" },
     ]
-  : [
+    : [
       { label: "Dashboard", path: "/dashboard" },
       { label: "Property", path: `/view-property/${propertyId ?? ""}` },
       { label: "Bookings", path: "/bookings" },
@@ -151,6 +151,15 @@ export default function Header() {
             >
               <User size={16} /> My Profile
             </Link>
+
+            {!isManager && (
+              <Link
+                to="/manager/create"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] w-full text-gray-700"
+              >
+                ➕ Add Manager
+              </Link>
+            )}
 
             <button
               onClick={logout}
