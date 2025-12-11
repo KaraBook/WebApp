@@ -15,8 +15,8 @@ import SingleSelectButtons from "@/components/SingleSelectButtons";
 import MultiSelectButtons from "../components/MultiSelectButtons";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { QuantityBox } from "@/components/QuantityBox";
-import { Check } from "lucide-react";
-import { propertyTypeOptions, foodOptions, amenitiesOptions, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions, petFriendlyOptions } from "../constants/dropdownOptions";
+import { Check, ChevronDown } from "lucide-react";
+import { propertyTypeOptions, foodOptions, amenitiesCategories, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions, petFriendlyOptions } from "../constants/dropdownOptions";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
@@ -791,7 +791,7 @@ const AddProperty = () => {
 
                 {currentStep === 4 && (
                     <>
-                        <div className="w-[48%]">
+                        <div className="w-[100%]">
                             <MultiSelectButtons label="Food Availability"
                                 options={foodOptions}
                                 selected={formData.foodAvailability}
@@ -801,33 +801,71 @@ const AddProperty = () => {
                             />
                         </div>
 
-                        <div className="w-[48%]">
+                        <div className="w-[100%]">
                             <label className="block mb-2 text-sm font-medium">Amenities</label>
 
-                            <div className="grid grid-cols-2 gap-3">
-                                {amenitiesOptions.map((item) => {
-                                    const Icon = item.icon;
-                                    const selected = formData.amenities.includes(item.value);
+                            <div className="flex flex-wrap items-start justify-start gap-4">
+                                {amenitiesCategories.map((cat) => (
+                                    <div key={cat.key} className="border rounded-lg w-[48%]">
 
+                                        {/* Category Header */}
+                                        <details className="group">
+                                            <summary className="flex justify-between items-center cursor-pointer px-3 py-2 bg-gray-100">
+                                                <span className="font-semibold">{cat.label}</span>
+                                                <ChevronDown className="group-open:rotate-180 transition" size={18} />
+                                            </summary>
+
+                                            {/* Category items */}
+                                            <div className="p-3 grid grid-cols-2 gap-2">
+                                                {cat.items.map((item) => {
+                                                    const Icon = item.icon;
+                                                    const selected = formData.amenities.includes(item.value);
+
+                                                    return (
+                                                        <button
+                                                            key={item.value}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const exists = formData.amenities.includes(item.value);
+                                                                setFormData((prev) => ({
+                                                                    ...prev,
+                                                                    amenities: exists
+                                                                        ? prev.amenities.filter((a) => a !== item.value)
+                                                                        : [...prev.amenities, item.value],
+                                                                }));
+                                                            }}
+                                                            className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition 
+                    ${selected ? "bg-black text-white border-black" : "bg-white border-gray-300"}
+                  `}
+                                                        >
+                                                            <Icon size={16} />
+                                                            {item.label}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </details>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Selected Tags (Like Gulposh UI) */}
+                            <div className="mt-4 flex flex-wrap gap-2">
+                                {formData.amenities.map((am) => {
+                                    const item = amenitiesCategories.flatMap(c => c.items).find(i => i.value === am);
                                     return (
-                                        <button
-                                            key={item.value}
-                                            type="button"
-                                            onClick={() => {
-                                                const exists = formData.amenities.includes(item.value);
-                                                setFormData((prev) => ({
+                                        <span key={am} className="px-3 py-1 bg-gray-200 rounded-full text-sm flex items-center gap-2">
+                                            {item?.label}
+                                            <button
+                                                onClick={() => setFormData(prev => ({
                                                     ...prev,
-                                                    amenities: exists
-                                                        ? prev.amenities.filter((a) => a !== item.value)
-                                                        : [...prev.amenities, item.value],
-                                                }));
-                                            }}
-                                            className={`flex items-center gap-2 p-3 rounded-lg border transition 
-            ${selected ? "bg-black text-white border-black" : "bg-white border-gray-300"}`}
-                                        >
-                                            <Icon className="w-5 h-5" />
-                                            <span>{item.label}</span>
-                                        </button>
+                                                    amenities: prev.amenities.filter(a => a !== am)
+                                                }))}
+                                                className="text-red-500"
+                                            >
+                                                ✕
+                                            </button>
+                                        </span>
                                     );
                                 })}
                             </div>

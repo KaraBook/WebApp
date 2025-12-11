@@ -15,11 +15,11 @@ import SingleSelectButtons from "@/components/SingleSelectButtons";
 import MultiSelectButtons from "../components/MultiSelectButtons";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { QuantityBox } from "@/components/QuantityBox";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import {
   propertyTypeOptions,
   foodOptions,
-  amenitiesOptions,
+  amenitiesCategories,
   kycVerifiedOptions,
   formSteps,
   approvalStatusOptions,
@@ -764,7 +764,7 @@ const EditProperty = () => {
         {/* STEP 4 */}
         {currentStep === 4 && (
           <>
-            <div className="w-[48%]">
+            <div className="w-[100%]">
               <MultiSelectButtons
                 label="Food Availability"
                 options={foodOptions}
@@ -773,34 +773,75 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="w-[100%]">
               <label className="block text-sm mb-2 font-medium">Amenities</label>
 
-              <div className="flex flex-wrap gap-2">
-                {amenitiesOptions.map((item) => {
-                  const Icon = item.icon; // IMPORTANT
-                  const isSelected = formData.amenities.includes(item.value);
+              <div className="flex flex-wrap items-start justify-start gap-4">
+                {amenitiesCategories.map((cat) => (
+                  <div key={cat.key} className="border rounded-lg w-[48%]">
 
+                    {/* Category Header */}
+                    <details className="group">
+                      <summary className="flex justify-between items-center cursor-pointer px-3 py-2 bg-gray-100">
+                        <span className="font-semibold">{cat.label}</span>
+                        <ChevronDown className="group-open:rotate-180 transition" size={18} />
+                      </summary>
+
+                      {/* Category Items */}
+                      <div className="p-3 grid grid-cols-2 gap-2">
+                        {cat.items.map((item) => {
+                          const Icon = item.icon;
+                          const isSelected = formData.amenities.includes(item.value);
+
+                          return (
+                            <button
+                              key={item.value}
+                              type="button"
+                              onClick={() => {
+                                setFormData((prev) => {
+                                  const exists = prev.amenities.includes(item.value);
+                                  return {
+                                    ...prev,
+                                    amenities: exists
+                                      ? prev.amenities.filter((v) => v !== item.value)
+                                      : [...prev.amenities, item.value],
+                                  };
+                                });
+                              }}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-md border text-sm transition 
+                    ${isSelected ? "bg-black text-white border-black" : "bg-white border-gray-300"}
+                  `}
+                            >
+                              <Icon size={16} />
+                              {item.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </details>
+                  </div>
+                ))}
+              </div>
+
+              {/* Selected tags */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {formData.amenities.map((am) => {
+                  const item = amenitiesCategories.flatMap(c => c.items).find(i => i.value === am);
                   return (
-                    <button
-                      key={item.value}
-                      type="button"
-                      onClick={() => {
-                        setFormData((prev) => {
-                          const nowSelected = prev.amenities.includes(item.value)
-                            ? prev.amenities.filter((a) => a !== item.value)
-                            : [...prev.amenities, item.value];
-
-                          return { ...prev, amenities: nowSelected };
-                        });
-                      }}
-                      className={`flex items-center gap-2 px-3 py-2 border rounded-md text-sm
-            ${isSelected ? "bg-black text-white border-black" : "bg-gray-100 text-gray-700"}
-          `}
-                    >
-                      <Icon size={16} />
-                      <span>{item.label}</span>
-                    </button>
+                    <span key={am} className="px-3 py-1 bg-gray-200 rounded-full text-sm flex items-center gap-2">
+                      {item?.label}
+                      <button
+                        onClick={() =>
+                          setFormData(prev => ({
+                            ...prev,
+                            amenities: prev.amenities.filter(v => v !== am),
+                          }))
+                        }
+                        className="text-red-500"
+                      >
+                        ✕
+                      </button>
+                    </span>
                   );
                 })}
               </div>

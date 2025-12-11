@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { amenitiesCategories } from "../constants/dropdownOptions";
 import {
   MapPin, Clock, Users, BedDouble, IndianRupee, CheckCircle2, XCircle, ShieldCheck, Image as ImageIcon,
   FileText, ArrowLeft, Edit3, Link2, Check, Star,
@@ -31,6 +32,13 @@ const SectionTitle = ({ children, icon: Icon }) => (
     </h3>
   </div>
 );
+
+const amenityLabelMap = amenitiesCategories
+  .flatMap(cat => cat.items)
+  .reduce((acc, item) => {
+    acc[item.value] = item.label;
+    return acc;
+  }, {});
 
 const ViewProperty = () => {
   const { id } = useParams();
@@ -407,11 +415,14 @@ const ViewProperty = () => {
                 <Field label="Amenities">
                   {amenities?.length ? (
                     <div className="flex flex-wrap gap-2">
-                      {amenities.map((a, i) => (
-                        <Badge key={i} variant="secondary" className="capitalize">
-                          {a}
-                        </Badge>
-                      ))}
+                      {amenities.map((a, i) => {
+                        const label = amenityLabelMap[a] || a;
+                        return (
+                          <Badge key={i} variant="secondary">
+                            {label}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   ) : (
                     "-"

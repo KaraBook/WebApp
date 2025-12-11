@@ -249,7 +249,7 @@ const PropertiesPage = () => {
 
       <div className="mt-6">
         <div className="overflow-x-auto">
-          <Table className="w-[1200px]">
+          <Table className="w-full">
             <TableHeader>
               <TableRow>
                 <TableHead>Sr. No</TableHead>

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import { Heart, MapPin, Home, Calendar, ChevronDown, Share2, Star } from "lucide-react";
-import { amenitiesOptions } from "@/constants/dropdownOptions";
+import { amenitiesCategories } from "@/constants/dropdownOptions";
 import AmenitiesList from "../components/AmenitiesList";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -19,6 +19,14 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
+
+const amenitiesMap = amenitiesCategories
+  .flatMap(cat => cat.items)
+  .reduce((acc, item) => {
+    acc[item.value] = item;
+    return acc;
+  }, {});
 
 export default function PropertyDetails() {
   const { id } = useParams();
@@ -323,16 +331,24 @@ export default function PropertyDetails() {
                 <Home className="w-5 h-5" /> Amenities
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
-                {property.amenities.map((a) => {
-                  const findAmenity = amenitiesOptions.find((x) => x.value === a);
-                  if (!findAmenity) return null;
+                {property.amenities.map((value) => {
+                  const amenity = amenitiesMap[value];
 
-                  const Icon = findAmenity.icon;
+                  if (!amenity) {
+                    return (
+                      <div key={value} className="flex items-center gap-2 text-gray-800">
+                        <span className="w-5 h-5"></span>
+                        <span className="capitalize">{value}</span>
+                      </div>
+                    );
+                  }
+
+                  const Icon = amenity.icon;
 
                   return (
-                    <div key={a} className="flex items-center gap-2 text-gray-800">
+                    <div key={value} className="flex items-center gap-2 text-gray-800">
                       <Icon className="w-5 h-5" />
-                      <span>{findAmenity.label}</span>
+                      <span>{amenity.label}</span>
                     </div>
                   );
                 })}
