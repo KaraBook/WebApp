@@ -15,6 +15,7 @@ import SummaryApi from "./common/SummaryApi";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
 import MyProfile from "./pages/MyProfile";
+import CreateManager from "./pages/CreateManager";
 
 
 /* -----------------------------------------
@@ -96,6 +97,7 @@ export default function App() {
         <Route path="calendar" element={<Calendar />} />
         <Route path="my-profile" element={<MyProfile />} />
         <Route path="invoice/:id" element={<ViewInvoice />} />
+        <Route path="/manager/create" element={<CreateManager />} />
       </Route>
 
       {/* CATCH-ALL */}
