@@ -19,17 +19,28 @@ export default function CreateManager() {
   };
 
   const handleCreate = async () => {
-    try {
-      if (manager.mobile.length !== 10)
-        return toast.error("Enter valid 10-digit number");
-
-      const res = await api.post(SummaryApi.createManager.url, manager);
-      toast.success("Manager created successfully");
-
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Error creating manager");
+  try {
+    if (!manager.firstName || !manager.lastName || !manager.email || !manager.mobile) {
+      return toast.error("All fields are required");
     }
-  };
+
+    if (manager.mobile.length !== 10)
+      return toast.error("Enter valid 10-digit number");
+
+    const payload = {
+      name: manager.firstName + " " + manager.lastName,
+      email: manager.email,
+      mobile: manager.mobile,
+    };
+
+    const res = await api.post(SummaryApi.createManager.url, payload);
+
+    toast.success("Manager created successfully");
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Error creating manager");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 p-6">
