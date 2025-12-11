@@ -90,7 +90,7 @@ const propertySchema = new mongoose.Schema({
   amenities: { type: [String], default: [] },
 
   pan: { type: String, required: true, unique: true },
-  gstin: { type: String, required: true, uppercase: true, trim: true, match: [GSTIN_REGEX, "Invalid GSTIN format"] },
+  gstin: { type: String, uppercase: true, trim: true, match: [GSTIN_REGEX, "Invalid GSTIN format"] },
 
   kycVerified: { type: Boolean, required: true },
   publishNow: { type: Boolean },

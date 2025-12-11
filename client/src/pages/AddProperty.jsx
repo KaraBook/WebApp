@@ -914,7 +914,7 @@ const AddProperty = () => {
 
                         <div className="w-[48%]">
                             <Label htmlFor="gstin" className="text-sm">
-                                GSTIN <span className="text-gray-400 text-xs">(15 characters)</span> <span className="text-red-500">*</span>
+                                GSTIN <span className="text-gray-400 text-xs">(15 characters)</span>
                             </Label>
                             <Input
                                 id="gstin"
@@ -968,7 +968,7 @@ const AddProperty = () => {
 
                         <div className="w-[48%]">
                             <Label htmlFor="internaNotes" className="text-sm">
-                                Internal Notes <span className="text-red-500">*</span>
+                                Internal Notes 
                             </Label>
                             <Textarea id="internalNotes" name="internalNotes"
                                 className="mt-2"

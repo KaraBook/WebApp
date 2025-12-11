@@ -78,7 +78,7 @@ const baseFields = {
   foodAvailability: Joi.array().items(Joi.string()),
   amenities: Joi.array().items(Joi.string().trim().min(1).max(50)).default([]),
   pan: Joi.string().length(10).required(),
-  gstin: Joi.string().length(15).pattern(GSTIN_REGEX).required()
+  gstin: Joi.string().length(15).pattern(GSTIN_REGEX)
     .messages({
       "string.empty": "GSTIN is required",
       "string.length": "GSTIN must be exactly 15 characters",
