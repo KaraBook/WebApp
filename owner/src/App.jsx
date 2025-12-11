@@ -17,6 +17,9 @@ import Header from "./components/Header";
 import MyProfile from "./pages/MyProfile";
 
 
+/* -----------------------------------------
+   AUTO-REDIRECT TO FIRST PROPERTY
+------------------------------------------ */
 function AutoPropertyRedirect() {
   const navigate = useNavigate();
 
@@ -24,7 +27,7 @@ function AutoPropertyRedirect() {
     (async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerProperties.url);
-        const list = res.data.data || [];
+        const list = res.data?.data || [];
 
         if (list.length > 0) {
           navigate(`/view-property/${list[0]._id}`, { replace: true });
@@ -45,6 +48,9 @@ function AutoPropertyRedirect() {
 }
 
 
+/* -----------------------------------------
+   MAIN LAYOUT
+------------------------------------------ */
 function MainContainer() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -56,13 +62,20 @@ function MainContainer() {
   );
 }
 
+
+/* -----------------------------------------
+   MAIN ROUTES WITH basename="/owner"
+------------------------------------------ */
 export default function App() {
   return (
     <Routes>
-      {/* LOGIN */}
-      <Route path="/owner/login" element={<Login userType="owner" />} />
+
+      {/* LOGIN ROUTES */}
+      {/* Because basename="/owner", actual URL becomes /owner/login */}
+      <Route path="/login" element={<Login userType="owner" />} />
       <Route path="/manager/login" element={<Login userType="manager" />} />
 
+      {/* PROTECTED ROUTES */}
       <Route
         path="/"
         element={
@@ -71,6 +84,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
+        {/* Default redirect */}
         <Route index element={<Navigate to="dashboard" replace />} />
 
         <Route path="dashboard" element={<Dashboard />} />
@@ -84,6 +98,7 @@ export default function App() {
         <Route path="invoice/:id" element={<ViewInvoice />} />
       </Route>
 
+      {/* CATCH-ALL */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
