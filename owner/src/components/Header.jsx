@@ -7,6 +7,8 @@ import SummaryApi from "../common/SummaryApi";
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const isManager = user?.role === "manager";
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [propertyId, setPropertyId] = useState(null);
   const dropdownRef = useRef(null);
@@ -14,20 +16,20 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isManager = user?.role === "manager";
-
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await api.get(SummaryApi.getOwnerProperties.url);
-        if (res.data?.data?.length > 0) {
-          setPropertyId(res.data.data[0]._id);
+    if (!isManager) {
+      (async () => {
+        try {
+          const res = await api.get(SummaryApi.getOwnerProperties.url);
+          if (res.data?.data?.length > 0) {
+            setPropertyId(res.data.data[0]._id);
+          }
+        } catch (err) {
+          console.log("Failed to load property id");
         }
-      } catch (err) {
-        console.log("Failed to load property id");
-      }
-    })();
-  }, []);
+      })();
+    }
+  }, [isManager]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -40,12 +42,12 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
+  // FULL NAME FIX
   const fullName = isManager
-  ? `${user?.firstName} (Manager)`
-  : `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
-    user?.name ||
-    "Owner";
+    ? `${user?.firstName} (Manager)`
+    : `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
+      user?.name ||
+      "Owner";
 
   const getInitials = (name) => {
     const parts = name.trim().split(" ");
@@ -59,22 +61,23 @@ export default function Header() {
     location.pathname.startsWith("/view-property") ||
     location.pathname.startsWith("/edit-property");
 
+  // MANAGER NAV ITEMS VS OWNER NAV ITEMS
   const navItems = isManager
-  ? [
-      { label: "Dashboard", path: "/manager/dashboard" },
-      { label: "Bookings", path: "/bookings" },
-      { label: "Calendar", path: "/calendar" },
-    ]
-  : [
-      { label: "Dashboard", path: "/dashboard" },
-      { label: "Property", path: `/view-property/${propertyId ?? ""}` },
-      { label: "Bookings", path: "/bookings" },
-      { label: "Calendar", path: "/calendar" },
-      {
-        label: "Customize",
-        path: propertyId ? `/offline-booking/${propertyId}` : null,
-      },
-    ];
+    ? [
+        { label: "Dashboard", path: "/manager/dashboard" },
+        { label: "Bookings", path: "/bookings" },
+        { label: "Calendar", path: "/calendar" },
+      ]
+    : [
+        { label: "Dashboard", path: "/dashboard" },
+        { label: "Property", path: `/view-property/${propertyId ?? ""}` },
+        { label: "Bookings", path: "/bookings" },
+        { label: "Calendar", path: "/calendar" },
+        {
+          label: "Customize",
+          path: propertyId ? `/offline-booking/${propertyId}` : null,
+        },
+      ];
 
   const handlePropertyClick = (e) => {
     if (!propertyId) {
@@ -86,12 +89,14 @@ export default function Header() {
 
   return (
     <header className="w-full bg-white/90 backdrop-blur border-b border-gray-200 px-8 py-3 flex items-center justify-between">
-
       {/* LOGO */}
       <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[150px]" />
 
       <nav className="hidden md:flex items-center gap-6">
         {navItems.map((item) => {
+          // REMOVE PROPERTY BUTTON FOR MANAGER
+          if (isManager && item.label === "Property") return null;
+
           const active =
             item.label === "Property"
               ? isPropertyActive
@@ -102,10 +107,11 @@ export default function Header() {
               <button
                 key={item.label}
                 onClick={handlePropertyClick}
-                className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
-                  ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  }`}
+                className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${
+                  active
+                    ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
               >
                 Property
               </button>
@@ -116,10 +122,11 @@ export default function Header() {
             <NavLink
               key={item.path}
               to={item.path}
-              className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
-                ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
+              className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${
+                active
+                  ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              }`}
             >
               {item.label}
             </NavLink>
