@@ -89,6 +89,11 @@ const userSchema = new mongoose.Schema({
   },
 
   avatarUrl: { type: String, default: "" },
+  
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 
   password: {
     type: String,
