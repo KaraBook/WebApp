@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { prepareImage, uploadBuffer } from "../utils/cloudinary.js";
 import { normalizeMobile } from "../utils/phone.js";
 import Razorpay from "razorpay";
+import { getEffectiveOwnerId } from "../utils/getEffectiveOwner.js";
 
 const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
@@ -17,7 +18,7 @@ const razorpay = new Razorpay({
 
 export const getOwnerDashboard = async (req, res) => {
   try {
-    const ownerId = req.user.id;
+    const ownerId = await getEffectiveOwnerId(req);
     const owner = await User.findById(ownerId).select("mobile email");
 
     const properties = await Property.find({
@@ -54,7 +55,8 @@ export const getOwnerDashboard = async (req, res) => {
 
 export const getOwnerProperties = async (req, res) => {
   try {
-    const owner = await User.findById(req.user.id).select("mobile email");
+    const ownerId = await getEffectiveOwnerId(req);
+    const owner = await User.findById(ownerId).select("mobile email");
     const properties = await Property.find({
       $or: [
         { ownerUserId: req.user.id },
@@ -71,7 +73,8 @@ export const getOwnerProperties = async (req, res) => {
 
 export const getOwnerBookings = async (req, res) => {
   try {
-    const owner = await User.findById(req.user.id).select("mobile email");
+    const ownerId = await getEffectiveOwnerId(req);
+    const owner = await User.findById(ownerId).select("mobile email");
 
     const properties = await Property.find({
       $or: [
@@ -97,7 +100,8 @@ export const getOwnerBookings = async (req, res) => {
 
 export const getSingleOwnerProperty = async (req, res) => {
   try {
-    const owner = await User.findById(req.user.id).select("mobile email");
+    const ownerId = await getEffectiveOwnerId(req);
+    const owner = await User.findById(ownerId).select("mobile email");
 
     const property = await Property.findOne({
       _id: req.params.id,
@@ -125,7 +129,7 @@ export const updateOwnerProperty = async (req, res) => {
   const session = await mongoose.startSession();
 
   try {
-    const ownerId = req.user.id;
+    const ownerId = await getEffectiveOwnerId(req);
     const propertyId = req.params.id;
 
     const existingProperty = await Property.findOne({
@@ -483,7 +487,7 @@ export const createOfflineBooking = async (req, res) => {
       totalAmount
     } = req.body;
 
-    const ownerId = req.user.id;
+    const ownerId = await getEffectiveOwnerId(req);
 
     if (!propertyId) {
       return res.status(400).json({ success: false, message: "Property ID missing" });
