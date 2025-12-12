@@ -59,7 +59,7 @@ export const getOwnerProperties = async (req, res) => {
     const owner = await User.findById(ownerId).select("mobile email");
     const properties = await Property.find({
       $or: [
-        { ownerUserId: req.user.id },
+        { ownerUserId: ownerId },
         { "resortOwner.mobile": owner?.mobile },
         { "resortOwner.email": owner?.email },
       ],
@@ -78,7 +78,7 @@ export const getOwnerBookings = async (req, res) => {
 
     const properties = await Property.find({
       $or: [
-        { ownerUserId: req.user.id },
+        { ownerUserId: ownerId },
         { "resortOwner.mobile": owner?.mobile },
         { "resortOwner.email": owner?.email },
       ],
@@ -106,7 +106,7 @@ export const getSingleOwnerProperty = async (req, res) => {
     const property = await Property.findOne({
       _id: req.params.id,
       $or: [
-        { ownerUserId: req.user.id },
+        { ownerUserId: ownerId },
         { "resortOwner.mobile": owner?.mobile },
         { "resortOwner.email": owner?.email },
       ],
