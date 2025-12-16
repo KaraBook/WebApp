@@ -42,14 +42,19 @@ export default function Checkout() {
         guests || { adults: 1, children: 0, infants: 0 }
     );
 
-    const totalMainGuests = guestData.adults + guestData.children;
-    const extraAdults = Math.max(0, guestData.adults - baseGuests);
-    const remainingBaseAfterAdults = Math.max(0, baseGuests - guestData.adults);
-    const extraChildren = Math.max(0, guestData.children - remainingBaseAfterAdults);
     const maxGuests = property?.maxGuests || 1;
     const baseGuests = property?.baseGuests || 0;
     const extraAdultCharge = property?.extraAdultCharge || 0;
     const extraChildCharge = property?.extraChildCharge || 0;
+
+    const totalMainGuests = guestData.adults + guestData.children;
+
+    const extraAdults = Math.max(0, guestData.adults - baseGuests);
+    const remainingBaseAfterAdults = Math.max(0, baseGuests - guestData.adults);
+    const extraChildren = Math.max(
+        0,
+        guestData.children - remainingBaseAfterAdults
+    );
 
     const [showCalendar, setShowCalendar] = useState(false);
     const [dateRange, setDateRange] = useState([
