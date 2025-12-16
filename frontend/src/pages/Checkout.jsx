@@ -43,7 +43,14 @@ export default function Checkout() {
     );
 
     const totalMainGuests = guestData.adults + guestData.children;
+    const extraAdults = Math.max(0, guestData.adults - baseGuests);
+    const remainingBaseAfterAdults = Math.max(0, baseGuests - guestData.adults);
+    const extraChildren = Math.max(0, guestData.children - remainingBaseAfterAdults);
     const maxGuests = property?.maxGuests || 1;
+    const baseGuests = property?.baseGuests || 0;
+    const extraAdultCharge = property?.extraAdultCharge || 0;
+    const extraChildCharge = property?.extraChildCharge || 0;
+
     const [showCalendar, setShowCalendar] = useState(false);
     const [dateRange, setDateRange] = useState([
         {
@@ -129,8 +136,14 @@ export default function Checkout() {
     };
 
     const basePrice = calcBasePrice();
-    const tax = Math.round(basePrice * 0.10);
-    const total = basePrice + tax;
+    const extraGuestPrice =
+        extraAdults * extraAdultCharge +
+        extraChildren * extraChildCharge;
+
+    const subtotal = basePrice + extraGuestPrice;
+    const tax = Math.round(subtotal * 0.10);
+    const total = subtotal + tax;
+
 
 
     const handleContactChange = (e) => {
@@ -434,6 +447,15 @@ export default function Checkout() {
                             </span>
                             <span>₹{basePrice.toLocaleString()}</span>
                         </div>
+
+                        {extraGuestPrice > 0 && (
+                            <div className="flex justify-between text-sm">
+                                <span>
+                                    Extra guests ({extraAdults} adults, {extraChildren} children)
+                                </span>
+                                <span>₹{extraGuestPrice.toLocaleString()}</span>
+                            </div>
+                        )}
 
                         <div className="flex justify-between">
                             <span>Taxes (10%)</span>

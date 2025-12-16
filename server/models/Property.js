@@ -78,8 +78,11 @@ const propertySchema = new mongoose.Schema({
   },
   petFriendly: { type: Boolean, required: true, default: false },
   maxGuests: { type: Number, required: true },
+  baseGuests: { type: Number, required: true },
   pricingPerNightWeekdays: { type: Number, required: true },
   pricingPerNightWeekend: { type: Number, required: true },
+  extraAdultCharge: { type: Number, required: true },
+  extraChildCharge: { type: Number, required: true },
   extraGuestCharge: { type: Number },
 
   checkInTime: { type: String, required: true },

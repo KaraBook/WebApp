@@ -154,9 +154,11 @@ export const updateOwnerProperty = async (req, res) => {
     const allowedFields = [
       "description",
       "maxGuests",
+      "baseGuests",
       "pricingPerNightWeekdays",
       "pricingPerNightWeekend",
-      "extraGuestCharge",
+      "extraAdultCharge",
+      "extraChildCharge",
       "checkInTime",
       "checkOutTime",
       "foodAvailability",
@@ -173,6 +175,31 @@ export const updateOwnerProperty = async (req, res) => {
         updatedData[field] = body[field];
       }
     });
+
+    [
+      "maxGuests",
+      "baseGuests",
+      "pricingPerNightWeekdays",
+      "pricingPerNightWeekend",
+      "extraAdultCharge",
+      "extraChildCharge",
+    ].forEach((f) => {
+      if (updatedData[f] !== undefined) {
+        updatedData[f] = Number(updatedData[f]);
+      }
+    });
+
+    if (
+      updatedData.baseGuests !== undefined &&
+      updatedData.maxGuests !== undefined &&
+      updatedData.baseGuests > updatedData.maxGuests
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Base guests cannot be greater than max guests",
+      });
+    }
+
 
     if (
       body["roomBreakdown[ac]"] ||
@@ -506,25 +533,54 @@ export const createOfflineBooking = async (req, res) => {
       return res.status(404).json({ success: false, message: "Property not found" });
     }
 
-    const weekdayPrice = Number(property.pricingPerNightWeekdays || 0);
-    const weekendPrice = Number(property.pricingPerNightWeekend || weekdayPrice);
-
-    let backendTotal = 0;
-
-    let d = new Date(checkIn);
+    const start = new Date(checkIn);
     const end = new Date(checkOut);
 
-    while (d < end) {
-      const day = d.getDay();
-      const isWeekend = day === 0 || day === 6;
-      backendTotal += isWeekend ? weekendPrice : weekdayPrice;
-      d.setDate(d.getDate() + 1);
+    const totalNights = Math.ceil(
+      (end - start) / (1000 * 60 * 60 * 24)
+    );
+
+    if (totalNights <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid date range" });
     }
+
+    const adults = Number(guests?.adults || 0);
+    const children = Number(guests?.children || 0);
+    const infants = Number(guests?.infants || 0);
+
+    const totalGuests = adults + children;
+
+    if (totalGuests > property.maxGuests) {
+      return res.status(400).json({
+        success: false,
+        message: `Maximum ${property.maxGuests} guests allowed`,
+      });
+    }
+
+    const baseGuests = Number(property.baseGuests);
+    const basePricePerNight = Number(property.pricingPerNightWeekdays);
+
+    const baseUsedByAdults = Math.min(adults, baseGuests);
+    const remainingBaseSlots = baseGuests - baseUsedByAdults;
+
+    const extraAdults = Math.max(0, adults - baseGuests);
+    const extraChildren = Math.max(0, children - remainingBaseSlots);
+
+    const extraAdultCost =
+      extraAdults * Number(property.extraAdultCharge);
+
+    const extraChildCost =
+      extraChildren * Number(property.extraChildCharge);
+
+    const perNightTotal =
+      basePricePerNight + extraAdultCost + extraChildCost;
+
+    const backendTotal = perNightTotal * totalNights;
 
     if (backendTotal !== Number(totalAmount)) {
       return res.status(400).json({
         success: false,
-        message: "Price mismatch! Please refresh and try again."
+        message: "Price mismatch! Please refresh and try again.",
       });
     }
 
@@ -540,9 +596,18 @@ export const createOfflineBooking = async (req, res) => {
     let user = await User.findOne({ mobile: normalized });
 
     if (user) {
-      const fields = ["firstName", "lastName", "email", "state", "city", "dateOfBirth", "address", "pinCode"];
-      let updated = false;
+      const fields = [
+        "firstName",
+        "lastName",
+        "email",
+        "state",
+        "city",
+        "dateOfBirth",
+        "address",
+        "pinCode",
+      ];
 
+      let updated = false;
       fields.forEach((f) => {
         if (!user[f] && traveller[f]) {
           user[f] = traveller[f];
@@ -551,7 +616,6 @@ export const createOfflineBooking = async (req, res) => {
       });
 
       if (updated) await user.save();
-
     } else {
       user = await User.create({
         firstName: traveller.firstName,
@@ -568,22 +632,22 @@ export const createOfflineBooking = async (req, res) => {
       });
     }
 
-    const nights = Math.ceil(
-      (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
-    );
-
     const booking = await Booking.create({
       userId: user._id,
       propertyId,
       checkIn,
       checkOut,
-      guests,
-      totalNights: nights,
-      totalAmount: Number(totalAmount),
+      guests: {
+        adults,
+        children,
+        infants,
+      },
+      totalNights,
+      totalAmount: backendTotal,
       bookedBy: ownerId,
       isOffline: true,
       paymentMethod: "razorpay",
-      paymentStatus: "initiated"
+      paymentStatus: "initiated",
     });
 
     return res.json({ success: true, booking });
@@ -597,6 +661,7 @@ export const createOfflineBooking = async (req, res) => {
     });
   }
 };
+
 
 
 

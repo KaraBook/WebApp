@@ -77,8 +77,8 @@ export default function Properties() {
   const statusColor = property.isBlocked
     ? "bg-red-50 text-red-600 border border-red-100"
     : property.isDraft
-    ? "bg-yellow-50 text-yellow-700 border border-yellow-100"
-    : "bg-emerald-50 text-emerald-700 border border-emerald-100";
+      ? "bg-yellow-50 text-yellow-700 border border-yellow-100"
+      : "bg-emerald-50 text-emerald-700 border border-emerald-100";
 
   const handleEditClick = (e) => {
     if (property.isDraft || property.isBlocked || !property.publishNow) {
@@ -102,8 +102,8 @@ export default function Properties() {
                 {property.isBlocked
                   ? "Blocked"
                   : property.isDraft
-                  ? "Draft"
-                  : "Published"}
+                    ? "Draft"
+                    : "Published"}
               </Badge>
             </h1>
 
@@ -174,20 +174,44 @@ export default function Properties() {
           <Separator />
 
           <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
-            <p><strong>Weekdays:</strong> ₹{property.pricingPerNightWeekdays}</p>
-            <p><strong>Weekend:</strong> ₹{property.pricingPerNightWeekend}</p>
             <p>
-              <strong>Extra Guest Charge:</strong>{" "}
-              {property.extraGuestCharge ? `₹${property.extraGuestCharge}` : "N/A"}
+              <strong>Base Price (per night):</strong>{" "}
+              ₹{property.pricingPerNightWeekdays}
             </p>
-            <p><strong>Minimum Nights:</strong> {property.minStayNights}</p>
+
+            <p>
+              <strong>Base Guests Included:</strong>{" "}
+              {property.baseGuests}
+            </p>
+
+            <p>
+              <strong>Extra Adult Charge:</strong>{" "}
+              ₹{property.extraAdultCharge} / night
+            </p>
+
+            <p>
+              <strong>Extra Child Charge:</strong>{" "}
+              ₹{property.extraChildCharge} / night
+            </p>
+
+            <p>
+              <strong>Maximum Guests Allowed:</strong>{" "}
+              {property.maxGuests}
+            </p>
+
+            <p>
+              <strong>Minimum Nights:</strong>{" "}
+              {property.minStayNights}
+            </p>
 
             <p className="flex items-center gap-2">
               <CalendarClock className="w-4 h-4 text-primary" />
               <strong>Check-In:</strong> {property.checkInTime}
             </p>
 
-            <p><strong>Check-Out:</strong> {property.checkOutTime}</p>
+            <p>
+              <strong>Check-Out:</strong> {property.checkOutTime}
+            </p>
           </div>
         </div>
 

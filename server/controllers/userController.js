@@ -311,7 +311,6 @@ export const resortOwnerLogin = async (req, res) => {
 
 
 
-/* ---------------------------- RESORT OWNER PRECHECK --------------------------- */
 export const checkResortOwnerNumber = async (req, res) => {
   try {
     const { mobile } = req.body;
@@ -361,7 +360,6 @@ export const checkResortOwnerNumber = async (req, res) => {
 
 
 
-/* ---------------------------- ME --------------------------- */
 export const me = async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) return res.status(404).json({ message: "User not found" });

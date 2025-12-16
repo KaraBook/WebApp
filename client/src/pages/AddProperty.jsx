@@ -64,7 +64,9 @@ const AddProperty = () => {
         maxGuests: "",
         pricingPerNightWeekdays: "",
         pricingPerNightWeekend: "",
-        extraGuestCharge: "",
+        baseGuests: "",
+        extraAdultCharge: "",
+        extraChildCharge: "",
         checkInTime: "",
         checkOutTime: "",
         minStayNights: "",
@@ -148,7 +150,9 @@ const AddProperty = () => {
             maxGuests: num(formData.maxGuests),
             pricingPerNightWeekdays: num(formData.pricingPerNightWeekdays),
             pricingPerNightWeekend: num(formData.pricingPerNightWeekend),
-            extraGuestCharge: num(formData.extraGuestCharge),
+            baseGuests: num(formData.baseGuests),
+            extraAdultCharge: num(formData.extraAdultCharge),
+            extraChildCharge: num(formData.extraChildCharge),
             checkInTime: formData.checkInTime,
             checkOutTime: formData.checkOutTime,
             minStayNights: num(formData.minStayNights),
@@ -195,6 +199,17 @@ const AddProperty = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (
+            formData.baseGuests &&
+            formData.maxGuests &&
+            Number(formData.baseGuests) > Number(formData.maxGuests)
+        ) {
+            toast.error("Base guests cannot exceed max guests");
+        }
+    }, [formData.baseGuests, formData.maxGuests]);
+
 
     const finalizeMedia = async () => {
         if (!propertyId) {
@@ -663,7 +678,7 @@ const AddProperty = () => {
                         </div>
 
 
-                        <div className="w-[15%]">
+                        <div className="w-[12%]">
                             <Label htmlFor="maxGuests" className="text-sm">
                                 Max Guests Allowed <span className="text-red-500">*</span>
                             </Label>
@@ -679,10 +694,62 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                        <div className="w-[26%]">
+                        <div className="w-[12%]">
+                            <Label className="text-sm">
+                                Base Guests <span className="text-red-500">*</span>
+                            </Label>
+                            <div className="mt-2">
+                            <QuantityBox
+                                value={formData.baseGuests}
+                                onChange={(val) =>
+                                    setFormData((prev) => ({ ...prev, baseGuests: val }))
+                                }
+                                min={1}
+                                max={formData.maxGuests || 999}
+                            />
+                            </div>
+                        </div>
+
+                        <div className="w-[15%]">
+                            <Label className="text-sm">
+                                Extra Adult Charge (₹ / night)
+                            </Label>
+                            <div className="mt-2">
+                            <Input
+                                value={formData.extraAdultCharge}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    if (/^\d{0,5}$/.test(v)) {
+                                        setFormData((p) => ({ ...p, extraAdultCharge: v }));
+                                    }
+                                }}
+                            />
+                            </div>
+                        </div>
+
+                        <div className="w-[16%]">
+                            <Label className="text-sm">
+                                Extra Child Charge (₹ / night)
+                            </Label>
+                            <div className="mt-2">
+                            <Input
+                                value={formData.extraChildCharge}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    if (/^\d{0,5}$/.test(v)) {
+                                        setFormData((p) => ({ ...p, extraChildCharge: v }));
+                                    }
+                                }}
+                            />
+                            </div>
+                        </div>
+
+
+                        <div className="w-[16%]">
                             <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
                                 Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
                             </Label>
+                            <div className="mt-2">
                             <Input
                                 id="pricingPerNightWeekdays" name="pricingPerNightWeekdays" type="text" inputMode="numeric" className="mt-2"
                                 value={formData.pricingPerNightWeekdays}
@@ -697,12 +764,14 @@ const AddProperty = () => {
                                 }}
                                 required
                             />
+                            </div>
                         </div>
 
-                        <div className="w-[26%]">
+                        <div className="w-[17%]">
                             <Label htmlFor="pricingPerNightWeekend" className="block font-medium mt-2">
                                 Price Per Night (Weekend) (₹) <span className="text-red-500">*</span>
                             </Label>
+                            <div className="mt-2">
                             <Input
                                 id="pricingPerNightWeekend" name="pricingPerNightWeekend" type="text" inputMode="numeric" className="mt-2"
                                 value={formData.pricingPerNightWeekend}
@@ -717,25 +786,7 @@ const AddProperty = () => {
                                 }}
                                 required
                             />
-                        </div>
-
-                        <div className="w-[26%]">
-                            <Label htmlFor="extraGuestCharge" className="block font-medium mt-2">
-                                Extra Guest Charge (₹)
-                            </Label>
-                            <Input
-                                id="extraGuestCharge" name="extraGuestCharge" type="text" inputMode="numeric" className="mt-2"
-                                value={formData.extraGuestCharge}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (/^\d{0,4}$/.test(value)) {
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            extraGuestCharge: value,
-                                        }));
-                                    }
-                                }}
-                            />
+                            </div>
                         </div>
 
 
@@ -968,7 +1019,7 @@ const AddProperty = () => {
 
                         <div className="w-[48%]">
                             <Label htmlFor="internaNotes" className="text-sm">
-                                Internal Notes 
+                                Internal Notes
                             </Label>
                             <Textarea id="internalNotes" name="internalNotes"
                                 className="mt-2"

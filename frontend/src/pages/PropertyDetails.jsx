@@ -28,6 +28,7 @@ const amenitiesMap = amenitiesCategories
     return acc;
   }, {});
 
+
 export default function PropertyDetails() {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
@@ -45,8 +46,19 @@ export default function PropertyDetails() {
     infants: 0,
   });
 
-  const totalMainGuests = guests.adults + guests.children;
   const maxGuests = property?.maxGuests || 1;
+  const baseGuests = property?.baseGuests || 0;
+  const extraAdultCharge = property?.extraAdultCharge || 0;
+  const extraChildCharge = property?.extraChildCharge || 0;
+
+  const totalMainGuests = guests.adults + guests.children;
+
+  const extraAdults = Math.max(0, guests.adults - baseGuests);
+  const remainingBaseAfterAdults = Math.max(0, baseGuests - guests.adults);
+  const extraChildren = Math.max(0, guests.children - remainingBaseAfterAdults);
+
+  const extraGuests = Math.max(0, totalMainGuests - baseGuests);
+
 
   const [bookedDates, setBookedDates] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
@@ -64,6 +76,39 @@ export default function PropertyDetails() {
 
   const calendarRef = useRef(null);
   const guestRef = useRef(null);
+
+
+  const nights = Math.max(
+    1,
+    Math.ceil(
+      (dateRange[0].endDate - dateRange[0].startDate) /
+      (1000 * 60 * 60 * 24)
+    )
+  );
+
+  const isWeekend = (date) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  return day === 0 || day === 6;
+};
+
+const calculateBasePrice = () => {
+  let total = 0;
+  let d = new Date(dateRange[0].startDate);
+  const end = new Date(dateRange[0].endDate);
+
+  while (d < end) {
+    total += isWeekend(d)
+      ? Number(property?.pricingPerNightWeekend || property?.pricingPerNightWeekdays)
+      : Number(property?.pricingPerNightWeekdays);
+    d.setDate(d.getDate() + 1);
+  }
+  return total;
+};
+
+const baseNightPrice = property?.pricingPerNightWeekdays || 0;
+const basePriceTotal = calculateBasePrice();
+
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -240,6 +285,15 @@ export default function PropertyDetails() {
     );
 
   if (!property) return <div className="text-center py-20">Property not found.</div>;
+
+
+  const extraAdultTotal = extraAdults * extraAdultCharge * nights;
+  const extraChildTotal = extraChildren * extraChildCharge * nights;
+
+  const finalTotal =
+    basePriceTotal + extraAdultTotal + extraChildTotal;
+
+
 
   return (
     <div className="w-full bg-[#fff5f529]">
@@ -677,45 +731,42 @@ export default function PropertyDetails() {
               <div className="mt-6 text-sm text-gray-700">
                 <div className="flex justify-between mb-1">
                   <span>
-                    ₹{property.pricingPerNightWeekdays} ×{" "}
-                    {Math.max(
-                      1,
-                      Math.ceil(
-                        (dateRange[0].endDate - dateRange[0].startDate) / (1000 * 60 * 60 * 24)
-                      )
-                    )}{" "}
-                    nights
+                    ₹{baseNightPrice} × {nights} nights
+                    {baseGuests > 0 && (
+                      <span className="block text-xs text-gray-500">
+                        Includes {baseGuests} guests
+                      </span>
+                    )}
                   </span>
-
                   <span className="font-medium text-gray-900">
-                    ₹
-                    {property.pricingPerNightWeekdays *
-                      Math.max(
-                        1,
-                        Math.ceil(
-                          (dateRange[0].endDate - dateRange[0].startDate) /
-                          (1000 * 60 * 60 * 24)
-                        )
-                      )}
+                    ₹{basePriceTotal}
                   </span>
                 </div>
 
+                {extraAdults > 0 && (
+                  <div className="flex justify-between mb-1">
+                    <span>
+                      Extra adults ({extraAdults} × ₹{extraAdultCharge} × {nights})
+                    </span>
+                    <span>₹{extraAdultTotal}</span>
+                  </div>
+                )}
+
+                {extraChildren > 0 && (
+                  <div className="flex justify-between mb-1">
+                    <span>
+                      Extra children ({extraChildren} × ₹{extraChildCharge} × {nights})
+                    </span>
+                    <span>₹{extraChildTotal}</span>
+                  </div>
+                )}
 
                 <div className="flex justify-between font-semibold text-lg border-t pt-3">
                   <span>Total</span>
-                  <span>
-                    ₹
-                    {property.pricingPerNightWeekdays *
-                      Math.max(
-                        1,
-                        Math.ceil(
-                          (dateRange[0].endDate - dateRange[0].startDate) /
-                          (1000 * 60 * 60 * 24)
-                        )
-                      )}
-                  </span>
+                  <span>₹{finalTotal}</span>
                 </div>
               </div>
+
 
 
               <Button

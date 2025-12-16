@@ -342,6 +342,12 @@ const ViewProperty = () => {
                   </div>
                 </Field>
                 <Separator />
+
+                <Field label="Base Guests (included in price)">
+                  {property.baseGuests ?? "-"}
+                </Field>
+
+                <Separator />
                 <Field label="Room Breakdown">
                   {roomBreakdown ? (
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -370,11 +376,17 @@ const ViewProperty = () => {
                 <SectionTitle icon={IndianRupee}>Pricing</SectionTitle>
               </CardHeader>
               <CardContent>
-                <Field label="Weekdays (₹)">{pricingPerNightWeekdays}</Field>
-                <Field label="Weekend (₹)">{pricingPerNightWeekend}</Field>
-                <Field label="Extra Guest Charge (₹)">
-                  {extraGuestCharge !== undefined && extraGuestCharge !== null && extraGuestCharge !== ""
-                    ? extraGuestCharge
+                <Field label="Weekday Price (₹ / night)">
+                  ₹{pricingPerNightWeekdays?.toLocaleString("en-IN")}
+                </Field>
+
+                <Field label="Weekend Price (₹ / night)">
+                  ₹{pricingPerNightWeekend?.toLocaleString("en-IN")}
+                </Field>
+
+                <Field label="Extra Guest Charge (₹ / guest / night)">
+                  {extraGuestCharge !== undefined && extraGuestCharge !== null
+                    ? `₹${extraGuestCharge.toLocaleString("en-IN")}`
                     : "-"}
                 </Field>
               </CardContent>

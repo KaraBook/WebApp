@@ -50,9 +50,11 @@ export default function EditProperty() {
     description: "",
     roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
     maxGuests: "",
+    baseGuests: "",
     pricingPerNightWeekdays: "",
     pricingPerNightWeekend: "",
-    extraGuestCharge: "",
+    extraAdultCharge: "",
+    extraChildCharge: "",
     checkInTime: "",
     checkOutTime: "",
     foodAvailability: [],
@@ -60,7 +62,6 @@ export default function EditProperty() {
     petFriendly: false,
   });
 
-  // FETCH PROPERTY DATA
   useEffect(() => {
     (async () => {
       try {
@@ -87,9 +88,11 @@ export default function EditProperty() {
             total: 0,
           },
           maxGuests: prop.maxGuests || "",
+          baseGuests: prop.baseGuests || "",
           pricingPerNightWeekdays: `${prop.pricingPerNightWeekdays || ""}`,
           pricingPerNightWeekend: `${prop.pricingPerNightWeekend || ""}`,
-          extraGuestCharge: `${prop.extraGuestCharge || ""}`,
+          extraAdultCharge: `${prop.extraAdultCharge || ""}`,
+          extraChildCharge: `${prop.extraChildCharge || ""}`,
           checkInTime: prop.checkInTime || "",
           checkOutTime: prop.checkOutTime || "",
           foodAvailability: prop.foodAvailability || [],
@@ -246,6 +249,44 @@ export default function EditProperty() {
                   />
                 </div>
 
+                <div>
+                  <Label>Base Guests Included</Label>
+                  <QuantityBox
+                    value={formData.baseGuests}
+                    min={1}
+                    max={formData.maxGuests || 999}
+                    onChange={(val) =>
+                      setFormData({ ...formData, baseGuests: val })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label>Extra Adult Charge (₹ / night)</Label>
+                  <Input
+                    value={formData.extraAdultCharge}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        extraAdultCharge: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label>Extra Child Charge (₹ / night)</Label>
+                  <Input
+                    value={formData.extraChildCharge}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        extraChildCharge: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
                 <SingleSelectDropdown
                   label="Pet Friendly"
                   value={formData.petFriendly}
@@ -294,19 +335,6 @@ export default function EditProperty() {
                 />
               </div>
 
-              <div>
-                <Label>Extra Guest Charge</Label>
-                <Input
-                  name="extraGuestCharge"
-                  value={formData.extraGuestCharge}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      extraGuestCharge: e.target.value,
-                    })
-                  }
-                />
-              </div>
             </div>
 
             <CustomTimePicker

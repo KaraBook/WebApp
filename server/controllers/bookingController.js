@@ -18,57 +18,89 @@ export const createOrder = async (req, res) => {
     const userId = req.user.id;
 
     const property = await Property.findById(propertyId).lean();
-    const weekday = Number(property.pricingPerNightWeekdays);
-    const weekend = Number(property.pricingPerNightWeekend || weekday);
-
-    let d = new Date(checkIn);
-    const end = new Date(checkOut);
-
-    let baseTotal = 0;
-
-    while (d < end) {
-      const day = d.getDay();
-      const isWeekend = day === 0 || day === 6;
-      const todayPrice = isWeekend ? weekend : weekday;
-      baseTotal += todayPrice;
-      d.setDate(d.getDate() + 1);
+    if (!property) {
+      return res.status(404).json({ success: false, message: "Property not found" });
     }
 
-    const tax = Math.round(baseTotal * 0.10);
-    const grandTotal = baseTotal + tax;
+    /* ---------- DATE & NIGHT CALC ---------- */
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
 
-    const options = {
+    const totalNights = Math.ceil(
+      (end - start) / (1000 * 60 * 60 * 24)
+    );
+
+    if (totalNights <= 0) {
+      return res.status(400).json({ success: false, message: "Invalid date range" });
+    }
+
+    /* ---------- GUEST CALC ---------- */
+    const adults = Number(guests?.adults || 0);
+    const children = Number(guests?.children || 0);
+    const infants = Number(guests?.infants || 0);
+
+    const totalGuests = adults + children;
+
+    if (totalGuests > property.maxGuests) {
+      return res.status(400).json({
+        success: false,
+        message: `Maximum ${property.maxGuests} guests allowed`,
+      });
+    }
+
+    /* ---------- BASE & EXTRA GUEST LOGIC ---------- */
+    const baseGuests = Number(property.baseGuests);
+    const basePricePerNight = Number(property.pricingPerNightWeekdays);
+
+    // Adults consume base slots first
+    const baseUsedByAdults = Math.min(adults, baseGuests);
+    const remainingBaseSlots = baseGuests - baseUsedByAdults;
+
+    const extraAdults = Math.max(0, adults - baseGuests);
+    const extraChildren = Math.max(0, children - remainingBaseSlots);
+
+    const extraAdultCost =
+      extraAdults * Number(property.extraAdultCharge);
+
+    const extraChildCost =
+      extraChildren * Number(property.extraChildCharge);
+
+    const perNightTotal =
+      basePricePerNight + extraAdultCost + extraChildCost;
+
+    const baseTotal = perNightTotal * totalNights;
+
+    /* ---------- TAX ---------- */
+    const taxAmount = Math.round(baseTotal * 0.10);
+    const grandTotal = baseTotal + taxAmount;
+
+    /* ---------- RAZORPAY ---------- */
+    const order = await razorpay.orders.create({
       amount: grandTotal * 100,
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
-    };
+    });
 
-    const order = await razorpay.orders.create(options);
-
+    /* ---------- BOOKING ---------- */
     const booking = await Booking.create({
       userId,
       propertyId,
       checkIn,
       checkOut,
       guests: {
-        adults: guests.adults,
-        children: guests.children,
-        infants: guests.infants,
+        adults,
+        children,
+        infants,
       },
-      totalNights: Math.ceil(
-        (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
-      ),
-
+      totalNights,
       totalAmount: baseTotal,
-
-      taxAmount: tax,
-      grandTotal: grandTotal,
-
+      taxAmount,
+      grandTotal,
       orderId: order.id,
       contactNumber,
     });
 
-    res.json({ success: true, order, booking });
+    return res.json({ success: true, order, booking });
 
   } catch (err) {
     console.error("❌ createOrder error:", err);

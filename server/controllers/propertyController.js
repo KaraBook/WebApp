@@ -134,6 +134,14 @@ export const createPropertyDraft = async (req, res) => {
       req.body.totalRooms = total;
       req.body.roomBreakdown = roomBreakdown;
 
+      req.body.maxGuests = Number(req.body.maxGuests);
+      req.body.baseGuests = Number(req.body.baseGuests);
+      req.body.pricingPerNightWeekdays = Number(req.body.pricingPerNightWeekdays);
+      req.body.pricingPerNightWeekend = Number(req.body.pricingPerNightWeekend);
+      req.body.extraAdultCharge = Number(req.body.extraAdultCharge);
+      req.body.extraChildCharge = Number(req.body.extraChildCharge);
+
+
       propertyDoc = new Property({
         ...req.body,
         resortOwner: owner,
@@ -293,16 +301,20 @@ export const getAllProperties = async (req, res) => {
 };
 
 
+
 export const getSingleProperty = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
-    if (!property) return res.status(404).json({ success: false, message: "Property not found" });
+    if (!property)
+      return res.status(404).json({ success: false, message: "Property not found" });
+
     res.status(200).json({ success: true, data: property });
   } catch (error) {
     console.error("Error fetching single property:", error);
     res.status(500).json({ success: false, message: "Server Error", error: error.message });
   }
 };
+
 
 
 
@@ -328,6 +340,20 @@ export const updateProperty = async (req, res) => {
     if (req.is("application/json")) {
       Object.assign(updatedData, req.body);
 
+       [
+        "maxGuests",
+        "baseGuests",
+        "pricingPerNightWeekdays",
+        "pricingPerNightWeekend",
+        "extraAdultCharge",
+        "extraChildCharge",
+      ].forEach((f) => {
+        if (updatedData[f] !== undefined) {
+          updatedData[f] = Number(updatedData[f]);
+        }
+      });
+
+
       if (req.body.area) {
         updatedData.area = req.body.area.trim();
       }
@@ -352,6 +378,19 @@ export const updateProperty = async (req, res) => {
 
     if (req.is("multipart/form-data")) {
       Object.assign(updatedData, req.body);
+
+      [
+        "maxGuests",
+        "baseGuests",
+        "pricingPerNightWeekdays",
+        "pricingPerNightWeekend",
+        "extraAdultCharge",
+        "extraChildCharge",
+      ].forEach((f) => {
+        if (updatedData[f] !== undefined) {
+          updatedData[f] = Number(updatedData[f]);
+        }
+      });
 
       if (req.body.roomBreakdown) {
         let rb = req.body.roomBreakdown;
