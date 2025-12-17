@@ -501,6 +501,8 @@ const basePriceTotal = calculateBasePrice();
                 </div>
               </div>
 
+              <p className="text-[12px] text-[#616161]">Base includes {property.baseGuests || 0} guests (Adults + Kids), Food included</p>
+
               <div className="mt-5 relative" ref={calendarRef}>
 
                 <div
@@ -660,7 +662,7 @@ const basePriceTotal = calculateBasePrice();
                     <div className="flex justify-between items-center py-2">
                       <div>
                         <p className="font-medium">Children</p>
-                        <p className="text-xs text-gray-500">Age 2–12</p>
+                        <p className="text-xs text-gray-500">Age 4–12</p>
                       </div>
 
                       <div className="flex items-center gap-3">
