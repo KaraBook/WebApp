@@ -39,7 +39,7 @@ export default function Checkout() {
 
     const { from, to, guests } = state || {};
     const [guestData, setGuestData] = useState(
-        guests || { adults: 1, children: 0, infants: 0 }
+        guests || { adults: 1, children: 0, }
     );
 
     const maxGuests = property?.maxGuests || 1;
@@ -373,31 +373,6 @@ export default function Checkout() {
                                     </div>
                                 </div>
 
-                                {/* Infants */}
-                                <div className="flex justify-between items-center py-2">
-                                    <div>
-                                        <p className="font-medium">Infants</p>
-                                        <p className="text-xs text-gray-500">Under 2</p>
-                                    </div>
-
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            className="border rounded-full w-7 h-7 flex items-center justify-center"
-                                            onClick={() =>
-                                                setGuestData((g) => ({ ...g, infants: Math.max(0, g.infants - 1) }))
-                                            }
-                                        >−</button>
-
-                                        <span>{guestData.infants}</span>
-
-                                        <button
-                                            className="border rounded-full w-7 h-7 flex items-center justify-center"
-                                            onClick={() =>
-                                                setGuestData((g) => ({ ...g, infants: g.infants + 1 }))
-                                            }
-                                        >+</button>
-                                    </div>
-                                </div>
                             </div>
                         )}
                     </div>
