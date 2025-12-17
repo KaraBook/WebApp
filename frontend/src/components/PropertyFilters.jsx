@@ -188,7 +188,8 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             paddingLeft: "8px",
             height: "40px",
             cursor: "pointer",
-            backgroundColor: "white",
+            backgroundColor: "#ededed",
+            borderRadius: "8px",
         }),
         option: (provided, state) => ({
             ...provided,
@@ -209,7 +210,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
 
 
     return (
-        <div className="w-full bg-white shadow-xl px-6 py-4 flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[20] border border-gray-100 overflow-visible">
+        <div className="w-full rounded-[15px] bg-white shadow-xl p-[25px] flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[20] border border-gray-100 overflow-visible">
             {/* State */}
             <div className="flex-1 min-w-[150px] z-10">
                 <label className="text-[14px] text-black uppercase ml-1">State</label>
@@ -287,7 +288,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             <div className="flex-1 min-w-[200px] relative" ref={calendarRef}>
                 <label className="text-[14px] text-black uppercase ml-1">Check-in - Check-out</label>
                 <div
-                    className="flex items-center justify-between border border-gray-300 hover:border-primary px-4 py-2 mt-1 cursor-pointer transition-all duration-200"
+                    className="flex items-center justify-between border bg-[#ededed] rounded-[8px] border-gray-200 hover:border-primary px-4 py-2 mt-1 cursor-pointer transition-all duration-200"
                     onClick={() => setShowCalendar(!showCalendar)}
                 >
                     <span className="text-gray-700 text-sm font-medium">
@@ -323,12 +324,12 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                                 return (
                                     <div
                                         className={`
-                flex items-center justify-center w-full h-full rounded-full
+                flex items-center justify-center w-full h-full
                 transition-all duration-150
                 ${isPast
                                                 ? "bg-[#1297a317] text-gray-400 cursor-not-allowed"
                                                 : isSelected
-                                                    ? "bg-primary text-white font-semibold"
+                                                    ? "bg-[#038ba033] text-white font-semibold"
                                                     : "hover:bg-primary hover:text-white cursor-pointer"
                                             }
             `}
@@ -349,7 +350,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
 
                 <div
                     onClick={() => setShowGuestBox(!showGuestBox)}
-                    className="border text-sm border-gray-300 hover:border-black px-4 py-2 mt-1 cursor-pointer flex items-center justify-between"
+                    className="border rounded-[8px] bg-[#ededed] text-sm border-gray-200 hover:border-primary px-4 py-2 mt-1 cursor-pointer flex items-center justify-between"
                 >
                     <span>{guests.adults + guests.children} guests</span>
                 </div>
@@ -400,27 +401,6 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                             </div>
                         </div>
 
-                        {/* Infants */}
-                        <div className="flex justify-between items-center py-2">
-                            <div>
-                                <p className="font-medium">Infants</p>
-                                <p className="text-xs text-gray-500">Under 2</p>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <button
-                                    className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
-                                    onClick={() => setGuests(g => ({ ...g, infants: Math.max(0, g.infants - 1) }))}
-                                >−</button>
-
-                                <span>{guests.infants}</span>
-
-                                <button
-                                    className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
-                                    onClick={() => setGuests(g => ({ ...g, infants: g.infants + 1 }))}
-                                >+</button>
-                            </div>
-                        </div>
                     </div>
                 )}
             </div>
@@ -429,7 +409,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             {/* Search Button */}
             <button
                 onClick={applyFilters}
-                className="bg-primary text-white px-8 py-2 mt-6 font-semibold transition-all duration-300 shadow-md"
+                className="bg-primary rounded-[8px] text-white px-8 py-2 mt-6 font-semibold transition-all duration-300 shadow-md"
             >
                 Search
             </button>

@@ -78,12 +78,58 @@
 
 
 
-.rdrDays button {
-  color: black!important;
+/* ---- Base day sizing (DO NOT CHANGE LOGIC) ---- */
+.rdrDayNumber span {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  border-radius: 10px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
 }
-.rdrInRange, .rdrStartEdge, .rdrEndEdge {
-  background-color: #00000000!important;   
+.rdrDayNumber{
+  color: #000!important;
 }
+/* ---- Past & blocked dates (keep visible) ---- */
+.rdrDayDisabled .rdrDayNumber span {
+  color: #9ca3af;
+  background: #eaf3f3;
+}
+
+/* ---- In-range (PASTEL BAR) ---- */
+.rdrInRange {
+  background: rgba(4, 146, 159, 0.18);
+  border-radius: 0;
+}
+
+/* ---- Start & End pills ---- */
+.rdrStartEdge,
+.rdrEndEdge {
+  background: #04929f;
+  border-radius: 10px;
+}
+
+.rdrStartEdge .rdrDayNumber span,
+.rdrEndEdge .rdrDayNumber span {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ---- Middle range text color ---- */
+.rdrInRange .rdrDayNumber span {
+  color: #065f46;
+}
+
+/* ---- Hover (non-disabled only) ---- */
+.rdrDay:not(.rdrDayDisabled):not(.rdrInRange):not(.rdrStartEdge):not(.rdrEndEdge):hover
+  .rdrDayNumber span {
+  background: rgba(4, 146, 159, 0.12);
+}
+
 
 .break-inside-avoid {
   break-inside: avoid-column;
@@ -116,4 +162,29 @@
 
 .react-select__menu-portal {
     z-index: 999999 !important;
+}
+
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-medium {
+  animation: float 5s ease-in-out infinite;
+}
+
+.float-fast {
+  animation: float 4s ease-in-out infinite;
 }
