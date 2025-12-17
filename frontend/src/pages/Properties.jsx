@@ -130,7 +130,7 @@ export default function Properties() {
 
 
       {/* Property Grid */}
-      <div className="max-w-7xl mx-auto px-4 mt-[100px]">
+      <div className="max-w-7xl mx-auto px-4 mt-[50px]">
         <PropertyTopFilters
           total={properties.length}
           onChange={handleTopFilters}
