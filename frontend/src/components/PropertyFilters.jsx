@@ -79,7 +79,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
         setSelectedArea(null);
     }, [selectedState, locationTree]);
 
-  
+
     useEffect(() => {
         if (!selectedState || !selectedCity || !locationTree.length) return;
 
@@ -196,14 +196,20 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             backgroundColor: state.isSelected
                 ? "#038ba0"
                 : state.isFocused
-                ? "#038ba02d"
-                : "white",
+                    ? "#038ba02d"
+                    : "white",
             color: state.isSelected ? "#ffffff" : "#111827",
             cursor: "pointer",
+            borderRadius: "8px",
+        }),
+        menuList: (provided) => ({
+            ...provided,
+            padding: "6px",             
         }),
         menu: (provided) => ({
             ...provided,
             zIndex: 9999,
+            borderRadius: "8px",
         }),
     };
 
@@ -300,7 +306,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                     <Calendar className="w-4 h-4 text-gray-500" />
                 </div>
                 {showCalendar && (
-                    <div className="absolute top-[71px] left-0 bg-white p-3 shadow-2xl border border-gray-100 z-[999999]">
+                    <div className="absolute top-[71px] left-0 bg-white rounded-[8px] p-3 shadow-2xl border border-gray-100 z-[999999]">
                         <DateRange
                             ranges={dateRange}
                             onChange={(item) => setDateRange([item.selection])}
@@ -356,7 +362,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                 </div>
 
                 {showGuestBox && (
-                    <div className="absolute z-[99999] bg-white shadow-xl border p-4 mt-2 w-[260px]">
+                    <div className="absolute z-[99999] bg-white shadow-xl border rounded-[8px] p-4 mt-2 w-[260px]">
                         {/* Adults */}
                         <div className="flex justify-between items-center py-2">
                             <div>
