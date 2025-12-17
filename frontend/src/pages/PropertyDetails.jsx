@@ -43,7 +43,6 @@ export default function PropertyDetails() {
   const [guests, setGuests] = useState({
     adults: 1,
     children: 0,
-    infants: 0,
   });
 
   const maxGuests = property?.maxGuests || 1;
@@ -685,36 +684,6 @@ const basePriceTotal = calculateBasePrice();
                               if (g.adults + g.children >= maxGuests) return g;
                               return { ...g, children: g.children + 1 };
                             })
-                          }
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Infants */}
-                    <div className="flex justify-between items-center py-2">
-                      <div>
-                        <p className="font-medium">Infants</p>
-                        <p className="text-xs text-gray-500">Under 2</p>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <button
-                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
-                          onClick={() =>
-                            setGuests((g) => ({ ...g, infants: Math.max(0, g.infants - 1) }))
-                          }
-                        >
-                          −
-                        </button>
-
-                        <span>{guests.infants}</span>
-
-                        <button
-                          className="border rounded-full w-7 h-7 flex items-center justify-center text-lg"
-                          onClick={() =>
-                            setGuests((g) => ({ ...g, infants: g.infants + 1 }))
                           }
                         >
                           +
