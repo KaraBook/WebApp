@@ -114,6 +114,23 @@ export default function Checkout() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        const handleClickOutsideGuests = (e) => {
+            if (
+                guestRef.current &&
+                !guestRef.current.contains(e.target)
+            ) {
+                setShowGuestDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutsideGuests);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutsideGuests);
+        };
+    }, []);
+
+
     if (loading) return <div className="text-center py-20">Loading...</div>;
     if (!property) return <div className="text-center py-20">Property not found.</div>;
 
