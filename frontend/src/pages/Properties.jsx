@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import PropertyCard from "../components/PropertyCard";
 import PropertyFilters from "../components/PropertyFilters";
 import { useSearchParams } from "react-router-dom";
-
+import PropertyTopFilters from "@/components/PropertyTopFilters";
 
 export default function Properties() {
   const [properties, setProperties] = useState([]);
@@ -34,33 +34,60 @@ export default function Properties() {
 
 
   useEffect(() => {
-  const state = searchParams.get("state") || "";
-  const city = searchParams.get("city") || "";
-  const area = searchParams.get("area") || "";
-  const guests = searchParams.get("guests") ? JSON.parse(searchParams.get("guests")) : null;
-  const checkIn = searchParams.get("checkIn");
-  const checkOut = searchParams.get("checkOut");
-  const filters = {
-    state,
-    city,
-    area,
-    guests,
-    checkIn,
-    checkOut,
-  };
-  fetchProperties(filters);
-}, [searchParams]);
+    const state = searchParams.get("state") || "";
+    const city = searchParams.get("city") || "";
+    const area = searchParams.get("area") || "";
+    const guests = searchParams.get("guests") ? JSON.parse(searchParams.get("guests")) : null;
+    const checkIn = searchParams.get("checkIn");
+    const checkOut = searchParams.get("checkOut");
+    const filters = {
+      state,
+      city,
+      area,
+      guests,
+      checkIn,
+      checkOut,
+    };
+    fetchProperties(filters);
+  }, [searchParams]);
 
+
+  const handleTopFilters = ({ type, price, sort }) => {
+    const filters = {};
+
+    if (type && type !== "All Types") {
+      filters.propertyType = type;
+    }
+
+    if (price === "Under ₹5,000") {
+      filters.maxPrice = 5000;
+    } else if (price === "₹5,000 - ₹10,000") {
+      filters.minPrice = 5000;
+      filters.maxPrice = 10000;
+    } else if (price === "₹10,000+") {
+      filters.minPrice = 10000;
+    }
+
+    if (sort === "Price: Low to High") {
+      filters.sort = "price_asc";
+    } else if (sort === "Price: High to Low") {
+      filters.sort = "price_desc";
+    } else if (sort === "Highest Rated") {
+      filters.sort = "rating_desc";
+    }
+
+    fetchProperties(filters);
+  };
 
 
   const defaultValues = {
-  state: searchParams.get("state") || "",
-  city: searchParams.get("city") || "",
-  area: searchParams.get("area") || "",
-  guests: searchParams.get("guests") ? JSON.parse(searchParams.get("guests")) : null,
-  checkIn: searchParams.get("checkIn"),
-  checkOut: searchParams.get("checkOut"),
-};
+    state: searchParams.get("state") || "",
+    city: searchParams.get("city") || "",
+    area: searchParams.get("area") || "",
+    guests: searchParams.get("guests") ? JSON.parse(searchParams.get("guests")) : null,
+    checkIn: searchParams.get("checkIn"),
+    checkOut: searchParams.get("checkOut"),
+  };
 
 
   return (
@@ -79,6 +106,11 @@ export default function Properties() {
 
       {/* Property Grid */}
       <div className="max-w-7xl mx-auto px-4 py-[90px]">
+
+        <PropertyTopFilters
+          total={properties.length}
+          onChange={handleTopFilters}
+        />
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-10 h-10 border-4 border-gray-300 border-t-[#efcc61] rounded-full animate-spin"></div>
