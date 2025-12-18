@@ -224,7 +224,7 @@ export default function Checkout() {
             <div>
                  <button
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-2 mb-4 text-sm font-medium text-gray-600 bg-gray-200 px-3 py-3 hover:text-black transition"
+                className="flex items-center gap-2 mb-4 rounded-[8px] text-sm font-medium text-gray-600 bg-gray-200 px-3 py-3 hover:text-black transition"
             >
                 <ArrowLeft className="w-4 h-4" />
                 Back
@@ -405,7 +405,7 @@ export default function Checkout() {
                 </div>
 
                 {/* Contact */}
-                <div className="border rounded-[12px] p-5 mb-6">
+                <div className="border rounded-[12px] mt-[120px] p-5 mb-6">
                     <h3 className="font-semibold mb-3 text-lg">Contact number</h3>
                     <input
                         type="tel"
