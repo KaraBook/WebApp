@@ -219,19 +219,16 @@ export default function Checkout() {
     };
 
     return (
-        <>
-        <div className="max-w-6xl">
-             <button
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-4 py-10">
+            {/* LEFT SECTION */}
+            <div>
+                 <button
                 onClick={() => navigate(-1)}
                 className="flex items-center w-full gap-2 mb-4 text-sm font-medium text-gray-600 hover:text-black transition"
             >
                 <ArrowLeft className="w-4 h-4" />
                 Back
             </button>
-        </div>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-4 py-10">
-            {/* LEFT SECTION */}
-            <div>
                 <h2 className="text-2xl font-bold mb-6">Confirm and pay</h2>
 
                 {/* Trip Summary */}
@@ -478,6 +475,5 @@ export default function Checkout() {
                 </div>
             </div>
         </div>
-        </>
     );
 }
