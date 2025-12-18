@@ -223,7 +223,7 @@ export default function Checkout() {
             {/* LEFT SECTION */}
             <button
                 onClick={() => navigate(-1)}
-                className="flex items-center gap-2 mb-4 text-sm font-medium text-gray-600 hover:text-black transition"
+                className="flex items-center w-full gap-2 mb-4 text-sm font-medium text-gray-600 hover:text-black transition"
             >
                 <ArrowLeft className="w-4 h-4" />
                 Back
