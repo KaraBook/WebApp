@@ -244,7 +244,7 @@ export default function Checkout() {
                         </button>
 
                         {showCalendar && (
-                            <div className="absolute top-10 left-0 bg-white p-3 rounded-[12px] shadow-2xl border border-gray-100 z-50">
+                            <div className="absolute pl-[42px] top-10 left-0 bg-white p-3 rounded-[12px] shadow-2xl border border-gray-100 z-50">
                                 <DateRange
                                     ranges={dateRange}
                                     months={2}
@@ -277,7 +277,7 @@ export default function Checkout() {
                 flex items-center justify-center w-full h-full rounded-full
                 ${disabled ? "bg-[#1297a317] text-gray-400 cursor-not-allowed" : ""}
                 ${!disabled && !isSelected ? "hover:bg-primary border-primary hover:text-white cursor-pointer" : ""}
-                ${isSelected ? "text-white font-semibold" : ""}
+                ${isSelected ? "font-semibold" : ""}
               `}
                                             >
                                                 {date.getDate()}
