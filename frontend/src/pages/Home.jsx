@@ -12,7 +12,7 @@ import FindByExperience from "@/components/FindByExperience";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
-import { House, Tent,  } from "lucide-react";
+import { House, Tent, } from "lucide-react";
 
 export default function Home() {
   const [properties, setProperties] = useState([]);
@@ -83,80 +83,81 @@ export default function Home() {
       </section>
 
 
-      <section className="max-w-7xl w-full mx-auto md:h-[20vh] mt-[120px] flex items-center flex-wrap justify-between">
+      <section className="max-w-7xl w-full mx-auto md:h-[20vh] mt-[130px] flex items-center flex-wrap justify-between">
         <div className="flex flex-col gap-4">
-        <span className="text-sm font-medium text-primary">
-          Curated stays across top destinations
-        </span>
-        <h1 className="font-display text-4xl md:text-4xl lg:text-5xl font-bold leading-tight text-left">
-          <span className="block text-[#1F2A2E]">Find Your</span>
-          <span className="block pb-[18px] pt-[10px] bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent">
-            Perfect Stay
+          <span className="text-sm font-medium text-primary">
+            Curated stays across top destinations
           </span>
-        </h1>
-        <p className="text-gray-600 leading-relaxed max-w-sm">
-              Experience the best of Maharashtra, from city life to coastal and hill escapes.
-            </p>
+          <h1 className="font-display text-4xl md:text-4xl lg:text-5xl font-bold leading-tight text-left">
+            <span className="block text-[#1F2A2E]">Find Your</span>
+            <span className="block pb-[18px] pt-[10px] bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent">
+              Perfect Stay
+            </span>
+          </h1>
+          <p className="text-gray-600 leading-relaxed max-w-sm">
+            Experience the best of Maharashtra, from city life to coastal and hill escapes.
+          </p>
 
-            <button className="inline-flex items-center gap-2 text-white px-4 w-fit py-2 rounded-[10px] font-medium group bg-primary">
-              Explore Beautiful Stays
-              <span className="transition-transform group-hover:translate-x-1">→</span>
-            </button>
+          <button className="inline-flex items-center gap-2 text-white px-4 w-fit py-2 rounded-[10px] font-medium group bg-primary">
+            Explore Beautiful Stays
+            <span className="transition-transform group-hover:translate-x-1">→</span>
+          </button>
         </div>
-        <div className="w-[38%] flex flex-wrap items-end justify-right gap-4 mt-4">
-          <div className="border md:w-[220px] p-2 h-20 flex justify-between items-center rounded-[12px] border-gray-300">
-             <div className="h-full bg-gray-300 rounded-[8px] ">
-              <Tent className="w-8 h-8 text-primary m-4"/>
-             </div>
-             <div>
-              <h2 className="font-[600] text-[20px]">Tent</h2>
-              <button className="text-[14px]">Explore More</button>
-             </div>
+        <div className="w-[55%] flex flex-wrap items-end justify-right gap-4 mt-4">
+          <div className="border relative md:w-[220px] p-2 h-[300px] flex justify-between items-center rounded-[12px] border-gray-300">
+            <div className="relative w-full h-full rounded-[8px] overflow-hidden">
+              <img
+                src="/banimg1.jpg"
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+              <div className="absolute  inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="text-lg font-semibold">Viilas</h3>
+                <p className="text-sm">Experience Luxury</p>
+              </div>
+            </div>
           </div>
-          <div className="border md:w-[220px] p-2 h-20 flex justify-between items-center rounded-[12px] border-gray-300">
-             <div className="h-full bg-gray-300 rounded-[8px] ">
-              <House className="w-8 h-8 text-primary m-4"/>
-             </div>
-             <div>
-              <h2 className="font-[600] text-[20px]">Villa</h2>
-              <button className="text-[14px]">Explore More</button>
-             </div>
+          <div className="border relative md:w-[220px] p-2 h-[300px] flex justify-between items-center rounded-[12px] border-gray-300">
+            <div className="relative w-full h-full rounded-[8px] overflow-hidden">
+              <img
+                src="/bannerimg.webp"
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="text-lg font-semibold">Tents</h3>
+                <p className="text-sm">Close to Nature</p>
+              </div>
+            </div>
           </div>
-          <div className="border md:w-[220px] p-2 h-20 flex justify-between items-center rounded-[12px] border-gray-300">
-             <div className="h-full bg-gray-300 rounded-[8px] ">
-              <Tent className="w-8 h-8 text-primary m-4"/>
-             </div>
-             <div>
-              <h2 className="font-[600] text-[20px]">Cottage</h2>
-              <button className="text-[14px]">Explore More</button>
-             </div>
+          <div className="border relative md:w-[220px] p-2 h-[300px] flex justify-between items-center rounded-[12px] border-gray-300">
+            <div className="relative w-full h-full rounded-[8px] overflow-hidden">
+              <img
+                src="/bannerImg1.webp"
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="text-lg font-semibold">Hotels</h3>
+                <p className="text-sm">Comfort & Convenience</p>
+              </div>
+            </div>
           </div>
-          <div className="border md:w-[220px] p-2 h-20 flex justify-between items-center rounded-[12px] border-gray-300">
-             <div className="h-full bg-gray-300 rounded-[8px] ">
-              <Tent className="w-8 h-8 text-primary m-4"/>
-             </div>
-             <div>
-              <h2 className="font-[600] text-[20px]">Hotel</h2>
-              <button className="text-[14px]">Explore More</button>
-             </div>
-          </div>
+          
         </div>
         
       </section>
 
-
-      <section className="w-full bg-[#faf7f4] py-[20px] md:py-[40px] mt-[200px] px-4 md:px-12">
+      <section className="w-full bg-[#faf7f4] py-[20px] md:pb-[80px] md:py-[40px] md:mt-[280px] px-4 md:px-12">
         <FindByExperience />
       </section>
 
-
-
       {/* PROPERTIES CAROUSEL */}
-      <section className="w-full py-16 bg-white overflow-hidden">
+      <section className="w-full py-16 md:mt-[50px] bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
             <h2 className="text-2xl md:text-3xl font-bold">Popular Stays</h2>
-            <Button className="rounded-none mt-2 md:mt-0" onClick={() => navigate("/properties")}>
+            <Button className="rounded-[10px] mt-2 md:mt-0" onClick={() => navigate("/properties")}>
               View All Properties
             </Button>
           </div>
