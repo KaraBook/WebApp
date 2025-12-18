@@ -191,6 +191,11 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
             backgroundColor: "#ededed",
             borderRadius: "8px",
         }),
+        menuList: (provided) => ({
+            ...provided,
+            borderRadius: "8px",
+            padding: "5px",
+        }),
         option: (provided, state) => ({
             ...provided,
             backgroundColor: state.isSelected
@@ -200,6 +205,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                     : "white",
             color: state.isSelected ? "#ffffff" : "#111827",
             cursor: "pointer",
+            borderRadius: "8px",
         }),
         menu: (provided) => ({
             ...provided,
@@ -381,9 +387,9 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                 </div>
 
                 {showGuestBox && (
-                    <div className="absolute z-[99999] bg-white shadow-xl border p-4 mt-2 w-[260px]">
+                    <div className="absolute z-[99999] bg-white shadow-xl rounded-[10px] border p-4 mt-2 w-[260px]">
                         {/* Adults */}
-                        <div className="flex justify-between items-center py-2">
+                        <div className="flex justify-between items-center py-2 ">
                             <div>
                                 <p className="font-medium">Adults</p>
                                 <p className="text-xs text-gray-500">Age 13+</p>

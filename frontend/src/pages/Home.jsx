@@ -8,9 +8,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, FreeMode } from "swiper/modules";
+import FindByExperience from "@/components/FindByExperience";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
+import { House, Tent,  } from "lucide-react";
 
 export default function Home() {
   const [properties, setProperties] = useState([]);
@@ -33,24 +35,24 @@ export default function Home() {
   }, []);
 
   const handleFilter = (filters) => {
-  const query = new URLSearchParams({
-    state: filters.state || "",
-    city: filters.city || "",
-    area: filters.area || "",
-    guests: JSON.stringify(filters.guests || {}),
-    checkIn: filters.checkIn?.toISOString(),
-    checkOut: filters.checkOut?.toISOString(),
-  }).toString();
+    const query = new URLSearchParams({
+      state: filters.state || "",
+      city: filters.city || "",
+      area: filters.area || "",
+      guests: JSON.stringify(filters.guests || {}),
+      checkIn: filters.checkIn?.toISOString(),
+      checkOut: filters.checkOut?.toISOString(),
+    }).toString();
 
-  navigate(`/properties?${query}`);
-};
+    navigate(`/properties?${query}`);
+  };
 
 
   return (
     <div className="flex flex-col min-h-screen relative">
 
       {/* HERO SECTION */}
-      <section className="relative w-full h-[65vh] md:h-[90vh] flex md:items-center items:start md:justify-center justify-start pt-[15vh]">
+      <section className="relative w-full h-[60vh] md:h-[85vh] flex md:items-center items:start md:justify-center justify-start pt-[15vh]">
         <img
           src="/bannerImg1.webp"
           alt="Banner"
@@ -64,7 +66,7 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="relative z-10 text-center text-white px-4"
         >
-          <h1 className="text-3xl md:text-5xl tracking-[2px] uppercase font-[500] mb-3 leading-snug">
+          <h1 className="text-3xl md:text-5xl tracking-[2px] uppercase font-[600] mb-3 leading-snug">
             Discover Stays That Feel Like Home
           </h1>
           <p className="text-sm md:text-lg text-gray-200 max-w-xl mx-auto">
@@ -80,71 +82,74 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION : Find Your Perfect Stay */}
-      <section className="w-full bg-[#faf7f4] py-[20px] md:py-[80px] mt-[150px] px-4 md:px-12">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10">
 
-          {/* LEFT TEXT BLOCK */}
-          <div className="flex flex-col w-full md:w-[40%]">
-            <h2 className="text-3xl md:text-4xl font-bold leading-snug text-gray-900">
-              Find Your <br /> Perfect Stay
-            </h2>
-
-            <p className="text-gray-600 mt-4 leading-relaxed max-w-sm">
+      <section className="max-w-7xl w-full mx-auto md:h-[20vh] mt-[120px] flex items-center flex-wrap justify-between">
+        <div className="flex flex-col gap-4">
+        <span className="text-sm font-medium text-primary">
+          Curated stays across top destinations
+        </span>
+        <h1 className="font-display text-4xl md:text-4xl lg:text-5xl font-bold leading-tight text-left">
+          <span className="block text-[#1F2A2E]">Find Your</span>
+          <span className="block pb-[18px] pt-[10px] bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent">
+            Perfect Stay
+          </span>
+        </h1>
+        <p className="text-gray-600 leading-relaxed max-w-sm">
               Experience the best of Maharashtra, from city life to coastal and hill escapes.
             </p>
 
-            <button className="mt-6 inline-flex items-center gap-2 text-gray-900 font-medium group">
+            <button className="inline-flex items-center gap-2 text-white px-4 w-fit py-2 rounded-[10px] font-medium group bg-primary">
               Explore Beautiful Stays
               <span className="transition-transform group-hover:translate-x-1">→</span>
             </button>
+        </div>
+        <div className="w-[38%] flex flex-wrap items-end justify-right gap-4 mt-4">
+          <div className="border md:w-[220px] p-2 h-20 flex justify-between items-center rounded-[12px] border-gray-300">
+             <div className="h-full bg-gray-300 rounded-[8px] ">
+              <Tent className="w-8 h-8 text-primary m-4"/>
+             </div>
+             <div>
+              <h2 className="font-[600] text-[20px]">Tent</h2>
+              <button className="text-[14px]">Explore More</button>
+             </div>
           </div>
-
-          {/* RIGHT CATEGORY CARDS */}
-          <div className="flex md:w-[60%] w-full justify-between gap-4 md:gap-6 flex-wrap md:flex-nowrap">
-
-            {/* CARD 1 */}
-            <div className="bg-white w-[100%] md:w-[33%] shadow-sm border overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
-                className="h-[220px] w-[100%] md:h-[300px] object-cover"
-              />
-              <div className="p-3 flex items-center justify-between border-t">
-                <span className="text-gray-900 font-medium">Villas</span>
-                <span className="text-gray-900">↗</span>
-              </div>
-              <p className="text-xs text-gray-500 px-3 pb-3">1,000 villas</p>
-            </div>
-
-            {/* CARD 2 */}
-            <div className="bg-white w-[100%] md:w-[33%] shadow-sm border overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
-                className="h-[220px] w-[100%] md:h-[300px] object-cover"
-              />
-              <div className="p-3 flex items-center justify-between border-t">
-                <span className="text-gray-900 font-medium">Apartments</span>
-                <span className="text-gray-900">↗</span>
-              </div>
-              <p className="text-xs text-gray-500 px-3 pb-3">3,000 apartments</p>
-            </div>
-
-            {/* CARD 3 */}
-            <div className="bg-white w-full md:w-[33%] shadow-sm border overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1504711434969-e33886168f5c"
-                className="h-[220px] md:h-[300px] w-[100%] object-cover"
-              />
-              <div className="p-3 flex items-center justify-between border-t">
-                <span className="text-gray-900 font-medium">Tents</span>
-                <span className="text-gray-900">↗</span>
-              </div>
-              <p className="text-xs text-gray-500 px-3 pb-3">2,000 tents</p>
-            </div>
-
+          <div className="border md:w-[220px] p-2 h-20 flex justify-between items-center rounded-[12px] border-gray-300">
+             <div className="h-full bg-gray-300 rounded-[8px] ">
+              <House className="w-8 h-8 text-primary m-4"/>
+             </div>
+             <div>
+              <h2 className="font-[600] text-[20px]">Villa</h2>
+              <button className="text-[14px]">Explore More</button>
+             </div>
+          </div>
+          <div className="border md:w-[220px] p-2 h-20 flex justify-between items-center rounded-[12px] border-gray-300">
+             <div className="h-full bg-gray-300 rounded-[8px] ">
+              <Tent className="w-8 h-8 text-primary m-4"/>
+             </div>
+             <div>
+              <h2 className="font-[600] text-[20px]">Cottage</h2>
+              <button className="text-[14px]">Explore More</button>
+             </div>
+          </div>
+          <div className="border md:w-[220px] p-2 h-20 flex justify-between items-center rounded-[12px] border-gray-300">
+             <div className="h-full bg-gray-300 rounded-[8px] ">
+              <Tent className="w-8 h-8 text-primary m-4"/>
+             </div>
+             <div>
+              <h2 className="font-[600] text-[20px]">Hotel</h2>
+              <button className="text-[14px]">Explore More</button>
+             </div>
           </div>
         </div>
+        
       </section>
+
+
+      <section className="w-full bg-[#faf7f4] py-[20px] md:py-[40px] mt-[200px] px-4 md:px-12">
+        <FindByExperience />
+      </section>
+
+
 
       {/* PROPERTIES CAROUSEL */}
       <section className="w-full py-16 bg-white overflow-hidden">
