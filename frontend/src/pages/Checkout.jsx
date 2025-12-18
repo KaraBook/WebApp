@@ -7,6 +7,7 @@ import SummaryApi from "../common/SummaryApi";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { DateRange } from "react-date-range";
+import { ArrowLeft } from "lucide-react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -220,6 +221,13 @@ export default function Checkout() {
     return (
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-4 py-10">
             {/* LEFT SECTION */}
+            <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 mb-4 text-sm font-medium text-gray-600 hover:text-black transition"
+            >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+            </button>
             <div>
                 <h2 className="text-2xl font-bold mb-6">Confirm and pay</h2>
 
