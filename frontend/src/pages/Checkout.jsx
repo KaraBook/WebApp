@@ -224,7 +224,7 @@ export default function Checkout() {
                 <h2 className="text-2xl font-bold mb-6">Confirm and pay</h2>
 
                 {/* Trip Summary */}
-                <div className="border rounded-[0] p-5 mb-6">
+                <div className="border rounded-[12px] p-5 mb-6">
                     <h3 className="font-semibold mb-2 text-lg">Your trip</h3>
 
                     {/* DATE PICKER */}
@@ -244,7 +244,7 @@ export default function Checkout() {
                         </button>
 
                         {showCalendar && (
-                            <div className="absolute top-10 left-0 bg-white p-3 rounded-[0] shadow-2xl border border-gray-100 z-50">
+                            <div className="absolute top-10 left-0 bg-white p-3 rounded-[12px] shadow-2xl border border-gray-100 z-50">
                                 <DateRange
                                     ranges={dateRange}
                                     months={2}
@@ -277,7 +277,7 @@ export default function Checkout() {
                 flex items-center justify-center w-full h-full rounded-full
                 ${disabled ? "bg-[#1297a317] text-gray-400 cursor-not-allowed" : ""}
                 ${!disabled && !isSelected ? "hover:bg-primary border-primary hover:text-white cursor-pointer" : ""}
-                ${isSelected ? "bg-primary text-white font-semibold" : ""}
+                ${isSelected ? "text-white font-semibold" : ""}
               `}
                                             >
                                                 {date.getDate()}
@@ -328,7 +328,7 @@ export default function Checkout() {
                         </button>
 
                         {showGuestDropdown && (
-                            <div className="absolute right-0 top-8 bg-white border shadow-xl p-4 w-[55%] z-50">
+                            <div className="absolute right-0 top-8 bg-white border rounded-[10px] shadow-xl p-4 w-[55%] z-50">
 
                                 {/* Adults */}
                                 <div className="flex justify-between items-center py-2">
@@ -397,14 +397,14 @@ export default function Checkout() {
                 </div>
 
                 {/* Contact */}
-                <div className="border rounded-[0] p-5 mb-6">
+                <div className="border rounded-[12px] p-5 mb-6">
                     <h3 className="font-semibold mb-3 text-lg">Contact number</h3>
                     <input
                         type="tel"
                         value={contact}
                         onChange={handleContactChange}
                         placeholder="Enter 10-digit mobile number"
-                        className="border border-gray-300 rounded-[0] px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-black"
+                        className="border border-gray-300 rounded-[10px] px-4 py-2 w-full focus:outline-none focus:ring-1 focus:ring-black"
                     />
                     <p className="text-xs text-gray-500 mt-2">
                         We'll contact you on this number for booking confirmation.
@@ -414,7 +414,7 @@ export default function Checkout() {
                 <Button
                     onClick={handlePayment}
                     disabled={contact.length !== 10}
-                    className="w-full bg-primary text-white rounded-[0] py-3 text-lg hover:bg-primary"
+                    className="w-full bg-primary text-white rounded-[10px] py-3 text-lg hover:bg-primary"
                 >
                     Pay Now
                 </Button>
@@ -422,7 +422,7 @@ export default function Checkout() {
 
             {/* RIGHT SECTION */}
             <div>
-                <div className="border rounded-[0] p-5 shadow-sm">
+                <div className="border rounded-[12px] p-5 shadow-sm">
                     <div className="flex gap-3 mb-3">
                         <img
                             src={property.coverImage}

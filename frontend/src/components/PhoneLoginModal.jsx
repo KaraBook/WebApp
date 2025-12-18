@@ -182,7 +182,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
             <Label className="text-[13px] font-medium">Enter OTP</Label>
 
             <Input
-              className="!rounded-none border px-3 py-2 text-[15px]"
+              className="rounded-[8px] border px-3 py-2 text-[15px]"
               maxLength={6}
               inputMode="numeric"
               placeholder="Enter 6-digit OTP"
@@ -218,7 +218,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
             </div>
 
             <Button
-              className="w-full bg-primary text-white py-3 !rounded-none"
+              className="w-full bg-primary text-white py-3 rounded-[8px]"
               disabled={otp.length < 4 || verifying}
               onClick={verifyOtp}
             >
