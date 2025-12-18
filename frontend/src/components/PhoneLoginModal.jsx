@@ -128,7 +128,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md !rounded-none p-6">
+      <DialogContent className="sm:max-w-md rounded-[12px] p-6">
 
         <DialogHeader>
           <DialogTitle className="text-[22px] font-semibold tracking-tight">
@@ -149,12 +149,12 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
             <Label className="text-[13px] font-medium">Mobile Number</Label>
 
             <div className="flex gap-2">
-              <div className="px-4 py-2 border bg-gray-100 text-sm text-gray-700 !rounded-none">
+              <div className="px-4 py-2 border bg-gray-100 text-sm text-gray-700 rounded-[8px]">
                 +91
               </div>
 
               <Input
-                className="!rounded-none border px-3 py-2 text-[15px]"
+                className="rounded-[8px] border px-3 py-2 text-[15px]"
                 maxLength={10}
                 inputMode="numeric"
                 placeholder="Enter number"
@@ -166,7 +166,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
             </div>
 
             <Button
-              className="w-full bg-primary text-white py-3 !rounded-none"
+              className="w-full bg-primary text-white py-3 rounded-[8px]"
               disabled={phone.length !== 10 || sending}
               onClick={sendOtp}
             >

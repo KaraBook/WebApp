@@ -39,7 +39,7 @@ export default function Header({ onLoginClick }) {
           {user ? (
             <AccountDropdown user={user} clearAuth={clearAuth} />
           ) : (
-            <Button onClick={onLoginClick} className="text-sm rounded-none tracking-[3px]">
+            <Button onClick={onLoginClick} className="text-sm rounded-[8px] tracking-[3px]">
               SIGN IN <ChevronRight className="w-4 h-4" />
             </Button>
           )}

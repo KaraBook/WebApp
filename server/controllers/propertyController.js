@@ -340,7 +340,7 @@ export const updateProperty = async (req, res) => {
     if (req.is("application/json")) {
       Object.assign(updatedData, req.body);
 
-       [
+      [
         "maxGuests",
         "baseGuests",
         "pricingPerNightWeekdays",
@@ -642,38 +642,66 @@ export const togglePublishProperty = async (req, res) => {
 
 export const getPublishedProperties = async (req, res) => {
   try {
-    const { state, city, checkIn, checkOut } = req.query;
-    const filter = { isDraft: false, publishNow: true };
+    const {
+      state,
+      city,
+      guests,
+      propertyType,
+      minPrice,
+      maxPrice,
+      sort,
+    } = req.query;
+
+    const filter = {
+      isDraft: false,
+      publishNow: true,
+    };
 
     if (state) filter.state = new RegExp(`^${state}$`, "i");
     if (city) filter.city = new RegExp(`^${city}$`, "i");
 
+    if (propertyType) {
+      filter.propertyType = propertyType.toLowerCase();
+    }
+
     let totalGuests = 0;
-
-    if (req.query.guests) {
-      try {
-        const g = typeof req.query.guests === "string"
-          ? JSON.parse(req.query.guests)
-          : req.query.guests;
-
-        totalGuests = (Number(g.adults) || 0) + (Number(g.children) || 0);
-      } catch (err) {
-        console.log("Guest parse error:", err);
-      }
+    if (guests) {
+      const g = typeof guests === "string" ? JSON.parse(guests) : guests;
+      totalGuests = (g.adults || 0) + (g.children || 0);
     }
 
     if (totalGuests > 0) {
       filter.maxGuests = { $gte: totalGuests };
     }
 
-    const properties = await Property.find(filter).sort({ createdAt: -1 });
-    res.json({ success: true, data: properties });
+    if (minPrice || maxPrice) {
+      filter.pricingPerNightWeekdays = {};
+
+      if (minPrice) {
+        filter.pricingPerNightWeekdays.$gte = Number(minPrice);
+      }
+
+      if (maxPrice) {
+        filter.pricingPerNightWeekdays.$lte = Number(maxPrice);
+      }
+    }
+
+    let sortQuery = { createdAt: -1 };
+
+    if (sort === "price_asc") {
+      sortQuery = { pricingPerNightWeekdays: 1 };
+    } else if (sort === "price_desc") {
+      sortQuery = { pricingPerNightWeekdays: -1 };
+    }
+
+    const properties = await Property.find(filter).sort(sortQuery);
+
+    res.status(200).json({ success: true, data: properties });
   } catch (err) {
     console.error("getPublishedProperties error:", err);
-    res.status(500).json({ success: false, message: "Failed to fetch published properties" });
+    res.status(500).json({ success: false });
   }
 };
-
 
 
 export const getPropertyBlockedDatesPublic = async (req, res) => {

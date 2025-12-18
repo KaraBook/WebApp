@@ -6,30 +6,9 @@ import {
 } from "lucide-react";
 
 
-export default function PropertyTopFilters({ total, onChange }) {
-  const [type, setType] = useState("All Types");
-  const [price, setPrice] = useState("All Prices");
-  const [sort, setSort] = useState("Recommended");
-
-  const applyFilters = (next = {}) => {
-    onChange({
-      type: next.type ?? type,
-      price: next.price ?? price,
-      sort: next.sort ?? sort,
-    });
-  };
-
+export default function PropertyTopFilters({ total, value, onChange }) {
   return (
-    <div
-      className="
-        w-full
-        bg-white
-        rounded-2xl
-        border border-[#E5EAF1]
-        px-6 py-4
-        mb-6
-      "
-    >
+    <div className="w-full bg-white rounded-2xl border border-[#E5EAF1] px-6 py-4 mb-6">
       <div className="flex items-center justify-between gap-4">
 
         {/* LEFT */}
@@ -40,26 +19,20 @@ export default function PropertyTopFilters({ total, onChange }) {
           </div>
 
           <FilterDropdown
-            label={type}
-            options={["All Types", "Villas", "Apartments", "Tents"]}
-            onSelect={(v) => {
-              setType(v);
-              applyFilters({ type: v });
-            }}
+            label={value.type}
+            options={["All Types", "villa", "tent", "cottage", "hotel"]}
+            onSelect={(v) => onChange({ ...value, type: v })}
           />
 
           <FilterDropdown
-            label={price}
+            label={value.price}
             options={[
               "All Prices",
               "Under ₹5,000",
               "₹5,000 - ₹10,000",
               "₹10,000+",
             ]}
-            onSelect={(v) => {
-              setPrice(v);
-              applyFilters({ price: v });
-            }}
+            onSelect={(v) => onChange({ ...value, price: v })}
           />
         </div>
 
@@ -67,17 +40,14 @@ export default function PropertyTopFilters({ total, onChange }) {
         <FilterDropdown
           align="right"
           icon
-          label={sort}
+          label={value.sort}
           options={[
             "Recommended",
             "Price: Low to High",
             "Price: High to Low",
             "Highest Rated",
           ]}
-          onSelect={(v) => {
-            setSort(v);
-            applyFilters({ sort: v });
-          }}
+          onSelect={(v) => onChange({ ...value, sort: v })}
         />
       </div>
     </div>

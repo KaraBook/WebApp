@@ -13,6 +13,12 @@ export default function Properties() {
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
 
+  const [topFilters, setTopFilters] = useState({
+    type: "All Types",
+    price: "All Prices",
+    sort: "Recommended",
+  });
+
   const fetchProperties = async (filters = {}) => {
     setLoading(true);
 
@@ -35,50 +41,42 @@ export default function Properties() {
 
 
   useEffect(() => {
-    const state = searchParams.get("state") || "";
-    const city = searchParams.get("city") || "";
-    const area = searchParams.get("area") || "";
-    const guests = searchParams.get("guests") ? JSON.parse(searchParams.get("guests")) : null;
-    const checkIn = searchParams.get("checkIn");
-    const checkOut = searchParams.get("checkOut");
-    const filters = {
-      state,
-      city,
-      area,
-      guests,
-      checkIn,
-      checkOut,
-    };
-    fetchProperties(filters);
-  }, [searchParams]);
-
-
-  const handleTopFilters = ({ type, price, sort }) => {
     const filters = {};
 
-    if (type && type !== "All Types") {
-      filters.propertyType = type;
+    const state = searchParams.get("state");
+    const city = searchParams.get("city");
+    if (state) filters.state = state;
+    if (city) filters.city = city;
+
+    const guestsParam = searchParams.get("guests");
+    if (guestsParam) {
+      filters.guests = JSON.parse(guestsParam);
     }
 
-    if (price === "Under ₹5,000") {
+    if (topFilters.type && topFilters.type !== "All Types") {
+      filters.propertyType = topFilters.type.toLowerCase();
+    }
+
+    if (topFilters.price === "Under ₹5,000") {
       filters.maxPrice = 5000;
-    } else if (price === "₹5,000 - ₹10,000") {
+    }
+    else if (topFilters.price === "₹5,000 - ₹10,000") {
       filters.minPrice = 5000;
       filters.maxPrice = 10000;
-    } else if (price === "₹10,000+") {
+    }
+    else if (topFilters.price === "₹10,000+") {
       filters.minPrice = 10000;
     }
 
-    if (sort === "Price: Low to High") {
+    if (topFilters.sort === "Price: Low to High") {
       filters.sort = "price_asc";
-    } else if (sort === "Price: High to Low") {
+    }
+    else if (topFilters.sort === "Price: High to Low") {
       filters.sort = "price_desc";
-    } else if (sort === "Highest Rated") {
-      filters.sort = "rating_desc";
     }
 
     fetchProperties(filters);
-  };
+  }, [searchParams, topFilters]);
 
 
   const defaultValues = {
@@ -133,7 +131,8 @@ export default function Properties() {
       <div className="max-w-7xl mx-auto px-4 mt-[50px]">
         <PropertyTopFilters
           total={properties.length}
-          onChange={handleTopFilters}
+          value={topFilters}
+          onChange={setTopFilters}
         />
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">

@@ -7,6 +7,7 @@ import { Heart, MapPin, Home, Calendar, ChevronDown, Share2, Star } from "lucide
 import { amenitiesCategories } from "@/constants/dropdownOptions";
 import AmenitiesList from "../components/AmenitiesList";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Map, BedDouble, Bath, Users } from "lucide-react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
@@ -86,27 +87,27 @@ export default function PropertyDetails() {
   );
 
   const isWeekend = (date) => {
-  const d = new Date(date);
-  const day = d.getDay();
-  return day === 0 || day === 6;
-};
+    const d = new Date(date);
+    const day = d.getDay();
+    return day === 0 || day === 6;
+  };
 
-const calculateBasePrice = () => {
-  let total = 0;
-  let d = new Date(dateRange[0].startDate);
-  const end = new Date(dateRange[0].endDate);
+  const calculateBasePrice = () => {
+    let total = 0;
+    let d = new Date(dateRange[0].startDate);
+    const end = new Date(dateRange[0].endDate);
 
-  while (d < end) {
-    total += isWeekend(d)
-      ? Number(property?.pricingPerNightWeekend || property?.pricingPerNightWeekdays)
-      : Number(property?.pricingPerNightWeekdays);
-    d.setDate(d.getDate() + 1);
-  }
-  return total;
-};
+    while (d < end) {
+      total += isWeekend(d)
+        ? Number(property?.pricingPerNightWeekend || property?.pricingPerNightWeekdays)
+        : Number(property?.pricingPerNightWeekdays);
+      d.setDate(d.getDate() + 1);
+    }
+    return total;
+  };
 
-const baseNightPrice = property?.pricingPerNightWeekdays || 0;
-const basePriceTotal = calculateBasePrice();
+  const baseNightPrice = property?.pricingPerNightWeekdays || 0;
+  const basePriceTotal = calculateBasePrice();
 
 
   useEffect(() => {
@@ -311,7 +312,7 @@ const basePriceTotal = calculateBasePrice();
             <div className="flex items-center gap-2 text-[15px] text-gray-800 mt-1">
 
               <span className="flex items-center gap-1 font-medium">
-                <Star className="w-4 h-4 text-black fill-black" />
+                <Star className="w-4 h-4 text-black fill-yellow-400" />
                 {property.averageRating ? property.averageRating.toFixed(1) : "0.0"}
               </span>
 
@@ -327,9 +328,9 @@ const basePriceTotal = calculateBasePrice();
               {property.city && property.state && (
                 <a
                   href={property.locationLink || "#"}
-                  className="underline text-gray-800 hover:text-black"
+                  className="flex items-center text-gray-800 hover:text-black"
                 >
-                  {property.city}, {property.state}
+                  <Map className="w-4 h-4 mr-1" />{property.city}, {property.state}
                 </a>
               )}
             </div>
@@ -339,7 +340,7 @@ const basePriceTotal = calculateBasePrice();
 
             <button
               onClick={toggleWishlist}
-              className="flex items-center gap-1 text-gray-700 hover:text-black"
+              className="flex items-center border rounded-[8px] px-3 py-2 hover:bg-[#038ba029] gap-1 text-gray-700 hover:text-black"
             >
               <Heart
                 className={`w-4 h-4 ${wishlist.includes(property._id)
@@ -353,7 +354,7 @@ const basePriceTotal = calculateBasePrice();
             </button>
 
             <button
-              className="flex items-center gap-1 text-gray-700 hover:text-black"
+              className="flex items-center gap-1 text-gray-700 hover:text-black border rounded-[8px] px-3 py-2 hover:bg-[#038ba042]"
               onClick={() => {
                 navigator.share
                   ? navigator.share({
@@ -374,9 +375,70 @@ const basePriceTotal = calculateBasePrice();
 
         {images.length > 0 && <PropertyGallery images={images} />}
 
+
         <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
           {/* LEFT */}
           <div className="lg:col-span-2">
+
+            {/* PROPERTY HIGHLIGHTS */}
+            <div className="mb-5 border border-gray-200 rounded-2xl bg-white px-6 py-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+                {/* BEDROOMS */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#038ba029] flex items-center justify-center">
+                    <BedDouble className="w-6 h-6 text-primary" />
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {property?.roomBreakdown?.total || 0} Bedrooms
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Comfortable beds
+                    </p>
+                  </div>
+                </div>
+
+                {/* BATHROOMS */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#038ba029] flex items-center justify-center">
+                    <Bath className="w-6 h-6 text-primary" />
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      {property?.bathrooms || 3} Bathrooms
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Modern fixtures
+                    </p>
+                  </div>
+                </div>
+
+                {/* GUESTS */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#038ba029] flex items-center justify-center">
+                    <Users className="w-6 h-6 text-primary" />
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-gray-900">
+                      Up to {property?.maxGuests || 0} Guests
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Perfect for groups
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-2">
+              About this property
+            </h2>
             <p className="text-gray-700 leading-relaxed mb-6">{property.description}</p>
 
             <div className="border-t pt-6 mt-6">
@@ -389,7 +451,7 @@ const basePriceTotal = calculateBasePrice();
 
                   if (!amenity) {
                     return (
-                      <div key={value} className="flex items-center gap-2 text-gray-800">
+                      <div key={value} className="flex items-center gap-2 text-gray-700">
                         <span className="w-5 h-5"></span>
                         <span className="capitalize">{value}</span>
                       </div>
@@ -399,8 +461,8 @@ const basePriceTotal = calculateBasePrice();
                   const Icon = amenity.icon;
 
                   return (
-                    <div key={value} className="flex items-center gap-2 text-gray-800">
-                      <Icon className="w-5 h-5" />
+                    <div key={value} className="flex items-center gap-2 text-gray-800 bg-gray-100 px-3 py-3 rounded-lg">
+                      <Icon className="w-5 h-5 text-primary" />
                       <span>{amenity.label}</span>
                     </div>
                   );
@@ -427,6 +489,7 @@ const basePriceTotal = calculateBasePrice();
                     )}&output=embed`}
                     width="100%"
                     height="100%"
+                    className="rounded-[14px] "
                     style={{ border: 0 }}
                     loading="lazy"
                     allowFullScreen
@@ -484,7 +547,7 @@ const basePriceTotal = calculateBasePrice();
 
           {/* RIGHT BOOKING BOX */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 border shadow-xl p-6 bg-white">
+            <div className="sticky top-24 border rounded-[12px] shadow-xl p-6 bg-white">
 
               <div className="flex items-center justify-between">
                 <h3 className="text-3xl font-semibold text-black">
@@ -510,7 +573,7 @@ const basePriceTotal = calculateBasePrice();
                     setShowCalendar(true);
                     setShowGuestDropdown(false);
                   }}
-                  className="grid grid-cols-2 border border-gray-300 overflow-hidden cursor-pointer"
+                  className="grid grid-cols-2 rounded-[12px] border border-gray-300 overflow-hidden cursor-pointer"
                 >
                   <div className="border-r p-3 bg-white hover:bg-gray-50">
                     <label className="text-[10px] uppercase text-gray-500">Check-in</label>
@@ -530,8 +593,8 @@ const basePriceTotal = calculateBasePrice();
                 {showCalendar && (
                   <div
                     className="
-      absolute mt-3 bg-white border shadow-2xl
-      z-[999] p-4 w-[650px] max-w-[90vw] right-0
+      absolute mt-3 bg-white border shadow-2xl rounded-[12px]
+      z-[999] p-4 w-[680px] max-w-[90vw] pl-[42px] right-0
     "
                   >
                     <DateRange
@@ -547,13 +610,26 @@ const basePriceTotal = calculateBasePrice();
                         const today = new Date();
                         today.setHours(0, 0, 0, 0);
 
+                        const startDate = dateRange[0].startDate;
+                        const endDate = dateRange[0].endDate;
+
                         const isPast = date < today;
                         const isBlocked = isDateDisabled(date);
-
                         const disabled = isPast || isBlocked;
 
-                        const isSelected =
-                          date >= dateRange[0].startDate && date <= dateRange[0].endDate;
+                        const isStart =
+                          startDate &&
+                          date.toDateString() === startDate.toDateString();
+
+                        const isEnd =
+                          endDate &&
+                          date.toDateString() === endDate.toDateString();
+
+                        const isInRange =
+                          startDate &&
+                          endDate &&
+                          date > startDate &&
+                          date < endDate;
 
                         return (
                           <div
@@ -564,17 +640,31 @@ const basePriceTotal = calculateBasePrice();
                               }
                             }}
                             className={`
-        flex items-center justify-center w-full h-full rounded-full
-        ${disabled ? "bg-[#1297a317] text-gray-400 cursor-not-allowed" : ""}
-        ${!disabled && !isSelected ? "hover:bg-primary border-primary hover:text-white cursor-pointer" : ""}
-        ${isSelected ? "bg-primary text-white font-semibold" : ""}
+        flex items-center justify-center
+        w-full h-full
+        transition-all duration-150
+
+        ${disabled
+                                ? "bg-[#1297a317] text-gray-400 cursor-not-allowed rounded-full"
+                                : ""}
+
+        ${isInRange
+                                ? "bg-primary/20 text-black"
+                                : ""}
+
+        ${isStart || isEnd
+                                ? "bg-primary text-white font-semibold rounded-full"
+                                : ""}
+
+        ${!disabled && !isStart && !isEnd && !isInRange
+                                ? "hover:bg-primary/20 hover:text-black cursor-pointer rounded-full"
+                                : ""}
       `}
                           >
                             {date.getDate()}
                           </div>
                         );
                       }}
-
 
                       onChange={(item) => {
                         const start = item.selection.startDate;
@@ -606,7 +696,7 @@ const basePriceTotal = calculateBasePrice();
               </div>
 
 
-              <div className="mt-4 border border-gray-300 p-3 relative" ref={guestRef}>
+              <div className="mt-4 rounded-[12px] border border-gray-300 p-3 relative" ref={guestRef}>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase">Guests</label>
 
                 <div
@@ -620,7 +710,7 @@ const basePriceTotal = calculateBasePrice();
                 </div>
 
                 {showGuestDropdown && (
-                  <div className="absolute left-0 w-full bg-white border shadow-xl p-4 mt-2 z-[999]">
+                  <div className="absolute left-0 w-full bg-white border shadow-xl p-4 mt-2 z-[999] rounded-[8px]">
 
                     {/* Adults */}
                     <div className="flex justify-between items-center py-2">
@@ -742,7 +832,7 @@ const basePriceTotal = calculateBasePrice();
 
               <Button
                 onClick={handleReserve}
-                className="w-full mt-4 bg-primary text-white rounded-[0px] py-5 text-lg hover:bg-primary/90"
+                className="w-full mt-4 bg-primary text-white rounded-[10px] py-5 text-lg hover:bg-primary/90"
               >
                 Reserve →
               </Button>

@@ -46,15 +46,17 @@ export default function PropertyCard({ property }) {
   return (
     <Card
       className="
-        bg-white
-        rounded-2xl
-        border border-gray-100
-        shadow-[0_4px_12px_rgba(0,0,0,0.06)]
-        hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)]
-        transition-shadow duration-300
-        overflow-hidden
-      "
+    bg-white
+    rounded-2xl
+    border border-gray-100
+    shadow-[0_4px_12px_rgba(0,0,0,0.06)]
+    hover:shadow-[0_14px_30px_rgba(0,0,0,0.12)]
+    transition-shadow duration-300
+    overflow-hidden
+    flex flex-col
+  "
     >
+
       {/* IMAGE */}
       <div className="relative">
         <Link to={`/properties/${property._id}`}>
@@ -78,11 +80,10 @@ export default function PropertyCard({ property }) {
           "
         >
           <Heart
-            className={`w-4 h-4 ${
-              inWishlist
+            className={`w-4 h-4 ${inWishlist
                 ? "text-red-500 fill-red-500"
                 : "text-gray-600"
-            }`}
+              }`}
           />
         </button>
 
@@ -104,7 +105,7 @@ export default function PropertyCard({ property }) {
       </div>
 
       {/* CONTENT */}
-      <CardContent className="px-4 pt-3 pb-2">
+      <CardContent className="px-4 pt-3 pb-2 flex-1">
         <div className="flex justify-between items-start gap-2">
           <Link to={`/properties/${property._id}`}>
             <h3 className="text-[15px] font-semibold text-gray-900 leading-tight">
@@ -146,7 +147,7 @@ export default function PropertyCard({ property }) {
           <Button
             variant="outline"
             className="
-              rounded-full
+              rounded-[10px]
               text-sm
               px-4
               border-gray-300

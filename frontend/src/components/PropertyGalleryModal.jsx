@@ -50,7 +50,7 @@ export default function PropertyGalleryModal({ images = [], open, onClose }) {
           <button
             onClick={onClose}
             className="absolute top-6 right-6 z-[10000] bg-white/20 hover:bg-white/30 
-                       text-white p-2"
+                       text-white p-2 rounded-[10px]"
           >
             <X size={26} />
           </button>
@@ -60,7 +60,7 @@ export default function PropertyGalleryModal({ images = [], open, onClose }) {
             <button
               onClick={prevSlide}
               className="absolute left-6 top-1/2 -translate-y-1/2 z-[10000] 
-                         bg-white/20 hover:bg-white/30 p-3 text-white"
+                         bg-white/20 hover:bg-white/30 p-3 text-white rounded-[10px]"
             >
               <ChevronLeft size={34} />
             </button>
@@ -71,7 +71,7 @@ export default function PropertyGalleryModal({ images = [], open, onClose }) {
             <button
               onClick={nextSlide}
               className="absolute right-6 top-1/2 -translate-y-1/2 z-[10000] 
-                         bg-white/20 hover:bg-white/30 p-3 text-white"
+                         bg-white/20 hover:bg-white/30 p-3 text-white rounded-[10px]"
             >
               <ChevronRight size={34} />
             </button>
@@ -87,20 +87,20 @@ export default function PropertyGalleryModal({ images = [], open, onClose }) {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.25 }}
-                className="max-h-[70vh] h-[70vh] max-w-[60vw] w-[100%] object-cover mx-auto pointer-events-none"
+                className="max-h-[70vh] h-[70vh] max-w-[60vw] w-[100%] object-cover mx-auto pointer-events-none rounded-[14px]"
               />
             </AnimatePresence>
           </div>
 
           {/* THUMBNAILS */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[10000] 
-                          flex gap-3 bg-black/40 p-3 backdrop-blur">
+                          flex gap-3 bg-black/40 p-3 backdrop-blur rounded-[14px]">
             {images.map((img, i) => (
               <img
                 key={i}
                 src={img}
                 onClick={() => setCurrent(i)}
-                className={`w-20 h-20 object-cover cursor-pointer border 
+                className={`w-20 h-20 object-cover cursor-pointer border rounded-[12px] 
                   ${i === current ? "border-white" : "border-transparent opacity-60 hover:opacity-100"}
                 `}
               />

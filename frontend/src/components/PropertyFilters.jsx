@@ -200,16 +200,10 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                     : "white",
             color: state.isSelected ? "#ffffff" : "#111827",
             cursor: "pointer",
-            borderRadius: "8px",
-        }),
-        menuList: (provided) => ({
-            ...provided,
-            padding: "6px",             
         }),
         menu: (provided) => ({
             ...provided,
             zIndex: 9999,
-            borderRadius: "8px",
         }),
     };
 
@@ -306,7 +300,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                     <Calendar className="w-4 h-4 text-gray-500" />
                 </div>
                 {showCalendar && (
-                    <div className="absolute top-[71px] left-0 bg-white rounded-[8px] p-3 shadow-2xl border border-gray-100 z-[999999]">
+                    <div className="absolute rounded-[12px] top-[71px] left-0 bg-white p-3 shadow-2xl border border-gray-100 pl-[42px] z-[999999]">
                         <DateRange
                             ranges={dateRange}
                             onChange={(item) => setDateRange([item.selection])}
@@ -322,28 +316,53 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                                 const today = new Date();
                                 today.setHours(0, 0, 0, 0);
 
+                                const startDate = dateRange[0].startDate;
+                                const endDate = dateRange[0].endDate;
+
                                 const isPast = date < today;
+
                                 const isSelected =
-                                    date >= dateRange[0].startDate &&
-                                    date <= dateRange[0].endDate;
+                                    startDate &&
+                                    endDate &&
+                                    date >= startDate &&
+                                    date <= endDate;
+
+                                const isStart =
+                                    startDate &&
+                                    date.toDateString() === startDate.toDateString();
+
+                                const isEnd =
+                                    endDate &&
+                                    date.toDateString() === endDate.toDateString();
 
                                 return (
                                     <div
                                         className={`
-                flex items-center justify-center w-full h-full
-                transition-all duration-150
-                ${isPast
+        flex items-center justify-center w-full h-full rounded-full
+        transition-all duration-150
+
+        ${isPast
                                                 ? "bg-[#1297a317] text-gray-400 cursor-not-allowed"
-                                                : isSelected
-                                                    ? "bg-[#038ba033] text-white font-semibold"
-                                                    : "hover:bg-primary hover:text-white cursor-pointer"
-                                            }
-            `}
+                                                : ""}
+
+        ${isSelected && !isStart && !isEnd
+                                                ? "text-black"
+                                                : ""}
+
+        ${isStart || isEnd
+                                                ? "text-white font-semibold"
+                                                : ""}
+
+        ${!isPast && !isSelected
+                                                ? "hover:bg-primary hover:text-white cursor-pointer"
+                                                : ""}
+      `}
                                     >
                                         {date.getDate()}
                                     </div>
                                 );
                             }}
+
                         />
 
                     </div>
@@ -362,7 +381,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
                 </div>
 
                 {showGuestBox && (
-                    <div className="absolute z-[99999] bg-white shadow-xl border rounded-[8px] p-4 mt-2 w-[260px]">
+                    <div className="absolute z-[99999] bg-white shadow-xl border p-4 mt-2 w-[260px]">
                         {/* Adults */}
                         <div className="flex justify-between items-center py-2">
                             <div>
