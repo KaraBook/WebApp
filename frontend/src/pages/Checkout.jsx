@@ -405,7 +405,7 @@ export default function Checkout() {
                 </div>
 
                 {/* Contact */}
-                <div className="border rounded-[12px] mt-[120px] p-5 mb-6">
+                <div className="border rounded-[12px] p-5 mb-6">
                     <h3 className="font-semibold mb-3 text-lg">Contact number</h3>
                     <input
                         type="tel"
@@ -430,7 +430,7 @@ export default function Checkout() {
 
             {/* RIGHT SECTION */}
             <div>
-                <div className="border rounded-[12px] p-5 shadow-sm">
+                <div className="border rounded-[12px] mt-[120px] p-5 shadow-sm">
                     <div className="flex gap-3 mb-3">
                         <img
                             src={property.coverImage}
