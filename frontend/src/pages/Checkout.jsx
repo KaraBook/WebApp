@@ -222,13 +222,13 @@ export default function Checkout() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-4 py-10">
             {/* LEFT SECTION */}
             <div>
-                 <button
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 mb-4 rounded-[8px] text-sm font-medium text-gray-600 bg-gray-200 px-3 py-3 hover:text-black transition"
-            >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-            </button>
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 mb-4 rounded-[8px] text-sm font-medium text-gray-600 bg-gray-200 px-3 py-3 hover:text-black transition"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+                </button>
                 <h2 className="text-2xl font-bold mb-6">Confirm and pay</h2>
 
                 {/* Trip Summary */}
@@ -269,9 +269,22 @@ export default function Checkout() {
                                         const isBlocked = isDateDisabled(date);
                                         const disabled = isPast || isBlocked;
 
+                                        const startDate = dateRange[0].startDate;
+                                        const endDate = dateRange[0].endDate;
+
                                         const isSelected =
-                                            date >= dateRange[0].startDate &&
-                                            date <= dateRange[0].endDate;
+                                            startDate &&
+                                            endDate &&
+                                            date >= startDate &&
+                                            date <= endDate;
+
+                                        const isStart =
+                                            startDate &&
+                                            date.toDateString() === startDate.toDateString();
+
+                                        const isEnd =
+                                            endDate &&
+                                            date.toDateString() === endDate.toDateString();
 
                                         return (
                                             <div
@@ -282,11 +295,25 @@ export default function Checkout() {
                                                     }
                                                 }}
                                                 className={`
-                flex items-center justify-center w-full h-full rounded-full
-                ${disabled ? "bg-[#1297a317] text-gray-400 cursor-not-allowed" : ""}
-                ${!disabled && !isSelected ? "hover:bg-primary border-primary hover:text-white cursor-pointer" : ""}
-                ${isSelected ? "font-semibold" : ""}
-              `}
+        flex items-center justify-center w-full h-full rounded-full
+        transition-all
+
+        ${disabled
+                                                        ? "bg-[#1297a317] text-gray-400 cursor-not-allowed"
+                                                        : ""}
+
+        ${isStart || isEnd
+                                                        ? "bg-primary text-white font-semibold"
+                                                        : ""}
+
+        ${isSelected && !isStart && !isEnd
+                                                        ? "text-black"
+                                                        : ""}
+
+        ${!disabled && !isSelected
+                                                        ? "hover:bg-primary hover:text-white cursor-pointer"
+                                                        : ""}
+      `}
                                             >
                                                 {date.getDate()}
                                             </div>
