@@ -64,7 +64,7 @@ export default function Profile() {
   if (!profile)
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="w-10 h-10 border-4 border-gray-300 border-t-[#efcc61] animate-spin"></div>
+        <div className="w-10 h-10 border-4 rounded-full border-gray-300 border-t-[#efcc61] animate-spin"></div>
       </div>
     );
 
@@ -82,16 +82,16 @@ export default function Profile() {
 
       <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Profile</h1>
 
-      <div className="border shadow-sm bg-white p-6 flex items-center gap-6">
+      <div className="border shadow-sm rounded-[12px] bg-white p-6 flex items-center gap-6">
 
         <div className="relative">
           {avatarPreview ? (
             <img
               src={avatarPreview}
-              className="w-[180px] h-[150px] object-cover border shadow-sm"
+              className="w-[180px] h-[150px] rounded-[12px] object-cover border shadow-sm"
             />
           ) : (
-            <div className="w-[180px] h-[150px] border shadow-sm bg-gray-100 
+            <div className="w-[180px] h-[150px] rounded-[12px] border shadow-sm bg-gray-100 
                     flex items-center justify-center text-5xl font-semibold text-[#233b19]">
               {profile?.name?.charAt(0)?.toUpperCase()}
             </div>
@@ -99,7 +99,7 @@ export default function Profile() {
 
           <button
             onClick={() => fileRef.current.click()}
-            className="absolute bottom-0 right-0 bg-white p-1 shadow border hover:bg-gray-100"
+            className="absolute rounded-[8px] bottom-0 right-0 bg-white p-1 shadow border hover:bg-gray-100"
           >
             <Camera size={16} />
           </button>
@@ -114,7 +114,7 @@ export default function Profile() {
         </div>
 
 
-        <div className="flex-1">
+        <div className="flex-1 rounded-[12px]">
           <h2 className="text-xl font-semibold text-gray-900">{profile.name}</h2>
           <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
 

@@ -45,7 +45,7 @@ export default function Wishlist() {
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="w-10 h-10 border-4 border-gray-300 border-t-[#efcc61] animate-spin"></div>
+        <div className="w-10 h-10 border-4 rounded-full border-gray-300 border-t-[#efcc61] animate-spin"></div>
       </div>
     );
 
