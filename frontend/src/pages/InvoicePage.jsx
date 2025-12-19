@@ -94,7 +94,7 @@ export default function InvoicePage() {
       <div className="max-w-3xl w-full py-4 flex items-start justify-between">
         <Link
           to="/account/bookings"
-          className="bg-gray-200 text-black px-3 py-1 rounded-[8px]"
+          className="bg-gray-200 text-black px-4 py-2 rounded-[8px]"
         >
           Back
         </Link>
