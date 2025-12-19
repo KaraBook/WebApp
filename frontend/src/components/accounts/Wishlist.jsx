@@ -65,7 +65,7 @@ export default function Wishlist() {
         {wishlist.map((property) => (
           <div
             key={property._id}
-            className="border shadow-sm hover:shadow-md transition-all bg-white p-0"
+            className="border shadow-sm rounded-[12px] hover:shadow-md transition-all bg-white p-0"
           >
             {/* Image */}
             <div className="relative w-full h-48 overflow-hidden cursor-pointer">
@@ -120,7 +120,7 @@ export default function Wishlist() {
 
                 <Link to={`/properties/${property._id}`}>
                   <Button
-                    className="bg-primary text-white rounded-none hover:bg-primary px-4"
+                    className="bg-primary text-white rounded-[8px] hover:bg-primary px-6"
                     size="sm"
                   >
                     View
