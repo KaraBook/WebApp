@@ -73,7 +73,7 @@ export default function Wishlist() {
                 <img
                   src={property.coverImage}
                   alt={property.propertyName}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-t-[12px] "
                 />
               </Link>
 
@@ -120,7 +120,7 @@ export default function Wishlist() {
 
                 <Link to={`/properties/${property._id}`}>
                   <Button
-                    className="bg-primary text-white rounded-[8px] hover:bg-primary px-6"
+                    className="bg-primary text-[14px] text-white rounded-[8px] hover:bg-primary px-6"
                     size="sm"
                   >
                     View
