@@ -252,8 +252,18 @@ export default function Bookings() {
 
           {/* BOOKING DETAILS POPUP */}
           {selectedBooking && (
-            <Dialog open={true} onOpenChange={() => setSelectedBooking(null)} className="max-h-[480px] overflow-y-auto">
-              <DialogContent className="max-w-3xl p-6 rounded-none mt-[2rem]">
+            <Dialog open={true} onOpenChange={() => setSelectedBooking(null)} >
+              <DialogContent
+                className="
+    max-w-3xl
+    w-full
+    max-h-[85vh]
+    overflow-y-auto
+    p-6
+    mt-6
+    rounded-md
+  "
+              >
 
                 <DialogHeader>
                   <DialogTitle className="text-xl font-semibold">Booking Details</DialogTitle>
