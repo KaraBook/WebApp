@@ -57,7 +57,7 @@ export default function Ratings() {
         {reviews.map((r) => (
           <div
             key={r._id}
-            className="relative border border-gray-200 bg-white shadow-sm p-4 flex gap-4 hover:shadow-md transition-all duration-200"
+            className="relative rounded-[10px] border border-gray-200 bg-white shadow-sm p-4 flex gap-4 hover:shadow-md transition-all duration-200"
           >
             <button
               onClick={() => handleDelete(r._id)}
@@ -70,7 +70,7 @@ export default function Ratings() {
               <img
                 src={r.propertyId?.coverImage}
                 alt={r.propertyId?.propertyName}
-                className="w-28 h-[120px] object-cover border"
+                className="w-28 h-[120px] rounded-[10px] object-cover border"
               />
             </Link>
 
