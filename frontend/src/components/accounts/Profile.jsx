@@ -128,13 +128,13 @@ export default function Profile() {
         <Button
           onClick={clearAuth}
           variant="outline"
-          className="rounded-none border-gray-300 text-gray-800 hover:bg-gray-50 flex items-center gap-2"
+          className="rounded-[8px] border-gray-300 text-gray-800 hover:bg-gray-50 flex items-center gap-2"
         >
           <LogOut size={16} /> Logout
         </Button>
       </div>
 
-      <div className="border shadow-sm bg-white p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="border rounded-[8px] shadow-sm bg-white p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
 
         <InfoRow icon={<Phone />} label="Mobile" value={profile.mobile} />
         <InfoRow icon={<Mail />} label="Email" value={profile.email} />
