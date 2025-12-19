@@ -74,7 +74,7 @@ export default function Bookings() {
       <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Bookings</h1>
 
       {/* TABLE WRAPPER */}
-      <div className="border border-gray-200 bg-white">
+      <div className="border border-gray-200 bg-white rounded-[10px]">
         <div className="overflow-x-auto">
           <table className="min-w-[1100px] w-full text-sm">
             <thead className="bg-gray-100 text-gray-700 border-b border-gray-200">

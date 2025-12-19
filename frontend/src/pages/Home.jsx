@@ -13,6 +13,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
 import { House, Tent, } from "lucide-react";
+import CarouselCard from "@/components/CarouselCard";
 
 export default function Home() {
   const [properties, setProperties] = useState([]);
@@ -103,49 +104,54 @@ export default function Home() {
             <span className="transition-transform group-hover:translate-x-1">→</span>
           </button>
         </div>
-        <div className="w-[55%] flex flex-wrap items-end justify-right gap-4 mt-4">
-          <div className="border relative md:w-[220px] p-2 h-[300px] flex justify-between items-center rounded-[12px] border-gray-300">
-            <div className="relative w-full h-full rounded-[8px] overflow-hidden">
-              <img
-                src="/banimg1.jpg"
-                className="absolute top-0 left-0 w-full h-full object-cover"
+        <div className="relative w-[55%] mt-4">
+
+          {/* LEFT WHITE GRADIENT */}
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-16 z-20
+    bg-gradient-to-r from-white via-white/80 to-transparent" />
+
+          {/* SCROLL CONTAINER */}
+          <div className="relative z-10 overflow-hidden">
+            <div className="carousel-track flex gap-4">
+              {/* ORIGINAL CARDS */}
+              <CarouselCard
+                title="Villas"
+                subtitle="Experience Luxury"
+                img="/banimg1.jpg"
               />
-              <div className="absolute  inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-lg font-semibold">Viilas</h3>
-                <p className="text-sm">Experience Luxury</p>
-              </div>
+              <CarouselCard
+                title="Tents"
+                subtitle="Close to Nature"
+                img="/bannerimg.webp"
+              />
+              <CarouselCard
+                title="Hotels"
+                subtitle="Comfort & Convenience"
+                img="/bannerImg1.webp"
+              />
+
+              {/* DUPLICATE FOR SEAMLESS LOOP */}
+              <CarouselCard
+                title="Villas"
+                subtitle="Experience Luxury"
+                img="/banimg1.jpg"
+              />
+              <CarouselCard
+                title="Tents"
+                subtitle="Close to Nature"
+                img="/bannerimg.webp"
+              />
+              <CarouselCard
+                title="Hotels"
+                subtitle="Comfort & Convenience"
+                img="/bannerImg1.webp"
+              />
             </div>
           </div>
-          <div className="border relative md:w-[220px] p-2 h-[300px] flex justify-between items-center rounded-[12px] border-gray-300">
-            <div className="relative w-full h-full rounded-[8px] overflow-hidden">
-              <img
-                src="/bannerimg.webp"
-                className="absolute top-0 left-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-lg font-semibold">Tents</h3>
-                <p className="text-sm">Close to Nature</p>
-              </div>
-            </div>
-          </div>
-          <div className="border relative md:w-[220px] p-2 h-[300px] flex justify-between items-center rounded-[12px] border-gray-300">
-            <div className="relative w-full h-full rounded-[8px] overflow-hidden">
-              <img
-                src="/bannerImg1.webp"
-                className="absolute top-0 left-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-lg font-semibold">Hotels</h3>
-                <p className="text-sm">Comfort & Convenience</p>
-              </div>
-            </div>
-          </div>
-          
+
         </div>
-        
+
+
       </section>
 
       <section className="w-full bg-[#faf7f4] py-[20px] md:pb-[80px] md:py-[40px] md:mt-[280px] px-4 md:px-12">

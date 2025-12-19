@@ -150,3 +150,18 @@
 .float-fast {
   animation: float 4s ease-in-out infinite;
 }
+
+
+
+.carousel-track {
+  animation: scroll-left 25s linear infinite;
+}
+
+@keyframes scroll-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
