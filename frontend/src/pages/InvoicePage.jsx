@@ -94,14 +94,14 @@ export default function InvoicePage() {
       <div className="max-w-3xl w-full py-4 flex items-start justify-between">
         <Link
           to="/account/bookings"
-          className="bg-gray-200 text-black px-3 py-1 rounded-[10px]"
+          className="bg-gray-200 text-black px-3 py-1 rounded-[8px]"
         >
           Back
         </Link>
         <Button
           onClick={handleDownloadPDF}
           disabled={!invoice}
-          className="flex items-center gap-2 bg-primary rounded-[10px]"
+          className="flex items-center gap-2 bg-primary rounded-[8px]"
         >
           <FileDown className="w-4 h-4" />
           Download Invoice
