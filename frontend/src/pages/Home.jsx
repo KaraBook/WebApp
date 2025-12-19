@@ -12,8 +12,33 @@ import FindByExperience from "@/components/FindByExperience";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
-import { House, Tent, } from "lucide-react";
 import CarouselCard from "@/components/CarouselCard";
+
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: "easeOut" },
+  },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.15 },
+  },
+};
+
+const cardFade = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
 
 export default function Home() {
   const [properties, setProperties] = useState([]);
@@ -48,12 +73,10 @@ export default function Home() {
     navigate(`/properties?${query}`);
   };
 
-
   return (
     <div className="flex flex-col min-h-screen relative">
 
-      {/* HERO SECTION */}
-      <section className="relative w-full h-[60vh] md:h-[85vh] flex md:items-center items:start md:justify-center justify-start pt-[15vh]">
+      <section className="relative w-full h-[60vh] md:h-[85vh] flex md:items-center pt-[15vh]">
         <img
           src="/bannerImg1.webp"
           alt="Banner"
@@ -62,12 +85,12 @@ export default function Home() {
         <div className="absolute inset-0 bg-black/60" />
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 text-center text-white px-4"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="relative z-10 text-center text-white px-4 mx-auto"
         >
-          <h1 className="text-3xl md:text-5xl tracking-[2px] uppercase font-[600] mb-3 leading-snug">
+          <h1 className="text-3xl md:text-5xl tracking-[2px] uppercase font-[600] mb-3">
             Discover Stays That Feel Like Home
           </h1>
           <p className="text-sm md:text-lg text-gray-200 max-w-xl mx-auto">
@@ -76,150 +99,139 @@ export default function Home() {
         </motion.div>
 
         {/* FILTERS */}
-        <div className="absolute -bottom-[200px] md:-bottom-[50px] w-full flex justify-center px-4 z-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="absolute -bottom-[200px] md:-bottom-[50px] w-full flex justify-center px-4 z-10"
+        >
           <div className="max-w-6xl w-full">
             <PropertyFilters onFilter={handleFilter} />
           </div>
-        </div>
+        </motion.div>
       </section>
 
-
-      <section className="max-w-7xl w-full mx-auto md:h-[20vh] mt-[130px] flex items-center flex-wrap justify-between">
-        <div className="flex flex-col gap-4">
+      <motion.section
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="max-w-7xl w-full mx-auto mt-[130px] flex flex-wrap justify-between items-center"
+      >
+        <motion.div variants={fadeUp} className="flex flex-col gap-4">
           <span className="text-sm font-medium text-primary">
             Curated stays across top destinations
           </span>
-          <h1 className="font-display text-4xl md:text-4xl lg:text-5xl font-bold leading-tight text-left">
+          <h1 className="font-display text-4xl lg:text-5xl font-bold">
             <span className="block text-[#1F2A2E]">Find Your</span>
-            <span className="block pb-[18px] pt-[10px] bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent">
               Perfect Stay
             </span>
           </h1>
-          <p className="text-gray-600 leading-relaxed max-w-sm">
+          <p className="text-gray-600 max-w-sm">
             Experience the best of Maharashtra, from city life to coastal and hill escapes.
           </p>
 
-          <button className="inline-flex items-center gap-2 text-white px-4 w-fit py-2 rounded-[10px] font-medium group bg-primary">
-            Explore Beautiful Stays
-            <span className="transition-transform group-hover:translate-x-1">→</span>
-          </button>
-        </div>
-        <div className="relative w-[55%] mt-4">
+          <Button
+              onClick={() => navigate("/properties")}
+              className=" relative w-fit overflow-hidden rounded-[10px] bg-primary text-white px-6 py-5 font-medium group">
+              <span className="relative z-10 flex items-center gap-2">
+                Explore Beautiful Stays
+                <span className="transition-transform duration-300 group-hover:translate-x-1">
+                  →
+                </span>
+              </span>
+              <span
+                className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"/>
+            </Button>
+        </motion.div>
 
-          {/* LEFT WHITE GRADIENT */}
-          <div className="pointer-events-none absolute left-0 top-0 h-full w-16 z-20
-    bg-gradient-to-r from-white via-white/80 to-transparent" />
-
-          {/* SCROLL CONTAINER */}
-          <div className="relative z-10 overflow-hidden">
-            <div className="carousel-track flex gap-4">
-              {/* ORIGINAL CARDS */}
-              <CarouselCard
-                title="Villas"
-                subtitle="Experience Luxury"
-                img="/banimg1.jpg"
-              />
-              <CarouselCard
-                title="Tents"
-                subtitle="Close to Nature"
-                img="/bannerimg.webp"
-              />
-              <CarouselCard
-                title="Hotels"
-                subtitle="Comfort & Convenience"
-                img="/bannerImg1.webp"
-              />
-
-              {/* DUPLICATE FOR SEAMLESS LOOP */}
-              <CarouselCard
-                title="Villas"
-                subtitle="Experience Luxury"
-                img="/banimg1.jpg"
-              />
-              <CarouselCard
-                title="Tents"
-                subtitle="Close to Nature"
-                img="/bannerimg.webp"
-              />
-              <CarouselCard
-                title="Hotels"
-                subtitle="Comfort & Convenience"
-                img="/bannerImg1.webp"
-              />
+        {/* AUTO CAROUSEL */}
+        <motion.div variants={fadeUp} className="relative w-[55%] mt-4">
+          <div className="absolute left-0 top-0 h-full w-16 z-20 bg-gradient-to-r from-white to-transparent" />
+          <div className="overflow-hidden">
+            <div className="carousel-track flex gap-4 animate-scroll">
+              {[...Array(2)].flatMap(() => [
+                <CarouselCard key="villa" title="Villas" subtitle="Experience Luxury" img="/banimg1.jpg" />,
+                <CarouselCard key="tent" title="Tents" subtitle="Close to Nature" img="/bannerimg.webp" />,
+                <CarouselCard key="hotel" title="Hotels" subtitle="Comfort & Convenience" img="/bannerImg1.webp" />,
+              ])}
             </div>
           </div>
+        </motion.div>
+      </motion.section>
 
-        </div>
-
-
-      </section>
-
-      <section className="w-full bg-[#faf7f4] py-[20px] md:pb-[80px] md:py-[40px] md:mt-[280px] px-4 md:px-12">
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="w-full bg-[#faf7f4] py-[40px] mt-[120px]"
+      >
         <FindByExperience />
-      </section>
+      </motion.section>
 
-      {/* PROPERTIES CAROUSEL */}
-      <section className="w-full py-16 md:mt-[50px] bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
+      <motion.section
+        variants={fadeUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="w-full mt-[50px] py-16 bg-white overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold">Popular Stays</h2>
-            <Button className="rounded-[10px] mt-2 md:mt-0" onClick={() => navigate("/properties")}>
-              View All Properties
+            <Button
+              onClick={() => navigate("/properties")}
+              className=" relative overflow-hidden rounded-[10px] bg-primary text-white px-6 py-5 font-medium group">
+              <span className="relative z-10 flex items-center gap-2">
+                View All Properties
+                <span className="transition-transform duration-300 group-hover:translate-x-1">
+                  →
+                </span>
+              </span>
+              <span
+                className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"/>
             </Button>
+
           </div>
 
-          {/* SLIDER */}
           <Swiper
             modules={[Navigation, Autoplay, FreeMode]}
             onBeforeInit={(swiper) => {
               swiper.params.navigation.prevEl = prevRef.current;
               swiper.params.navigation.nextEl = nextRef.current;
             }}
-            navigation={{
-              prevEl: prevRef.current,
-              nextEl: nextRef.current,
-            }}
-            loop={true}
-            autoplay={{
-              delay: 1,
-              disableOnInteraction: false,
-            }}
+            loop
+            autoplay={{ delay: 1, disableOnInteraction: false }}
             speed={5000}
-            freeMode={true}
-            freeModeMomentum={false}
+            freeMode
             slidesPerView="auto"
             spaceBetween={16}
-            grabCursor={true}
-            className="relative"
           >
             {properties.map((property, i) => (
               <SwiperSlide key={i} style={{ width: "250px" }}>
-                <div className="h-[350px] md:h-[380px] flex">
+                <motion.div
+                  variants={cardFade}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  whileHover={{ scale: 1.03 }}
+                  className="h-[400px]"
+                >
                   <PropertyCard property={property} />
-                </div>
+                </motion.div>
               </SwiperSlide>
             ))}
           </Swiper>
 
           {/* ARROWS */}
-          <div className="hidden md:flex justify-end gap-3 mt-6 pr-2">
-            <button
-              ref={prevRef}
-              className="w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white transition flex items-center justify-center"
-            >
-              ←
-            </button>
-
-            <button
-              ref={nextRef}
-              className="w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white transition flex items-center justify-center"
-            >
-              →
-            </button>
+          <div className="hidden md:flex justify-end gap-3 mt-6">
+            <button ref={prevRef} className="w-10 h-10 bg-gray-100">←</button>
+            <button ref={nextRef} className="w-10 h-10 bg-gray-100">→</button>
           </div>
-
         </div>
-      </section>
+      </motion.section>
 
     </div>
   );
