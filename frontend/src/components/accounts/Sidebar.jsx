@@ -36,7 +36,7 @@ export default function Sidebar({ onNavigate, className }) {
       {/* USER BOX */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 bg-gray-200 flex items-center justify-center text-gray-700 text-lg font-semibold">
+          <div className="h-12 w-12 bg-gray-200 flex items-center rounded-[8px] justify-center text-gray-700 text-lg font-semibold">
             {user?.name?.[0] || "U"}
           </div>
 
