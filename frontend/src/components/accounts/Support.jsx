@@ -66,11 +66,11 @@ export default function Support() {
         Support & Help
       </h1>
       <Tabs defaultValue="contact" className="w-full">
-        <TabsList className="grid grid-cols-2 w-full max-w-sm mb-8 rounded-[0] ">
-          <TabsTrigger value="contact" className="rounded-[0]">
+        <TabsList className="grid grid-cols-2 w-full max-w-sm mb-8 rounded-[8px] ">
+          <TabsTrigger value="contact" className="rounded-[8px]">
             <Mail className="w-4 h-4 mr-2" /> Contact Form
           </TabsTrigger>
-          <TabsTrigger value="faq" className="rounded-[0]">
+          <TabsTrigger value="faq" className="rounded-[8px]">
             <HelpCircle className="w-4 h-4 mr-2" /> FAQs
           </TabsTrigger>
         </TabsList>
@@ -78,7 +78,7 @@ export default function Support() {
         <TabsContent value="contact">
           <form
             onSubmit={handleSubmit}
-            className="bg-white border border-gray-200 shadow-sm rounded-[0] p-6 space-y-5"
+            className="bg-white border border-gray-200 shadow-sm rounded-[10px] p-6 space-y-5"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -90,7 +90,7 @@ export default function Support() {
                   value={form.name}
                   onChange={handleChange}
                   placeholder="Enter your name"
-                  className="rounded-[0]"
+                  className="rounded-[8px]"
                 />
               </div>
               <div>
@@ -103,7 +103,7 @@ export default function Support() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
-                  className="rounded-[0]"
+                  className="rounded-[8px]"
                 />
               </div>
             </div>
@@ -117,7 +117,7 @@ export default function Support() {
                 value={form.subject}
                 onChange={handleChange}
                 placeholder="What can we help you with?"
-                className="rounded-[0]"
+                className="rounded-[8px]"
               />
             </div>
 
@@ -131,14 +131,14 @@ export default function Support() {
                 value={form.message}
                 onChange={handleChange}
                 placeholder="Write your message here..."
-                className="rounded-[0]"
+                className="rounded-[8px]"
               />
             </div>
 
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="bg-primary hover:bg-primary text-white px-6 py-2 rounded-[0]"
+                className="bg-primary hover:bg-primary text-white px-6 py-2 rounded-[8px]"
               >
                 Send Message
               </Button>
@@ -147,7 +147,7 @@ export default function Support() {
         </TabsContent>
 
         <TabsContent value="faq">
-          <div className="bg-white border border-gray-200 shadow-sm rounded-[0] p-6">
+          <div className="bg-white border border-gray-200 shadow-sm rounded-[10px] p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">
               Frequently Asked Questions
             </h2>
