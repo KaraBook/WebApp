@@ -75,8 +75,8 @@ export default function Bookings() {
 
       {/* TABLE WRAPPER */}
       <div className="border border-gray-200 bg-white rounded-[10px]">
-        <div className="overflow-x-auto">
-          <table className="min-w-[1100px] w-full text-sm">
+        <div className="overflow-x-auto rounded-[10px]">
+          <table className="min-w-[1100px] w-full text-sm rounded-[10px]">
             <thead className="bg-gray-100 text-gray-700 border-b border-gray-200">
               <tr>
                 {[
