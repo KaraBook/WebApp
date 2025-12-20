@@ -82,6 +82,19 @@ export const createOrder = async (req, res) => {
     const taxAmount = Math.round(baseTotal * 0.10);
     const grandTotal = baseTotal + taxAmount;
 
+
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+  console.error("❌ Razorpay env missing", {
+    key: process.env.RAZORPAY_KEY_ID,
+    secret: !!process.env.RAZORPAY_KEY_SECRET,
+  });
+  return res.status(500).json({
+    success: false,
+    message: "Payment gateway configuration error",
+  });
+}
+
+
     /* ---------- RAZORPAY ---------- */
     const order = await razorpay.orders.create({
       amount: grandTotal * 100,
