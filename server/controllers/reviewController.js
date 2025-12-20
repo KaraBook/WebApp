@@ -64,13 +64,15 @@ export const getPropertyReviews = async (req, res) => {
   try {
     const { propertyId } = req.params;
     const reviews = await Review.find({ propertyId })
-      .populate("userId", "name avatarUrl")
+      .populate("userId", "name firstName lastName email avatarUrl")
       .sort({ createdAt: -1 });
+
     res.json({ success: true, data: reviews });
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch reviews" });
   }
 };
+
 
 
 export const getUserReviews = async (req, res) => {

@@ -304,11 +304,11 @@ export default function PropertyDetails() {
       >
 
         <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 mb-4 rounded-[8px] text-sm font-medium text-gray-600 bg-gray-200 px-3 py-3 hover:text-black transition"
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 mb-4 rounded-[8px] text-sm font-medium text-gray-600 bg-gray-200 px-3 py-3 hover:text-black transition"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
         </button>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -518,34 +518,84 @@ export default function PropertyDetails() {
                 {reviews.length === 0 ? (
                   <p className="text-gray-600">No reviews yet. Be the first to review!</p>
                 ) : (
-                  <Swiper
+                  <><Swiper
                     modules={[Navigation]}
-                    navigation
-                    spaceBetween={20}
+                    navigation={{
+                      nextEl: ".review-next",
+                      prevEl: ".review-prev",
+                    }}
+                    spaceBetween={24}
                     slidesPerView={1}
-                    className="mySwiper z-0"
+                    breakpoints={{
+                      768: { slidesPerView: 2 },
+                      1024: { slidesPerView: 3 },
+                    }}
+                    className="relative"
                   >
-                    {reviews.map((r) => (
-                      <SwiperSlide key={r._id}>
-                        <div className="p-5 border bg-gray-50 shadow-sm">
-                          <div className="flex items-center gap-2">
-                            {[...Array(r.rating)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className="w-4 h-4 text-black fill-black"
-                              />
-                            ))}
+                    {reviews.map((r) => {
+                      const name =
+                        r.userId?.name ||
+                        (r.userId?.firstName || r.userId?.lastName
+                          ? `${r.userId.firstName || ""} ${r.userId.lastName || ""}`.trim()
+                          : "Traveller");
+
+                      const firstLetter = name.charAt(0).toUpperCase();
+
+                      return (
+                        <SwiperSlide key={r._id}>
+                          <div className="bg-white rounded-2xl p-6 mb-[20px] shadow-lg h-full flex flex-col">
+
+                            {/* Avatar */}
+                            <div className="flex items-center gap-3 mb-3">
+                              {r.userId?.avatarUrl ? (
+                                <img
+                                  src={r.userId.avatarUrl}
+                                  alt={name}
+                                  className="w-12 h-12 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center text-lg font-semibold">
+                                  {firstLetter}
+                                </div>
+                              )}
+
+                              <div>
+                                <p className="font-semibold text-gray-900">{name}</p>
+                                <p className="text-xs text-gray-500">Traveller</p>
+                              </div>
+                            </div>
+
+                            {/* Rating */}
+                            <div className="flex items-center gap-1 mb-2">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-4 h-4 ${star <= r.rating
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-gray-300"
+                                    }`}
+                                />
+                              ))}
+                            </div>
+
+                            {/* Comment */}
+                            <p className="text-gray-700 text-sm leading-relaxed mt-2">
+                              “{r.comment}”
+                            </p>
+
                           </div>
-
-                          <p className="text-gray-800 mt-2">{r.comment}</p>
-
-                          <p className="text-xs text-gray-500 mt-1">
-                            — {r.userId?.name || "Traveller"}
-                          </p>
-                        </div>
-                      </SwiperSlide>
-                    ))}
+                        </SwiperSlide>
+                      );
+                    })}
                   </Swiper>
+                    <div className="flex justify-end gap-3 mt-4">
+                      <button className="review-prev w-10 h-10 rounded-full border flex items-center justify-center hover:bg-gray-100">
+                        ←
+                      </button>
+                      <button className="review-next w-10 h-10 rounded-full border flex items-center justify-center hover:bg-gray-100">
+                        →
+                      </button>
+                    </div></>
                 )}
               </div>
             </div>
