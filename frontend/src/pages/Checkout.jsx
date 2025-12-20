@@ -180,13 +180,21 @@ export default function Checkout() {
             return;
         }
         try {
-            const res = await Axios.post(SummaryApi.createBookingOrder.url, {
-                propertyId,
-                checkIn: startDate,
-                checkOut: endDate,
-                guests: guestData,
-                contactNumber: contact,
-            });
+            const res = await Axios.post(
+                SummaryApi.createBookingOrder.url,
+                {
+                    propertyId,
+                    checkIn: startDate,
+                    checkOut: endDate,
+                    guests: guestData,
+                    contactNumber: contact,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                }
+            );
 
             const { order } = res.data;
             const loaded = await loadRazorpayScript();

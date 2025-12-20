@@ -15,7 +15,15 @@ const razorpay = new Razorpay({
 export const createOrder = async (req, res) => {
   try {
     const { propertyId, checkIn, checkOut, guests, contactNumber } = req.body;
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
     const userId = req.user.id;
+
 
     const property = await Property.findById(propertyId).lean();
     if (!property) {
