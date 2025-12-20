@@ -14,6 +14,10 @@ const bookingSchema = new mongoose.Schema(
     },
     totalNights: Number,
     totalAmount: Number,
+    taxAmount: Number,
+    grandTotal: Number,
+
+    contactNumber: String,
 
     paymentId: String,
     orderId: String,
