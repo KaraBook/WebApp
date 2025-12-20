@@ -45,7 +45,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
     try {
       buildRecaptcha();
-    } catch {}
+    } catch { }
   }, [open]);
 
   /* ================= TIMER ================= */
@@ -70,7 +70,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
     try {
       try {
         await auth.signOut();
-      } catch {}
+      } catch { }
 
       let verifier = window.recaptchaVerifier || buildRecaptcha();
       const confirmation = await signInWithPhoneNumber(
@@ -189,7 +189,10 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         {/* OTP STEP */}
         {step === "otp" && (
           <div className="flex flex-col gap-4 mt-4">
-            <Label className="text-[13px] font-medium">One-Time Password</Label>
+
+            <Label className="text-[13px] font-medium">
+              Enter OTP
+            </Label>
 
             <Input
               maxLength={6}
@@ -202,6 +205,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
               }
             />
 
+            {/* Resend & Edit */}
             <div className="flex justify-between text-sm text-gray-600">
               {timer > 0 ? (
                 <span>Resend OTP in {timer}s</span>
@@ -226,11 +230,15 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
               </button>
             </div>
 
-            {verifying && (
-              <p className="text-center text-sm text-gray-500">
-                Verifying OTP…
-              </p>
-            )}
+            {/* VERIFY BUTTON (IMPORTANT) */}
+            <Button
+              className="w-full py-3"
+              disabled={otp.length !== 6 || verifying}
+              onClick={() => verifyOtp(otp)}
+            >
+              {verifying ? "Verifying..." : "Verify & Continue"}
+            </Button>
+
           </div>
         )}
 
