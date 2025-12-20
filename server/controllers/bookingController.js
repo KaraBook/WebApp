@@ -72,21 +72,27 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    /* ---------- PRICE CALC ---------- */
-    const baseGuests = Number(property.baseGuests);
-    const basePricePerNight = Number(property.pricingPerNightWeekdays);
+    /* ---------- PRICE CALC (SAFE) ---------- */
+    const baseGuests = Number(property.baseGuests || 0);
+    const basePricePerNight = Number(property.pricingPerNightWeekdays || 0);
+    const extraAdultCharge = Number(property.extraAdultCharge || 0);
+    const extraChildCharge = Number(property.extraChildCharge || 0);
+
+    if (basePricePerNight <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Property pricing not configured",
+      });
+    }
 
     const baseUsedByAdults = Math.min(adults, baseGuests);
-    const remainingBaseSlots = baseGuests - baseUsedByAdults;
+    const remainingBaseSlots = Math.max(0, baseGuests - baseUsedByAdults);
 
     const extraAdults = Math.max(0, adults - baseGuests);
     const extraChildren = Math.max(0, children - remainingBaseSlots);
 
-    const extraAdultCost =
-      extraAdults * Number(property.extraAdultCharge || 0);
-
-    const extraChildCost =
-      extraChildren * Number(property.extraChildCharge || 0);
+    const extraAdultCost = extraAdults * extraAdultCharge;
+    const extraChildCost = extraChildren * extraChildCharge;
 
     const perNightTotal =
       basePricePerNight + extraAdultCost + extraChildCost;
@@ -95,12 +101,20 @@ export const createOrder = async (req, res) => {
     const taxAmount = Math.round(baseTotal * 0.1);
     const grandTotal = baseTotal + taxAmount;
 
-    if (!grandTotal || grandTotal <= 0) {
+    if (!Number.isFinite(grandTotal) || grandTotal <= 0) {
+      console.error("❌ Invalid amount calc", {
+        basePricePerNight,
+        extraAdultCost,
+        extraChildCost,
+        totalNights,
+      });
+
       return res.status(400).json({
         success: false,
         message: "Invalid booking amount",
       });
     }
+
 
     /* ---------- RAZORPAY ORDER ---------- */
     console.log("🧾 Creating Razorpay order for:", grandTotal);
