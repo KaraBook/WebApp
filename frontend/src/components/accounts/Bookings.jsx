@@ -15,7 +15,7 @@ export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [openGuestRow, setOpenGuestRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 8;
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [ratingBooking, setRatingBooking] = useState(null);
 
@@ -75,180 +75,186 @@ export default function Bookings() {
 
       {/* TABLE WRAPPER */}
       <div className="border border-gray-200 bg-white rounded-[12px]">
-        <div className="overflow-x-auto rounded-[12px]">
-          <table className="min-w-[1100px] w-full text-sm rounded-[12px]">
-            <thead className="bg-gray-100 text-gray-700 border-b border-gray-200">
-              <tr>
-                {[
-                  "Booking ID",
-                  "Property",
-                  "Check-in",
-                  "Check-out",
-                  "Nights",
-                  "Guests",
-                  "Amount",
-                  "Status",
-                  "Created",
-                  "Actions",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left font-medium border-r last:border-r-0"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
 
-            <tbody>
-              {bookings.length === 0 && (
+        {/* TABLE SCROLL AREA */}
+        <div className="relative overflow-hidden rounded-[12px]">
+          <div className="overflow-x-auto lg:overflow-x-hidden">
+            <table className="min-w-[1050px] w-full text-sm">
+              <thead className="bg-gray-100 text-gray-700 border-b border-gray-200">
                 <tr>
-                  <td colSpan="10" className="text-center py-10 text-gray-500">
-                    No bookings found
-                  </td>
+                  {[
+                    "Booking ID",
+                    "Property",
+                    "Check-in",
+                    "Check-out",
+                    "Nights",
+                    "Guests",
+                    "Amount",
+                    "Status",
+                    "Created",
+                    "Actions",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left font-medium border-r last:border-r-0"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
-              )}
+              </thead>
 
-              {paginatedBookings.map((b) => {
-                const nights = Math.max(
-                  1,
-                  (new Date(b.checkOut) - new Date(b.checkIn)) /
-                  (1000 * 60 * 60 * 24)
-                );
-
-                return (
-                  <tr
-                    key={b._id}
-                    className="hover:bg-gray-50 border-b border-gray-200"
-                  >
-                    <td className="px-4 py-3 font-medium text-[#233b19]">
-                      #{b._id.slice(-5)}
+              <tbody>
+                {bookings.length === 0 && (
+                  <tr>
+                    <td colSpan="10" className="text-center py-10 text-gray-500">
+                      No bookings found
                     </td>
+                  </tr>
+                )}
 
-                    <td className="px-4 py-3 cursor-pointer">
-                      <span onClick={() => setSelectedBooking(b)} className="cursor-pointer">{b.property?.propertyName || "—"}</span>
-                    </td>
+                {paginatedBookings.map((b) => {
+                  const nights = Math.max(
+                    1,
+                    (new Date(b.checkOut) - new Date(b.checkIn)) /
+                    (1000 * 60 * 60 * 24)
+                  );
 
-                    <td className="px-4 py-3">
-                      {format(new Date(b.checkIn), "dd MMM yyyy")}
-                    </td>
+                  return (
+                    <tr
+                      key={b._id}
+                      className="hover:bg-gray-50 border-b border-gray-200"
+                    >
+                      <td className="px-4 py-3 font-medium text-[#233b19]">
+                        #{b._id.slice(-5)}
+                      </td>
 
-                    <td className="px-4 py-3">
-                      {format(new Date(b.checkOut), "dd MMM yyyy")}
-                    </td>
+                      <td className="px-4 py-3 cursor-pointer">
+                        <span onClick={() => setSelectedBooking(b)} className="cursor-pointer">{b.property?.propertyName || "—"}</span>
+                      </td>
 
-                    <td className="px-4 py-3 text-center">{nights}</td>
+                      <td className="px-4 py-3">
+                        {format(new Date(b.checkIn), "dd MMM yyyy")}
+                      </td>
 
-                    <td className="px-4 py-3 text-center relative guest-dropdown-cell">
-                      <button
-                        onClick={() => setOpenGuestRow(openGuestRow === b._id ? null : b._id)}
-                        className="text-[#233b19] font-medium"
-                      >
-                        {typeof b.guests === "number"
-                          ? `${b.guests} Guests`
-                          : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
-                          }`}
-                      </button>
+                      <td className="px-4 py-3">
+                        {format(new Date(b.checkOut), "dd MMM yyyy")}
+                      </td>
 
-                      {/* Dropdown */}
-                      {openGuestRow === b._id && typeof b.guests !== "number" && (
-                        <div className="absolute left-1/2 -translate-x-1/2 top-10 w-40 bg-white border shadow-lg rounded-md p-3 text-left z-50">
-                          <div className="text-sm py-1 flex justify-between">
-                            <span>Adults</span>
-                            <span className="font-semibold">{b.guests.adults}</span>
+                      <td className="px-4 py-3 text-center">{nights}</td>
+
+                      <td className="px-4 py-3 text-center relative guest-dropdown-cell">
+                        <button
+                          onClick={() => setOpenGuestRow(openGuestRow === b._id ? null : b._id)}
+                          className="text-[#233b19] font-medium"
+                        >
+                          {typeof b.guests === "number"
+                            ? `${b.guests} Guests`
+                            : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                            }`}
+                        </button>
+
+                        {/* Dropdown */}
+                        {openGuestRow === b._id && typeof b.guests !== "number" && (
+                          <div className="absolute left-1/2 -translate-x-1/2 top-10 w-40 bg-white border shadow-lg rounded-md p-3 text-left z-50">
+                            <div className="text-sm py-1 flex justify-between">
+                              <span>Adults</span>
+                              <span className="font-semibold">{b.guests.adults}</span>
+                            </div>
+                            <div className="text-sm py-1 flex justify-between">
+                              <span>Children</span>
+                              <span className="font-semibold">{b.guests.children}</span>
+                            </div>
+                            <div className="text-sm py-1 flex justify-between">
+                              <span>Infants</span>
+                              <span className="font-semibold">{b.guests.infants}</span>
+                            </div>
                           </div>
-                          <div className="text-sm py-1 flex justify-between">
-                            <span>Children</span>
-                            <span className="font-semibold">{b.guests.children}</span>
-                          </div>
-                          <div className="text-sm py-1 flex justify-between">
-                            <span>Infants</span>
-                            <span className="font-semibold">{b.guests.infants}</span>
-                          </div>
-                        </div>
-                      )}
-                    </td>
+                        )}
+                      </td>
 
-                    <td className="px-4 py-3 font-semibold">
-                      ₹{b.totalAmount.toLocaleString()}
-                    </td>
+                      <td className="px-4 py-3 font-semibold">
+                        ₹{b.totalAmount.toLocaleString()}
+                      </td>
 
-                    <td className="px-4 py-3 relative group cursor-default flex justify-center">
-                      <span
-                        className={`inline-block w-3 h-3 rounded-full ${statusDot(
-                          b.paymentStatus
-                        )}`}
-                      ></span>
+                      <td className="px-4 py-3 relative group cursor-default flex justify-center">
+                        <span
+                          className={`inline-block w-3 h-3 rounded-full ${statusDot(
+                            b.paymentStatus
+                          )}`}
+                        ></span>
 
-                      <div
-                        className="
+                        <div
+                          className="
       absolute left-1/2 -translate-x-1/2 top-7
       bg-black text-white text-[11px] px-2 py-1 rounded
       opacity-0 group-hover:opacity-100
       transition-all duration-200 whitespace-nowrap
       pointer-events-none z-50
     "
-                      >
-                        {b.paymentStatus?.toUpperCase()}
-                      </div>
-                    </td>
+                        >
+                          {b.paymentStatus?.toUpperCase()}
+                        </div>
+                      </td>
 
-                    <td className="px-4 py-3">
-                      {format(new Date(b.createdAt), "dd MMM yyyy")}
-                    </td>
+                      <td className="px-4 py-3">
+                        {format(new Date(b.createdAt), "dd MMM yyyy")}
+                      </td>
 
-                    <td className="px-4 py-3 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <MoreVertical className="h-5 w-5 text-gray-700 hover:text-black cursor-pointer" />
-                        </DropdownMenuTrigger>
+                      <td className="px-4 py-3 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <MoreVertical className="h-5 w-5 text-gray-700 hover:text-black cursor-pointer" />
+                          </DropdownMenuTrigger>
 
-                        <DropdownMenuContent className="shadow-md border bg-white p-1">
-                          <DropdownMenuItem onClick={() => setSelectedBooking(b)}>
-                            <div className="flex items-center gap-2">
-                              <Eye size={16} /> View Booking
-                            </div>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem asChild>
-                            <Link to={`/account/invoice/${b._id}`}>
+                          <DropdownMenuContent className="shadow-md border bg-white p-1">
+                            <DropdownMenuItem onClick={() => setSelectedBooking(b)}>
                               <div className="flex items-center gap-2">
-                                <FileDown size={16} /> View Invoice
+                                <Eye size={16} /> View Booking
                               </div>
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              if (b.paymentStatus !== "paid") {
-                                toast.error("You can rate only after payment is completed.");
-                                return;
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link to={`/account/invoice/${b._id}`}>
+                                <div className="flex items-center gap-2">
+                                  <FileDown size={16} /> View Invoice
+                                </div>
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                if (b.paymentStatus !== "paid") {
+                                  toast.error("You can rate only after payment is completed.");
+                                  return;
+                                }
+                                setRatingBooking(b);
+                              }}
+                            >
+                              <div className="flex items-center gap-2">
+                                ⭐ Rate this Resort
+                              </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                window.open(`tel:${b.property?.contactNumber}`)
                               }
-                              setRatingBooking(b);
-                            }}
-                          >
-                            <div className="flex items-center gap-2">
-                              ⭐ Rate this Resort
-                            </div>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              window.open(`tel:${b.property?.contactNumber}`)
-                            }
-                          >
-                            Call Resort
-                          </DropdownMenuItem>
+                            >
+                              Call Resort
+                            </DropdownMenuItem>
 
-                          <DropdownMenuItem className="text-red-600">
-                            Cancel Booking
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                            <DropdownMenuItem className="text-red-600">
+                              Cancel Booking
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          </div>
+
 
           {/* BOOKING DETAILS POPUP */}
           {selectedBooking && (
@@ -504,7 +510,6 @@ export default function Bookings() {
               </button>
             </div>
           )}
-        </div>
       </div>
     </div>
   );
