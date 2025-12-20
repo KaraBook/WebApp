@@ -14,20 +14,33 @@ const razorpay = new Razorpay({
 
 export const createOrder = async (req, res) => {
   try {
-    const { propertyId, checkIn, checkOut, guests, contactNumber } = req.body;
-    if (!req.user || !req.user.id) {
+    /* ---------- AUTH ---------- */
+    if (!req.user?.id) {
       return res.status(401).json({
         success: false,
         message: "Unauthorized",
       });
     }
 
+    /* ---------- ENV GUARD ---------- */
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      console.error("❌ Razorpay env missing");
+      return res.status(500).json({
+        success: false,
+        message: "Payment gateway configuration error",
+      });
+    }
+
+    const { propertyId, checkIn, checkOut, guests, contactNumber } = req.body;
     const userId = req.user.id;
 
-
+    /* ---------- PROPERTY ---------- */
     const property = await Property.findById(propertyId).lean();
     if (!property) {
-      return res.status(404).json({ success: false, message: "Property not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
     }
 
     /* ---------- DATE & NIGHT CALC ---------- */
@@ -38,8 +51,11 @@ export const createOrder = async (req, res) => {
       (end - start) / (1000 * 60 * 60 * 24)
     );
 
-    if (totalNights <= 0) {
-      return res.status(400).json({ success: false, message: "Invalid date range" });
+    if (!totalNights || totalNights <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid date range",
+      });
     }
 
     /* ---------- GUEST CALC ---------- */
@@ -49,18 +65,17 @@ export const createOrder = async (req, res) => {
 
     const totalGuests = adults + children;
 
-    if (totalGuests > property.maxGuests) {
+    if (totalGuests > Number(property.maxGuests)) {
       return res.status(400).json({
         success: false,
         message: `Maximum ${property.maxGuests} guests allowed`,
       });
     }
 
-    /* ---------- BASE & EXTRA GUEST LOGIC ---------- */
+    /* ---------- PRICE CALC ---------- */
     const baseGuests = Number(property.baseGuests);
     const basePricePerNight = Number(property.pricingPerNightWeekdays);
 
-    // Adults consume base slots first
     const baseUsedByAdults = Math.min(adults, baseGuests);
     const remainingBaseSlots = baseGuests - baseUsedByAdults;
 
@@ -68,39 +83,37 @@ export const createOrder = async (req, res) => {
     const extraChildren = Math.max(0, children - remainingBaseSlots);
 
     const extraAdultCost =
-      extraAdults * Number(property.extraAdultCharge);
+      extraAdults * Number(property.extraAdultCharge || 0);
 
     const extraChildCost =
-      extraChildren * Number(property.extraChildCharge);
+      extraChildren * Number(property.extraChildCharge || 0);
 
     const perNightTotal =
       basePricePerNight + extraAdultCost + extraChildCost;
 
     const baseTotal = perNightTotal * totalNights;
-
-    /* ---------- TAX ---------- */
-    const taxAmount = Math.round(baseTotal * 0.10);
+    const taxAmount = Math.round(baseTotal * 0.1);
     const grandTotal = baseTotal + taxAmount;
 
+    if (!grandTotal || grandTotal <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid booking amount",
+      });
+    }
 
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-  console.error("❌ Razorpay env missing", {
-    key: process.env.RAZORPAY_KEY_ID,
-    secret: !!process.env.RAZORPAY_KEY_SECRET,
-  });
-  return res.status(500).json({
-    success: false,
-    message: "Payment gateway configuration error",
-  });
-}
+    /* ---------- RAZORPAY ORDER ---------- */
+    console.log("🧾 Creating Razorpay order for:", grandTotal);
 
-
-    /* ---------- RAZORPAY ---------- */
     const order = await razorpay.orders.create({
-      amount: grandTotal * 100,
+      amount: Math.round(grandTotal * 100), // paise
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
     });
+
+    if (!order?.id) {
+      throw new Error("Razorpay order creation failed");
+    }
 
     /* ---------- BOOKING ---------- */
     const booking = await Booking.create({
@@ -108,27 +121,31 @@ export const createOrder = async (req, res) => {
       propertyId,
       checkIn,
       checkOut,
-      guests: {
-        adults,
-        children,
-        infants,
-      },
+      guests: { adults, children, infants },
       totalNights,
       totalAmount: baseTotal,
       taxAmount,
       grandTotal,
       orderId: order.id,
       contactNumber,
+      paymentMethod: "razorpay",
+      paymentStatus: "initiated",
     });
 
-    return res.json({ success: true, order, booking });
+    return res.status(200).json({
+      success: true,
+      order,
+      booking,
+    });
 
   } catch (err) {
     console.error("❌ createOrder error:", err);
-    res.status(500).json({ success: false, message: "Order creation failed" });
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Order creation failed",
+    });
   }
 };
-
 
 
 
