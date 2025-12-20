@@ -133,17 +133,17 @@ export default function Home() {
           </p>
 
           <Button
-              onClick={() => navigate("/properties")}
-              className=" relative w-fit overflow-hidden rounded-[10px] bg-primary text-white px-6 py-5 font-medium group">
-              <span className="relative z-10 flex items-center gap-2">
-                Explore Beautiful Stays
-                <span className="transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
+            onClick={() => navigate("/properties")}
+            className=" relative w-fit overflow-hidden rounded-[10px] bg-primary text-white px-6 py-5 font-medium group">
+            <span className="relative z-10 flex items-center gap-2">
+              Explore Beautiful Stays
+              <span className="transition-transform duration-300 group-hover:translate-x-1">
+                →
               </span>
-              <span
-                className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"/>
-            </Button>
+            </span>
+            <span
+              className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+          </Button>
         </motion.div>
 
         {/* AUTO CAROUSEL */}
@@ -191,7 +191,7 @@ export default function Home() {
                 </span>
               </span>
               <span
-                className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"/>
+                className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
             </Button>
 
           </div>
@@ -210,14 +210,14 @@ export default function Home() {
             spaceBetween={16}
           >
             {properties.map((property, i) => (
-              <SwiperSlide key={i} style={{ width: "250px" }}>
+              <SwiperSlide key={i} style={{ width: "250px", height: "100%" }} className="flex">
                 <motion.div
                   variants={cardFade}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
                   whileHover={{ scale: 1.03 }}
-                  className="h-[400px]"
+                  className="h-[470px] w-full pt-[40px] pb-[70px] flex"
                 >
                   <PropertyCard property={property} />
                 </motion.div>
