@@ -7,7 +7,7 @@ import { Heart, MapPin, Home, Calendar, ChevronDown, Share2, Star } from "lucide
 import { amenitiesCategories } from "@/constants/dropdownOptions";
 import AmenitiesList from "../components/AmenitiesList";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Map, BedDouble, Bath, Users } from "lucide-react";
+import { Map, BedDouble, Bath, Users, ArrowLeft } from "lucide-react";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
