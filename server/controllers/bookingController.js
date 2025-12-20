@@ -14,7 +14,6 @@ const razorpay = new Razorpay({
 
 export const createOrder = async (req, res) => {
   try {
-    /* ---------- AUTH ---------- */
     if (!req.user?.id) {
       return res.status(401).json({
         success: false,
@@ -22,7 +21,6 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    /* ---------- ENV GUARD ---------- */
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       console.error("❌ Razorpay env missing");
       return res.status(500).json({
@@ -34,7 +32,6 @@ export const createOrder = async (req, res) => {
     const { propertyId, checkIn, checkOut, guests, contactNumber } = req.body;
     const userId = req.user.id;
 
-    /* ---------- PROPERTY ---------- */
     const property = await Property.findById(propertyId).lean();
     if (!property) {
       return res.status(404).json({
@@ -43,7 +40,6 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    /* ---------- DATE & NIGHT CALC ---------- */
     const start = new Date(checkIn);
     const end = new Date(checkOut);
 
@@ -58,7 +54,6 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    /* ---------- GUEST CALC ---------- */
     const adults = Number(guests?.adults || 0);
     const children = Number(guests?.children || 0);
     const infants = Number(guests?.infants || 0);
@@ -72,7 +67,6 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    /* ---------- PRICE CALC (SAFE) ---------- */
     const baseGuests = Number(property.baseGuests || 0);
     const basePricePerNight = Number(property.pricingPerNightWeekdays || 0);
     const extraAdultCharge = Number(property.extraAdultCharge || 0);
@@ -115,12 +109,10 @@ export const createOrder = async (req, res) => {
       });
     }
 
-
-    /* ---------- RAZORPAY ORDER ---------- */
     console.log("🧾 Creating Razorpay order for:", grandTotal);
 
     const order = await razorpay.orders.create({
-      amount: Math.round(grandTotal * 100), // paise
+      amount: Math.round(grandTotal * 100), 
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
     });
@@ -129,7 +121,6 @@ export const createOrder = async (req, res) => {
       throw new Error("Razorpay order creation failed");
     }
 
-    /* ---------- BOOKING ---------- */
     const booking = await Booking.create({
       userId,
       propertyId,

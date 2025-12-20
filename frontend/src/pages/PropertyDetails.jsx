@@ -302,6 +302,14 @@ export default function PropertyDetails() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
+
+        <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-2 mb-4 rounded-[8px] text-sm font-medium text-gray-600 bg-gray-200 px-3 py-3 hover:text-black transition"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
+        </button>
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
