@@ -230,11 +230,14 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
               </button>
             </div>
 
-            {/* VERIFY BUTTON (IMPORTANT) */}
             <Button
-              className="w-full py-3"
-              disabled={otp.length !== 6 || verifying}
-              onClick={() => verifyOtp(otp)}
+              className={`w-full py-3 transition-all
+    ${verifying ? "bg-primary text-white cursor-wait opacity-100" : ""}
+  `}
+              disabled={otp.length !== 6}
+              onClick={() => {
+                if (!verifying) verifyOtp(otp);
+              }}
             >
               {verifying ? "Verifying..." : "Verify & Continue"}
             </Button>
