@@ -69,7 +69,7 @@ export default function Bookings() {
   };
 
   return (
-    <div className="w-full px-4">
+    <div className="w-full px-4 min-h-[calc(100vh-160px)]">
       {/* TITLE */}
       <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Bookings</h1>
 
