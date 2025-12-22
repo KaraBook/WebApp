@@ -15,7 +15,7 @@ export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [openGuestRow, setOpenGuestRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 3;
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [ratingBooking, setRatingBooking] = useState(null);
 
