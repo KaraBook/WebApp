@@ -253,14 +253,14 @@ export default function Bookings() {
               </tbody>
             </table>
           </div>
-          </div>
+        </div>
 
 
-          {/* BOOKING DETAILS POPUP */}
-          {selectedBooking && (
-            <Dialog open={true} onOpenChange={() => setSelectedBooking(null)} >
-              <DialogContent
-                className="
+        {/* BOOKING DETAILS POPUP */}
+        {selectedBooking && (
+          <Dialog open={true} onOpenChange={() => setSelectedBooking(null)} >
+            <DialogContent
+              className="
     max-w-3xl
     w-full
     max-h-[85vh]
@@ -269,247 +269,248 @@ export default function Bookings() {
     mt-6
     rounded-md
   "
-              >
+            >
 
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-semibold">Booking Details</DialogTitle>
-                </DialogHeader>
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold">Booking Details</DialogTitle>
+              </DialogHeader>
 
-                {/* PROPERTY DETAILS */}
-                <div className="flex gap-4 items-center border-b pb-4 mb-4">
-                  <img
-                    src={selectedBooking.property?.coverImage}
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <div>
-                    <p className="font-semibold text-lg">{selectedBooking.property?.propertyName}</p>
-                    <p className="text-gray-600 text-sm">
-                      {selectedBooking.property?.city}, {selectedBooking.property?.state}
-                    </p>
-                  </div>
+              {/* PROPERTY DETAILS */}
+              <div className="flex gap-4 items-center border-b pb-4 mb-4">
+                <img
+                  src={selectedBooking.property?.coverImage}
+                  className="w-20 h-20 object-cover rounded"
+                />
+                <div>
+                  <p className="font-semibold text-lg">{selectedBooking.property?.propertyName}</p>
+                  <p className="text-gray-600 text-sm">
+                    {selectedBooking.property?.city}, {selectedBooking.property?.state}
+                  </p>
                 </div>
+              </div>
 
-                {/* ROW 1 — STAY DETAILS + PRICE BREAKDOWN */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* ROW 1 — STAY DETAILS + PRICE BREAKDOWN */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                  {/* LEFT SIDE — STAY DETAILS */}
-                  <div className="md:col-span-2 bg-gray-50 p-4 rounded-md border">
-                    <h4 className="font-semibold mb-3">Stay Details</h4>
+                {/* LEFT SIDE — STAY DETAILS */}
+                <div className="md:col-span-2 bg-gray-50 p-4 rounded-md border">
+                  <h4 className="font-semibold mb-3">Stay Details</h4>
 
-                    <div className="grid grid-cols-2 gap-6 text-sm">
+                  <div className="grid grid-cols-2 gap-6 text-sm">
 
-                      <div>
-                        <p className="text-gray-500 text-xs uppercase">Check-in</p>
-                        <p className="text-base font-medium mt-1">
-                          {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
-                        </p>
-                      </div>
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase">Check-in</p>
+                      <p className="text-base font-medium mt-1">
+                        {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
+                      </p>
+                    </div>
 
-                      <div>
-                        <p className="text-gray-500 text-xs uppercase">Check-out</p>
-                        <p className="text-base font-medium mt-1">
-                          {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
-                        </p>
-                      </div>
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase">Check-out</p>
+                      <p className="text-base font-medium mt-1">
+                        {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
+                      </p>
+                    </div>
 
-                      <div>
-                        <p className="text-gray-500 text-xs uppercase">Nights</p>
-                        <p className="text-base mt-1 font-semibold text-[#233b19]">
-                          {selectedBooking.totalNights}
-                        </p>
-                      </div>
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase">Nights</p>
+                      <p className="text-base mt-1 font-semibold text-[#233b19]">
+                        {selectedBooking.totalNights}
+                      </p>
+                    </div>
 
-                      <div>
-                        <p className="text-gray-500 text-xs uppercase">Payment</p>
-                        <span
-                          className={`inline-block mt-1 px-2 py-1 text-xs font-semibold rounded
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase">Payment</p>
+                      <span
+                        className={`inline-block mt-1 px-2 py-1 text-xs font-semibold rounded
               ${selectedBooking.paymentStatus === "paid"
-                              ? "bg-green-100 text-green-700"
-                              : selectedBooking.paymentStatus === "pending"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-red-100 text-red-700"
-                            }
+                            ? "bg-green-100 text-green-700"
+                            : selectedBooking.paymentStatus === "pending"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-700"
+                          }
             `}
-                        >
-                          {selectedBooking.paymentStatus.toUpperCase()}
-                        </span>
-                      </div>
-
-                      <div>
-                        <p className="text-gray-500 text-xs uppercase">Booking Date</p>
-                        <p className="text-base font-medium mt-1">
-                          {format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-gray-500 text-xs uppercase">SubTotal</p>
-                        <p className="text-base font-semibold mt-1">
-                          ₹{selectedBooking.totalAmount.toLocaleString()}
-                        </p>
-                      </div>
-
+                      >
+                        {selectedBooking.paymentStatus.toUpperCase()}
+                      </span>
                     </div>
-                  </div>
 
-                  {/* RIGHT SIDE — PRICE BREAKDOWN */}
-                  <div className="bg-white border rounded-md p-4 h-fit shadow-sm">
-                    <h4 className="font-semibold mb-2">Price Breakdown</h4>
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase">Booking Date</p>
+                      <p className="text-base font-medium mt-1">
+                        {format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}
+                      </p>
+                    </div>
 
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Subtotal</span>
-                      <span className="font-medium">
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase">SubTotal</p>
+                      <p className="text-base font-semibold mt-1">
                         ₹{selectedBooking.totalAmount.toLocaleString()}
-                      </span>
+                      </p>
                     </div>
 
-                    <div className="flex justify-between text-sm mt-2">
-                      <span className="text-gray-600">Tax (10%)</span>
-                      <span className="font-medium">
-                        ₹{Math.round(selectedBooking.totalAmount * 0.10).toLocaleString()}
-                      </span>
-                    </div>
-
-                    <div className="border-t my-3"></div>
-
-                    <div className="flex justify-between text-base font-semibold text-[#233b19]">
-                      <span>Total</span>
-                      <span>
-                        ₹{(
-                          selectedBooking.totalAmount +
-                          Math.round(selectedBooking.totalAmount * 0.10)
-                        ).toLocaleString()}
-                      </span>
-                    </div>
                   </div>
-
                 </div>
 
-                {/* ROW 2 — GUESTS + TRAVELLER DETAILS */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                {/* RIGHT SIDE — PRICE BREAKDOWN */}
+                <div className="bg-white border rounded-md p-4 h-fit shadow-sm">
+                  <h4 className="font-semibold mb-2">Price Breakdown</h4>
 
-                  {/* LEFT — GUESTS */}
-                  <div className="md:col-span-2 bg-white border rounded-md p-4">
-                    <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
-
-                    <div className="text-sm space-y-1">
-                      <p>Adults: {selectedBooking.guests.adults}</p>
-                      <p>Children: {selectedBooking.guests.children}</p>
-                      <p>Infants: {selectedBooking.guests.infants}</p>
-                    </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium">
+                      ₹{selectedBooking.totalAmount.toLocaleString()}
+                    </span>
                   </div>
 
-                  {/* RIGHT — TRAVELLER DETAILS */}
-                  <div className="bg-white border rounded-md p-4">
-                    <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
-
-                    <div className="text-sm space-y-1">
-                      <p>Name: {selectedBooking.user?.fullName || "—"}</p>
-                      <p>Phone: {selectedBooking.user?.phone || "—"}</p>
-                      <p>Email: {selectedBooking.user?.email || "—"}</p>
-                    </div>
+                  <div className="flex justify-between text-sm mt-2">
+                    <span className="text-gray-600">Tax (10%)</span>
+                    <span className="font-medium">
+                      ₹{Math.round(selectedBooking.totalAmount * 0.10).toLocaleString()}
+                    </span>
                   </div>
 
+                  <div className="border-t my-3"></div>
+
+                  <div className="flex justify-between text-base font-semibold text-[#233b19]">
+                    <span>Total</span>
+                    <span>
+                      ₹{(
+                        selectedBooking.totalAmount +
+                        Math.round(selectedBooking.totalAmount * 0.10)
+                      ).toLocaleString()}
+                    </span>
+                  </div>
                 </div>
 
-              </DialogContent>
-            </Dialog>
-          )}
+              </div>
 
+              {/* ROW 2 — GUESTS + TRAVELLER DETAILS */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
 
-          {ratingBooking && (
-            <Dialog open={true} onOpenChange={() => setRatingBooking(null)}>
-              <DialogContent className="max-w-md p-6 rounded-none mt-[2rem]">
-                <DialogHeader>
-                  <DialogTitle className="text-xl font-semibold">Rate this Resort</DialogTitle>
-                </DialogHeader>
+                {/* LEFT — GUESTS */}
+                <div className="md:col-span-2 bg-white border rounded-md p-4">
+                  <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
 
-                <div className="mt-4 space-y-4">
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`w-6 h-6 cursor-pointer ${star <= (ratingBooking.rating || 0)
-                          ? "text-black fill-black"
-                          : "text-gray-400"
-                          }`}
-                        onClick={() =>
-                          setRatingBooking((rb) => ({ ...rb, rating: star }))
-                        }
-                      />
-                    ))}
+                  <div className="text-sm space-y-1">
+                    <p>Adults: {selectedBooking.guests.adults}</p>
+                    <p>Children: {selectedBooking.guests.children}</p>
+                    <p>Infants: {selectedBooking.guests.infants}</p>
                   </div>
+                </div>
 
-                  <textarea
-                    className="w-full border p-3"
-                    rows="3"
-                    placeholder="Write your review..."
-                    onChange={(e) =>
-                      setRatingBooking((rb) => ({ ...rb, comment: e.target.value }))
-                    }
-                  />
+                {/* RIGHT — TRAVELLER DETAILS */}
+                <div className="bg-white border rounded-md p-4">
+                  <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
 
-                  <button
-                    className="w-full bg-primary text-white py-3 rounded-none"
-                    onClick={async () => {
-                      try {
-                        await Axios.post(
-                          SummaryApi.addReview.url,
-                          {
-                            propertyId: ratingBooking.property?._id,
-                            bookingId: ratingBooking._id,
-                            rating: ratingBooking.rating,
-                            comment: ratingBooking.comment,
-                          },
-                          { headers: { Authorization: `Bearer ${accessToken}` } }
-                        );
+                  <div className="text-sm space-y-1">
+                    <p>Name: {selectedBooking.user?.fullName || "—"}</p>
+                    <p>Phone: {selectedBooking.user?.phone || "—"}</p>
+                    <p>Email: {selectedBooking.user?.email || "—"}</p>
+                  </div>
+                </div>
 
-                        toast.success("Review submitted!");
-                        setRatingBooking(null);
-                      } catch (err) {
-                        toast.error(err.response?.data?.message || "Failed to submit review");
+              </div>
+
+            </DialogContent>
+          </Dialog>
+        )}
+
+
+        {ratingBooking && (
+          <Dialog open={true} onOpenChange={() => setRatingBooking(null)}>
+            <DialogContent className="max-w-md p-6 rounded-none mt-[2rem]">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold">Rate this Resort</DialogTitle>
+              </DialogHeader>
+
+              <div className="mt-4 space-y-4">
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-6 h-6 cursor-pointer ${star <= (ratingBooking.rating || 0)
+                        ? "text-black fill-black"
+                        : "text-gray-400"
+                        }`}
+                      onClick={() =>
+                        setRatingBooking((rb) => ({ ...rb, rating: star }))
                       }
-                    }}
-                  >
-                    Submit Review
-                  </button>
+                    />
+                  ))}
                 </div>
-              </DialogContent>
-            </Dialog>
-          )}
 
+                <textarea
+                  className="w-full border p-3"
+                  rows="3"
+                  placeholder="Write your review..."
+                  onChange={(e) =>
+                    setRatingBooking((rb) => ({ ...rb, comment: e.target.value }))
+                  }
+                />
 
-          {/* PAGINATION */}
-          {totalPages > 1 && (
-            <div className="flex justify-end items-center my-4 gap-2 px-2">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 border disabled:opacity-50"
-              >
-                Previous
-              </button>
-
-              {[...Array(totalPages)].map((_, index) => (
                 <button
-                  key={index}
-                  onClick={() => setCurrentPage(index + 1)}
-                  className={`px-3 py-1 border ${currentPage === index + 1 ? "bg-primary text-white" : ""
-                    }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
+                  className="w-full bg-primary text-white py-3 rounded-none"
+                  onClick={async () => {
+                    try {
+                      await Axios.post(
+                        SummaryApi.addReview.url,
+                        {
+                          propertyId: ratingBooking.property?._id,
+                          bookingId: ratingBooking._id,
+                          rating: ratingBooking.rating,
+                          comment: ratingBooking.comment,
+                        },
+                        { headers: { Authorization: `Bearer ${accessToken}` } }
+                      );
 
+                      toast.success("Review submitted!");
+                      setRatingBooking(null);
+                    } catch (err) {
+                      toast.error(err.response?.data?.message || "Failed to submit review");
+                    }
+                  }}
+                >
+                  Submit Review
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="flex justify-end items-center my-4 gap-2 px-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border disabled:opacity-50"
+            >
+              Previous
+            </button>
+
+            {[...Array(totalPages)].map((_, index) => (
               <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 border disabled:opacity-50"
+                key={index}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`px-3 py-1 border ${currentPage === index + 1 ? "bg-primary text-white" : ""
+                  }`}
               >
-                Next
+                {index + 1}
               </button>
-            </div>
-          )}
+            ))}
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+
+        )}
       </div>
     </div>
   );
