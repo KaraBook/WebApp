@@ -9,7 +9,7 @@ import SummaryApi from "@/common/SummaryApi";
 import Axios from "@/utils/Axios";
 import { STATE_CODE_TO_NAME } from "@/utils/stateMap";
 
-export default function PropertyFilters({ onFilter, defaultValues = {} }) {
+export default function PropertyFilters({ onFilter, defaultValues = {}, enableStickyGlass = false, }) {
     const [locationTree, setLocationTree] = useState([]);
 
     const [states, setStates] = useState([]);
@@ -22,6 +22,26 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
 
     const guestRef = useRef(null);
     const calendarRef = useRef(null);
+
+    const filterRef = useRef(null);
+    const [isSticky, setIsSticky] = useState(false);
+    const STICKY_TOP = 70;
+
+    useEffect(() => {
+        if (!enableStickyGlass) return;
+
+        const handleScroll = () => {
+            if (!filterRef.current) return;
+
+            const rect = filterRef.current.getBoundingClientRect();
+
+            setIsSticky(rect.top <= STICKY_TOP);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [enableStickyGlass]);
+
 
     const [guests, setGuests] = useState({
         adults: 1,
@@ -216,7 +236,20 @@ export default function PropertyFilters({ onFilter, defaultValues = {} }) {
 
 
     return (
-        <div className="w-full rounded-[15px] bg-white shadow-xl p-[25px] flex flex-wrap items-center justify-between gap-3 relative -mt-10 z-[20] border border-gray-100 overflow-visible">
+<div
+  ref={filterRef}
+  className={`
+    w-full p-[25px] flex flex-wrap items-center justify-between gap-3
+    relative -mt-10 z-[20] overflow-visible
+    transition-all duration-300
+
+    ${
+      enableStickyGlass && isSticky
+        ? "glass-filter"
+        : "bg-white shadow-xl border border-gray-100 rounded-[15px]"
+    }
+  `}
+>
             {/* State */}
             <div className="flex-1 min-w-[150px] z-10">
                 <label className="text-[14px] text-black uppercase ml-1">State</label>

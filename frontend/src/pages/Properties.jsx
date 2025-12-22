@@ -13,6 +13,7 @@ export default function Properties() {
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
 
+
   const [topFilters, setTopFilters] = useState({
     type: "All Types",
     price: "All Prices",
@@ -122,6 +123,7 @@ export default function Properties() {
           <PropertyFilters
             onFilter={fetchProperties}
             defaultValues={defaultValues}
+            enableStickyGlass
           />
         </div>
       </div>
