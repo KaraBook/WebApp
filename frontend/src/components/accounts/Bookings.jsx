@@ -485,7 +485,7 @@ export default function Bookings() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 border disabled:opacity-50"
+              className="px-3 py-1 border disabled:opacity-50 rounded-[8px]"
             >
               Previous
             </button>
@@ -494,7 +494,7 @@ export default function Bookings() {
               <button
                 key={index}
                 onClick={() => setCurrentPage(index + 1)}
-                className={`px-3 py-1 border ${currentPage === index + 1 ? "bg-primary text-white" : ""
+                className={`px-3 py-1 border rounded-[8px] ${currentPage === index + 1 ? "bg-primary text-white" : ""
                   }`}
               >
                 {index + 1}
@@ -504,7 +504,7 @@ export default function Bookings() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 border disabled:opacity-50"
+              className="px-3 py-1 border rounded-[8px] disabled:opacity-50"
             >
               Next
             </button>
