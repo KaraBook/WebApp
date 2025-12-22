@@ -78,7 +78,7 @@ export default function Bookings() {
 
         {/* TABLE SCROLL AREA */}
         <div className="relative overflow-hidden rounded-[12px]">
-          <div className="overflow-x-auto lg:overflow-x-auto lg:overflow-y-hidden min-h-[80vh]">
+          <div className="overflow-x-auto lg:overflow-x-auto lg:overflow-y-hidden min-h-[75vh]">
             <table className="min-w-[1050px] w-full text-sm">
               <thead className="bg-gray-100 text-gray-700 border-b border-gray-200">
                 <tr>
