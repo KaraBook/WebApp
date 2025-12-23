@@ -288,7 +288,7 @@ export default function Bookings() {
               </div>
 
               {/* ROW 1 — STAY DETAILS + PRICE BREAKDOWN */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 -mt-[15px]">
 
                 {/* LEFT SIDE — STAY DETAILS */}
                 <div className="md:col-span-2 bg-gray-50 p-4 rounded-md border">
