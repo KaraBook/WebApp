@@ -2,7 +2,6 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { normalizeMobile } from "../utils/phone.js";
-import { prepareImage, uploadBuffer } from "../utils/cloudinary.js";
 
 const issueTokens = (user) => {
   const accessToken = jwt.sign(
@@ -199,20 +198,23 @@ export const travellerSignup = async (req, res) => {
   }
 };
 
-// Upload Avatar separately
+
 export const uploadTravellerAvatar = async (req, res) => {
   try {
     const userId = req.user.id;
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     const file = req.file;
-    if (!file?.buffer) return res.status(400).json({ message: "No file uploaded" });
+    if (!file?.path) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
 
-    const processed = await prepareImage(file.buffer);
-    const cloud = await uploadBuffer(processed, { folder: "users/avatars" });
+    const BASE_URL = process.env.BACKEND_BASE_URL || "";
 
-    user.avatarUrl = cloud.secure_url;
+    user.avatarUrl = `${BASE_URL}/${file.path.replace(/\\/g, "/")}`;
     await user.save();
 
     return res.status(200).json({
@@ -221,12 +223,15 @@ export const uploadTravellerAvatar = async (req, res) => {
     });
   } catch (err) {
     console.error("Upload avatar error:", err);
-    return res.status(500).json({ message: "Upload failed", error: err.message });
+    return res.status(500).json({
+      message: "Upload failed",
+      error: err.message,
+    });
   }
 };
 
 
-/* ---------------------------- UPDATE MOBILE --------------------------- */
+
 export const updateTravellerMobile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -261,7 +266,6 @@ export const updateTravellerMobile = async (req, res) => {
 };
 
 
-/* ---------------------------- RESORT OWNER LOGIN --------------------------- */
 export const resortOwnerLogin = async (req, res) => {
   try {
     const { firebaseUser } = req;

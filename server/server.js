@@ -35,7 +35,7 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-
+app.use("/uploads", express.static("uploads"));
 app.get("/", (_req, res) => res.send("API is up"));
 
 app.use("/api/auth", userRoutes);

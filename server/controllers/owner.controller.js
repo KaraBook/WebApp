@@ -4,7 +4,6 @@ import User from "../models/User.js";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
-import { prepareImage, uploadBuffer } from "../utils/cloudinary.js";
 import { normalizeMobile } from "../utils/phone.js";
 import Razorpay from "razorpay";
 import { getEffectiveOwnerId } from "../utils/getEffectiveOwner.js";
@@ -200,7 +199,6 @@ export const updateOwnerProperty = async (req, res) => {
       });
     }
 
-
     if (
       body["roomBreakdown[ac]"] ||
       body["roomBreakdown[nonAc]"] ||
@@ -220,6 +218,7 @@ export const updateOwnerProperty = async (req, res) => {
     }
 
     const files = req.files || {};
+    const BASE_URL = process.env.BACKEND_BASE_URL || "";
 
     let removed = [];
 
@@ -234,6 +233,7 @@ export const updateOwnerProperty = async (req, res) => {
       arr = Array.isArray(arr) ? arr : [arr];
       removed = [...removed, ...arr];
     }
+
     if (removed.length > 0) {
       existingProperty.galleryPhotos = existingProperty.galleryPhotos.filter(
         (img) => !removed.includes(img)
@@ -251,47 +251,42 @@ export const updateOwnerProperty = async (req, res) => {
     }
 
     if (files.coverImage?.[0]) {
-      const processed = await prepareImage(files.coverImage[0].buffer);
-      const result = await uploadBuffer(processed, { folder: "properties" });
-      updatedData.coverImage = result.secure_url;
+      updatedData.coverImage = `${BASE_URL}/${files.coverImage[0].path.replace(
+        /\\/g,
+        "/"
+      )}`;
     }
 
     if (files.shopAct?.[0]) {
-      const processed = await prepareImage(files.shopAct[0].buffer);
-      const result = await uploadBuffer(processed, {
-        folder: "properties/shopAct",
-      });
-      updatedData.shopAct = result.secure_url;
+      updatedData.shopAct = `${BASE_URL}/${files.shopAct[0].path.replace(
+        /\\/g,
+        "/"
+      )}`;
     }
 
     if (files.galleryPhotos?.length > 0) {
-      const galleryResults = await Promise.all(
-        files.galleryPhotos.map(async (f) => {
-          const processed = await prepareImage(f.buffer);
-          const result = await uploadBuffer(processed, {
-            folder: "properties/gallery",
-          });
-          return result.secure_url;
-        })
+      const newGallery = files.galleryPhotos.map(
+        (file) => `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
       );
 
       updatedData.galleryPhotos = [
         ...(existingProperty.galleryPhotos || []),
-        ...galleryResults,
+        ...newGallery,
       ];
-    } else {
+    } else if (!updatedData.galleryPhotos) {
       updatedData.galleryPhotos = existingProperty.galleryPhotos;
     }
 
-
-    const finalCover = updatedData.coverImage || existingProperty.coverImage;
+    const finalCover =
+      updatedData.coverImage || existingProperty.coverImage;
     const finalGallery =
       updatedData.galleryPhotos || existingProperty.galleryPhotos || [];
 
     if (!finalCover) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Cover image is required" });
+      return res.status(400).json({
+        success: false,
+        message: "Cover image is required",
+      });
     }
 
     if (!Array.isArray(finalGallery) || finalGallery.length < 3) {
@@ -326,7 +321,7 @@ export const updateOwnerProperty = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Update failed",
       error: err.message,
@@ -335,6 +330,7 @@ export const updateOwnerProperty = async (req, res) => {
     session.endSession();
   }
 };
+
 
 
 

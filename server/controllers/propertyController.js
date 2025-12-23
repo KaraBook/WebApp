@@ -1,6 +1,5 @@
 import Property from "../models/Property.js";
 import User from "../models/User.js";
-import cloudinary, { prepareImage, uploadBuffer } from "../utils/cloudinary.js";;
 import fs from "fs/promises";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -188,52 +187,51 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     const { id } = req.params;
 
     const prop = await Property.findById(id).populate("ownerUserId", "email firstName");
-    if (!prop) return res.status(404).json({ success: false, message: "Property not found" });
-    if (prop.isBlocked) return res.status(403).json({ success: false, message: "Blocked property cannot be edited." });
+    if (!prop) {
+      return res.status(404).json({ success: false, message: "Property not found" });
+    }
+
+    if (prop.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        message: "Blocked property cannot be edited.",
+      });
+    }
 
     const coverFile = req.files?.coverImage?.[0];
     const shopActFile = req.files?.shopAct?.[0];
-    const gallery = req.files?.galleryPhotos || [];
-    const isImage = (m) => /^image\//.test(m || "");
+    const galleryFiles = req.files?.galleryPhotos || [];
+
+    const BASE_URL = process.env.BACKEND_BASE_URL || "";
 
     if (coverFile) {
-      const coverBuf = await prepareImage(coverFile.buffer);
-      const coverResult = await uploadBuffer(coverBuf, { folder: "properties", resourceType: "image" });
-      prop.coverImage = coverResult.secure_url;
+      prop.coverImage = `${BASE_URL}/${coverFile.path.replace(/\\/g, "/")}`;
     } else if (!prop.coverImage) {
-      return res.status(400).json({ success: false, message: "coverImage is required" });
+      return res.status(400).json({
+        success: false,
+        message: "coverImage is required",
+      });
     }
 
     if (shopActFile) {
-      let shopActResult;
-      if (isImage(shopActFile.mimetype)) {
-        const shopActBuf = await prepareImage(shopActFile.buffer);
-        shopActResult = await uploadBuffer(shopActBuf, {
-          folder: "properties/shopAct",
-          resourceType: "image",
-        });
-      } else {
-        shopActResult = await uploadBuffer(shopActFile.buffer, {
-          folder: "properties/shopAct",
-          resourceType: "raw",
-        });
-      }
-      prop.shopAct = shopActResult.secure_url;
+      prop.shopAct = `${BASE_URL}/${shopActFile.path.replace(/\\/g, "/")}`;
     }
 
-    if (gallery.length > 0) {
-      const galleryResults = await Promise.all(
-        gallery.map(async (f) => {
-          const b = await prepareImage(f.buffer);
-          return uploadBuffer(b, { folder: "properties/gallery", resourceType: "image" });
-        })
+    if (galleryFiles.length > 0) {
+      const newGalleryUrls = galleryFiles.map((file) =>
+        `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
       );
-      const newUrls = galleryResults.map((r) => r.secure_url);
-      prop.galleryPhotos = [...(prop.galleryPhotos || []), ...newUrls];
+
+      prop.galleryPhotos = [
+        ...(prop.galleryPhotos || []),
+        ...newGalleryUrls,
+      ];
     }
 
     if (typeof req.body.publishNow !== "undefined") {
-      prop.publishNow = ["true", "1", "yes", "on"].includes(String(req.body.publishNow).toLowerCase());
+      prop.publishNow = ["true", "1", "yes", "on"].includes(
+        String(req.body.publishNow).toLowerCase()
+      );
     }
 
     prop.isDraft = false;
@@ -263,20 +261,27 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
       console.error("Failed to send property created mail:", mailErr);
     }
 
-    return res.status(200).json({ success: true, message: "Media attached & published", data: prop });
+    return res.status(200).json({
+      success: true,
+      message: "Media attached & published",
+      data: prop,
+    });
   } catch (err) {
     console.error("Finalize error:", err);
-    if (err?.http_code === 400 && /Missing required parameter - file/i.test(err.message)) {
-      return res.status(400).json({ success: false, message: "Upload failed: missing file content" });
-    }
+
     if (err?.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({ success: false, message: "Image too large. Max 5MB per file." });
+      return res.status(400).json({
+        success: false,
+        message: "Image too large. Max 5MB per file.",
+      });
     }
-    return res.status(500).json({ success: false, message: "Failed to finalize property" });
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to finalize property",
+    });
   }
 };
-
-
 
 
 
@@ -321,11 +326,17 @@ export const getSingleProperty = async (req, res) => {
 
 export const updateProperty = async (req, res) => {
   const session = await mongoose.startSession();
+
   try {
     const propertyId = req.params.id;
+
     const existingProperty = await Property.findById(propertyId);
-    if (!existingProperty)
-      return res.status(404).json({ success: false, message: "Property not found" });
+    if (!existingProperty) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
+    }
 
     if (existingProperty.isBlocked) {
       return res.status(403).json({
@@ -336,6 +347,8 @@ export const updateProperty = async (req, res) => {
 
     const updatedData = {};
     const files = req.files || {};
+    const BASE_URL = process.env.BACKEND_BASE_URL || "";
+
 
     if (req.is("application/json")) {
       Object.assign(updatedData, req.body);
@@ -353,7 +366,6 @@ export const updateProperty = async (req, res) => {
         }
       });
 
-
       if (req.body.area) {
         updatedData.area = req.body.area.trim();
       }
@@ -361,19 +373,25 @@ export const updateProperty = async (req, res) => {
       if (req.body.roomBreakdown) {
         let rb = req.body.roomBreakdown;
         if (typeof rb === "string") {
-          try { rb = JSON.parse(rb); } catch (_) { }
+          try {
+            rb = JSON.parse(rb);
+          } catch (_) {}
         }
+
         const ac = Number(rb.ac || 0);
         const nonAc = Number(rb.nonAc || 0);
         const deluxe = Number(rb.deluxe || 0);
         const luxury = Number(rb.luxury || 0);
         const total = ac + nonAc + deluxe + luxury;
+
         updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, total };
         updatedData.totalRooms = total;
       }
 
       const incomingOwner = parseResortOwner(req.body);
-      if (incomingOwner?.email) updatedData.resortOwner = incomingOwner;
+      if (incomingOwner?.email) {
+        updatedData.resortOwner = incomingOwner;
+      }
     }
 
     if (req.is("multipart/form-data")) {
@@ -395,38 +413,42 @@ export const updateProperty = async (req, res) => {
       if (req.body.roomBreakdown) {
         let rb = req.body.roomBreakdown;
         if (typeof rb === "string") {
-          try { rb = JSON.parse(rb); } catch (_) { }
+          try {
+            rb = JSON.parse(rb);
+          } catch (_) {}
         }
+
         const ac = Number(rb.ac || 0);
         const nonAc = Number(rb.nonAc || 0);
         const deluxe = Number(rb.deluxe || 0);
         const luxury = Number(rb.luxury || 0);
         const total = ac + nonAc + deluxe + luxury;
+
         updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, total };
         updatedData.totalRooms = total;
       }
 
-
       const incomingOwner = parseResortOwner(req.body);
-      if (incomingOwner?.mobile) incomingOwner.mobile = normalizeMobile(incomingOwner.mobile);
-      if (incomingOwner?.resortMobile)
+      if (incomingOwner?.mobile) {
+        incomingOwner.mobile = normalizeMobile(incomingOwner.mobile);
+      }
+      if (incomingOwner?.resortMobile) {
         incomingOwner.resortMobile = normalizeMobile(incomingOwner.resortMobile);
-      if (incomingOwner?.email) updatedData.resortOwner = incomingOwner;
+      }
+      if (incomingOwner?.email) {
+        updatedData.resortOwner = incomingOwner;
+      }
 
       const coverImageFile = files.coverImage?.[0];
       const shopActFile = files.shopAct?.[0];
       const galleryFiles = files.galleryPhotos || [];
 
       if (coverImageFile) {
-        const processed = await prepareImage(coverImageFile.buffer);
-        const result = await uploadBuffer(processed, { folder: "properties" });
-        updatedData.coverImage = result.secure_url;
+        updatedData.coverImage = `${BASE_URL}/${coverImageFile.path.replace(/\\/g, "/")}`;
       }
 
       if (shopActFile) {
-        const processed = await prepareImage(shopActFile.buffer);
-        const result = await uploadBuffer(processed, { folder: "properties/shopAct" });
-        updatedData.shopAct = result.secure_url;
+        updatedData.shopAct = `${BASE_URL}/${shopActFile.path.replace(/\\/g, "/")}`;
       }
 
       let finalGallery = [...(existingProperty.galleryPhotos || [])];
@@ -438,25 +460,19 @@ export const updateProperty = async (req, res) => {
           console.log("JSON parse error (existingGallery)", e);
         }
       }
+
       if (galleryFiles.length > 0) {
-        const newUploads = await Promise.all(
-          galleryFiles.map(async (f) => {
-            const processed = await prepareImage(f.buffer);
-            return uploadBuffer(processed, { folder: "properties/gallery" });
-          })
+        const newGalleryUrls = galleryFiles.map(
+          (file) => `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
         );
-        const newUrls = newUploads.map((u) => u.secure_url);
-        finalGallery.push(...newUrls);
+        finalGallery.push(...newGalleryUrls);
       }
 
       updatedData.galleryPhotos = finalGallery;
-
-
     }
 
-    const effectiveCover = updatedData.coverImage || existingProperty.coverImage;
-    const effectiveGallery =
-      updatedData.galleryPhotos || existingProperty.galleryPhotos || [];
+    const effectiveCover =
+      updatedData.coverImage || existingProperty.coverImage;
 
     if (!effectiveCover) {
       return res.status(400).json({
@@ -464,6 +480,7 @@ export const updateProperty = async (req, res) => {
         message: "Cover image is required.",
       });
     }
+
     if (!updatedData.galleryPhotos || updatedData.galleryPhotos.length < 3) {
       return res.status(400).json({
         success: false,
@@ -471,8 +488,8 @@ export const updateProperty = async (req, res) => {
       });
     }
 
-
     let updatedProperty;
+
     await session.withTransaction(async () => {
       if (updatedData.resortOwner?.email && updatedData.resortOwner?.mobile) {
         const incomingOwner = updatedData.resortOwner;
@@ -480,49 +497,60 @@ export const updateProperty = async (req, res) => {
         if (incomingOwner.mobile.length === 10) {
           let user = existingProperty.ownerUserId
             ? await User.findById(existingProperty.ownerUserId)
-              .select("+password")
-              .session(session)
+                .select("+password")
+                .session(session)
             : await User.findOne({
-              $or: [
-                { email: incomingOwner.email.toLowerCase() },
-                { mobile: incomingOwner.mobile },
-              ],
-            })
-              .select("+password")
-              .session(session);
+                $or: [
+                  { email: incomingOwner.email.toLowerCase() },
+                  { mobile: incomingOwner.mobile },
+                ],
+              })
+                .select("+password")
+                .session(session);
 
           if (!user) {
             const hash = await bcrypt.hash(genTempPassword(), 10);
-            user = await User.create(
-              [
-                {
-                  name: `${incomingOwner.firstName} ${incomingOwner.lastName}`.trim(),
-                  firstName: incomingOwner.firstName,
-                  lastName: incomingOwner.lastName,
-                  email: incomingOwner.email.toLowerCase(),
-                  mobile: incomingOwner.mobile,
-                  role: "resortOwner",
-                  password: hash,
-                },
-              ],
-              { session }
-            );
-            user = user[0];
+            user = (
+              await User.create(
+                [
+                  {
+                    name: `${incomingOwner.firstName} ${incomingOwner.lastName}`.trim(),
+                    firstName: incomingOwner.firstName,
+                    lastName: incomingOwner.lastName,
+                    email: incomingOwner.email.toLowerCase(),
+                    mobile: incomingOwner.mobile,
+                    role: "resortOwner",
+                    password: hash,
+                  },
+                ],
+                { session }
+              )
+            )[0];
           } else {
-            user.name = `${incomingOwner.firstName} ${incomingOwner.lastName}`.trim() || user.name;
+            user.name =
+              `${incomingOwner.firstName} ${incomingOwner.lastName}`.trim() ||
+              user.name;
             user.firstName = incomingOwner.firstName || user.firstName;
             user.lastName = incomingOwner.lastName || user.lastName;
+
             if (incomingOwner.mobile) user.mobile = incomingOwner.mobile;
-            if (incomingOwner.email && incomingOwner.email.toLowerCase() !== user.email) {
+
+            if (
+              incomingOwner.email &&
+              incomingOwner.email.toLowerCase() !== user.email
+            ) {
               const exists = await User.findOne({
                 email: incomingOwner.email.toLowerCase(),
                 _id: { $ne: user._id },
               }).session(session);
+
               if (!exists) user.email = incomingOwner.email.toLowerCase();
             }
+
             if (user.role !== "admin") user.role = "resortOwner";
             await user.save({ session });
           }
+
           updatedData.ownerUserId = user._id;
         }
       }
@@ -537,7 +565,9 @@ export const updateProperty = async (req, res) => {
         const owner = await User.findById(updatedData.ownerUserId).session(session);
         if (
           owner &&
-          !owner.ownedProperties?.some((id) => String(id) === String(updatedProperty._id))
+          !owner.ownedProperties?.some(
+            (id) => String(id) === String(updatedProperty._id)
+          )
         ) {
           owner.ownedProperties.push(updatedProperty._id);
           await owner.save({ session });
@@ -545,15 +575,25 @@ export const updateProperty = async (req, res) => {
       }
     });
 
-    res.status(200).json({ success: true, data: updatedProperty });
+    res.status(200).json({
+      success: true,
+      data: updatedProperty,
+    });
   } catch (err) {
     console.error("Update Error:", err);
+
     if (err?.code === 11000) {
-      return res
-        .status(409)
-        .json({ success: false, message: "Email or mobile already exists for another user." });
+      return res.status(409).json({
+        success: false,
+        message: "Email or mobile already exists for another user.",
+      });
     }
-    res.status(500).json({ success: false, message: "Server Error", error: err.message });
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
   } finally {
     session.endSession();
   }

@@ -102,7 +102,6 @@ const baseFields = {
     .max(99999)
     .required(),
 
-  // legacy (not used in pricing anymore)
   extraGuestCharge: Joi.number().min(0).max(9999).optional(),
 
   petFriendly: Joi.boolean().required(),
