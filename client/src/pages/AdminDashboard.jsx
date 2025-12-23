@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Loader2, Users, CalendarCheck, Clock, Wallet, Home } from "lucide-react";
+import { Loader2, Users, CalendarCheck, Clock, Wallet, Home} from "lucide-react";
 
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
@@ -15,7 +15,7 @@ const DashboardPage = () => {
       setLoading(true);
       const [bookingsRes, usersRes, propertiesRes] = await Promise.all([
         Axios.get(SummaryApi.getAllBookings.url),
-        Axios.get("/api/admin/users"), 
+        Axios.get("/api/admin/users"),
         Axios.get(SummaryApi.getProperties.url),
       ]);
 
@@ -27,7 +27,10 @@ const DashboardPage = () => {
       const pending = bookings.filter((b) => b.paymentStatus === "pending");
       const failed = bookings.filter((b) => b.paymentStatus === "failed");
 
-      const totalRevenue = confirmed.reduce((acc, b) => acc + (b.totalAmount || 0), 0);
+      const totalRevenue = confirmed.reduce(
+        (acc, b) => acc + (b.totalAmount || 0),
+        0
+      );
 
       setStats({
         totalBookings: bookings.length,
@@ -54,8 +57,8 @@ const DashboardPage = () => {
     typeof n === "number"
       ? `₹${n.toLocaleString("en-IN")}`
       : n
-        ? `₹${Number(n).toLocaleString("en-IN")}`
-        : "₹0";
+      ? `₹${Number(n).toLocaleString("en-IN")}`
+      : "₹0";
 
   const formatDate = (dateString) => {
     if (!dateString) return "—";
@@ -63,113 +66,90 @@ const DashboardPage = () => {
     return new Date(dateString).toLocaleDateString("en-IN", options);
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[70vh]">
+      <div className="flex justify-center items-center min-h-[60vh]">
         <Loader2 className="w-6 h-6 animate-spin text-neutral-600" />
       </div>
     );
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex justify-between items-center border-b pb-4">
-        <h1 className="text-2xl font-bold">Dashboard Overview</h1>
-        <Button className="bg-transparent text-black hover:bg-transparent" onClick={fetchDashboardData}>
+    <div className="space-y-6 sm:space-y-8 overflow-x-hidden">
+      <div className="flex justify-between sm:flex-row sm:justify-between sm:items-center gap-3 border-b pb-4">
+        <h1 className="text-xl sm:text-2xl font-bold">
+          Dashboard Overview
+        </h1>
+
+        <Button
+          className="w-auto sm:w-auto bg-transparent text-black hover:bg-transparent"
+          onClick={fetchDashboardData}
+        >
           Refresh
         </Button>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border border-neutral-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
-            <CalendarCheck className="w-5 h-5 text-neutral-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats.totalBookings}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-neutral-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Confirmed</CardTitle>
-            <Clock className="w-5 h-5 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-700">{stats.confirmed}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-neutral-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pending</CardTitle>
-            <Clock className="w-5 h-5 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-yellow-700">{stats.pending}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-neutral-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Failed</CardTitle>
-            <Clock className="w-5 h-5 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-red-700">{stats.failed}</div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Total Bookings"
+          value={stats.totalBookings}
+          icon={CalendarCheck}
+        />
+        <StatCard
+          title="Confirmed"
+          value={stats.confirmed}
+          icon={Clock}
+          color="text-green-700"
+        />
+        <StatCard
+          title="Pending"
+          value={stats.pending}
+          icon={Clock}
+          color="text-yellow-700"
+        />
+        <StatCard
+          title="Failed"
+          value={stats.failed}
+          icon={Clock}
+          color="text-red-700"
+        />
       </div>
 
-      {/* Users / Revenue / Properties */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="border border-neutral-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="w-5 h-5 text-neutral-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats.totalUsers}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-neutral-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
-            <Home className="w-5 h-5 text-neutral-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats.totalProperties}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-neutral-200 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <Wallet className="w-5 h-5 text-neutral-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatCard title="Total Users" value={stats.totalUsers} icon={Users} />
+        <StatCard
+          title="Total Properties"
+          value={stats.totalProperties}
+          icon={Home}
+        />
+        <StatCard
+          title="Total Revenue"
+          value={formatCurrency(stats.totalRevenue)}
+          icon={Wallet}
+        />
       </div>
 
-      {/* Recent Bookings Table */}
-      <h1 className="font-bold text-xl p-0 m-0 h-2">Recent Bookings</h1>
-      <div className="border rounded-lg overflow-hidden shadow-sm">
-        <Table className="text-sm">
+      <h2 className="font-bold text-lg sm:text-xl">
+        Recent Bookings
+      </h2>
+
+      <div className="border rounded-lg shadow-sm overflow-x-auto">
+        <Table className="w-full text-sm">
           <TableHeader>
             <TableRow>
               <TableHead>Sr. No</TableHead>
               <TableHead>Traveller</TableHead>
-              <TableHead>Property</TableHead>
+              <TableHead>
+                Property
+              </TableHead>
               <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead className="hidden md:table-cell">Status</TableHead>
+              <TableHead className="hidden md:table-cell">
+                Date
+              </TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {stats.recentBookings.length === 0 && (
               <TableRow>
@@ -182,23 +162,38 @@ const DashboardPage = () => {
             {stats.recentBookings.map((b, index) => (
               <TableRow key={b._id}>
                 <TableCell>{index + 1}</TableCell>
+
                 <TableCell>
                   {b?.userId?.firstName} {b?.userId?.lastName}
                 </TableCell>
-                <TableCell className="max-w-[200px] truncate">
+
+                <TableCell className="hidden sm:table-cell max-w-[200px] truncate">
                   {b?.propertyId?.propertyName || "—"}
                 </TableCell>
-                <TableCell>{formatCurrency(b.totalAmount)}</TableCell>
+
+                <TableCell>
+                  {formatCurrency(b.totalAmount)}
+                </TableCell>
+
                 <TableCell>
                   {b.paymentStatus === "paid" ? (
-                    <span className="text-green-600 font-medium">Paid</span>
+                    <span className="text-green-600 font-medium">
+                      Paid
+                    </span>
                   ) : b.paymentStatus === "pending" ? (
-                    <span className="text-yellow-600 font-medium">Pending</span>
+                    <span className="text-yellow-600 font-medium">
+                      Pending
+                    </span>
                   ) : (
-                    <span className="text-red-600 font-medium">Failed</span>
+                    <span className="text-red-600 font-medium">
+                      Failed
+                    </span>
                   )}
                 </TableCell>
-                <TableCell>{formatDate(b.createdAt)}</TableCell>
+
+                <TableCell className="hidden md:table-cell">
+                  {formatDate(b.createdAt)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -207,5 +202,23 @@ const DashboardPage = () => {
     </div>
   );
 };
+
+function StatCard({ title, value, icon: Icon, color = "" }) {
+  return (
+    <Card className="border border-neutral-200 shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-medium">
+          {title}
+        </CardTitle>
+        <Icon className="w-5 h-5 text-neutral-500" />
+      </CardHeader>
+      <CardContent className="pt-2">
+        <div className={`text-2xl sm:text-3xl font-bold ${color}`}>
+          {value}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default DashboardPage;

@@ -291,7 +291,6 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
 
 
-
 export const getAllProperties = async (req, res) => {
   try {
     const { isDraft, approvalStatus, featured, blocked, published } = req.query;
