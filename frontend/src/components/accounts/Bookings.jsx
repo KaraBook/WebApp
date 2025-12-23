@@ -349,9 +349,8 @@ export default function Bookings() {
 
                     <div>
                       <p className="text-gray-500 text-xs uppercase">Guests</p>
-                      <div className="text-base font-semibold mt-1">
-                        <p>Adults: {selectedBooking.guests.adults}</p>
-                        <p>Children: {selectedBooking.guests.children}</p>
+                      <div className="text-base font-medium mt-1">
+                        <p>Adults: {selectedBooking.guests.adults}</p> | <p>Children: {selectedBooking.guests.children}</p>
                       </div>
                     </div>
 
