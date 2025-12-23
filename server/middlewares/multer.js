@@ -2,7 +2,6 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 
-
 const UPLOAD_BASE = "uploads";
 
 const ensureDir = (dirPath) => {
@@ -10,7 +9,6 @@ const ensureDir = (dirPath) => {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 };
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -48,32 +46,43 @@ const storage = multer.diskStorage({
   },
 });
 
-const ALLOWED = [
+const IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/jpg",
-  "application/pdf", 
 ];
 
+const PDF_TYPE = "application/pdf";
+
 const fileFilter = (req, file, cb) => {
-  if (!ALLOWED.includes(file.mimetype)) {
+  if (file.fieldname === "shopAct") {
+    if (
+      IMAGE_TYPES.includes(file.mimetype) ||
+      file.mimetype === PDF_TYPE
+    ) {
+      return cb(null, true);
+    }
     return cb(
-      new Error(
-        "Invalid file type. Allowed: JPG, PNG, WEBP, PDF"
-      )
+      new Error("Shop Act must be an image (JPG, PNG, WEBP) or PDF")
     );
   }
+
+  if (!IMAGE_TYPES.includes(file.mimetype)) {
+    return cb(
+      new Error("Only JPG, PNG or WEBP images are allowed")
+    );
+  }
+
   cb(null, true);
 };
-
 
 const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024,
-    files: 20,               
+    fileSize: 5 * 1024 * 1024, 
+    files: 20,
   },
 });
 
