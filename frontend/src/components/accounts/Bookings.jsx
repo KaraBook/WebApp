@@ -304,9 +304,9 @@ export default function Bookings() {
                 <div className="bg-white border rounded-md p-4">
                   <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
 
-                  <div className="text-sm space-y-1 flex gap-4 ">
-                    <p>Name: {fullName(selectedBooking.user)}</p>
-                    <p>Phone: {selectedBooking.user?.mobile}</p>
+                  <div className="text-sm space-y-1 flex items-center gap-4 ">
+                    <p>Name: {fullName(selectedBooking.user)}</p>|
+                    <p>Phone: {selectedBooking.user?.mobile}</p>|
                     <p>Email: {selectedBooking.user?.email}</p>
                   </div>
                 </div>
