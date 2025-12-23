@@ -206,24 +206,30 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     if (coverFile) {
       prop.coverImage = `${BASE_URL}/${coverFile.path.replace(/\\/g, "/")}`;
-    } else if (!prop.coverImage) {
-      return res.status(400).json({
-        success: false,
-        message: "coverImage is required",
-      });
+    } else if (prop.coverImage?.startsWith("/uploads/")) {
+      prop.coverImage = `${BASE_URL}${prop.coverImage}`;
     }
 
     if (shopActFile) {
       prop.shopAct = `${BASE_URL}/${shopActFile.path.replace(/\\/g, "/")}`;
+    } else if (prop.shopAct?.startsWith("/uploads/")) {
+      prop.shopAct = `${BASE_URL}${prop.shopAct}`;
     }
 
     if (galleryFiles.length > 0) {
-      const newGalleryUrls = galleryFiles.map((file) =>
-        `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
+      const newGalleryUrls = galleryFiles.map(
+        (file) => `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
       );
 
+      const normalizedExisting = (prop.galleryPhotos || []).map((url) => {
+        if (url.startsWith("/uploads/")) {
+          return `${BASE_URL}${url}`;
+        }
+        return url;
+      });
+
       prop.galleryPhotos = [
-        ...(prop.galleryPhotos || []),
+        ...normalizedExisting,
         ...newGalleryUrls,
       ];
     }
@@ -375,7 +381,7 @@ export const updateProperty = async (req, res) => {
         if (typeof rb === "string") {
           try {
             rb = JSON.parse(rb);
-          } catch (_) {}
+          } catch (_) { }
         }
 
         const ac = Number(rb.ac || 0);
@@ -415,7 +421,7 @@ export const updateProperty = async (req, res) => {
         if (typeof rb === "string") {
           try {
             rb = JSON.parse(rb);
-          } catch (_) {}
+          } catch (_) { }
         }
 
         const ac = Number(rb.ac || 0);
@@ -451,11 +457,21 @@ export const updateProperty = async (req, res) => {
         updatedData.shopAct = `${BASE_URL}/${shopActFile.path.replace(/\\/g, "/")}`;
       }
 
-      let finalGallery = [...(existingProperty.galleryPhotos || [])];
+      let finalGallery = (existingProperty.galleryPhotos || []).map((url) => {
+        if (url.startsWith("/uploads/")) {
+          return `${BASE_URL}${url}`;
+        }
+        return url;
+      });
 
       if (req.body.existingGallery) {
         try {
-          finalGallery = JSON.parse(req.body.existingGallery);
+          finalGallery = JSON.parse(req.body.existingGallery).map((url) => {
+            if (url.startsWith("/uploads/")) {
+              return `${BASE_URL}${url}`;
+            }
+            return url;
+          });
         } catch (e) {
           console.log("JSON parse error (existingGallery)", e);
         }
@@ -497,16 +513,16 @@ export const updateProperty = async (req, res) => {
         if (incomingOwner.mobile.length === 10) {
           let user = existingProperty.ownerUserId
             ? await User.findById(existingProperty.ownerUserId)
-                .select("+password")
-                .session(session)
+              .select("+password")
+              .session(session)
             : await User.findOne({
-                $or: [
-                  { email: incomingOwner.email.toLowerCase() },
-                  { mobile: incomingOwner.mobile },
-                ],
-              })
-                .select("+password")
-                .session(session);
+              $or: [
+                { email: incomingOwner.email.toLowerCase() },
+                { mobile: incomingOwner.mobile },
+              ],
+            })
+              .select("+password")
+              .session(session);
 
           if (!user) {
             const hash = await bcrypt.hash(genTempPassword(), 10);
