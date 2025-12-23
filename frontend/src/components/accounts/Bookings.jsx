@@ -33,6 +33,12 @@ export default function Bookings() {
     })();
   }, []);
 
+  const fullName = (user) => {
+    if (!user) return "—";
+    return `${user.firstName} ${user.lastName}`;
+  };
+
+
   const totalPages = Math.ceil(bookings.length / itemsPerPage);
 
   const paginatedBookings = bookings.slice(
@@ -294,7 +300,7 @@ export default function Bookings() {
                   <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
 
                   <div className="text-sm space-y-1 flex ">
-                    <p>Name: {selectedBooking.user?.fullName || "—"}</p>
+                    <p>Name: {fullName(selectedBooking.user)}</p>
                     <p>Phone: {selectedBooking.user?.phone || "—"}</p>
                     <p>Email: {selectedBooking.user?.email || "—"}</p>
                   </div>
