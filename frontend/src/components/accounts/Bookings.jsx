@@ -289,7 +289,7 @@ export default function Bookings() {
 
 
               {/* Travellers Details */}
-              <div>
+              <div className="-mt-[15px]">
                 <div className="bg-white border rounded-md p-4">
                   <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
 
@@ -303,7 +303,7 @@ export default function Bookings() {
 
 
               {/* ROW 1 — STAY DETAILS + PRICE BREAKDOWN */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 -mt-[15px]">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 -mt-[8px]">
 
                 {/* LEFT SIDE — STAY DETAILS */}
                 <div className="md:col-span-2 bg-gray-50 p-4 rounded-md border">
