@@ -287,6 +287,21 @@ export default function Bookings() {
                 </div>
               </div>
 
+
+              {/* Travellers Details */}
+              <div>
+                <div className="bg-white border rounded-md p-4">
+                  <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
+
+                  <div className="text-sm space-y-1 flex ">
+                    <p>Name: {selectedBooking.user?.fullName || "—"}</p>
+                    <p>Phone: {selectedBooking.user?.phone || "—"}</p>
+                    <p>Email: {selectedBooking.user?.email || "—"}</p>
+                  </div>
+                </div>
+              </div>
+
+
               {/* ROW 1 — STAY DETAILS + PRICE BREAKDOWN */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 -mt-[15px]">
 
@@ -348,9 +363,9 @@ export default function Bookings() {
                     </div>
 
                     <div>
-                      <p className="text-gray-500 text-[12px] uppercase">Guests</p>
+                      <p className="text-gray-500 text-[14px] uppercase">Guests</p>
                       <div className="text-[12px] font-medium mt-1">
-                        <p>Adults: {selectedBooking.guests.adults} | Children: {selectedBooking.guests.children}</p> 
+                        <p>Adults: {selectedBooking.guests.adults} | Children: {selectedBooking.guests.children}</p>
                       </div>
                     </div>
 
@@ -389,23 +404,6 @@ export default function Bookings() {
                 </div>
 
               </div>
-
-              {/* ROW 2 — GUESTS + TRAVELLER DETAILS */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-
-                {/* RIGHT — TRAVELLER DETAILS */}
-                <div className="bg-white border rounded-md p-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
-
-                  <div className="text-sm space-y-1">
-                    <p>Name: {selectedBooking.user?.fullName || "—"}</p>
-                    <p>Phone: {selectedBooking.user?.phone || "—"}</p>
-                    <p>Email: {selectedBooking.user?.email || "—"}</p>
-                  </div>
-                </div>
-
-              </div>
-
             </DialogContent>
           </Dialog>
         )}
