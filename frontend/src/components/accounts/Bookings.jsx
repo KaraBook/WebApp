@@ -294,7 +294,7 @@ export default function Bookings() {
                 <div className="md:col-span-2 bg-gray-50 p-4 rounded-md border">
                   <h4 className="font-semibold mb-2">Stay Details</h4>
 
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
 
                     <div>
                       <p className="text-gray-500 text-xs uppercase">Check-in</p>
