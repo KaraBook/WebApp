@@ -39,8 +39,8 @@ export default function Bookings() {
   };
 
   const phoneNumber = (user) => {
-    if (!user || !user.phone) return "—";
-    return user.phone;
+    if (!user || !user.mobile) return "—";
+    return user.mobile;
   };
 
 
@@ -306,8 +306,8 @@ export default function Bookings() {
 
                   <div className="text-sm space-y-1 flex gap-4 ">
                     <p>Name: {fullName(selectedBooking.user)}</p>
-                    <p>Phone: {phoneNumber(selectedBooking.user)}</p>
-                    <p>Email: {selectedBooking.user?.email || "—"}</p>
+                    <p>Phone: {selectedBooking.user?.mobile}</p>
+                    <p>Email: {selectedBooking.user?.email}</p>
                   </div>
                 </div>
               </div>

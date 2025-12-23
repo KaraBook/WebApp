@@ -270,21 +270,28 @@ export const getBookedDates = async (req, res) => {
 export const getUserBookings = async (req, res) => {
   try {
     const userId = req.user.id;
+
     const bookings = await Booking.find({ userId })
-      .populate("propertyId")
+      .populate("propertyId", "propertyName city state coverImage contactNumber")
+      .populate("userId", "firstName lastName email mobile")
       .sort({ createdAt: -1 });
 
     const formatted = bookings.map((b) => ({
       ...b._doc,
       property: b.propertyId,
+      user: b.userId,
     }));
 
     res.json({ success: true, data: formatted });
   } catch (err) {
     console.error("getUserBookings error:", err);
-    res.status(500).json({ success: false, message: "Failed to fetch user bookings" });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch user bookings",
+    });
   }
 };
+
 
 
 export const getBookingInvoice = async (req, res) => {
