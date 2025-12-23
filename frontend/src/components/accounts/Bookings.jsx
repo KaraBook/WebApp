@@ -38,6 +38,11 @@ export default function Bookings() {
     return `${user.firstName} ${user.lastName}`;
   };
 
+  const phoneNumber = (user) => {
+    if (!user || !user.phone) return "—";
+    return user.phone;
+  };
+
 
   const totalPages = Math.ceil(bookings.length / itemsPerPage);
 
@@ -299,9 +304,9 @@ export default function Bookings() {
                 <div className="bg-white border rounded-md p-4">
                   <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
 
-                  <div className="text-sm space-y-1 flex ">
+                  <div className="text-sm space-y-1 flex gap-4 ">
                     <p>Name: {fullName(selectedBooking.user)}</p>
-                    <p>Phone: {selectedBooking.user?.phone || "—"}</p>
+                    <p>Phone: {phoneNumber(selectedBooking.user)}</p>
                     <p>Email: {selectedBooking.user?.email || "—"}</p>
                   </div>
                 </div>
