@@ -347,6 +347,14 @@ export default function Bookings() {
                       </p>
                     </div>
 
+                    <div>
+                      <p className="text-gray-500 text-xs uppercase">Guests</p>
+                      <div className="text-base font-semibold mt-1">
+                        <p>Adults: {selectedBooking.guests.adults}</p>
+                        <p>Children: {selectedBooking.guests.children}</p>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
 
@@ -385,16 +393,6 @@ export default function Bookings() {
 
               {/* ROW 2 — GUESTS + TRAVELLER DETAILS */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-
-                {/* LEFT — GUESTS */}
-                <div className="md:col-span-2 bg-white border rounded-md p-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">Guests</h4>
-
-                  <div className="text-sm space-y-1">
-                    <p>Adults: {selectedBooking.guests.adults}</p>
-                    <p>Children: {selectedBooking.guests.children}</p>
-                  </div>
-                </div>
 
                 {/* RIGHT — TRAVELLER DETAILS */}
                 <div className="bg-white border rounded-md p-4">
