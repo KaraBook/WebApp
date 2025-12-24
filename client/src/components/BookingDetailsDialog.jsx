@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "./ui/button";
 import { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
 import { Link } from "react-router-dom";
 
 const formatDate = (d) => (d ? format(new Date(d), "dd MMM yyyy") : "—");
