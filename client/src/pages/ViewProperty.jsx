@@ -105,9 +105,12 @@ const ViewProperty = () => {
     totalRooms,
     maxGuests,
     petFriendly,
+    isRefundable,
+    refundNotes,
     pricingPerNightWeekdays,
     pricingPerNightWeekend,
-    extraGuestCharge,
+    extraAdultCharge,
+    extraChildCharge,
     checkInTime,
     checkOutTime,
     minStayNights,
@@ -264,6 +267,32 @@ const ViewProperty = () => {
               )}
             </CardContent>
           </Card>
+
+           <Card>
+              <CardHeader className="pb-2">
+                <SectionTitle icon={IndianRupee}>Pricing</SectionTitle>
+              </CardHeader>
+              <CardContent>
+                <Field label="Weekday Price (₹ / night)">
+                  ₹{pricingPerNightWeekdays?.toLocaleString("en-IN")}
+                </Field>
+
+                <Field label="Weekend Price (₹ / night)">
+                  ₹{pricingPerNightWeekend?.toLocaleString("en-IN")}
+                </Field>
+
+                <Field label="Extra Guest Charge (₹ / guest / night)">
+                  {extraAdultCharge !== undefined && extraAdultCharge !== null
+                    ? `₹${extraAdultCharge.toLocaleString("en-IN")}`
+                    : "-"}
+                </Field>
+                <Field label="Extra Child Charge (₹ / child / night)">
+                  {extraChildCharge !== undefined && extraChildCharge !== null
+                    ? `₹${extraChildCharge.toLocaleString("en-IN")}`
+                    : "-"}
+                </Field>
+              </CardContent>
+            </Card>
         </div>
 
         {/* Right: Details */}
@@ -371,37 +400,52 @@ const ViewProperty = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle icon={IndianRupee}>Pricing</SectionTitle>
-              </CardHeader>
-              <CardContent>
-                <Field label="Weekday Price (₹ / night)">
-                  ₹{pricingPerNightWeekdays?.toLocaleString("en-IN")}
-                </Field>
-
-                <Field label="Weekend Price (₹ / night)">
-                  ₹{pricingPerNightWeekend?.toLocaleString("en-IN")}
-                </Field>
-
-                <Field label="Extra Guest Charge (₹ / guest / night)">
-                  {extraGuestCharge !== undefined && extraGuestCharge !== null
-                    ? `₹${extraGuestCharge.toLocaleString("en-IN")}`
-                    : "-"}
-                </Field>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Times & Options */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
             <Card>
               <CardHeader className="pb-2">
                 <SectionTitle icon={Clock}>Check-in / Check-out</SectionTitle>
               </CardHeader>
+
               <CardContent>
                 <Field label="Check-in">{checkInTime}</Field>
                 <Field label="Check-out">{checkOutTime}</Field>
+
+                <Separator />
+
+                {/* Pet Friendly */}
+                <Field label="Pet Friendly">
+                  {typeof petFriendly === "boolean"
+                    ? petFriendly
+                      ? "Yes"
+                      : "No"
+                    : "-"}
+                </Field>
+
+                <Separator />
+
+                {/* Refundable */}
+                <Field label="Refundable">
+                  {typeof isRefundable === "boolean"
+                    ? isRefundable
+                      ? "Yes"
+                      : "No"
+                    : "-"}
+                </Field>
+
+                {/* Refund Notes (ONLY if refundable) */}
+                {isRefundable === true && refundNotes && (
+                  <>
+                    <Separator />
+                    <Field label="Refund Policy / Notes">
+                      <div className="whitespace-pre-wrap">
+                        {refundNotes}
+                      </div>
+                    </Field>
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -473,13 +517,6 @@ const ViewProperty = () => {
                 </Field>
                 <Field label="Published">{publishNow ? "Yes" : "No"}</Field>
                 <Field label="Featured">{featured ? "Yes" : "No"}</Field>
-                <Field label="Pet Friendly">
-                  {typeof petFriendly === "boolean"
-                    ? petFriendly
-                      ? "Yes"
-                      : "No"
-                    : "-"}
-                </Field>
               </CardContent>
             </Card>
 

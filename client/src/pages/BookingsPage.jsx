@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
@@ -20,19 +20,11 @@ import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
 import { useRef } from "react";
 
-const filterOptions = [
-    { label: "All Bookings", value: "all" },
-    { label: "Paid", value: "paid" },
-    { label: "Pending", value: "pending" },
-    { label: "Failed", value: "failed" },
-    { label: "Upcoming", value: "upcoming" },
-    { label: "Past", value: "past" },
-];
-
 const itemsPerPageDefault = 8;
 
 const BookingsPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [selectedFilter, setSelectedFilter] = useState("all");
     const [search, setSearch] = useState("");
@@ -47,6 +39,24 @@ const BookingsPage = () => {
     const invoiceRef = useRef(null);
 
     const itemsPerPage = itemsPerPageDefault;
+
+    const bookingCounts = useMemo(() => {
+        return {
+            all: bookings.length,
+            paid: bookings.filter(b => b.paymentStatus === "paid").length,
+            pending: bookings.filter(b => b.paymentStatus === "pending").length,
+            failed: bookings.filter(b => b.paymentStatus === "failed").length,
+        };
+    }, [bookings]);
+
+    const filterOptions = useMemo(() => [
+        { label: `All Bookings (${bookingCounts.all})`, value: "all" },
+        { label: `Paid (${bookingCounts.paid})`, value: "paid" },
+        { label: `Pending (${bookingCounts.pending})`, value: "pending" },
+        { label: `Failed (${bookingCounts.failed})`, value: "failed" },
+        { label: "Upcoming", value: "upcoming" },
+        { label: "Past", value: "past" },
+    ], [bookingCounts]);
 
     const closeConfirm = () => setConfirm({ open: false, type: null, booking: null });
     const openConfirm = (type, booking) => {
@@ -78,6 +88,18 @@ const BookingsPage = () => {
             setLoading(false);
         }
     };
+
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const status = params.get("status");
+
+        if (status && ["paid", "pending", "failed"].includes(status)) {
+            setSelectedFilter(status);
+        } else {
+            setSelectedFilter("all");
+        }
+    }, [location.search]);
 
 
     useEffect(() => {
@@ -325,22 +347,22 @@ const BookingsPage = () => {
                     {filterOptions.find((o) => o.value === selectedFilter)?.label || "All Bookings"}
                 </h2>
 
-                <div className="flex gap-2 w-full md:w-auto">
+                <div className="flex flex-wrap md:flex-nowrap gap-2 w-full md:w-auto">
                     <Input
                         placeholder="Search: booking id / traveller / property / email / phone"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="bg-white"
+                        className="bg-white text-[12px] h-8"
                     />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-48 justify-between bg-white text-primary">
+                            <Button variant="outline" className="w-full md:w-48 h-8 text-[12px] justify-between bg-white text-primary">
                                 {filterOptions.find((o) => o.value === selectedFilter)?.label || "Select"}
                                 <IoIosArrowDropdown className="ml-2" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
+                        <DropdownMenuContent className="w-56 ">
                             {filterOptions.map((option) => (
                                 <DropdownMenuItem
                                     key={option.value}
@@ -400,7 +422,14 @@ const BookingsPage = () => {
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
                                                         {statusDot(b.paymentStatus)}
-                                                        <span className="font-medium">{shortId(b._id)}</span>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => openView(b)}
+                                                            className="font-medium text-primary cursor-pointer"
+                                                        >
+                                                            {shortId(b._id)}
+                                                        </button>
                                                     </div>
                                                 </TableCell>
 
@@ -454,6 +483,9 @@ const BookingsPage = () => {
                                                         </DropdownMenuTrigger>
 
                                                         <DropdownMenuContent className="w-56">
+                                                            <DropdownMenuItem onSelect={() => openView(b)}>
+                                                                View Booking
+                                                            </DropdownMenuItem>
                                                             <DropdownMenuItem onSelect={() => navigate(`/invoice/${b._id}`)}>
                                                                 View Invoice
                                                             </DropdownMenuItem>
@@ -518,7 +550,7 @@ const BookingsPage = () => {
 
                 {/* Pagination */}
                 {!loading && totalPages > 1 && (
-                    <div className="flex justify-end items-center mt-6 gap-2">
+                    <div className="flex flex-wrap justify-end items-center mt-6 gap-2">
                         <Button
                             variant="outline"
                             size="sm"
@@ -590,6 +622,7 @@ const BookingsPage = () => {
                 </div>
             )}
         </>
+
     );
 };
 

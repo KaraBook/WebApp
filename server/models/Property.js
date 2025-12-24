@@ -95,6 +95,20 @@ const propertySchema = new mongoose.Schema({
   pan: { type: String, required: true, unique: true },
   gstin: { type: String, uppercase: true, trim: true, match: [GSTIN_REGEX, "Invalid GSTIN format"] },
 
+  isRefundable: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+
+  refundNotes: {
+    type: String,
+    maxlength: 500,
+    required: function () {
+      return this.isRefundable === true;
+    },
+  },
+
   kycVerified: { type: Boolean, required: true },
   publishNow: { type: Boolean },
   featured: { type: Boolean, default: false },

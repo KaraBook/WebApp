@@ -92,6 +92,13 @@ const baseFields = {
   pricingPerNightWeekdays: Joi.number().min(10).max(999999).required(),
   pricingPerNightWeekend: Joi.number().min(10).max(999999).required(),
 
+  isRefundable: Joi.boolean().required(),
+
+  refundNotes: Joi.string()
+    .max(500)
+    .allow("")
+    .optional(),
+
   extraAdultCharge: Joi.number()
     .min(0)
     .max(99999)
@@ -141,6 +148,13 @@ const draftSchema = Joi.object(baseFields).custom((value, helpers) => {
   if (value.baseGuests > value.maxGuests) {
     return helpers.message("Base guests cannot be greater than max guests");
   }
+  if (value.isRefundable === true && !value.refundNotes?.trim()) {
+    return helpers.message("Refund notes are required when property is refundable");
+  }
+
+  if (value.isRefundable === false && value.refundNotes) {
+    value.refundNotes = "";
+  }
   return value;
 });
 
@@ -153,6 +167,13 @@ const updateSchema = Joi.object({
   if (value.baseGuests > value.maxGuests) {
     return helpers.message("Base guests cannot be greater than max guests");
   }
+  if (value.isRefundable === true && !value.refundNotes?.trim()) {
+    return helpers.message("Refund notes are required when property is refundable");
+  }
+
+  if (value.isRefundable === false && value.refundNotes) {
+    value.refundNotes = "";
+  }
   return value;
 });
 
@@ -164,7 +185,7 @@ function parseResortOwnerFromBody(body) {
       return typeof body.resortOwner === "string"
         ? JSON.parse(body.resortOwner)
         : body.resortOwner;
-    } catch {}
+    } catch { }
   }
 
   const first = (...keys) => {
@@ -210,7 +231,7 @@ function normalizeArraysAndTypes(body) {
     }
   });
 
-  ["kycVerified", "publishNow", "featured"].forEach((b) => {
+  ["kycVerified", "publishNow", "featured", "isRefundable"].forEach((b) => {
     if (body[b] === "true") body[b] = true;
     if (body[b] === "false") body[b] = false;
   });

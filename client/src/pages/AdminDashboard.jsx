@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
-import { Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Loader2, Users, CalendarCheck, Clock, Wallet, Home} from "lucide-react";
+import { Loader2, Users, CalendarCheck, Clock, Wallet, Home } from "lucide-react";
+import { Link } from "react-router-dom";
+import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
@@ -57,8 +61,8 @@ const DashboardPage = () => {
     typeof n === "number"
       ? `₹${n.toLocaleString("en-IN")}`
       : n
-      ? `₹${Number(n).toLocaleString("en-IN")}`
-      : "₹0";
+        ? `₹${Number(n).toLocaleString("en-IN")}`
+        : "₹0";
 
   const formatDate = (dateString) => {
     if (!dateString) return "—";
@@ -90,38 +94,50 @@ const DashboardPage = () => {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Bookings"
-          value={stats.totalBookings}
-          icon={CalendarCheck}
-        />
-        <StatCard
-          title="Confirmed"
-          value={stats.confirmed}
-          icon={Clock}
-          color="text-green-700"
-        />
+        <Link to="/bookings">
+          <StatCard
+            title="Total Bookings"
+            value={stats.totalBookings}
+            icon={CalendarCheck}
+          />
+        </Link>
+        <Link to="/bookings?status=paid">
+          <StatCard
+            title="Confirmed"
+            value={stats.confirmed}
+            icon={Clock}
+            color="text-green-700"
+          />
+        </Link>
+        <Link to="/bookings?status=pending">
         <StatCard
           title="Pending"
           value={stats.pending}
           icon={Clock}
           color="text-yellow-700"
         />
+        </Link>
+        <Link to="/bookings?status=cancelled">
         <StatCard
-          title="Failed"
+          title="Cancelled"
           value={stats.failed}
           icon={Clock}
           color="text-red-700"
         />
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Link to="/users">
         <StatCard title="Total Users" value={stats.totalUsers} icon={Users} />
+        </Link>
+        <Link to="/properties">
         <StatCard
           title="Total Properties"
           value={stats.totalProperties}
           icon={Home}
         />
+        </Link>
         <StatCard
           title="Total Revenue"
           value={formatCurrency(stats.totalRevenue)}
@@ -134,19 +150,15 @@ const DashboardPage = () => {
       </h2>
 
       <div className="border rounded-lg shadow-sm overflow-x-auto">
-        <Table className="w-full text-sm">
+        <Table className="w-[650px] md:w-full text-sm">
           <TableHeader>
             <TableRow>
               <TableHead>Sr. No</TableHead>
               <TableHead>Traveller</TableHead>
-              <TableHead>
-                Property
-              </TableHead>
+              <TableHead>Property</TableHead>
               <TableHead>Amount</TableHead>
-              <TableHead className="hidden md:table-cell">Status</TableHead>
-              <TableHead className="hidden md:table-cell">
-                Date
-              </TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -164,10 +176,17 @@ const DashboardPage = () => {
                 <TableCell>{index + 1}</TableCell>
 
                 <TableCell>
-                  {b?.userId?.firstName} {b?.userId?.lastName}
+                  <button
+                    onClick={() => {
+                      setSelectedBooking(b);
+                      setOpenModal(true);
+                    }}
+                  >
+                    {b?.userId?.firstName} {b?.userId?.lastName}
+                  </button>
                 </TableCell>
 
-                <TableCell className="hidden sm:table-cell max-w-[200px] truncate">
+                <TableCell className="max-w-[200px] truncate">
                   {b?.propertyId?.propertyName || "—"}
                 </TableCell>
 
@@ -191,7 +210,7 @@ const DashboardPage = () => {
                   )}
                 </TableCell>
 
-                <TableCell className="hidden md:table-cell">
+                <TableCell>
                   {formatDate(b.createdAt)}
                 </TableCell>
               </TableRow>
@@ -199,9 +218,22 @@ const DashboardPage = () => {
           </TableBody>
         </Table>
       </div>
+
+      <BookingDetailsDialog
+      open={openModal}
+      booking={selectedBooking}
+      onClose={(open) => {
+        if (!open) {
+          setOpenModal(false);
+          setSelectedBooking(null);
+        }
+      }}
+    />
     </div>
+
   );
 };
+
 
 function StatCard({ title, value, icon: Icon, color = "" }) {
   return (
@@ -220,5 +252,6 @@ function StatCard({ title, value, icon: Icon, color = "" }) {
     </Card>
   );
 }
+
 
 export default DashboardPage;

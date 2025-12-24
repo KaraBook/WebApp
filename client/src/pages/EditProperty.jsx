@@ -88,6 +88,8 @@ const EditProperty = () => {
     approvalStatus: "pending",
     publishNow: false,
     internalNotes: "",
+    isRefundable: false,
+    refundNotes: "",
   });
 
   const nextStep = () => {
@@ -172,6 +174,8 @@ const EditProperty = () => {
           approvalStatus: prop.approvalStatus || "pending",
           publishNow: !!prop.publishNow,
           internalNotes: prop.internalNotes || "",
+          isRefundable: !!prop.isRefundable,
+          refundNotes: prop.refundNotes || "",
         });
 
         setCoverImagePreview(prop.coverImage || null);
@@ -190,14 +194,14 @@ const EditProperty = () => {
 
 
   useEffect(() => {
-  if (
-    formData.baseGuests &&
-    formData.maxGuests &&
-    Number(formData.baseGuests) > Number(formData.maxGuests)
-  ) {
-    toast.error("Base guests cannot exceed max guests");
-  }
-}, [formData.baseGuests, formData.maxGuests]);
+    if (
+      formData.baseGuests &&
+      formData.maxGuests &&
+      Number(formData.baseGuests) > Number(formData.maxGuests)
+    ) {
+      toast.error("Base guests cannot exceed max guests");
+    }
+  }, [formData.baseGuests, formData.maxGuests]);
 
 
   const handleSubmit = async (e) => {
@@ -613,7 +617,7 @@ const EditProperty = () => {
               <div className="flex flex-wrap items-center gap-3 mt-3">
                 {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
                   <div key={key} className="flex items-center gap-2">
-                    <span className="px-3 py-1 bg-black text-white rounded-md text-sm capitalize">
+                    <span className="px-3 py-2 bg-black text-white rounded-md text-sm capitalize">
                       {key === "nonAc" ? "Non AC" : key}
                     </span>
                     <QuantityBox
@@ -640,142 +644,19 @@ const EditProperty = () => {
                 ))}
 
                 <div className="flex items-center gap-2 ml-4">
-                  <span className="px-3 py-1 bg-black text-white rounded-md text-sm">
+                  <span className="px-3 py-2 bg-black text-white rounded-md text-sm">
                     Total
                   </span>
                   <input
                     readOnly
-                    className="w-16 text-center border rounded-md py-1"
+                    className="w-16 text-center border rounded-md py-[5px]"
                     value={formData.roomBreakdown.total}
                   />
                 </div>
               </div>
             </div>
 
-
-            <div className="w-[12%]">
-              <Label htmlFor="maxGuests" className="text-sm">
-                Max Guests Allowed <span className="text-red-500">*</span>
-              </Label>
-              <div className="mt-2">
-                <QuantityBox
-                  value={formData.maxGuests}
-                  onChange={(val) => setFormData((prev) => ({ ...prev, maxGuests: val }))}
-                  min={1}
-                  max={999}
-                />
-              </div>
-            </div>
-
-            <div className="w-[12%]">
-              <Label className="text-sm">
-                Base Guests <span className="text-red-500">*</span>
-              </Label>
-              <div className="mt-2">
-              <QuantityBox
-                value={formData.baseGuests}
-                onChange={(val) =>
-                  setFormData((prev) => ({ ...prev, baseGuests: val }))
-                }
-                min={1}
-                max={formData.maxGuests || 999}
-              />
-              </div>
-            </div>
-
-            <div className="w-[15%]">
-              <Label className="text-sm">
-                Extra Adult Charge (₹ / night)
-              </Label>
-              <div className="mt-2">
-              <Input
-                value={formData.extraAdultCharge}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (/^\d{0,5}$/.test(v)) {
-                    setFormData((p) => ({ ...p, extraAdultCharge: v }));
-                  }
-                }}
-              />
-              </div>
-            </div>
-
             <div className="w-[16%]">
-              <Label className="text-sm">
-                Extra Child Charge (₹ / night)
-              </Label>
-              <div className="mt-2">
-              <Input
-                value={formData.extraChildCharge}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (/^\d{0,5}$/.test(v)) {
-                    setFormData((p) => ({ ...p, extraChildCharge: v }));
-                  }
-                }}
-              />
-              </div>
-            </div>
-
-            <div className="w-[16%]">
-              <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
-                Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
-              </Label>
-              <div className="mt-2">
-              <Input
-                id="pricingPerNightWeekdays"
-                name="pricingPerNightWeekdays"
-                type="text"
-                inputMode="numeric"
-                className="mt-2"
-                value={formData.pricingPerNightWeekdays}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d{0,6}$/.test(value)) {
-                    setFormData((prev) => ({ ...prev, pricingPerNightWeekdays: value }));
-                  }
-                }}
-                required
-              />
-              </div>
-            </div>
-
-            <div className="w-[17%]">
-              <Label htmlFor="pricingPerNightWeekend" className="block font-medium mt-2">
-                Price Per Night (Weekend) (₹) <span className="text-red-500">*</span>
-              </Label>
-              <div className="mt-2">
-              <Input
-                id="pricingPerNightWeekend"
-                name="pricingPerNightWeekend"
-                type="text"
-                inputMode="numeric"
-                className="mt-2"
-                value={formData.pricingPerNightWeekend}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d{0,6}$/.test(value)) {
-                    setFormData((prev) => ({ ...prev, pricingPerNightWeekend: value }));
-                  }
-                }}
-                required
-              />
-              </div>
-            </div>
-
-            <CustomTimePicker
-              label="Check-In Time"
-              value={formData.checkInTime}
-              onChange={(val) => setFormData({ ...formData, checkInTime: val })}
-            />
-
-            <CustomTimePicker
-              label="Check-Out Time"
-              value={formData.checkOutTime}
-              onChange={(val) => setFormData({ ...formData, checkOutTime: val })}
-            />
-
-            <div className="w-[32%]">
               <Label htmlFor="minStayNights" className="text-sm">
                 Minimum Stay (Nights) <span className="text-red-500">*</span>
               </Label>
@@ -789,7 +670,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[48%]">
+            <div className="w-[28%]">
               <SingleSelectDropdown
                 label="Is this property Pet Friendly?"
                 value={formData.petFriendly}
@@ -807,6 +688,174 @@ const EditProperty = () => {
               />
             </div>
 
+
+            <div className="w-[15%]">
+              <Label htmlFor="maxGuests" className="text-sm">
+                Max Guests Allowed <span className="text-red-500">*</span>
+              </Label>
+              <div className="mt-2">
+                <QuantityBox
+                  value={formData.maxGuests}
+                  onChange={(val) => setFormData((prev) => ({ ...prev, maxGuests: val }))}
+                  min={1}
+                  max={999}
+                />
+              </div>
+            </div>
+
+            <div className="w-[15%]">
+              <Label className="text-sm">
+                Base Guests <span className="text-red-500">*</span>
+              </Label>
+              <div className="mt-2">
+                <QuantityBox
+                  value={formData.baseGuests}
+                  onChange={(val) =>
+                    setFormData((prev) => ({ ...prev, baseGuests: val }))
+                  }
+                  min={1}
+                  max={formData.maxGuests || 999}
+                />
+              </div>
+            </div>
+
+            <div className="w-[22%]">
+              <Label className="text-sm">
+                Extra Adult Charge (₹ / night)
+              </Label>
+              <div className="mt-2">
+                <Input
+                  value={formData.extraAdultCharge}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (/^\d{0,5}$/.test(v)) {
+                      setFormData((p) => ({ ...p, extraAdultCharge: v }));
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="w-[22%]">
+              <Label className="text-sm">
+                Extra Child Charge (₹ / night)
+              </Label>
+              <div className="mt-2">
+                <Input
+                  value={formData.extraChildCharge}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (/^\d{0,5}$/.test(v)) {
+                      setFormData((p) => ({ ...p, extraChildCharge: v }));
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="w-[22%]">
+              <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
+                Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
+              </Label>
+              <div className="mt-2">
+                <Input
+                  id="pricingPerNightWeekdays"
+                  name="pricingPerNightWeekdays"
+                  type="text"
+                  inputMode="numeric"
+                  className="mt-2"
+                  value={formData.pricingPerNightWeekdays}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d{0,6}$/.test(value)) {
+                      setFormData((prev) => ({ ...prev, pricingPerNightWeekdays: value }));
+                    }
+                  }}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="w-[22%]">
+              <Label htmlFor="pricingPerNightWeekend" className="block font-medium mt-2">
+                Price Per Night (Weekend) (₹) <span className="text-red-500">*</span>
+              </Label>
+              <div className="mt-2">
+                <Input
+                  id="pricingPerNightWeekend"
+                  name="pricingPerNightWeekend"
+                  type="text"
+                  inputMode="numeric"
+                  className="mt-2"
+                  value={formData.pricingPerNightWeekend}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d{0,6}$/.test(value)) {
+                      setFormData((prev) => ({ ...prev, pricingPerNightWeekend: value }));
+                    }
+                  }}
+                  required
+                />
+              </div>
+            </div>
+
+            <CustomTimePicker
+              label="Check-In Time"
+              value={formData.checkInTime}
+              onChange={(val) => setFormData({ ...formData, checkInTime: val })}
+            />
+
+            <CustomTimePicker
+              label="Check-Out Time"
+              value={formData.checkOutTime}
+              onChange={(val) => setFormData({ ...formData, checkOutTime: val })}
+            />
+
+            <div className="w-[48%] flex flex-col gap-2">
+              <Label className="text-sm">
+                Is this property refundable?
+                <span className="text-red-500">*</span>
+              </Label>
+
+              <SingleSelectDropdown
+                value={formData.isRefundable}
+                options={[
+                  { label: "Yes", value: true },
+                  { label: "No", value: false },
+                ]}
+                onChange={(val) => {
+                  const boolVal = val === true || val === "true";
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    isRefundable: boolVal,
+                    refundNotes: boolVal ? prev.refundNotes : "",
+                  }));
+                }}
+                placeholder="Select Option"
+              />
+            </div>
+
+            {formData.isRefundable === true && (
+              <div className="w-[48%]">
+                <Label className="text-sm">
+                  Refund Policy / Notes <span className="text-red-500">*</span>
+                </Label>
+
+                <textarea
+                  rows={4}
+                  className="w-full mt-2 border rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-black"
+                  placeholder="Example: 100% refund if cancelled 7 days before check-in"
+                  value={formData.refundNotes}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      refundNotes: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            )}
 
           </>
         )}

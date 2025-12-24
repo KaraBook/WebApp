@@ -10,9 +10,8 @@ export default function MobileHeader({ onMenuClick }) {
         </span>
 
         <Button
-          variant="ghost"
-          size="icon"
           onClick={onMenuClick}
+          className="px-2 py-1 text-[18px] bg-gray-200 text-black hover:bg-gray-300 h-8"
         >
           <Menu />
         </Button>

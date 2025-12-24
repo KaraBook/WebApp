@@ -140,6 +140,9 @@ export const createPropertyDraft = async (req, res) => {
       req.body.extraAdultCharge = Number(req.body.extraAdultCharge);
       req.body.extraChildCharge = Number(req.body.extraChildCharge);
 
+      if (req.body.isRefundable === false) {
+        req.body.refundNotes = "";
+      }
 
       propertyDoc = new Property({
         ...req.body,
@@ -568,6 +571,10 @@ export const updateProperty = async (req, res) => {
 
           updatedData.ownerUserId = user._id;
         }
+      }
+
+      if (updatedData.isRefundable === false) {
+        updatedData.refundNotes = "";
       }
 
       updatedProperty = await Property.findByIdAndUpdate(

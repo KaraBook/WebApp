@@ -26,7 +26,7 @@ export default function AdminLayout() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-4 sm:p-6 bg-white pb-24 md:pb-6">
+        <main className="flex-1 p-4 overflow-x-hidden sm:p-6 bg-white pb-24 md:pb-6">
           <Outlet />
         </main>
       </div>

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
+import { Link } from "react-router-dom";
 
 const filterOptions = [
   { label: "All Properties", value: "all" },
@@ -55,7 +56,7 @@ const PropertiesPage = () => {
   }, []);
 
   const formatDate = (dateString) => {
-    const options = { day: "numeric", month: "long", year: "2-digit" };
+    const options = { day: "numeric", month: "short", year: "2-digit" };
     return new Date(dateString).toLocaleDateString("en-IN", options);
   };
 
@@ -203,22 +204,22 @@ const PropertiesPage = () => {
       <div className="flex justify-between items-center border-b pb-4">
         <h1 className="text-xl font-bold">Properties</h1>
         <div className="flex gap-2">
-          <Button onClick={() => navigate("/properties/drafts")}>View Drafts</Button>
-          <Button onClick={() => navigate("/add-property")}>Add Property</Button>
+          <Button className="text-[12px] md:text-[13px] h-8 md:h-auto" onClick={() => navigate("/properties/drafts")}>View Drafts</Button>
+          <Button className="text-[12px] md:text-[13px] h-8 md:h-auto" onClick={() => navigate("/add-property")}>Add Property</Button>
         </div>
       </div>
 
-      <div className="mt-4 flex justify-between items-center">
-        <h2>
+      <div className="mt-4 flex flex-wrap justify-between items-center">
+        <h2 className="mb-2">
           {filterOptions.find((o) => o.value === selectedFilter)?.label ||
             "All Properties"}
         </h2>
-        <div className="flex items-center gap-3">
-          <div>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="md:w-auto w-[100%]">
             <input
               type="text"
               placeholder="Search property..."
-              className="border rounded-md px-3 py-2 w-64 text-sm focus:outline-none focus:ring-1 focus:ring-black"
+              className="border rounded-md px-3 py-1 md:py-2 w-[100%] md:w-64 text-sm focus:outline-none focus:ring-1 focus:ring-black"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -227,7 +228,7 @@ const PropertiesPage = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="w-64 justify-between bg-white text-primary"
+                className="w-full md:w-64 md:h-auto h-8 text-[12px] justify-between bg-white text-primary"
               >
                 {filterOptions.find((o) => o.value === selectedFilter)?.label || "Select"}
                 <IoIosArrowDropdown className="ml-2" />
@@ -249,7 +250,7 @@ const PropertiesPage = () => {
 
       <div className="mt-6">
         <div className="overflow-x-auto">
-          <Table className="w-full">
+          <Table className="md:w-full w-[1100px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Sr. No</TableHead>
@@ -261,8 +262,8 @@ const PropertiesPage = () => {
                 <TableHead>Status</TableHead>
                 <TableHead>Featured</TableHead>
                 <TableHead>Published</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead>Last Updated</TableHead>
+                <TableHead className="hidden md:table-cell">Created</TableHead>
+                <TableHead className="hidden md:table-cell">Last Updated</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -271,7 +272,13 @@ const PropertiesPage = () => {
               {paginatedProperties.map((property, index) => (
                 <TableRow key={property._id}>
                   <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                  <TableCell>{property.propertyName}</TableCell>
+                  <TableCell>
+                    <Link
+                      to={`/view-property/${property._id}`}
+                    >
+                      {property.propertyName}
+                    </Link>
+                  </TableCell>
                   <TableCell>{property.resortOwner?.firstName || "N/A"}</TableCell>
                   <TableCell>{property.state}</TableCell>
                   <TableCell>{property.city}</TableCell>
@@ -285,8 +292,12 @@ const PropertiesPage = () => {
                       onCheckedChange={() => openConfirm("publish", property)}
                     />
                   </TableCell>
-                  <TableCell>{formatDate(property.createdAt)}</TableCell>
-                  <TableCell>{formatDate(property.updatedAt)}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {formatDate(property.createdAt)}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {formatDate(property.updatedAt)}
+                  </TableCell>
                   <TableCell>
                     <DropdownMenu
                       open={openDropdownId === property._id}
@@ -348,7 +359,7 @@ const PropertiesPage = () => {
         </div>
 
         {totalPages > 1 && (
-          <div className="flex justify-end items-center mt-6 gap-2">
+          <div className="flex justify-end flex-wrap items-center mt-6 gap-2">
             <Button
               variant="outline"
               size="sm"
