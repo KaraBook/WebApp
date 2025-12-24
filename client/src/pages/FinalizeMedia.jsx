@@ -168,7 +168,7 @@ export default function FinalizeMedia() {
         </div>
 
         {/* Publish */}
-        <div className="w-[48%] min-w-[320px]">
+        <div className="w-[48%] min-w-[320px] mt-2">
           <SingleSelectDropdown
             label="Publish Now"
             value={publishNow}
@@ -198,7 +198,7 @@ export default function FinalizeMedia() {
         </div>
 
         <div className="ml-auto flex gap-2 mt-6">
-          <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+          <Button type="button" onClick={() => navigate(-1)}>
             Cancel
           </Button>
           <Button type="submit" disabled={submitting}>
