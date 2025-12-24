@@ -21,18 +21,18 @@ export default function FinalizeMedia() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Cover
+  /* ================= COVER ================= */
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState(null);
 
-  // Shop Act
+  /* ================= SHOP ACT ================= */
   const [shopActFile, setShopActFile] = useState(null);
   const [shopActPreview, setShopActPreview] = useState(null);
 
-  // Gallery (IMPORTANT)
+  /* ================= GALLERY (MATCHES EditProperty) ================= */
   const [existingGallery, setExistingGallery] = useState([]);
-  const [galleryImageFiles, setGalleryImageFiles] = useState([]);
-  const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
+  const [newGalleryFiles, setNewGalleryFiles] = useState([]);
+  const [newGalleryPreviews, setNewGalleryPreviews] = useState([]);
 
   const [publishNow, setPublishNow] = useState(false);
 
@@ -48,8 +48,6 @@ export default function FinalizeMedia() {
 
         setCoverImagePreview(p?.coverImage || null);
         setShopActPreview(p?.shopAct || null);
-
-        // 🔥 THIS WAS MISSING
         setExistingGallery(p?.galleryPhotos || []);
       } catch (err) {
         toast.error(err?.response?.data?.message || "Failed to load property");
@@ -88,14 +86,13 @@ export default function FinalizeMedia() {
     }
 
     const totalGallery =
-      existingGallery.length + newGalleryFiles.length
+      existingGallery.length + newGalleryFiles.length;
 
     if (totalGallery < 3) {
       return "Minimum 3 gallery images are required.";
     }
 
     for (const f of newGalleryFiles) {
-    {
       if (
         !ALLOWED_IMAGE_TYPES.includes(f.type) ||
         f.size > MAX_FILE_MB * 1024 * 1024
@@ -123,16 +120,15 @@ export default function FinalizeMedia() {
       const fd = new FormData();
 
       fd.append("publishNow", String(!!publishNow));
+      fd.append("existingGallery", JSON.stringify(existingGallery));
 
       if (coverImageFile) fd.append("coverImage", coverImageFile);
       if (shopActFile) fd.append("shopAct", shopActFile);
 
-      // 🔥 SEND EXISTING GALLERY
-      fd.append("existingGallery", JSON.stringify(existingGallery));
-
       newGalleryFiles.forEach((file) =>
         fd.append("galleryPhotos", file)
       );
+
       const { url, method } = SummaryApi.finalizeProperty(id);
 
       await Axios({
@@ -163,8 +159,8 @@ export default function FinalizeMedia() {
         {/* Shop Act */}
         <div className="w-[48%] min-w-[320px]">
           <FileUploadsSection
-            setShopActFile={setShopActFile}
             shopActFile={shopActFile}
+            setShopActFile={setShopActFile}
             shopActPreview={shopActPreview}
             setShopActPreview={setShopActPreview}
             showFields={{ shopAct: true }}
@@ -197,7 +193,7 @@ export default function FinalizeMedia() {
             newGalleryPreviews={newGalleryPreviews}
             setNewGalleryPreviews={setNewGalleryPreviews}
 
-            showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+            showFields={{ coverImage: true, galleryPhotos: true }}
           />
         </div>
 
