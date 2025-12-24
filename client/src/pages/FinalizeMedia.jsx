@@ -1,6 +1,6 @@
 // src/pages/FinalizeMedia.jsx
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { toast } from "sonner";
@@ -21,7 +21,7 @@ export default function FinalizeMedia() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Media state (mirrors AddProperty)
+  // Media state
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState(null);
 
@@ -31,17 +31,21 @@ export default function FinalizeMedia() {
   const [galleryImageFiles, setGalleryImageFiles] = useState([]);
   const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
 
-  // Publish now (same control you use in AddProperty)
   const [publishNow, setPublishNow] = useState(false);
 
+  /* ================= LOAD PROPERTY ================= */
   useEffect(() => {
     (async () => {
       try {
         const res = await Axios(SummaryApi.getSingleProperty(id));
         const p = res?.data?.data;
+
         setProperty(p || null);
-        // If draft already has a preference, reflect it; otherwise default false
         setPublishNow(!!p?.publishNow);
+
+        // preload previews (important UX)
+        setCoverImagePreview(p?.coverImage || null);
+        setShopActPreview(p?.shopAct || null);
       } catch (err) {
         toast.error(err?.response?.data?.message || "Failed to load property");
       } finally {
@@ -50,73 +54,104 @@ export default function FinalizeMedia() {
     })();
   }, [id]);
 
-  const filesOk = () => {
-    if (!coverImageFile) {
-      return { ok: false, message: "Cover image is required." };
-    }
-    if (!ALLOWED_IMAGE_TYPES.includes(coverImageFile.type) || coverImageFile.size > MAX_FILE_MB * 1024 * 1024) {
-      return { ok: false, message: "Cover image must be JPG/PNG/WEBP under 5MB." };
-    }
-
-    if (!shopActFile) {
-      return { ok: false, message: "Shop Act file is required." };
-    }
-    const isShopActOk =
-      ALLOWED_IMAGE_TYPES.includes(shopActFile.type) || shopActFile.type === "application/pdf";
-    if (!isShopActOk || shopActFile.size > MAX_FILE_MB * 1024 * 1024) {
-      return { ok: false, message: "Shop Act must be an image (JPG/PNG/WEBP) or PDF under 5MB." };
+  /* ================= VALIDATION ================= */
+  const validateFiles = () => {
+    // Cover
+    if (!coverImageFile && !property?.coverImage) {
+      return "Cover image is required.";
     }
 
-    if (!galleryImageFiles.length) {
-      return { ok: false, message: "Please add at least one gallery photo." };
+    if (
+      coverImageFile &&
+      (!ALLOWED_IMAGE_TYPES.includes(coverImageFile.type) ||
+        coverImageFile.size > MAX_FILE_MB * 1024 * 1024)
+    ) {
+      return "Cover image must be JPG/PNG/WEBP under 5MB.";
     }
-    for (const f of galleryImageFiles) {
-      if (!ALLOWED_IMAGE_TYPES.includes(f.type) || f.size > MAX_FILE_MB * 1024 * 1024) {
-        return { ok: false, message: "All gallery photos must be JPG/PNG/WEBP under 5MB." };
+
+    // Shop Act
+    if (!shopActFile && !property?.shopAct) {
+      return "Shop Act file is required.";
+    }
+
+    if (shopActFile) {
+      const isValid =
+        ALLOWED_IMAGE_TYPES.includes(shopActFile.type) ||
+        shopActFile.type === "application/pdf";
+
+      if (!isValid || shopActFile.size > MAX_FILE_MB * 1024 * 1024) {
+        return "Shop Act must be an image or PDF under 5MB.";
       }
     }
-    return { ok: true };
+
+    // Gallery (MIN 3 TOTAL)
+    const existingCount = property?.galleryPhotos?.length || 0;
+    const newCount = galleryImageFiles.length;
+    const totalGallery = existingCount + newCount;
+
+    if (totalGallery < 3) {
+      return "Minimum 3 gallery images are required.";
+    }
+
+    for (const f of galleryImageFiles) {
+      if (
+        !ALLOWED_IMAGE_TYPES.includes(f.type) ||
+        f.size > MAX_FILE_MB * 1024 * 1024
+      ) {
+        return "All gallery images must be JPG/PNG/WEBP under 5MB.";
+      }
+    }
+
+    return null;
   };
 
+  /* ================= SUBMIT ================= */
   const onSubmit = async (e) => {
-  e?.preventDefault?.();
+    e.preventDefault();
 
-  if (!coverImageFile && !property?.coverImage) {
-    toast.error("Cover image is required.");
-    return;
-  }
-  if (!galleryImageFiles.length && (!property?.galleryPhotos || property.galleryPhotos.length === 0)) {
-    toast.error("Please add at least one gallery photo.");
-    return;
-  }
+    const error = validateFiles();
+    if (error) {
+      toast.error(error);
+      return;
+    }
 
-  setSubmitting(true);
-  try {
-    const fd = new FormData();
-    fd.append("publishNow", String(!!publishNow));
+    setSubmitting(true);
 
-    if (coverImageFile) fd.append("coverImage", coverImageFile);
-    if (shopActFile) fd.append("shopAct", shopActFile);
-    galleryImageFiles.forEach((f) => fd.append("galleryPhotos", f));
+    try {
+      const fd = new FormData();
 
-    const { url, method } = SummaryApi.finalizeProperty(id);
-    await Axios({
-      url,
-      method,
-      data: fd,
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+      fd.append("publishNow", String(!!publishNow));
 
-    toast.success("Media uploaded. Property published!");
-    // 👇 pass refresh flag to properties page
-    navigate("/admin/properties", { state: { refresh: true } });
-  } catch (err) {
-    toast.error(err?.response?.data?.message || "Failed to upload media");
-  } finally {
-    setSubmitting(false);
-  }
-};
+      if (coverImageFile) fd.append("coverImage", coverImageFile);
+      if (shopActFile) fd.append("shopAct", shopActFile);
 
+      // ✅ IMPORTANT: send existing gallery (same as EditProperty)
+      fd.append(
+        "existingGallery",
+        JSON.stringify(property?.galleryPhotos || [])
+      );
+
+      galleryImageFiles.forEach((f) => {
+        fd.append("galleryPhotos", f);
+      });
+
+      const { url, method } = SummaryApi.finalizeProperty(id);
+
+      await Axios({
+        url,
+        method,
+        data: fd,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      toast.success("Media uploaded & property published!");
+      navigate("/admin/properties", { state: { refresh: true } });
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to upload media");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) return <FullPageLoader />;
 
@@ -124,10 +159,14 @@ export default function FinalizeMedia() {
     <div className="p-3 w-full mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl md:text-2xl font-bold">
-          Attach Media{property ? ` — ${property.propertyName}` : ""}
+          Attach Media — {property?.propertyName}
         </h1>
+
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/admin/properties/drafts")}>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/admin/properties/drafts")}
+          >
             Back to Drafts
           </Button>
           <Button variant="ghost" onClick={() => navigate(-1)}>
@@ -136,9 +175,11 @@ export default function FinalizeMedia() {
         </div>
       </div>
 
-      {/* Layout matches your AddProperty media step */}
-      <form onSubmit={onSubmit} className="flex w-full flex-wrap justify-between gap-4">
-        {/* Shop Act first (you used this order in AddProperty step) */}
+      <form
+        onSubmit={onSubmit}
+        className="flex w-full flex-wrap justify-between gap-4"
+      >
+        {/* Shop Act */}
         <div className="w-[48%] min-w-[320px] -mt-2">
           <FileUploadsSection
             setShopActFile={setShopActFile}
@@ -149,7 +190,7 @@ export default function FinalizeMedia() {
           />
         </div>
 
-        {/* Publish Now selector (same component and options as AddProperty) */}
+        {/* Publish */}
         <div className="w-[48%] min-w-[320px]">
           <SingleSelectDropdown
             label="Publish Now"
@@ -160,15 +201,13 @@ export default function FinalizeMedia() {
           />
         </div>
 
-        {/* Cover + Gallery block (identical to AddProperty UI) */}
+        {/* Cover + Gallery */}
         <div className="w-full">
           <FileUploadsSection
-            // cover
             setCoverImageFile={setCoverImageFile}
             coverImageFile={coverImageFile}
             coverImagePreview={coverImagePreview}
             setCoverImagePreview={setCoverImagePreview}
-            // gallery
             setGalleryImageFiles={setGalleryImageFiles}
             galleryImageFiles={galleryImageFiles}
             galleryImagePreviews={galleryImagePreviews}
@@ -177,8 +216,8 @@ export default function FinalizeMedia() {
           />
         </div>
 
-        {/* Actions */}
         <div className="w-full border mt-6"></div>
+
         <div className="ml-auto flex gap-2">
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>
             Cancel
