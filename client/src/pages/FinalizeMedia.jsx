@@ -139,7 +139,7 @@ export default function FinalizeMedia() {
       });
 
       toast.success("Media uploaded & property published");
-      navigate("/admin/properties", { state: { refresh: true } });
+      navigate("/properties", { state: { refresh: true } });
     } catch (err) {
       toast.error(err?.response?.data?.message || "Upload failed");
     } finally {
