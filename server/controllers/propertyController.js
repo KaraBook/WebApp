@@ -189,9 +189,16 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const prop = await Property.findById(id).populate("ownerUserId", "email firstName");
+    const prop = await Property.findById(id).populate(
+      "ownerUserId",
+      "email firstName"
+    );
+
     if (!prop) {
-      return res.status(404).json({ success: false, message: "Property not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
     }
 
     if (prop.isBlocked) {
@@ -207,36 +214,62 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     const BASE_URL = process.env.BACKEND_BASE_URL || "";
 
+    /* ================= COVER ================= */
     if (coverFile) {
       prop.coverImage = `${BASE_URL}/${coverFile.path.replace(/\\/g, "/")}`;
     } else if (prop.coverImage?.startsWith("/uploads/")) {
       prop.coverImage = `${BASE_URL}${prop.coverImage}`;
     }
 
+    /* ================= SHOP ACT ================= */
     if (shopActFile) {
       prop.shopAct = `${BASE_URL}/${shopActFile.path.replace(/\\/g, "/")}`;
     } else if (prop.shopAct?.startsWith("/uploads/")) {
       prop.shopAct = `${BASE_URL}${prop.shopAct}`;
     }
 
+    /* ================= GALLERY (FIXED) ================= */
+    let finalGallery = [];
+
+    // ✅ 1. existingGallery from frontend
+    if (req.body.existingGallery) {
+      try {
+        finalGallery = JSON.parse(req.body.existingGallery);
+      } catch (e) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid existing gallery data",
+        });
+      }
+    } else if (prop.galleryPhotos?.length) {
+      // fallback for safety
+      finalGallery = prop.galleryPhotos;
+    }
+
+    // normalize URLs
+    finalGallery = finalGallery.map((url) =>
+      url.startsWith("/uploads/") ? `${BASE_URL}${url}` : url
+    );
+
+    // ✅ 2. append new gallery files
     if (galleryFiles.length > 0) {
       const newGalleryUrls = galleryFiles.map(
         (file) => `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
       );
-
-      const normalizedExisting = (prop.galleryPhotos || []).map((url) => {
-        if (url.startsWith("/uploads/")) {
-          return `${BASE_URL}${url}`;
-        }
-        return url;
-      });
-
-      prop.galleryPhotos = [
-        ...normalizedExisting,
-        ...newGalleryUrls,
-      ];
+      finalGallery.push(...newGalleryUrls);
     }
 
+    // ✅ 3. validate minimum gallery count
+    if (finalGallery.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "Minimum 3 gallery images are required.",
+      });
+    }
+
+    prop.galleryPhotos = finalGallery;
+
+    /* ================= PUBLISH ================= */
     if (typeof req.body.publishNow !== "undefined") {
       prop.publishNow = ["true", "1", "yes", "on"].includes(
         String(req.body.publishNow).toLowerCase()
@@ -248,6 +281,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     await prop.save();
 
+    /* ================= EMAIL ================= */
     try {
       const mailData = propertyCreatedTemplate({
         ownerFirstName: prop.resortOwner?.firstName,
@@ -264,10 +298,9 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
           text: mailData.text,
           html: mailData.html,
         });
-        console.log(`📩 Property finalized email sent to ${prop.resortOwner.email}`);
       }
     } catch (mailErr) {
-      console.error("Failed to send property created mail:", mailErr);
+      console.error("Email error:", mailErr);
     }
 
     return res.status(200).json({

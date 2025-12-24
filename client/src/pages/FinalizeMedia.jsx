@@ -21,13 +21,16 @@ export default function FinalizeMedia() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Media state
+  // Cover
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState(null);
 
+  // Shop Act
   const [shopActFile, setShopActFile] = useState(null);
   const [shopActPreview, setShopActPreview] = useState(null);
 
+  // Gallery (IMPORTANT)
+  const [existingGallery, setExistingGallery] = useState([]);
   const [galleryImageFiles, setGalleryImageFiles] = useState([]);
   const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
 
@@ -40,12 +43,14 @@ export default function FinalizeMedia() {
         const res = await Axios(SummaryApi.getSingleProperty(id));
         const p = res?.data?.data;
 
-        setProperty(p || null);
+        setProperty(p);
         setPublishNow(!!p?.publishNow);
 
-        // preload previews (important UX)
         setCoverImagePreview(p?.coverImage || null);
         setShopActPreview(p?.shopAct || null);
+
+        // 🔥 THIS WAS MISSING
+        setExistingGallery(p?.galleryPhotos || []);
       } catch (err) {
         toast.error(err?.response?.data?.message || "Failed to load property");
       } finally {
@@ -56,7 +61,6 @@ export default function FinalizeMedia() {
 
   /* ================= VALIDATION ================= */
   const validateFiles = () => {
-    // Cover
     if (!coverImageFile && !property?.coverImage) {
       return "Cover image is required.";
     }
@@ -69,25 +73,22 @@ export default function FinalizeMedia() {
       return "Cover image must be JPG/PNG/WEBP under 5MB.";
     }
 
-    // Shop Act
     if (!shopActFile && !property?.shopAct) {
       return "Shop Act file is required.";
     }
 
     if (shopActFile) {
-      const isValid =
+      const valid =
         ALLOWED_IMAGE_TYPES.includes(shopActFile.type) ||
         shopActFile.type === "application/pdf";
 
-      if (!isValid || shopActFile.size > MAX_FILE_MB * 1024 * 1024) {
-        return "Shop Act must be an image or PDF under 5MB.";
+      if (!valid || shopActFile.size > MAX_FILE_MB * 1024 * 1024) {
+        return "Shop Act must be image/PDF under 5MB.";
       }
     }
 
-    // Gallery (MIN 3 TOTAL)
-    const existingCount = property?.galleryPhotos?.length || 0;
-    const newCount = galleryImageFiles.length;
-    const totalGallery = existingCount + newCount;
+    const totalGallery =
+      existingGallery.length + galleryImageFiles.length;
 
     if (totalGallery < 3) {
       return "Minimum 3 gallery images are required.";
@@ -98,7 +99,7 @@ export default function FinalizeMedia() {
         !ALLOWED_IMAGE_TYPES.includes(f.type) ||
         f.size > MAX_FILE_MB * 1024 * 1024
       ) {
-        return "All gallery images must be JPG/PNG/WEBP under 5MB.";
+        return "Gallery images must be JPG/PNG/WEBP under 5MB.";
       }
     }
 
@@ -125,15 +126,12 @@ export default function FinalizeMedia() {
       if (coverImageFile) fd.append("coverImage", coverImageFile);
       if (shopActFile) fd.append("shopAct", shopActFile);
 
-      // ✅ IMPORTANT: send existing gallery (same as EditProperty)
-      fd.append(
-        "existingGallery",
-        JSON.stringify(property?.galleryPhotos || [])
-      );
+      // 🔥 SEND EXISTING GALLERY
+      fd.append("existingGallery", JSON.stringify(existingGallery));
 
-      galleryImageFiles.forEach((f) => {
-        fd.append("galleryPhotos", f);
-      });
+      galleryImageFiles.forEach((file) =>
+        fd.append("galleryPhotos", file)
+      );
 
       const { url, method } = SummaryApi.finalizeProperty(id);
 
@@ -144,10 +142,10 @@ export default function FinalizeMedia() {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Media uploaded & property published!");
+      toast.success("Media uploaded & property published");
       navigate("/admin/properties", { state: { refresh: true } });
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed to upload media");
+      toast.error(err?.response?.data?.message || "Upload failed");
     } finally {
       setSubmitting(false);
     }
@@ -157,36 +155,19 @@ export default function FinalizeMedia() {
 
   return (
     <div className="p-3 w-full mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl md:text-2xl font-bold">
-          Attach Media — {property?.propertyName}
-        </h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-6">
+        Attach Media — {property?.propertyName}
+      </h1>
 
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => navigate("/admin/properties/drafts")}
-          >
-            Back to Drafts
-          </Button>
-          <Button variant="ghost" onClick={() => navigate(-1)}>
-            Back
-          </Button>
-        </div>
-      </div>
-
-      <form
-        onSubmit={onSubmit}
-        className="flex w-full flex-wrap justify-between gap-4"
-      >
+      <form onSubmit={onSubmit} className="flex flex-wrap gap-4">
         {/* Shop Act */}
-        <div className="w-[48%] min-w-[320px] -mt-2">
+        <div className="w-[48%] min-w-[320px]">
           <FileUploadsSection
             setShopActFile={setShopActFile}
             shopActFile={shopActFile}
             shopActPreview={shopActPreview}
             setShopActPreview={setShopActPreview}
-            showFields={{ coverImage: false, galleryPhotos: false, shopAct: true }}
+            showFields={{ shopAct: true }}
           />
         </div>
 
@@ -196,29 +177,32 @@ export default function FinalizeMedia() {
             label="Publish Now"
             value={publishNow}
             options={publishNowOptions}
-            onChange={(val) => setPublishNow(val)}
-            placeholder="Select Publish Status"
+            onChange={setPublishNow}
           />
         </div>
 
         {/* Cover + Gallery */}
         <div className="w-full">
           <FileUploadsSection
-            setCoverImageFile={setCoverImageFile}
             coverImageFile={coverImageFile}
+            setCoverImageFile={setCoverImageFile}
             coverImagePreview={coverImagePreview}
             setCoverImagePreview={setCoverImagePreview}
-            setGalleryImageFiles={setGalleryImageFiles}
+
+            // 🔥 REQUIRED
+            existingGallery={existingGallery}
+            setExistingGallery={setExistingGallery}
+
             galleryImageFiles={galleryImageFiles}
+            setGalleryImageFiles={setGalleryImageFiles}
             galleryImagePreviews={galleryImagePreviews}
             setGalleryImagePreviews={setGalleryImagePreviews}
-            showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+
+            showFields={{ coverImage: true, galleryPhotos: true }}
           />
         </div>
 
-        <div className="w-full border mt-6"></div>
-
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex gap-2 mt-6">
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>
             Cancel
           </Button>
