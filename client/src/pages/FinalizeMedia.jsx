@@ -88,13 +88,14 @@ export default function FinalizeMedia() {
     }
 
     const totalGallery =
-      existingGallery.length + galleryImageFiles.length;
+      existingGallery.length + newGalleryFiles.length
 
     if (totalGallery < 3) {
       return "Minimum 3 gallery images are required.";
     }
 
-    for (const f of galleryImageFiles) {
+    for (const f of newGalleryFiles) {
+    {
       if (
         !ALLOWED_IMAGE_TYPES.includes(f.type) ||
         f.size > MAX_FILE_MB * 1024 * 1024
@@ -129,10 +130,9 @@ export default function FinalizeMedia() {
       // 🔥 SEND EXISTING GALLERY
       fd.append("existingGallery", JSON.stringify(existingGallery));
 
-      galleryImageFiles.forEach((file) =>
+      newGalleryFiles.forEach((file) =>
         fd.append("galleryPhotos", file)
       );
-
       const { url, method } = SummaryApi.finalizeProperty(id);
 
       await Axios({
@@ -189,16 +189,15 @@ export default function FinalizeMedia() {
             coverImagePreview={coverImagePreview}
             setCoverImagePreview={setCoverImagePreview}
 
-            // 🔥 REQUIRED
             existingGallery={existingGallery}
             setExistingGallery={setExistingGallery}
 
-            galleryImageFiles={galleryImageFiles}
-            setGalleryImageFiles={setGalleryImageFiles}
-            galleryImagePreviews={galleryImagePreviews}
-            setGalleryImagePreviews={setGalleryImagePreviews}
+            newGalleryFiles={newGalleryFiles}
+            setNewGalleryFiles={setNewGalleryFiles}
+            newGalleryPreviews={newGalleryPreviews}
+            setNewGalleryPreviews={setNewGalleryPreviews}
 
-            showFields={{ coverImage: true, galleryPhotos: true }}
+            showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
           />
         </div>
 
