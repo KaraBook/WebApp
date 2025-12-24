@@ -47,8 +47,6 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use(
   "/uploads",
@@ -65,6 +63,9 @@ app.use("/api/reviews", reviewRoute);
 app.use("/api/admin", adminRoutes);
 app.use("/api/owner", ownerRoutes);
 app.use("/api", locationRoutes);
+
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
