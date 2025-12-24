@@ -238,13 +238,13 @@ const DashboardPage = () => {
 function StatCard({ title, value, icon: Icon, color = "" }) {
   return (
     <Card className="border border-neutral-200 shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex p-3 md:p-auto flex-row items-center justify-between">
         <CardTitle className="text-sm font-medium">
           {title}
         </CardTitle>
         <Icon className="w-5 h-5 text-neutral-500" />
       </CardHeader>
-      <CardContent className="pt-2">
+      <CardContent className="p-3 md:p-auto">
         <div className={`text-2xl sm:text-3xl font-bold ${color}`}>
           {value}
         </div>
