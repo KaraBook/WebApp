@@ -168,7 +168,7 @@ export default function FinalizeMedia() {
         </div>
 
         {/* Publish */}
-        <div className="w-[48%] min-w-[320px] mt-2">
+        <div className="w-[48%] min-w-[320px] mt-4">
           <SingleSelectDropdown
             label="Publish Now"
             value={publishNow}
