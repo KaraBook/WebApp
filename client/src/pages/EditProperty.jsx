@@ -47,9 +47,7 @@ const EditProperty = () => {
   const [existingGallery, setExistingGallery] = useState([]);
   const [newGalleryFiles, setNewGalleryFiles] = useState([]);
   const [newGalleryPreviews, setNewGalleryPreviews] = useState([]);
-
-
-
+  const [submitMode, setSubmitMode] = useState("step");
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -206,6 +204,12 @@ const EditProperty = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (currentStep < 6) {
+      setCurrentStep(6);
+      return;
+    }
+
     setLoading(true);
 
     try {
