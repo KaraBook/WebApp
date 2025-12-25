@@ -297,14 +297,21 @@ export const validatePropertyUpdate = (req, res, next) => {
 
 export const ensureMediaFilesPresent = (req, res, next) => {
   const cover = req.files?.coverImage?.[0];
-  const shop = req.files?.shopAct?.[0];
   const gal = req.files?.galleryPhotos || [];
 
-  if (!cover || !shop || gal.length === 0) {
+  if (!cover) {
     return res.status(400).json({
       success: false,
-      message: "coverImage, shopAct and galleryPhotos are required",
+      message: "Cover image is required",
     });
   }
+
+  if (gal.length < 3) {
+    return res.status(400).json({
+      success: false,
+      message: "Minimum 3 gallery images are required",
+    });
+  }
+
   next();
 };

@@ -71,9 +71,6 @@ export default function FinalizeMedia() {
       return "Cover image must be JPG/PNG/WEBP under 5MB.";
     }
 
-    if (!shopActFile && !property?.shopAct) {
-      return "Shop Act file is required.";
-    }
 
     if (shopActFile) {
       const valid =
