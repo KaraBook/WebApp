@@ -204,8 +204,8 @@ const PropertiesPage = () => {
       <div className="flex justify-between items-center border-b pb-4">
         <h1 className="text-xl font-bold">Properties</h1>
         <div className="flex gap-2">
-          <Button className="text-[12px] md:text-[13px] h-8 md:h-auto" onClick={() => navigate("/properties/drafts")}>View Drafts</Button>
-          <Button className="text-[12px] md:text-[13px] h-8 md:h-auto" onClick={() => navigate("/add-property")}>Add Property</Button>
+          <Button className="text-[14px] md:text-[13px] h-8 md:h-auto" onClick={() => navigate("/properties/drafts")}>View Drafts</Button>
+          <Button className="text-[14px] md:text-[13px] h-8 md:h-auto" onClick={() => navigate("/add-property")}>Add Property</Button>
         </div>
       </div>
 
@@ -219,7 +219,7 @@ const PropertiesPage = () => {
             <input
               type="text"
               placeholder="Search property..."
-              className="border rounded-md px-3 py-1 md:py-2 w-[100%] md:w-64 text-sm focus:outline-none focus:ring-1 focus:ring-black"
+              className="border rounded-md px-3 py-2 md:py-2 w-[100%] md:w-64 text-sm focus:outline-none focus:ring-1 focus:ring-black"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -228,7 +228,7 @@ const PropertiesPage = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full md:w-64 md:h-auto h-8 text-[12px] justify-between bg-white text-primary"
+                className="w-full md:w-64 md:h-auto h-10 text-[14px] justify-between bg-white text-primary"
               >
                 {filterOptions.find((o) => o.value === selectedFilter)?.label || "Select"}
                 <IoIosArrowDropdown className="ml-2" />

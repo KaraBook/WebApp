@@ -40,6 +40,36 @@ const BookingsPage = () => {
 
     const itemsPerPage = itemsPerPageDefault;
 
+    const getPaginationPages = (current, total) => {
+        const pages = [];
+
+        if (total <= 5) {
+            return Array.from({ length: total }, (_, i) => i + 1);
+        }
+
+        pages.push(1);
+
+        if (current > 3) {
+            pages.push("ellipsis-start");
+        }
+
+        const start = Math.max(2, current - 1);
+        const end = Math.min(total - 1, current + 1);
+
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+
+        if (current < total - 2) {
+            pages.push("ellipsis-end");
+        }
+
+        pages.push(total);
+
+        return pages;
+    };
+
+
     const bookingCounts = useMemo(() => {
         return {
             all: bookings.length,
@@ -352,12 +382,12 @@ const BookingsPage = () => {
                         placeholder="Search: booking id / traveller / property / email / phone"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="bg-white text-[12px] h-8"
+                        className="bg-white text-[14px] h-10"
                     />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="w-full md:w-48 h-8 text-[12px] justify-between bg-white text-primary">
+                            <Button variant="outline" className="w-full md:w-48 h-10 text-[14px] justify-between bg-white text-primary">
                                 {filterOptions.find((o) => o.value === selectedFilter)?.label || "Select"}
                                 <IoIosArrowDropdown className="ml-2" />
                             </Button>
@@ -548,38 +578,51 @@ const BookingsPage = () => {
                     </div>
                 </div>
 
-                {/* Pagination */}
+                {/* Shadcn-style Ellipsis Pagination */}
                 {!loading && totalPages > 1 && (
-                    <div className="flex flex-wrap justify-end items-center mt-6 gap-2">
+                    <div className="flex items-center gap-1 mt-6 md:justify-end justify-center">
+                        {/* Previous */}
                         <Button
-                            variant="outline"
                             size="sm"
+                            className="bg-gray-200 text-black hover:bg-gray-200"
                             disabled={currentPage === 1}
                             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                            className="border bg-transparent text-black"
                         >
                             Previous
                         </Button>
 
-                        {[...Array(totalPages)].map((_, i) => (
-                            <Button
-                                key={i}
-                                size="sm"
-                                variant={currentPage === i + 1 ? "default bg-transparent" : "bg-transparent"}
-                                className={`${currentPage === i + 1 ? "bg-transparent border text-black" : "border"
-                                    }`}
-                                onClick={() => setCurrentPage(i + 1)}
-                            >
-                                {i + 1}
-                            </Button>
-                        ))}
+                        {/* Page Numbers */}
+                        {getPaginationPages(currentPage, totalPages).map((page, i) => {
+                            if (page === "ellipsis-start" || page === "ellipsis-end") {
+                                return (
+                                    <span
+                                        key={i}
+                                        className="px-2 text-muted-foreground select-none"
+                                    >
+                                        …
+                                    </span>
+                                );
+                            }
 
+                            return (
+                                <Button
+                                    key={i}
+                                    size="sm"
+                                    variant={page === currentPage ? "" : "ghost"}
+                                    onClick={() => setCurrentPage(page)}
+                                    className="min-w-8"
+                                >
+                                    {page}
+                                </Button>
+                            );
+                        })}
+
+                        {/* Next */}
                         <Button
-                            variant="outline"
+                            className="bg-gray-200 text-black hover:bg-gray-200"
                             size="sm"
                             disabled={currentPage === totalPages}
                             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-                            className="border bg-transparent text-black"
                         >
                             Next
                         </Button>

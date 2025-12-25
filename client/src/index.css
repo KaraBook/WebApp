@@ -104,4 +104,7 @@
   scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
 }
 
-
+.menu-icon svg{
+  width: 25px!important;
+  height: 25px!important;
+}

@@ -11,9 +11,9 @@ export default function MobileHeader({ onMenuClick }) {
 
         <Button
           onClick={onMenuClick}
-          className="px-2 py-1 text-[18px] bg-gray-200 text-black hover:bg-gray-300 h-8"
+          className="px-2 py-1 menu-icon text-[18px] bg-gray-200 text-black hover:bg-gray-300 h-8"
         >
-          <Menu />
+          <Menu className="menu-icon" />
         </Button>
       </div>
     </header>
