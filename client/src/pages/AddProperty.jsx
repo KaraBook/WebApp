@@ -231,24 +231,36 @@ const AddProperty = () => {
             toast.error("Draft not created yet. Please complete previous step.");
             return;
         }
-        if (!coverImageFile || !shopActFile || newGalleryFiles.length === 0) {
-            toast.error("Please add cover image, shop act and at least 1 gallery photo.");
+
+        const totalGalleryCount =
+            (existingGallery?.length || 0) + (newGalleryFiles?.length || 0);
+
+        if (!coverImageFile && !coverImagePreview) {
+            toast.error("Please add a cover image.");
+            return;
+        }
+
+        if (totalGalleryCount < 3) {
+            toast.error("Please add at least 3 gallery images.");
             return;
         }
 
         setLoading(true);
         try {
             const fd = new FormData();
+
             fd.append("publishNow", String(!!formData.publishNow));
 
-            fd.append("coverImage", coverImageFile);
-            fd.append("shopAct", shopActFile);
+            if (coverImageFile) fd.append("coverImage", coverImageFile);
+            if (shopActFile) fd.append("shopAct", shopActFile); // ✅ optional
+
             newGalleryFiles.forEach((file) => {
                 fd.append("galleryPhotos", file);
             });
 
             const { url, method } = SummaryApi.finalizeProperty(propertyId);
-            const resp = await Axios({
+
+            await Axios({
                 url,
                 method,
                 data: fd,
@@ -258,8 +270,7 @@ const AddProperty = () => {
             toast.success("Property created successfully!");
             navigate("/properties");
         } catch (err) {
-            const msg = err?.response?.data?.message || "Failed to upload media";
-            toast.error(msg);
+            toast.error(err?.response?.data?.message || "Failed to upload media");
         } finally {
             setLoading(false);
         }
