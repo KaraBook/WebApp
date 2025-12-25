@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Axios from "../utils/Axios";
 import { toast } from "sonner";
 import SummaryApi from "../common/SummaryApi";
@@ -48,6 +48,7 @@ const EditProperty = () => {
   const [newGalleryFiles, setNewGalleryFiles] = useState([]);
   const [newGalleryPreviews, setNewGalleryPreviews] = useState([]);
   const [submitMode, setSubmitMode] = useState("step");
+  const [searchParams] = useSearchParams();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -179,6 +180,11 @@ const EditProperty = () => {
         setCoverImagePreview(prop.coverImage || null);
         setShopActPreview(prop.shopAct || null);
         setExistingGallery(Array.isArray(prop.galleryPhotos) ? prop.galleryPhotos : []);
+
+        const stepFromQuery = Number(searchParams.get("step"));
+        if (stepFromQuery && stepFromQuery >= 1 && stepFromQuery <= formSteps.length) {
+          setCurrentStep(stepFromQuery);
+        }
 
       } catch (err) {
         console.error(err);

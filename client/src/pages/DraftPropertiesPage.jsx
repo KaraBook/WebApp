@@ -11,12 +11,25 @@ import {
 import { useNavigate } from "react-router-dom";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+
 
 export default function DraftPropertiesPage() {
   const [drafts, setDrafts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const navigate = useNavigate();
+  const [deleteId, setDeleteId] = useState(null);
 
   const fetchDrafts = async () => {
     try {
@@ -48,6 +61,24 @@ export default function DraftPropertiesPage() {
     const endIndex = startIndex + itemsPerPage;
     return drafts.slice(startIndex, endIndex);
   }, [drafts, currentPage]);
+
+  const handleDeleteDraft = async () => {
+    if (!deleteId) return;
+
+    try {
+      await Axios({
+        method: SummaryApi.deleteProperty(deleteId).method,
+        url: SummaryApi.deleteProperty(deleteId).url,
+      });
+
+      setDrafts((prev) => prev.filter((d) => d._id !== deleteId));
+      setDeleteId(null);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to delete draft");
+    }
+  };
+
 
   return (
     <>
@@ -83,13 +114,48 @@ export default function DraftPropertiesPage() {
                   <TableCell>{formatDate(p.createdAt)}</TableCell>
                   <TableCell className="flex gap-2">
                     <Button
-                      className="bg-transparent"
                       size="sm"
-                      variant="outline"
-                      onClick={() => navigate(`/properties/${p._id}/media`)}
+                      className="bg-gray-100 text-black hover:bg-gray-100 text-black"
+                      onClick={() => navigate(`/edit-property/${p._id}?step=6`)}
                     >
                       Continue
                     </Button>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => setDeleteId(p._id)}
+                        >
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Delete Draft Property?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. The draft property will be permanently deleted.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="bg-gray-100" onClick={() => setDeleteId(null)}>
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-red-600 hover:bg-red-700"
+                            onClick={handleDeleteDraft}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
                   </TableCell>
                 </TableRow>
               ))}
@@ -121,11 +187,10 @@ export default function DraftPropertiesPage() {
                 key={i}
                 size="sm"
                 variant={currentPage === i + 1 ? "default bg-transparent" : "bg-transparent"}
-                className={`${
-                  currentPage === i + 1
-                    ? "bg-transparent border text-black"
-                    : "border"
-                }`}
+                className={`${currentPage === i + 1
+                  ? "bg-transparent border text-black"
+                  : "border"
+                  }`}
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}

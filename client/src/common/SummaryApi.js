@@ -79,6 +79,10 @@ const SummaryApi = {
     method: 'get',
   },
   
+  deleteProperty: (id) => ({
+    url: `/api/properties/${id}`,
+    method: "delete",
+  }),
 
 };
 
