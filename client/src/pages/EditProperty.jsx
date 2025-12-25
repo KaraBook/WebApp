@@ -205,11 +205,10 @@ const EditProperty = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (currentStep < 6) {
+    if (submitMode === "step" && currentStep === 5) {
       setCurrentStep(6);
       return;
     }
-
     setLoading(true);
 
     try {
@@ -258,7 +257,9 @@ const EditProperty = () => {
       });
 
       toast.success("Property updated successfully!");
-      navigate("/properties");
+      if (submitMode === "final") {
+        navigate("/properties");
+      }
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || "Failed to update property");
@@ -1043,7 +1044,6 @@ const EditProperty = () => {
                 onChange={handleChange}
                 minLength={3}
                 maxLength={500}
-                required
               />
             </div>
 
@@ -1104,16 +1104,28 @@ const EditProperty = () => {
           </button>
         )}
 
-        {currentStep < formSteps.length ? (
+        {currentStep === 5 ? (
+          <button
+            type="submit"
+            onClick={() => setSubmitMode("step")}
+            className="ml-auto px-4 py-2 border rounded-md bg-black text-white"
+          >
+            Next
+          </button>
+        ) : currentStep < formSteps.length ? (
           <button
             type="button"
             onClick={() => setCurrentStep((prev) => prev + 1)}
-            className="ml-auto px-4 py-2 border rounded-md bg-black text-white hover:bg-gray-900"
+            className="ml-auto px-4 py-2 border rounded-md bg-black text-white"
           >
             Next
           </button>
         ) : (
-          <button type="submit" className="ml-auto px-4 py-2 border rounded-md bg-black text-white hover:bg-gray-900">
+          <button
+            type="submit"
+            onClick={() => setSubmitMode("final")}
+            className="ml-auto px-4 py-2 border rounded-md bg-black text-white"
+          >
             Update
           </button>
         )}
