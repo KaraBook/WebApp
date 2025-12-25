@@ -92,8 +92,8 @@ const propertySchema = new mongoose.Schema({
   foodAvailability: { type: [String], default: [] },
   amenities: { type: [String], default: [] },
 
-  pan: { type: String, required: true, unique: true },
-  gstin: { type: String, uppercase: true, trim: true, match: [GSTIN_REGEX, "Invalid GSTIN format"] },
+  pan: { type: String, uppercase: true, trim: true, sparse: true, unique: true},
+  gstin: { type: String, uppercase: true, trim: true, sparse: true, match: [GSTIN_REGEX, "Invalid GSTIN format"]},
 
   isRefundable: {
     type: Boolean,

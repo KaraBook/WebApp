@@ -180,7 +180,10 @@ const AddProperty = () => {
     };
 
     const createDraft = async () => {
-        if (formData.gstin && !GSTIN_REGEX.test(formData.gstin.toUpperCase())) {
+        if (
+            formData.gstin &&
+            !GSTIN_REGEX.test(formData.gstin.toUpperCase())
+        ) {
             toast.error("Invalid GSTIN format");
             return;
         }
@@ -999,7 +1002,6 @@ const AddProperty = () => {
                                     }
                                 }}
                                 className="mt-2 uppercase"
-
                             />
                         </div>
 
@@ -1036,7 +1038,6 @@ const AddProperty = () => {
                                         setFormData((prev) => ({ ...prev, gstin: val }));
                                     }
                                 }}
-                                required
                             />
                             {formData.gstin && !GSTIN_REGEX.test(formData.gstin) && (
                                 <p className="text-xs text-red-500 mt-1">Please enter a valid GSTIN.</p>

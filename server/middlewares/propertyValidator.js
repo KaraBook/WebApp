@@ -121,14 +121,15 @@ const baseFields = {
   foodAvailability: Joi.array().items(Joi.string()),
   amenities: Joi.array().items(Joi.string().trim().min(1).max(50)).default([]),
 
-  pan: Joi.string().length(10).required(),
+  pan: Joi.string() .length(10) .optional() .allow("")
+  .messages({
+    "string.length": "PAN must be exactly 10 characters",
+  }),
 
-  gstin: Joi.string()
-    .length(15)
-    .pattern(GSTIN_REGEX)
-    .messages({
-      "string.pattern.base": "GSTIN format is invalid",
-    }),
+  gstin: Joi.string() .length(15) .pattern(GSTIN_REGEX) .optional() .allow("")
+  .messages({
+    "string.pattern.base": "GSTIN format is invalid",
+  }),
 
   kycVerified: Joi.boolean().required(),
 

@@ -75,14 +75,23 @@ export const createPropertyDraft = async (req, res) => {
       return res.status(400).json({ success: false, message: "Resort owner mobile is required (10 digits)" });
     }
 
-    const duplicateField = await checkDuplicateFields({
+    const duplicatePayload = {
       "resortOwner.email": owner.email,
       "resortOwner.mobile": owner.mobile,
       addressLine1: req.body.addressLine1,
-      pan: (req.body.pan || "").toUpperCase(),
       locationLink: req.body.locationLink,
-      gstin: (req.body.gstin || "").toUpperCase(),
-    });
+    };
+
+    if (req.body.pan) {
+      duplicatePayload.pan = req.body.pan.toUpperCase();
+    }
+
+    if (req.body.gstin) {
+      duplicatePayload.gstin = req.body.gstin.toUpperCase();
+    }
+
+    const duplicateField = await checkDuplicateFields(duplicatePayload);
+
     if (duplicateField) {
       return res.status(409).json({ success: false, message: `${duplicateField} already exists` });
     }

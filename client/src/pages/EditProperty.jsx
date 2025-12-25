@@ -1000,7 +1000,6 @@ const EditProperty = () => {
                     setFormData((prev) => ({ ...prev, gstin: val }));
                   }
                 }}
-                required
               />
               {formData.gstin && !GSTIN_REGEX.test(formData.gstin) && (
                 <p className="text-xs text-red-500 mt-1">Please enter a valid GSTIN.</p>
