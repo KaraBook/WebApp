@@ -822,3 +822,21 @@ export const getPropertyBlockedDatesPublic = async (req, res) => {
 };
 
 
+export const deleteProperty = async (req, res) => {
+  const prop = await Property.findById(req.params.id);
+
+  if (!prop) {
+    return res.status(404).json({ message: "Property not found" });
+  }
+
+  if (!prop.isDraft) {
+    return res.status(400).json({
+      message: "Only draft properties can be deleted",
+    });
+  }
+
+  await prop.deleteOne();
+
+  res.json({ success: true });
+};
+

@@ -11,6 +11,7 @@ import {
   togglePublishProperty,
   getPublishedProperties,
   getPropertyBlockedDatesPublic,
+  deleteProperty
 } from "../controllers/propertyController.js";
 import { requireAuth, requireAdmin } from "../middlewares/requireAuth.js";
 import upload from "../middlewares/multer.js";
@@ -75,6 +76,7 @@ router.put("/:id/unblock", requireAuth, requireAdmin, unblockProperty);
 router.put("/:id/toggle-featured", requireAuth, requireAdmin, toggleFeaturedProperty);
 router.put("/:id/toggle-publish", requireAuth, requireAdmin, togglePublishProperty);
 router.get("/:id/blocked-dates", getPropertyBlockedDatesPublic);
+router.delete( "/:id", requireAuth, requireAdmin, deleteProperty);
 
 
 export default router;

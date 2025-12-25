@@ -1,4 +1,3 @@
-// src/pages/FinalizeMedia.jsx
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Axios from "@/utils/Axios";
@@ -21,22 +20,18 @@ export default function FinalizeMedia() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  /* ================= COVER ================= */
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [coverImagePreview, setCoverImagePreview] = useState(null);
 
-  /* ================= SHOP ACT ================= */
   const [shopActFile, setShopActFile] = useState(null);
   const [shopActPreview, setShopActPreview] = useState(null);
 
-  /* ================= GALLERY (MATCHES EditProperty) ================= */
   const [existingGallery, setExistingGallery] = useState([]);
   const [newGalleryFiles, setNewGalleryFiles] = useState([]);
   const [newGalleryPreviews, setNewGalleryPreviews] = useState([]);
 
   const [publishNow, setPublishNow] = useState(false);
 
-  /* ================= LOAD PROPERTY ================= */
   useEffect(() => {
     (async () => {
       try {
@@ -57,7 +52,6 @@ export default function FinalizeMedia() {
     })();
   }, [id]);
 
-  /* ================= VALIDATION ================= */
   const validateFiles = () => {
     if (!coverImageFile && !property?.coverImage) {
       return "Cover image is required.";
@@ -101,7 +95,6 @@ export default function FinalizeMedia() {
     return null;
   };
 
-  /* ================= SUBMIT ================= */
   const onSubmit = async (e) => {
     e.preventDefault();
 

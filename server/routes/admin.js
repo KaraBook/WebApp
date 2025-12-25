@@ -48,6 +48,7 @@ router.get("/users", requireAuth, requireAdmin, async (_req, res) => {
 
 router.get('/invoice/:bookingId', requireAuth, requireAdmin, getBookingInvoice);
 
+
 export default router;
 
 
