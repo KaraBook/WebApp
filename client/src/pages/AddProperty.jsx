@@ -32,10 +32,12 @@ const AddProperty = () => {
     const [cities, setCities] = useState([]);
     const [coverImageFile, setCoverImageFile] = useState(null);
     const [shopActFile, setShopActFile] = useState(null);
-    const [galleryImageFiles, setGalleryImageFiles] = useState([]);
     const [coverImagePreview, setCoverImagePreview] = useState(null);
     const [shopActPreview, setShopActPreview] = useState(null);
-    const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
+    const [existingGallery, setExistingGallery] = useState([]);
+    const [newGalleryFiles, setNewGalleryFiles] = useState([]);
+    const [newGalleryPreviews, setNewGalleryPreviews] = useState([]);
+
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -229,7 +231,7 @@ const AddProperty = () => {
             toast.error("Draft not created yet. Please complete previous step.");
             return;
         }
-        if (!coverImageFile || !shopActFile || galleryImageFiles.length === 0) {
+        if (!coverImageFile || !shopActFile || newGalleryFiles.length === 0) {
             toast.error("Please add cover image, shop act and at least 1 gallery photo.");
             return;
         }
@@ -241,7 +243,9 @@ const AddProperty = () => {
 
             fd.append("coverImage", coverImageFile);
             fd.append("shopAct", shopActFile);
-            galleryImageFiles.forEach((file) => fd.append("galleryPhotos", file));
+            newGalleryFiles.forEach((file) => {
+                fd.append("galleryPhotos", file);
+            });
 
             const { url, method } = SummaryApi.finalizeProperty(propertyId);
             const resp = await Axios({
@@ -1119,15 +1123,18 @@ const AddProperty = () => {
                         </div>
 
                         <FileUploadsSection
-                            setCoverImageFile={setCoverImageFile}
                             coverImageFile={coverImageFile}
+                            setCoverImageFile={setCoverImageFile}
                             coverImagePreview={coverImagePreview}
                             setCoverImagePreview={setCoverImagePreview}
 
-                            setGalleryImageFiles={setGalleryImageFiles}
-                            galleryImageFiles={galleryImageFiles}
-                            galleryImagePreviews={galleryImagePreviews}
-                            setGalleryImagePreviews={setGalleryImagePreviews}
+                            existingGallery={existingGallery}
+                            setExistingGallery={setExistingGallery}
+
+                            newGalleryFiles={newGalleryFiles}
+                            setNewGalleryFiles={setNewGalleryFiles}
+                            newGalleryPreviews={newGalleryPreviews}
+                            setNewGalleryPreviews={setNewGalleryPreviews}
 
                             showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
                         />
