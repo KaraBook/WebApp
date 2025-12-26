@@ -23,6 +23,28 @@ const filterOptions = [
 
 const itemsPerPageDefault = 8;
 
+const getPaginationPages = (current, total) => {
+  const pages = [];
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  pages.push(1);
+  if (current > 3) {
+    pages.push("ellipsis-start");
+  }
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  if (current < total - 2) {
+    pages.push("ellipsis-end");
+  }
+  pages.push(total);
+  return pages;
+};
+
+
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("all");
@@ -150,17 +172,17 @@ const UsersPage = () => {
             "All Users"}
         </h2>
 
-        <div className="flex gap-2 w-full md:w-auto">
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           <Input
             placeholder="Search: name / email / mobile / city / state"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-white"
+            className="bg-white md:min-w-[300px]"
           />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-48 justify-between bg-white text-primary">
+              <Button variant="outline" className="w-full md:min-w-[200px] justify-between bg-white text-primary">
                 {filterOptions.find((o) => o.value === selectedFilter)?.label ||
                   "Select"}
                 <IoIosArrowDropdown className="ml-2" />
@@ -182,12 +204,12 @@ const UsersPage = () => {
 
       {/* Table */}
       <div className="mt-6 w-full">
-        <div className="overflow-x-auto border rounded-lg">
-          <div className="min-w-[1100px]">
-            <Table className="whitespace-nowrap text-sm">
+        <div className=" border rounded-lg">
+          <div>
+            <Table className="whitespace-nowrap min-w-[750px] overflow-x-auto md:min-w-full text-sm">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-center">Sr. No</TableHead>
+                  <TableHead className="text-center hidden md:table-cell">Sr. No</TableHead>
                   <TableHead>User</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Mobile</TableHead>
@@ -210,7 +232,7 @@ const UsersPage = () => {
                 {!loading &&
                   paginated.map((u, index) => (
                     <TableRow key={u._id}>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center hidden md:table-cell">
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </TableCell>
 
@@ -286,43 +308,50 @@ const UsersPage = () => {
           </div>
         </div>
 
-        {/* Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="flex justify-end items-center mt-6 gap-2">
+          <div className="flex items-center gap-1 mt-6 md:justify-end justify-center">
+            {/* Previous */}
             <Button
-              variant="outline"
               size="sm"
+              className="bg-gray-200 text-black hover:bg-gray-200"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-              className="border bg-transparent text-black"
             >
               Previous
             </Button>
 
-            {[...Array(totalPages)].map((_, i) => (
-              <Button
-                key={i}
-                size="sm"
-                variant={
-                  currentPage === i + 1 ? "default bg-transparent" : "bg-transparent"
-                }
-                className={`${
-                  currentPage === i + 1
-                    ? "bg-transparent border text-black"
-                    : "border"
-                }`}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </Button>
-            ))}
+            {/* Page Numbers */}
+            {getPaginationPages(currentPage, totalPages).map((page, i) => {
+              if (page === "ellipsis-start" || page === "ellipsis-end") {
+                return (
+                  <span
+                    key={i}
+                    className="px-2 text-muted-foreground select-none"
+                  >
+                    …
+                  </span>
+                );
+              }
 
+              return (
+                <Button
+                  key={i}
+                  size="sm"
+                  variant={page === currentPage ? "" : "ghost"}
+                  onClick={() => setCurrentPage(page)}
+                  className="min-w-8"
+                >
+                  {page}
+                </Button>
+              );
+            })}
+
+            {/* Next */}
             <Button
-              variant="outline"
               size="sm"
+              className="bg-gray-200 text-black hover:bg-gray-200"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-              className="border bg-transparent text-black"
             >
               Next
             </Button>

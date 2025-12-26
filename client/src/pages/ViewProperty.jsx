@@ -4,544 +4,473 @@ import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import FullPageLoader from "@/components/FullPageLoader";
 import { errorToast } from "../utils/toastHelper";
+
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { amenitiesCategories } from "../constants/dropdownOptions";
+import { Separator } from "@/components/ui/separator";
+
 import {
-  MapPin, Clock, Users, BedDouble, IndianRupee, CheckCircle2, XCircle, ShieldCheck, Image as ImageIcon,
-  FileText, ArrowLeft, Edit3, Link2, Check, Star,
+  ArrowLeft,
+  Image as ImageIcon,
+  FileText,
+  IndianRupee,
+  User,
+  MapPin,
+  Users,
+  Clock,
+  ShieldCheck,
+  CheckCircle2,
+  XCircle,
+  Link2,
+  ShieldCheckIcon,
+  Calendar
 } from "lucide-react";
 
-const isImageUrl = (url = "") =>
-  /\.(jpeg|jpg|png|gif|webp|bmp|svg)$/i.test(url.split("?")[0] || "");
 
-const Field = ({ label, children }) => (
-  <div className="flex items-start justify-between gap-4 py-2">
-    <span className="text-sm text-muted-foreground min-w-[160px]">{label}</span>
-    <div className="text-sm font-medium flex-1">{children || "-"}</div>
-  </div>
+import { amenitiesCategories, propertyTypeOptions } from "../constants/dropdownOptions";
+import { prototype } from "postcss/lib/previous-map";
+
+/* ---------------- helpers ---------------- */
+
+const SectionCard = ({ icon: Icon, title, children }) => (
+  <Card className="overflow-hidden">
+    <div className="flex items-center gap-2 bg-slate-50 px-4 py-3 border-b">
+      <Icon className="h-4 w-4 text-slate-600" />
+      <h3 className="text-sm font-semibold">{title}</h3>
+    </div>
+    <div className="p-4">{children}</div>
+  </Card>
 );
 
-const SectionTitle = ({ children, icon: Icon }) => (
-  <div className="flex items-center gap-2">
-    {Icon ? <Icon className="h-4 w-4" /> : null}
-    <h3 className="text-sm font-semibold tracking-wide uppercase text-muted-foreground">
-      {children}
-    </h3>
-  </div>
-);
-
-const amenityLabelMap = amenitiesCategories
-  .flatMap(cat => cat.items)
+const amenityMap = amenitiesCategories
+  .flatMap((cat) => cat.items)
   .reduce((acc, item) => {
-    acc[item.value] = item.label;
+    acc[item.value] = {
+      label: item.label,
+      icon: item.icon,
+    };
     return acc;
   }, {});
 
-const ViewProperty = () => {
+
+const InfoRow = ({ label, value }) => (
+  <div className="space-y-1">
+    <p className="text-xs text-muted-foreground">{label}</p>
+    <p className="text-sm font-medium">{value || "-"}</p>
+  </div>
+);
+
+const StatusRow = ({ label, value, status }) => (
+  <div className="flex items-center justify-between py-2">
+    <span className="text-sm text-muted-foreground">{label}</span>
+    <span
+      className={`inline-flex items-center gap-1 text-sm font-medium ${status ? "text-emerald-600" : "text-slate-400"
+        }`}
+    >
+      {status && <CheckCircle2 className="h-4 w-4" />}
+      {value}
+    </span>
+  </div>
+);
+
+
+const isImageUrl = (url = "") =>
+  /\.(jpg|jpeg|png|webp|gif)$/i.test(url.split("?")[0]);
+
+const amenityLabelMap = amenitiesCategories
+  .flatMap((c) => c.items)
+  .reduce((a, i) => {
+    a[i.value] = i.label;
+    return a;
+  }, {});
+
+/* ---------------- component ---------------- */
+
+export default function ViewProperty() {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
   const [property, setProperty] = useState(null);
 
   useEffect(() => {
-    const fetchProperty = async () => {
+    (async () => {
       try {
-        setLoading(true);
         const res = await Axios.get(SummaryApi.getSingleProperty(id).url);
-        setProperty(res.data?.data || null);
-      } catch (err) {
-        console.error(err);
-        errorToast(err.response?.data?.message || "Failed to load property");
+        setProperty(res.data?.data);
+      } catch {
+        errorToast("Failed to load property");
       } finally {
         setLoading(false);
       }
-    };
-    fetchProperty();
+    })();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="p-3 w-full mx-auto">
-        <FullPageLoader />
-      </div>
-    );
-  }
-
-  if (!property) {
-    return (
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back
-          </Button>
-        </div>
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            Property not found.
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  if (loading) return <FullPageLoader />;
+  if (!property) return null;
 
   const {
     propertyName,
     propertyType,
     description,
+    pricingPerNightWeekdays,
+    pricingPerNightWeekend,
+    extraAdultCharge,
+    extraChildCharge,
     resortOwner,
     addressLine1,
     addressLine2,
     city,
     state,
     area,
-    pinCode,
     locationLink,
-    roomBreakdown = { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
-    totalRooms,
     maxGuests,
-    petFriendly,
-    isRefundable,
-    refundNotes,
-    pricingPerNightWeekdays,
-    pricingPerNightWeekend,
-    extraAdultCharge,
-    extraChildCharge,
+    baseGuests,
+    minStayNights,
     checkInTime,
     checkOutTime,
-    minStayNights,
-    foodAvailability = [],
-    amenities = [],
+    petFriendly,
+    isRefundable,
+    roomBreakdown,
+    refundNotes,
+    foodAvailability,
+    amenities,
     pan,
+    gstin,
     kycVerified,
-    publishNow,
-    featured,
     approvalStatus,
+    publishNow,
     internalNotes,
     coverImage,
     shopAct,
     galleryPhotos = [],
-    createdAt,
-    updatedAt,
   } = property;
 
-  const statusBadge = (() => {
-    switch (approvalStatus) {
-      case "approved":
-        return <Badge className="bg-emerald-600 hover:bg-emerald-600">Approved</Badge>;
-      case "rejected":
-        return <Badge className="bg-red-600 hover:bg-red-600">Rejected</Badge>;
-      default:
-        return <Badge variant="secondary">Pending</Badge>;
-    }
-  })();
-
   return (
-    <div className="p-3 w-full mx-auto">
+    <div className="p-4 max-w-[1400px] mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-start gap-3 justify-between mb-6">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            {propertyName}
-            {featured ? (
-              <Badge className="bg-yellow-500 text-black hover:bg-yellow-500 flex items-center gap-1">
-                <Star className="h-3 w-3" /> Featured
-              </Badge>
-            ) : null}
-          </h2>
-          <div className="flex flex-wrap items-center gap-2 pt-4">
-            <Badge variant="outline" className="capitalize">{propertyType}</Badge>
-            {statusBadge}
-            <Badge variant={publishNow ? "default" : "secondary"} className="flex items-center gap-1">
-              <ShieldCheck className="h-3 w-3" />
-              {publishNow ? "Published" : "Not Published"}
+       <Button className="bg-gray-200 text-black hover:bg-gray-200" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Back
+        </Button>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold -mt-2">{propertyName}</h1>
+          <div className="flex gap-2 mt-2">
+            <Badge>{propertyType}</Badge>
+            <Badge>{approvalStatus}</Badge>
+            <Badge variant={publishNow ? "default" : "secondary"}>
+              {publishNow ? "Published" : "Unpublished"}
             </Badge>
-            <Badge className={kycVerified ? "bg-emerald-600" : "bg-amber-600"}>
+            <Badge className={kycVerified ? "bg-emerald-600" : "bg-amber-500"}>
               {kycVerified ? "KYC Verified" : "KYC Pending"}
             </Badge>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" className="bg-[#f4f4f4]" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <Button onClick={() => navigate(`/edit-property/${id}`)}>
-            <Edit3 className="h-4 w-4 mr-2" />
-            Edit Property
-          </Button>
-        </div>
       </div>
 
+      {/* Main grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Left: Images */}
-        <div className="xl:col-span-1 space-y-6">
-          {/* Cover Image */}
-          <Card>
-            <CardHeader className="pb-0">
-              <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <ImageIcon className="h-4 w-4" />
-                Cover Image
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              {coverImage ? (
-                <a href={coverImage} target="_blank" rel="noreferrer">
-                  <img
-                    src={coverImage}
-                    alt="Cover"
-                    className="w-full aspect-video object-cover rounded-xl border"
-                  />
+        {/* LEFT */}
+        <div className="space-y-6">
+          <SectionCard icon={ImageIcon} title="Cover Image">
+            <img
+              src={coverImage}
+              className="w-full aspect-video object-cover rounded-lg border"
+            />
+          </SectionCard>
+
+          <SectionCard icon={FileText} title="Shop Act Document">
+            {shopAct ? (
+              isImageUrl(shopAct) ? (
+                <img src={shopAct} className="rounded-lg border" />
+              ) : (
+                <a
+                  href={shopAct}
+                  target="_blank"
+                  className="inline-flex items-center gap-1 text-primary underline"
+                >
+                  <Link2 className="h-4 w-4" />
+                  View Document
                 </a>
-              ) : (
-                <div className="w-full aspect-video rounded-xl bg-muted grid place-items-center text-muted-foreground">
-                  No cover image
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              )
+            ) : (
+              "-"
+            )}
+          </SectionCard>
 
-          {/* Shop Act */}
-          <Card>
-            <CardHeader className="pb-0">
-              <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Shop Act
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              {shopAct ? (
-                isImageUrl(shopAct) ? (
-                  <a href={shopAct} target="_blank" rel="noreferrer">
-                    <img
-                      src={shopAct}
-                      alt="Shop Act"
-                      className="w-full rounded-xl border object-cover"
-                    />
-                  </a>
-                ) : (
-                  <a
-                    href={shopAct}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm text-primary underline inline-flex items-center gap-1"
-                  >
-                    <Link2 className="h-4 w-4" />
-                    Open document
-                  </a>
-                )
-              ) : (
-                <div className="text-sm text-muted-foreground">No file uploaded</div>
-              )}
-            </CardContent>
-          </Card>
+          <SectionCard icon={ImageIcon} title="Gallery">
+            {/* Desktop: grid | Mobile: horizontal scroll */}
+            <div className="hidden sm:grid grid-cols-3 gap-2">
+              {galleryPhotos.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  className="h-24 w-full object-cover rounded-md border"
+                />
+              ))}
+            </div>
 
-          {/* Gallery */}
-          <Card>
-            <CardHeader className="pb-0">
-              <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <ImageIcon className="h-4 w-4" />
-                Gallery ({galleryPhotos.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              {galleryPhotos.length ? (
-                <div className="grid grid-cols-3 gap-2">
-                  {galleryPhotos.map((url, idx) => (
-                    <a key={idx} href={url} target="_blank" rel="noreferrer">
-                      <img
-                        src={url}
-                        alt={`Gallery ${idx + 1}`}
-                        className="h-24 w-full object-cover rounded-md border hover:opacity-90 transition"
-                      />
-                    </a>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-sm text-muted-foreground">No gallery images</div>
-              )}
-            </CardContent>
-          </Card>
+            {/* Mobile horizontal scroll */}
+            <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 -mx-4 px-4">
+              {galleryPhotos.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  className="h-28 w-44 flex-shrink-0 object-cover rounded-md border"
+                />
+              ))}
+            </div>
+          </SectionCard>
 
-           <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle icon={IndianRupee}>Pricing</SectionTitle>
-              </CardHeader>
-              <CardContent>
-                <Field label="Weekday Price (₹ / night)">
-                  ₹{pricingPerNightWeekdays?.toLocaleString("en-IN")}
-                </Field>
-
-                <Field label="Weekend Price (₹ / night)">
-                  ₹{pricingPerNightWeekend?.toLocaleString("en-IN")}
-                </Field>
-
-                <Field label="Extra Guest Charge (₹ / guest / night)">
-                  {extraAdultCharge !== undefined && extraAdultCharge !== null
-                    ? `₹${extraAdultCharge.toLocaleString("en-IN")}`
-                    : "-"}
-                </Field>
-                <Field label="Extra Child Charge (₹ / child / night)">
-                  {extraChildCharge !== undefined && extraChildCharge !== null
-                    ? `₹${extraChildCharge.toLocaleString("en-IN")}`
-                    : "-"}
-                </Field>
-              </CardContent>
-            </Card>
+          <SectionCard icon={IndianRupee} title="Pricing">
+            <div className="grid grid-cols-2 gap-4">
+              <InfoRow label="Weekday Price" value={`₹${pricingPerNightWeekdays}/night`} />
+              <InfoRow label="Weekend Price" value={`₹${pricingPerNightWeekend}/2 nights`} />
+              <InfoRow label="Extra Guest" value={`₹${extraAdultCharge}`} />
+              <InfoRow label="Extra Child" value={`₹${extraChildCharge}`} />
+            </div>
+          </SectionCard>
         </div>
 
-        {/* Right: Details */}
+        {/* RIGHT */}
         <div className="xl:col-span-2 space-y-6">
-          {/* Description */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold">Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm leading-relaxed">{description || "-"}</p>
-            </CardContent>
-          </Card>
+          <SectionCard icon={FileText} title="Overview">
+            <p className="text-sm leading-relaxed">{description}</p>
+          </SectionCard>
 
-          {/* Owner & Address */}
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle icon={ShieldCheck}>Owner</SectionTitle>
-              </CardHeader>
-              <CardContent>
-                <Field label="Name">
-                  {resortOwner?.firstName} {resortOwner?.lastName}
-                </Field>
-                <Separator />
-                <Field label="Email">{resortOwner?.email}</Field>
-                <Field label="Resort Email">{resortOwner?.resortEmail}</Field>
-                <Separator />
-                <Field label="Mobile">{resortOwner?.mobile}</Field>
-                <Field label="Resort Mobile">{resortOwner?.resortMobile}</Field>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SectionCard icon={User} title="Owner Information">
+              <div className="space-y-4">
+                <InfoRow label="Owner Name" value={resortOwner?.firstName + " " + resortOwner?.lastName} />
+                <InfoRow label="Email" value={resortOwner?.email} />
+                <InfoRow label="Resort Email" value={resortOwner?.resortEmail} />
+                <div className="flex gap-8">
+                  <InfoRow label="Mobile" value={resortOwner?.mobile} />
+                  <InfoRow label="Resort Mobile" value={resortOwner?.resortMobile} />
+                </div>
+              </div>
+            </SectionCard>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle icon={MapPin}>Address</SectionTitle>
-              </CardHeader>
-              <CardContent>
-                <Field label="Address Line 1">{addressLine1}</Field>
-                <Field label="Address Line 2">{addressLine2 || "-"}</Field>
-                <Field label="City / State">
-                  {city}, {state} {pinCode ? `- ${pinCode}` : ""}
-                </Field>
-                <Field label="Area">{area || "-"}</Field>
-                <Separator />
-                <Field label="Location Link">
-                  {locationLink ? (
-                    <a
-                      href={locationLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-primary underline break-all"
-                    >
-                      <Link2 className="h-4 w-4" />
-                      Open in Maps
-                    </a>
-                  ) : (
-                    "-"
-                  )}
-                </Field>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Capacity & Pricing */}
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle icon={BedDouble}>Capacity</SectionTitle>
-              </CardHeader>
-              <CardContent>
-                <Field label="Max Guests Allowed">
-                  <div className="inline-flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    {maxGuests}
-                  </div>
-                </Field>
-                <Separator />
-
-                <Field label="Base Guests (included in price)">
-                  {property.baseGuests ?? "-"}
-                </Field>
-
-                <Separator />
-                <Field label="Room Breakdown">
-                  {roomBreakdown ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
-                        <Badge key={key} variant="secondary" className="capitalize flex justify-between w-24">
-                          <span>{key === "nonAc" ? "Non AC" : key}</span>
-                          <span className="font-semibold ml-2">{roomBreakdown[key] ?? 0}</span>
-                        </Badge>
-                      ))}
-                      <Badge className="bg-black text-white flex justify-between w-full">
-                        <span>Total</span>
-                        <span className="font-semibold ml-2">{roomBreakdown.total ?? 0}</span>
-                      </Badge>
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </Field>
-                <Separator />
-                <Field label="Minimum Stay (Nights)">{minStayNights}</Field>
-              </CardContent>
-            </Card>
-
-          </div>
-
-          {/* Times & Options */}
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle icon={Clock}>Check-in / Check-out</SectionTitle>
-              </CardHeader>
-
-              <CardContent>
-                <Field label="Check-in">{checkInTime}</Field>
-                <Field label="Check-out">{checkOutTime}</Field>
-
-                <Separator />
-
-                {/* Pet Friendly */}
-                <Field label="Pet Friendly">
-                  {typeof petFriendly === "boolean"
-                    ? petFriendly
-                      ? "Yes"
-                      : "No"
-                    : "-"}
-                </Field>
-
-                <Separator />
-
-                {/* Refundable */}
-                <Field label="Refundable">
-                  {typeof isRefundable === "boolean"
-                    ? isRefundable
-                      ? "Yes"
-                      : "No"
-                    : "-"}
-                </Field>
-
-                {/* Refund Notes (ONLY if refundable) */}
-                {isRefundable === true && refundNotes && (
-                  <>
-                    <Separator />
-                    <Field label="Refund Policy / Notes">
-                      <div className="whitespace-pre-wrap">
-                        {refundNotes}
-                      </div>
-                    </Field>
-                  </>
+            <SectionCard icon={MapPin} title="Address">
+              <div className="space-y-3">
+                <p className="text-sm font-medium">
+                  {addressLine1}
+                  <br />
+                  {addressLine2}
+                  <br />
+                  {city}, {state}
+                </p>
+                <p className="text-xs text-muted-foreground">Area: {area}</p>
+                {locationLink && (
+                  <a
+                    href={locationLink}
+                    target="_blank"
+                    className="inline-flex items-center gap-1 text-sm border px-3 py-1.5 rounded-md"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    View on Maps
+                  </a>
                 )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle>Food & Amenities</SectionTitle>
-              </CardHeader>
-              <CardContent>
-                <Field label="Food Availability">
-                  {foodAvailability?.length ? (
-                    <div className="flex flex-wrap gap-2">
-                      {foodAvailability.map((f, i) => (
-                        <Badge key={i} variant="secondary" className="capitalize">
-                          {f}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </Field>
-                <Separator />
-                <Field label="Amenities">
-                  {amenities?.length ? (
-                    <div className="flex flex-wrap gap-2">
-                      {amenities.map((a, i) => {
-                        const label = amenityLabelMap[a] || a;
-                        return (
-                          <Badge key={i} variant="secondary">
-                            {label}
-                          </Badge>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </Field>
-              </CardContent>
-            </Card>
+              </div>
+            </SectionCard>
           </div>
 
-          {/* Compliance & Status */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle>Compliance & Status</SectionTitle>
-              </CardHeader>
-              <CardContent>
-                <Field label="PAN">{pan}</Field>
-                <Separator />
-                <Field label="KYC">
-                  <div className="inline-flex items-center gap-2">
-                    {kycVerified ? (
-                      <>
-                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                        Verified
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-4 w-4 text-amber-600" />
-                        Pending
-                      </>
-                    )}
+          <SectionCard icon={Users} title="Capacity">
+            {/* Top stats like screenshot */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <InfoRow label="Max Guests" value={maxGuests} />
+              <InfoRow label="Base Guests" value={baseGuests} />
+              <InfoRow label="Min Stay" value={`${minStayNights} night`} />
+              <InfoRow label="Total Rooms" value={roomBreakdown?.total} />
+            </div>
+
+            {/* Room Breakdown like screenshot (below stats) */}
+            <div className="mt-5 border rounded-lg overflow-hidden">
+              <div className="grid grid-cols-3 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">
+                <div>Type</div>
+                <div>Category</div>
+                <div className="text-right">Count</div>
+              </div>
+
+              {[
+                { type: "AC", category: "Ac", count: property?.roomBreakdown?.ac ?? 0 },
+                { type: "NonAC", category: "NonAc", count: property?.roomBreakdown?.nonAc ?? 0 },
+                { type: "Luxury", category: "Luxury", count: property?.roomBreakdown?.luxury ?? 0 },
+                { type: "Deluxe", category: "Deluxe", count: property?.roomBreakdown?.deluxe ?? 0 },
+              ].map((row, idx) => (
+                <div
+                  key={idx}
+                  className="grid grid-cols-3 px-3 py-2 text-sm border-t"
+                >
+                  <div>{row.type}</div>
+                  <div className="text-slate-600">{row.category}</div>
+                  <div className="text-right font-medium">{row.count}</div>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+
+          <SectionCard icon={Clock} title="Check-in / Check-out">
+            {/* Top time boxes */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
+              <div className="bg-slate-50 rounded-lg p-4 text-center">
+                <p className="text-sm text-muted-foreground">Check-in</p>
+                <p className="text-lg font-semibold mt-1">{checkInTime}</p>
+              </div>
+
+              <div className="bg-slate-50 rounded-lg p-4 text-center">
+                <p className="text-sm text-muted-foreground">Check-out</p>
+                <p className="text-lg font-semibold mt-1">{checkOutTime}</p>
+              </div>
+            </div>
+
+            {/* Pet Friendly & Refundable */}
+            <div className="mt-4 space-y-3">
+              {/* Pet Friendly */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm">
+                  <Users className="h-4 w-4 text-slate-600" />
+                  <span>Pet Friendly</span>
+                </div>
+
+                <div className="flex items-center gap-1 text-emerald-600 text-sm font-medium">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {petFriendly ? "Yes" : "No"}
+                </div>
+              </div>
+
+              {/* Refundable */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm">
+                  <ShieldCheck className="h-4 w-4 text-slate-600" />
+                  <span>Refundable</span>
+                </div>
+
+                <div
+                  className={`flex items-center gap-1 text-sm font-medium ${isRefundable ? "text-emerald-600" : "text-slate-400"
+                    }`}
+                >
+                  {isRefundable && <CheckCircle2 className="h-4 w-4" />}
+                  {isRefundable ? "Yes" : "No"}
+                </div>
+              </div>
+            </div>
+
+            {/* Refund Policy */}
+            {isRefundable && refundNotes && (
+              <div className="mt-4 bg-slate-50 rounded-lg p-4">
+                <p className="text-sm font-medium mb-1">Refund Policy</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {refundNotes}
+                </p>
+              </div>
+            )}
+          </SectionCard>
+
+          <SectionCard icon={ShieldCheck} title="Food & Amenities">
+            {/* Food Availability */}
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Food Availability</p>
+
+              <div className="flex flex-wrap gap-4">
+                {foodAvailability?.map((food) => (
+                  <div
+                    key={food}
+                    className="flex items-center gap-2 text-sm font-medium"
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    <span className="capitalize">{food}</span>
                   </div>
-                </Field>
-                <Field label="Approval Status" >
-                  <span className="capitalize">{approvalStatus}</span>
-                </Field>
-                <Field label="Published">{publishNow ? "Yes" : "No"}</Field>
-                <Field label="Featured">{featured ? "Yes" : "No"}</Field>
-              </CardContent>
-            </Card>
+                ))}
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <SectionTitle>Notes & Timestamps</SectionTitle>
-              </CardHeader>
-              <CardContent>
-                <Field label="Internal Notes">
-                  <div className="whitespace-pre-wrap">{internalNotes || "-"}</div>
-                </Field>
-                <Separator />
-                <Field label="Created At">
-                  {createdAt ? new Date(createdAt).toLocaleString() : "-"}
-                </Field>
-                <Field label="Updated At">
-                  {updatedAt ? new Date(updatedAt).toLocaleString() : "-"}
-                </Field>
-              </CardContent>
-            </Card>
+            {/* Divider */}
+            <Separator className="my-4" />
+
+            {/* Amenities */}
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Amenities</p>
+
+              <div className="flex flex-wrap gap-3">
+                {amenities?.map((a) => {
+                  const amenity = amenityMap[a];
+                  const Icon = amenity?.icon;
+
+                  return (
+                    <div
+                      key={a}
+                      className="flex items-center gap-2 px-2 py-[2px] rounded-full border bg-slate-50 text-sm"
+                    >
+                      {Icon && <Icon className="h-3 w-3 text-slate-600" />}
+                      <span className="text-[12px]">{amenity?.label || a}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </SectionCard>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Compliance & Status */}
+            <SectionCard icon={ShieldCheckIcon} title="Compliance & Status">
+              <StatusRow label="GSTIN" value={gstin || "-"} />
+              <StatusRow label="PAN" value={pan || "-"} />
+              <StatusRow
+                label="KYC Status"
+                value={kycVerified ? "Verified" : "Pending"}
+                status={kycVerified}
+              />
+              <StatusRow
+                label="Approval"
+                value={approvalStatus === "approved" ? "Approved" : approvalStatus}
+                status={approvalStatus === "approved"}
+              />
+              <StatusRow
+                label="Published"
+                value={publishNow ? "Live" : "Not Live"}
+                status={publishNow}
+              />
+            </SectionCard>
+
+            {/* Notes & Timestamps */}
+            <SectionCard icon={FileText} title="Notes & Timestamps">
+              {/* Internal Notes */}
+              <div className="bg-slate-50 rounded-lg p-3 text-sm leading-relaxed">
+                {internalNotes || "-"}
+              </div>
+
+              <Separator className="my-4" />
+
+              {/* Dates */}
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>
+                    Created:&nbsp;
+                    <span className="text-slate-900">
+                      {new Date(property.createdAt).toLocaleString()}
+                    </span>
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>
+                    Updated:&nbsp;
+                    <span className="text-slate-900">
+                      {new Date(property.updatedAt).toLocaleString()}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </SectionCard>
           </div>
+
         </div>
       </div>
     </div>
   );
-};
-
-export default ViewProperty;
+}

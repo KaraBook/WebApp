@@ -30,6 +30,29 @@ import {
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 
+
+const getPaginationPages = (current, total) => {
+  const pages = [];
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  pages.push(1);
+  if (current > 3) {
+    pages.push("ellipsis-start");
+  }
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  if (current < total - 2) {
+    pages.push("ellipsis-end");
+  }
+  pages.push(total);
+  return pages;
+};
+
+
 const BlockedProperties = () => {
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
@@ -39,6 +62,16 @@ const BlockedProperties = () => {
     property: null,
   });
   const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  const totalPages = Math.ceil(properties.length / itemsPerPage) || 1;
+
+  const paginatedProperties = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return properties.slice(start, start + itemsPerPage);
+  }, [properties, currentPage]);
+
 
   const openConfirm = (type, property) => {
     setOpenDropdownId(null);
@@ -129,9 +162,9 @@ const BlockedProperties = () => {
       </div>
 
       {/* Table */}
-      <div className="mt-6">
+      <div className="mt-6 min-h-[65vh]">
         <div className="overflow-x-auto">
-          <Table>
+          <Table className="w-[900px] overflow-x-auto md:w-full">
             <TableHeader>
               <TableRow>
                 <TableHead>Sr. No</TableHead>
@@ -146,9 +179,11 @@ const BlockedProperties = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {properties.map((property, index) => (
+              {paginatedProperties.map((property, index) => (
                 <TableRow key={property._id}>
-                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </TableCell>
                   <TableCell>{property.propertyName}</TableCell>
                   <TableCell>
                     {property.resortOwner?.firstName || "N/A"}
@@ -194,8 +229,69 @@ const BlockedProperties = () => {
                   </TableCell>
                 </TableRow>
               ))}
+
+              {properties.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={9}
+                    className="text-center py-10 text-muted-foreground"
+                  >
+                    No blocked property
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
+
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1 mt-6 md:justify-end justify-center">
+              {/* Previous */}
+              <Button
+                size="sm"
+                className="bg-gray-200 text-black hover:bg-gray-200"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              >
+                Previous
+              </Button>
+
+              {/* Page Numbers */}
+              {getPaginationPages(currentPage, totalPages).map((page, i) => {
+                if (page === "ellipsis-start" || page === "ellipsis-end") {
+                  return (
+                    <span
+                      key={i}
+                      className="px-2 text-muted-foreground select-none"
+                    >
+                      …
+                    </span>
+                  );
+                }
+
+                return (
+                  <Button
+                    key={i}
+                    size="sm"
+                    variant={page === currentPage ? "" : "ghost"}
+                    onClick={() => setCurrentPage(page)}
+                    className="min-w-8"
+                  >
+                    {page}
+                  </Button>
+                );
+              })}
+
+              {/* Next */}
+              <Button
+                size="sm"
+                className="bg-gray-200 text-black hover:bg-gray-200"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

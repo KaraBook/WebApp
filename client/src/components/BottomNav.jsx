@@ -26,7 +26,10 @@ export default function BottomNav() {
                 active ? "text-primary font-medium" : "text-neutral-500"
               }`}
             >
-              <Icon size={20} />
+              <Icon size={20}
+               className={`flex flex-col items-center justify-center text-xs ${
+                active ? "text-white p-2 rounded bg-black w-[30px] h-[30px]" : "text-neutral-500"
+              }`} />
               {item.label}
             </Link>
           );
