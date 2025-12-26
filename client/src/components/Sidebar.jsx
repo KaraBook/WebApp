@@ -41,13 +41,18 @@ function Sidebar() {
           return (
             <div key={index}>
               {item.children ? (
-                <SubMenu item={item} collapsed={collapsed} location={location} />
+                <SubMenu
+                  item={item}
+                  collapsed={collapsed}
+                  location={location}
+                  navigate={navigate}
+                />
+
               ) : (
                 <Link
                   to={item.path}
-                  className={`flex items-center gap-3 px-3 text-primary py-2 rounded-md hover:bg-hoverbg/80 text-sm font-medium transition-colors ${
-                    isActive ? "bg-hoverbg/80 text-primary" : "text-primary hover:text-primary"
-                  }`}
+                  className={`flex items-center gap-3 px-3 text-primary py-2 rounded-md hover:bg-hoverbg/80 text-sm font-medium transition-colors ${isActive ? "bg-hoverbg/80 text-primary" : "text-primary hover:text-primary"
+                    }`}
                 >
                   <Icon size={18} />
                   {!collapsed && <span>{item.label}</span>}
@@ -75,37 +80,53 @@ function Sidebar() {
   );
 }
 
-function SubMenu({ item, collapsed, location }) {
+function SubMenu({ item, collapsed, location, navigate }) {
   const [open, setOpen] = useState(false);
   const Icon = item.icon;
-  const isActive = item.children.some((c) => location.pathname === c.path);
+
+  const isActive = item.children.some((c) =>
+    location.pathname.startsWith(c.path)
+  );
+
+  const handleParentClick = () => {
+    setOpen((prev) => !prev);
+
+    // 👉 Redirect to first child (All Properties)
+    if (item.children?.length) {
+      navigate(item.children[0].path);
+    }
+  };
 
   return (
     <div>
       <button
-        className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium hover:bg-hoverbg/80 transition-colors ${
-          isActive ? "bg-hoverbg/80 text-primary" : "text-primary hover:text-primary"
-        }`}
-        onClick={() => setOpen(!open)}
+        type="button"
+        onClick={handleParentClick}
+        className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium hover:bg-hoverbg/80 transition-colors ${isActive ? "bg-hoverbg/80 text-primary" : "text-primary"
+          }`}
       >
         <div className="flex items-center gap-3">
           <Icon size={18} />
           {!collapsed && <span>{item.label}</span>}
         </div>
-        {!collapsed && (open ? <ChevronLeft size={16} /> : <ChevronRight size={16} />)}
+
+        {!collapsed && (
+          open ? <ChevronLeft size={16} /> : <ChevronRight size={16} />
+        )}
       </button>
 
       {open && !collapsed && (
-        <ul className="pl-8 mt-1 space-y-1">
+        <ul className="pl-[10px] border-l border-gray-400 ml-[20px] mt-1 space-y-1">
           {item.children.map((sub, idx) => {
-            const isActive = location.pathname === sub.path;
+            const isSubActive = location.pathname === sub.path;
             return (
               <li key={idx}>
                 <Link
                   to={sub.path}
-                  className={`block px-2 py-1 text-sm rounded-md hover:bg-hoverbg/80 transition-colors ${
-                    isActive ? "bg-hoverbg/80 text-primary" : "text-primary hover:text-primary"
-                  }`}
+                  className={`block px-2 py-1 text-sm rounded-md transition-colors hover:bg-hoverbg/80 ${isSubActive
+                      ? "bg-hoverbg/80 text-primary"
+                      : "text-primary"
+                    }`}
                 >
                   {sub.label}
                 </Link>
@@ -117,5 +138,6 @@ function SubMenu({ item, collapsed, location }) {
     </div>
   );
 }
+
 
 export default Sidebar;
