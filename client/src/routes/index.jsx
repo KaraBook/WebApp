@@ -29,6 +29,7 @@ const InvoicePreviewWrapper = () => {
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const invoiceRef = useRef(null);
+  const [pdfMode, setPdfMode] = useState(false);
 
   useEffect(() => {
     const fetchInvoice = async () => {
@@ -52,21 +53,49 @@ const InvoicePreviewWrapper = () => {
 
   const downloadPDF = async () => {
     try {
-      if (!invoiceRef.current) return;
-      toast.info("Generating PDF...");
-      const canvas = await html2canvas(invoiceRef.current, { scale: 2, useCORS: true });
+      toast.info("Generating PDF…");
+
+      const original = invoiceRef.current;
+      if (!original) return;
+
+      const clone = original.cloneNode(true);
+
+      const hiddenWrapper = document.createElement("div");
+      hiddenWrapper.style.position = "fixed";
+      hiddenWrapper.style.left = "-9999px";
+      hiddenWrapper.style.top = "0";
+      hiddenWrapper.style.width = "794px";
+      hiddenWrapper.style.background = "white";
+      hiddenWrapper.appendChild(clone);
+
+      document.body.appendChild(hiddenWrapper);
+
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        width: 794,
+        windowWidth: 794,
+      });
+
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
       const pdf = new jsPDF("p", "mm", "a4");
-      const width = 210;
-      const height = (canvas.height * width) / canvas.width;
-      pdf.addImage(imgData, "JPEG", 0, 0, width, height);
-      pdf.save(`Invoice_${invoice?.invoiceNumber || bookingId}.pdf`);
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+      pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
+
+      document.body.removeChild(hiddenWrapper);
+
       toast.success("PDF downloaded successfully!");
     } catch (err) {
-      console.error("PDF generation error:", err);
+      console.error(err);
       toast.error("Failed to generate PDF");
     }
   };
+
 
   if (loading) return <p className="text-center mt-20">Loading invoice…</p>;
 
@@ -94,7 +123,11 @@ const InvoicePreviewWrapper = () => {
 
       <div
         ref={invoiceRef}
-        className="bg-white rounded-xl p-2 w-full max-w-5xl"
+        style={{
+          width: pdfMode ? "794px" : "100%",
+          margin: pdfMode ? "0 auto" : "0",
+          background: "white",
+        }}
       >
         <InvoicePreview invoice={invoice} />
       </div>

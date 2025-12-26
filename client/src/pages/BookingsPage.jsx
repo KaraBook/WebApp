@@ -244,58 +244,46 @@ const BookingsPage = () => {
             toast.info("Generating PDF… please wait");
 
             const res = await Axios.get(`/api/admin/invoice/${bookingId}`);
-
-            console.log("Invoice API response:", res.data);
-
             if (!res.data?.success || !res.data.data) {
-                toast.error("Invoice not found or invalid.");
+                toast.error("Invoice not found.");
                 return;
             }
 
             setInvoiceData(res.data.data);
 
-            await new Promise((resolve) => requestAnimationFrame(resolve));
-            await new Promise((resolve) => requestAnimationFrame(resolve));
+            // ⏳ WAIT for DOM to paint
+            await new Promise((r) => requestAnimationFrame(r));
+            await new Promise((r) => requestAnimationFrame(r));
 
             const element = invoiceRef.current;
-            if (!element) throw new Error("Invoice DOM element not found");
+            if (!element) throw new Error("Invoice DOM not ready");
 
             const canvas = await html2canvas(element, {
                 scale: 2,
+                backgroundColor: "#ffffff",
                 useCORS: true,
-                logging: false,
+                width: 794,
+                windowWidth: 794,
             });
 
             const imgData = canvas.toDataURL("image/jpeg", 1.0);
             const pdf = new jsPDF("p", "mm", "a4");
 
             const imgWidth = 210;
-            const pageHeight = 297;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            let position = 0;
 
-            pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-
-            const fileName = `Invoice_${res.data.data.invoiceNumber || bookingId}.pdf`;
-            pdf.save(fileName);
+            pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+            pdf.save(`Invoice_${res.data.data.invoiceNumber}.pdf`);
 
             toast.success("Invoice downloaded successfully!");
         } catch (err) {
             console.error("PDF generation error:", err);
-            toast.error("Failed to generate or download invoice PDF");
+            toast.error("Failed to generate invoice PDF");
         } finally {
-            setTimeout(() => setInvoiceData(null), 500);
+            setInvoiceData(null);
         }
     };
+
 
 
     const confirmTitle = useMemo(() => {
@@ -660,7 +648,7 @@ const BookingsPage = () => {
             {invoiceData && (
                 <div
                     ref={invoiceRef}
-                    className="invisible absolute left-[-9999px] top-0 w-[794px] bg-white p-8">
+                    className="opacity-0 absolute left-[-9999px] top-0 w-[794px] pointer-events-none">
                     <InvoicePreview invoice={invoiceData} />
                 </div>
             )}

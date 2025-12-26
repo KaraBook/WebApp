@@ -40,21 +40,21 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
   return (
     <div
       ref={ref}
-      className="bg-white rounded-xl border p-8 max-w-3xl w-full text-sm"
+      className="bg-white rounded-xl border p-4 sm:p-6 md:p-8 max-w-3xl w-full text-sm"
       style={{ fontFamily: "sans-serif", color: "#333" }}
     >
       {/* HEADER */}
-      <div className="flex justify-between items-start mb-8">
+      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-xl font-semibold">
+          <h1 className="text-lg sm:text-xl font-semibold">
             {invoice.propertyName || "Property"}
           </h1>
           <p className="text-gray-600 text-sm">
             {invoice.propertyCity || ""} {invoice.propertyState || ""}
           </p>
         </div>
-        <div className="text-right">
-          <h2 className="text-2xl font-bold">Invoice</h2>
+        <div className="sm:text-right">
+          <h2 className="text-xl sm:text-2xl font-bold">Invoice</h2>
           <p className="text-sm text-gray-500">
             Invoice No: {invoice.invoiceNumber || "-"}
           </p>
@@ -62,8 +62,8 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       </div>
 
       {/* BOOKING DETAILS */}
-      <div className="grid grid-cols-2 gap-4 text-sm mb-6 border rounded-lg p-4">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-6 border rounded-lg p-4">
+        <div className="space-y-1">
           <p>
             <strong>Check-in:</strong>{" "}
             {invoice.checkIn
@@ -83,7 +83,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
             <strong>Guests:</strong> {formatGuests(invoice.guests)}
           </p>
         </div>
-        <div>
+        <div className="space-y-1">
           <p>
             <strong>Booking Date:</strong>{" "}
             {invoice.bookingDate
@@ -101,16 +101,16 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       </div>
 
       {/* GUEST INFO */}
-      <div className="grid grid-cols-2 gap-4 text-sm mb-6 border rounded-lg p-4">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-6 border rounded-lg p-4">
+        <div className="space-y-1">
           <h3 className="font-semibold mb-1">Guest Info</h3>
           <p>{user.name || "-"}</p>
           <p>{user.mobile || "-"}</p>
-          <p>{user.email || "-"}</p>
+          <p className="break-all">{user.email || "-"}</p>
         </div>
         <div>
           <h3 className="font-semibold mb-1">Room & Pricing Details</h3>
-          <p>
+          <p className="text-gray-600">
             Base room charges include standard occupancy. Additional adult and
             child charges are applied per night where applicable.
           </p>
@@ -118,45 +118,44 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       </div>
 
       {/* PRICE BREAKDOWN */}
-      <table className="w-full text-sm border-t border-gray-200 mb-6">
-        <thead>
-          <tr className="font-semibold border-b">
-            <th className="text-left py-2">Description</th>
-            <th className="text-right py-2">Rate</th>
-            <th className="text-right py-2">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {breakdown.length > 0 ? (
-            breakdown.map((item, i) => (
-              <tr key={i} className="border-b last:border-0">
-                <td className="py-2">{item.description || "-"}</td>
-                <td className="py-2 text-right">{item.rate || "-"}</td>
-                <td className="py-2 text-right">{item.total || "-"}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan={3}
-                className="py-4 text-center text-gray-500"
-              >
-                No price breakdown available
-              </td>
+      <div className="overflow-x-auto mb-6">
+        <table className="min-w-[520px] w-full text-sm border-t border-gray-200">
+          <thead>
+            <tr className="font-semibold border-b bg-gray-50">
+              <th className="text-left py-2 px-2">Description</th>
+              <th className="text-right py-2 px-2">Rate</th>
+              <th className="text-right py-2 px-2">Total</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {breakdown.length > 0 ? (
+              breakdown.map((item, i) => (
+                <tr key={i} className="border-b last:border-0">
+                  <td className="py-2 px-2">{item.description || "-"}</td>
+                  <td className="py-2 px-2 text-right">{item.rate || "-"}</td>
+                  <td className="py-2 px-2 text-right">{item.total || "-"}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="py-4 text-center text-gray-500">
+                  No price breakdown available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* TOTALS */}
-      <div className="text-right text-sm">
+      <div className="text-right text-sm space-y-1">
         <p>
           <strong>Sub Total:</strong> ₹{rawSubtotal.toLocaleString("en-IN")}
         </p>
         <p>
           <strong>Tax (10%):</strong> ₹{tax.toLocaleString("en-IN")}
         </p>
-        <p className="text-lg font-semibold mt-1">
+        <p className="text-base sm:text-lg font-semibold mt-1">
           Grand Total: ₹{grandTotal.toLocaleString("en-IN")}
         </p>
       </div>
