@@ -62,7 +62,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
             onClick={() => setCurrentPage(p)}
             className={
               p === currentPage
-                ? "px-3 py-1.5 text-sm rounded-lg bg-black text-white"
+                ? "px-3 py-1.5 text-sm rounded-lg bg-[#028ea1] text-white"
                 : "px-2 text-sm text-gray-700 hover:text-black"
             }
           >
