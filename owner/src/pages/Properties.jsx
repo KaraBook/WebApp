@@ -14,7 +14,8 @@ import {
   CalendarClock,
   ArrowLeft,
   Image as ImageIcon,
-  Utensils
+  Utensils,
+  Users
 } from "lucide-react";
 
 import { amenitiesOptions, foodOptions } from "@/constants/dropdownOptions";
@@ -226,6 +227,13 @@ export default function Properties() {
                     <span className="text-[16px]">Extra Child Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-24">
+            <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
+             <Users className="w-5 h-5 text-white"/>
+             <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">Capacity</h2> 
             </div>
           </div>
         </div>
