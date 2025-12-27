@@ -61,6 +61,18 @@ export default function Properties() {
   return (
     <div className="bg-[#f6f7f8] min-h-screen pb-10">
 
+      <div className="relative flex justify-between items-center mt-6 max-w-7xl mx-auto">
+         <div>
+          <h1 className="text-2xl md:text-3xl font-bold">
+            {property.propertyName}
+          </h1>
+          <p className="flex items-center gap-2 text-sm mt-1">
+            <MapPin className="w-4 h-4" />
+            {property.city}, {property.state}
+          </p>
+         </div>
+      </div>
+
       {/* HERO */}
       <div className="relative mt-6 max-w-7xl mx-auto">
         <img
@@ -68,23 +80,6 @@ export default function Properties() {
           alt="cover"
           className="w-full h-[260px] md:h-[420px] object-cover rounded-2xl"
         />
-        <div className="absolute inset-0 bg-black/25 rounded-2xl" />
-
-        <div className="absolute bottom-6 left-6 right-6 max-w-7xl mx-auto text-white">
-          <div className="flex gap-2 mb-2">
-            <Badge className="bg-emerald-500 text-white">Published</Badge>
-            <Badge className="bg-white/90 text-gray-800">5-Star Property</Badge>
-          </div>
-
-          <h1 className="text-2xl md:text-3xl font-bold">
-            {property.propertyName}
-          </h1>
-
-          <p className="flex items-center gap-2 text-sm mt-1">
-            <MapPin className="w-4 h-4" />
-            {property.city}, {property.state}
-          </p>
-        </div>
       </div>
 
       {/* CONTENT */}
@@ -174,7 +169,7 @@ export default function Properties() {
               <h2 className="text-black uppercase text-[18px] font-[600] tracking-[1.1px]">Address</h2>
             </div>
             <Separator />
-            <div className="p-4">
+            <div className="p-4 flex flex-col gap-2">
               <p className="text-sm">{property.addressLine1}</p>
               <p className="text-sm">{property.addressLine2}</p>
               <p className="text-sm"><strong>State:</strong> {property.state}</p>
