@@ -16,6 +16,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
 import MyProfile from "./pages/MyProfile";
 import CreateManager from "./pages/CreateManager";
+import MobileBottomNav from "./components/MobileBottomNav";
 
 
 /* -----------------------------------------
@@ -49,34 +50,29 @@ function AutoPropertyRedirect() {
 }
 
 
-/* -----------------------------------------
-   MAIN LAYOUT
------------------------------------------- */
+
 function MainContainer() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="p-0">
+
+      <main className="p-0 pb-16 md:pb-0">
         <Outlet />
       </main>
+
+      <MobileBottomNav />
     </div>
   );
 }
 
 
-/* -----------------------------------------
-   MAIN ROUTES WITH basename="/owner"
------------------------------------------- */
 export default function App() {
   return (
     <Routes>
 
-      {/* LOGIN ROUTES */}
-      {/* Because basename="/owner", actual URL becomes /owner/login */}
       <Route path="/login" element={<Login userType="owner" />} />
       <Route path="/manager/login" element={<Login userType="manager" />} />
 
-      {/* PROTECTED ROUTES */}
       <Route
         path="/"
         element={
@@ -85,7 +81,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        {/* Default redirect */}
+
         <Route index element={<Navigate to="dashboard" replace />} />
 
         <Route path="dashboard" element={<Dashboard />} />

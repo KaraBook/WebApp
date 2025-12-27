@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, buildRecaptcha, signInWithPhoneNumber } from "../firebase";
 import api from "../api/axios";
@@ -27,6 +27,8 @@ export default function Login({ userType = "owner" }) {
   const [timer, setTimer] = useState(0);
   const [canResend, setCanResend] = useState(true);
 
+  const autoVerifyTriggered = useRef(false);
+
   const { loginWithTokens } = useAuth();
   const navigate = useNavigate();
 
@@ -52,7 +54,6 @@ export default function Login({ userType = "owner" }) {
       await auth.signOut();
       const verifier = await buildRecaptcha();
 
-      // Select correct PRECHECK API
       const precheckUrl =
         userType === "manager"
           ? SummaryApi.managerPrecheck?.url
@@ -68,6 +69,9 @@ export default function Login({ userType = "owner" }) {
 
       setConfirmRes(confirmation);
       setPhase("verify");
+      setOtp("");
+      autoVerifyTriggered.current = false;
+
       setCanResend(false);
       setTimer(90);
 
@@ -92,8 +96,8 @@ export default function Login({ userType = "owner" }) {
 
   /* -------------------- VERIFY OTP -------------------- */
   const verifyOtp = async () => {
-    if (!confirmRes) return toast.error("No OTP session found");
-    if (otp.length !== 6) return toast.error("Enter 6-digit OTP");
+    if (!confirmRes || loading) return;
+    if (otp.length !== 6) return;
 
     setLoading(true);
 
@@ -101,7 +105,6 @@ export default function Login({ userType = "owner" }) {
       const cred = await confirmRes.confirm(otp);
       const idToken = await cred.user.getIdToken();
 
-      // Select correct LOGIN API
       const loginUrl =
         userType === "manager"
           ? SummaryApi.managerLogin?.url
@@ -117,7 +120,6 @@ export default function Login({ userType = "owner" }) {
         userType === "manager" ? "Manager logged in!" : "Login successful"
       );
 
-      // Redirect
       navigate(
         userType === "manager" ? "/manager/dashboard" : "/dashboard",
         { replace: true }
@@ -125,24 +127,41 @@ export default function Login({ userType = "owner" }) {
     } catch (e) {
       console.error("OTP error:", e);
       toast.error(e.response?.data?.message || "OTP verification failed");
+      autoVerifyTriggered.current = false;
     } finally {
       setLoading(false);
     }
   };
 
+  /* -------------------- AUTO VERIFY ON 6 DIGITS -------------------- */
+  useEffect(() => {
+    if (
+      phase === "verify" &&
+      otp.length === 6 &&
+      !loading &&
+      confirmRes &&
+      !autoVerifyTriggered.current
+    ) {
+      autoVerifyTriggered.current = true;
+      verifyOtp();
+    }
+  }, [otp, phase, loading, confirmRes]);
+
   /* -------------------- JSX UI -------------------- */
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
       <Card className="w-full max-w-md border border-border shadow-sm">
-        <CardHeader className="text-center space-y-1">
-          <CardTitle className="text-xl font-semibold tracking-tight">
-            <img
-              src="/owner/KarabookLogo.png"
-              alt="BookMyStay"
-              className="h-3 w-auto md:h-14 m-auto"
-            />
+        <CardHeader className="text-center space-y-2">
+          <img
+            src="/owner/KarabookLogo.png"
+            alt="Karabook"
+            className="h-10 mx-auto"
+          />
+
+          <CardTitle className="text-xl font-semibold">
             {userType === "manager" ? "Manager Login" : "Resort Owner Login"}
           </CardTitle>
+
           <CardDescription>
             {userType === "manager"
               ? "Managers login using the number assigned by the owner"
@@ -187,19 +206,22 @@ export default function Login({ userType = "owner" }) {
 
           {/* VERIFY OTP */}
           {phase === "verify" && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Label>Enter OTP</Label>
+
               <Input
                 placeholder="6-digit OTP"
                 maxLength={6}
                 value={otp}
+                autoFocus
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                 className="text-center tracking-widest text-lg"
               />
 
+              {/* Fallback button (auto-triggered on 6 digits) */}
               <Button
                 onClick={verifyOtp}
-                disabled={loading}
+                disabled={loading || otp.length !== 6}
                 className="w-full"
               >
                 {loading ? "Verifying..." : "Verify & Continue"}
@@ -214,14 +236,6 @@ export default function Login({ userType = "owner" }) {
                   Resend in {timer}s
                 </Button>
               )}
-
-              <Button
-                variant="outline"
-                onClick={() => setPhase("enter")}
-                className="w-full"
-              >
-                Change Number
-              </Button>
             </div>
           )}
         </CardContent>

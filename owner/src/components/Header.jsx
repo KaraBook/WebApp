@@ -85,7 +85,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white/90 backdrop-blur border-b border-gray-200 px-8 py-3 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur border-b border-gray-200 px-4 sm:px-8 py-3 flex items-center justify-between">
 
       {/* LOGO */}
       <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[150px]" />
