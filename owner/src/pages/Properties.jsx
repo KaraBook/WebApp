@@ -61,7 +61,7 @@ export default function Properties() {
   return (
     <div className="bg-[#f6f7f8] min-h-screen pb-10">
 
-      <div className="relative flex justify-between items-center mt-6 max-w-7xl mx-auto">
+      <div className="relative flex justify-between items-center pt-4 max-w-7xl mx-auto">
          <div>
           <h1 className="text-2xl md:text-3xl font-bold">
             {property.propertyName}
