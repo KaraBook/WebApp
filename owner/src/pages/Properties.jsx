@@ -137,7 +137,7 @@ export default function Properties() {
               </div>
             </div>
             <div className="p-4 -mt-[25px]">
-              <span className="text-[14px] mb-2">Room Breakdown</span>
+              <span className="text-[14px] pb-2">Room Breakdown</span>
               <div className="bg-[#0596691c] p-1 pl-4 pr-4 flex flex gap-1 justify-between rounded-[8px]">
                 <div className="flex flex-col">
                   <span className="text-[14px]">Ac</span>
@@ -165,6 +165,15 @@ export default function Properties() {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-0 shadow-sm w-[48%]">
+            <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
+              <Users className="w-4 h-4 text-black" />
+              <h2 className="text-black uppercase text-[18px] font-[600] tracking-[1.1px]">Capacity</h2>
+            </div>
+            <Separator />
+            
           </div>
           </div>
 
