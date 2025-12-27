@@ -46,7 +46,11 @@ export default function MobileBottomNav() {
                 active ? "text-black font-medium" : "text-gray-500"
               }`}
             >
-              <Icon size={22} strokeWidth={active ? 2.2 : 1.8} />
+              <Icon 
+               className={` ${
+                active ? "bg-[#028ea1] p-[8px] rounded-[5px] w-[12px] h-[12px]" : " "
+              }`}
+               size={22} strokeWidth={active ? 2.2 : 1.8} />
               <span>{label}</span>
             </NavLink>
           );
