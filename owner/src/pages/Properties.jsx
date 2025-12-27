@@ -230,7 +230,7 @@ export default function Properties() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-[500px]">
+          <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-[200px]">
             <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
              <Users className="w-5 h-5 text-black"/>
              <h2 className="text-black uppercase text-[20px] font-[600] tracking-[1.1px]">Capacity</h2> 
