@@ -76,8 +76,8 @@ export default function Properties() {
   /* -------------------- UI HELPERS -------------------- */
   const PriceBox = ({ label, value }) => (
     <div className="bg-gray-100 p-4 rounded-lg w-[48%]">
-      <span className="text-[16px]">{label}</span>
-      <p className="font-bold text-[18px]">₹ {value} / night</p>
+      <span className="md:text-[16px] text-[15px]">{label}</span>
+      <p className="font-bold md:text-[18px] text-[16px]">₹ {value} / night</p>
     </div>
   );
 
