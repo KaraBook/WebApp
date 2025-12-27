@@ -19,9 +19,6 @@ import CreateManager from "./pages/CreateManager";
 import MobileBottomNav from "./components/MobileBottomNav";
 
 
-/* -----------------------------------------
-   AUTO-REDIRECT TO FIRST PROPERTY
------------------------------------------- */
 function AutoPropertyRedirect() {
   const navigate = useNavigate();
 
