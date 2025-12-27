@@ -61,6 +61,7 @@ export default function Properties() {
     pricingPerNightWeekend,
     extraAdultCharge,
     extraChildCharge,
+    publishNow,
     coverImage,
     galleryPhotos = [],
     amenities = [],
