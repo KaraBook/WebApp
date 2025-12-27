@@ -209,6 +209,20 @@ export default function Properties() {
              <IndianRupee className="w-5 h-5 text-white"/>
              <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">Pricing</h2> 
             </div>
+            <div className="w-full bg-white p-4 flex flex-wrap justify-between items-center">
+                <div className="bg-gray-200 p-2 w-[48%]">
+
+                </div>
+                <div className="bg-gray-200 p-2 w-[48%]">
+
+                </div>
+                <div className="bg-gray-200 p-2 w-[48%]">
+
+                </div>
+                <div className="bg-gray-200 p-2 w-[48%]">
+
+                </div>
+            </div>
           </div>
         </div>
       </div>
