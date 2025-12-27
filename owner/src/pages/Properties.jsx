@@ -175,7 +175,10 @@ export default function Properties() {
             </div>
             <Separator />
             <div className="p-4">
-              <p>{property.addressLine1}</p>
+              <p className="text-sm">{property.addressLine1}</p>
+              <p className="text-sm">{property.addressLine2}</p>
+              <p className="text-sm"><strong>State:</strong> {property.state}</p>
+              <p className="text-sm"><strong>City:</strong> {property.city}</p>
             </div>
           </div>
           </div>
