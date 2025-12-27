@@ -66,7 +66,7 @@ export default function Properties() {
           alt="cover"
           className="w-full h-[260px] md:h-[420px] object-cover rounded-b-2xl"
         />
-        <div className="absolute inset-0 bg-black/25 rounded-b-2xl" />
+        <div className="absolute inset-0 bg-black/25 rounded-2xl" />
 
         <div className="absolute bottom-6 left-6 right-6 max-w-7xl mx-auto text-white">
           <div className="flex gap-2 mb-2">
