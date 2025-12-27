@@ -1,6 +1,6 @@
 import {
   Wifi, Car, Sun, Tv, Snowflake, Utensils, Trees, Key, Bed, Droplets,
-  Shield, Briefcase, PawPrint, Lock, Refrigerator, ShowerHead
+  Shield, Briefcase, PawPrint, Lock, Refrigerator, ShowerHead, CoffeeIcon
 } from "lucide-react";
 
 export const propertyTypeOptions = [
@@ -74,6 +74,15 @@ export const amenitiesCategories = [
       { label: "Kitchen", value: "kitchen", icon: Utensils },
       { label: "Refrigerator", value: "fridge", icon: Refrigerator },
       { label: "Dining Area", value: "diningArea", icon: Utensils },
+      { label: "Glasses", value: "glasses", icon: Utensils },
+      { label: "Microwave", value: "microwave", icon: Utensils },
+    ]
+  },
+  {
+    label: "High Tea & Barbeque",
+    key: "barbeque",
+    items: [
+      { label: "Tea", value: "tea", icon: CoffeeIcon },
     ]
   },
 
@@ -87,13 +96,19 @@ export const amenitiesCategories = [
   },
 
   {
-    label: "Parking & Transport",
+    label: "Transport",
     key: "transport",
+    items: [
+      { label: "Transport", value: "transport", icon: Car },
+    ]
+  },
+  {
+    label: "Parking",
+    key: "parking",
     items: [
       { label: "Parking", value: "parking", icon: Car },
     ]
   },
-
   {
     label: "Pets & Eco",
     key: "pets",

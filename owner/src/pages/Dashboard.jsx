@@ -67,7 +67,7 @@ function StatCard({
       </div>
 
       <p className="text-xs text-gray-500">{label}</p>
-      <p className="text-[24px] font-semibold text-gray-900 leading-tight">
+      <p className="text-[28px] font-[700] text-gray-900 leading-tight">
         {value ?? 0}
       </p>
       {caption && <p className="text-[11px] text-gray-400">{caption}</p>}
