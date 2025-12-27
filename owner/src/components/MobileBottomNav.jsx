@@ -48,7 +48,7 @@ export default function MobileBottomNav() {
             >
               <Icon 
                className={` ${
-                active ? "bg-[#028ea1] p-[8px] rounded-[5px] w-[12px] h-[12px]" : " "
+                active ? "bg-[#028ea1] p-[8px] rounded-[5px]" : " "
               }`}
                size={22} strokeWidth={active ? 2.2 : 1.8} />
               <span>{label}</span>
