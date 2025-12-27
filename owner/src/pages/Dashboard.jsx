@@ -289,7 +289,7 @@ export default function Dashboard() {
         <div className="flex w-full justify-between gap-6 items-start">
 
           {/* BOOKINGS TABLE */}
-          <div className="w-[68%] bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="w-[60%] bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="px-6 pt-5 pb-3">
               <h2 className="text-sm font-semibold text-gray-900">Last bookings</h2>
             </div>
