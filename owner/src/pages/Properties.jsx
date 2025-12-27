@@ -232,8 +232,8 @@ export default function Properties() {
 
           <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-[380px]">
             <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
-              <Users className="w-5 h-5 text-black" />
-              <h2 className="text-black uppercase text-[20px] font-[600] tracking-[1.1px]">Capacity</h2>
+              <Users className="w-4 h-4 text-black" />
+              <h2 className="text-black uppercase text-[18px] font-[600] tracking-[1.1px]">Capacity</h2>
             </div>
             <Separator />
             <div className="mt-0 p-4 flex gap-2 justify-between">
