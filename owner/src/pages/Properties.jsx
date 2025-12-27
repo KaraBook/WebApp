@@ -108,20 +108,39 @@ export default function Properties() {
 
           {/* AMENITIES & FOOD */}
           <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
-            <h2 className="text-lg font-semibold">Amenities & Food</h2>
 
-            {/* FOOD */}
+            {/* MAIN TITLE */}
+            <div className="flex items-center gap-2">
+              <Utensils className="w-5 h-5 text-emerald-600" />
+              <h2 className="text-[16px] font-semibold text-gray-900">
+                Amenities & Food
+              </h2>
+            </div>
+
+            {/* FOOD AVAILABILITY */}
             <div>
-              <p className="text-xs text-gray-500 mb-2">FOOD AVAILABILITY</p>
+              <p className="text-[11px] text-gray-500 mb-3 tracking-wider uppercase">
+                Food Availability
+              </p>
+
               <div className="flex gap-2 flex-wrap">
-                {foodOptions.map((f) =>
-                  activeFood.has(f.value) ? (
-                    <Badge
-                      key={f.value}
-                      className="bg-emerald-50 text-emerald-700"
+                {foodOptions.map(({ label, value, icon: Icon }) =>
+                  activeFood.has(value) ? (
+                    <div
+                      key={value}
+                      className="
+              flex items-center gap-2
+              px-4 py-2
+              rounded-full
+              bg-emerald-50
+              text-emerald-700
+              text-[13px]
+              font-medium
+            "
                     >
-                      {f.label}
-                    </Badge>
+                      <Icon className="w-4 h-4 text-emerald-600" />
+                      {label}
+                    </div>
                   ) : null
                 )}
               </div>
@@ -130,34 +149,34 @@ export default function Properties() {
             <Separator />
 
             {/* AMENITIES */}
-            <div className="space-y-4">
-              {amenitiesOptions.map((cat) => {
-                const items = cat.items.filter((i) =>
-                  activeAmenities.has(i.value)
-                );
+            <div>
+              <p className="text-[11px] text-gray-500 mb-4 tracking-wider uppercase">
+                Amenities
+              </p>
 
-                if (!items.length) return null;
-
-                return (
-                  <div key={cat.key}>
-                    <p className="text-xs text-gray-500 mb-2 uppercase">
-                      {cat.label}
-                    </p>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {items.map(({ label, value, icon: Icon }) => (
-                        <div
-                          key={value}
-                          className="flex items-center gap-2 border rounded-lg px-3 py-2 text-sm bg-gray-50"
-                        >
-                          <Icon className="w-4 h-4 text-emerald-600" />
-                          <span>{label}</span>
-                        </div>
-                      ))}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {amenitiesCategories
+                  .flatMap((cat) => cat.items)
+                  .filter((item) => activeAmenities.has(item.value))
+                  .map(({ label, value, icon: Icon }) => (
+                    <div
+                      key={value}
+                      className="
+              flex items-center gap-2
+              px-4 py-3
+              rounded-xl
+              bg-white
+              border border-[#E7E3DE]
+              text-[13px]
+              font-medium
+              text-gray-800
+            "
+                    >
+                      <Icon className="w-4 h-4 text-emerald-600" />
+                      {label}
                     </div>
-                  </div>
-                );
-              })}
+                  ))}
+              </div>
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 import {
   Wifi, Car, Sun, Tv, Snowflake, Utensils, Trees, Key, Bed, Droplets,
-  Shield, Briefcase, PawPrint, Lock, Refrigerator, ShowerHead, CoffeeIcon
+  Shield, Briefcase, PawPrint, Lock, Refrigerator, ShowerHead, CoffeeIcon, Coffee, Moon
 } from "lucide-react";
 
 export const propertyTypeOptions = [
@@ -11,9 +11,9 @@ export const propertyTypeOptions = [
 ];
 
 export const foodOptions = [
-  { label: "Breakfast", value: "breakfast" },
-  { label: "Lunch", value: "lunch" },
-  { label: "Dinner", value: "dinner" },
+  { label: "Breakfast", value: "breakfast", icon: Coffee },
+  { label: "Lunch", value: "lunch", icon: Sun },
+  { label: "Dinner", value: "dinner", icon: Moon },
 ];
 
 export const amenitiesOptions = [
