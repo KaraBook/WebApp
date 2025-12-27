@@ -323,7 +323,7 @@ export default function Dashboard() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1000px] text-sm">
+              <table className="w-full md:min-w-[1200px] min-w-[1000px] text-sm">
                 <thead className="bg-gray-50 text-gray-500 border-y border-gray-100">
                   <tr className="text-left">
                     <th className="py-3 px-4 sm:px-6 text-left">Traveller</th>
