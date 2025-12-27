@@ -42,7 +42,7 @@ export default function MobileBottomNav() {
                         <NavLink
                             key={label}
                             to={path}
-                            className={`flex flex-col items-center justify-center gap-1 text-xs transition ${active ? "text-black font-medium" : "text-gray-500"
+                            className={`flex flex-col items-center justify-center gap-0 text-xs transition ${active ? "text-black font-medium" : "text-gray-500"
                                 }`}
                         >
                             {/* ICON WRAPPER */}
@@ -50,7 +50,7 @@ export default function MobileBottomNav() {
                                 className={`flex items-center justify-center rounded-[6px] transition
       ${active
                                         ? "bg-[#028ea1] w-8 h-8"
-                                        : "w-8 h-8"
+                                        : "w-8 h-6"
                                     }`}
                             >
                                 <Icon
