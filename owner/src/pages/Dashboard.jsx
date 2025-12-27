@@ -506,7 +506,7 @@ export default function Dashboard() {
                 }
 
                 return (
-                  <div key={i} className="flex justify-center">
+                  <div key={i} className="flex justify-center w-8">
                     <div
                       className={`aspect-square w-8 sm:w-9 flex items-center justify-center rounded-lg text-xs transition
       ${isDateBooked(day)
