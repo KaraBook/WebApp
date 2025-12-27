@@ -392,8 +392,9 @@ export default function Dashboard() {
                           >
                             {typeof b.guests === "number"
                               ? `${b.guests} Guests`
-                              : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
-                              }`}
+                              : `${b.guests.adults + b.guests.children} Guests${
+                                  b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                                }`}
                           </button>
                         </td>
 
@@ -506,20 +507,8 @@ export default function Dashboard() {
                 }
 
                 return (
-                  <div key={i} className="flex justify-center w-8">
-                    <div
-                      className={`aspect-square w-8 sm:w-9 flex items-center justify-center rounded-lg text-xs transition
-      ${isDateBooked(day)
-                          ? "bg-red-200 text-red-700"
-                          : blocked
-                            ? "bg-gray-200 text-gray-500"
-                            : isToday
-                              ? "border border-primary text-primary font-semibold"
-                              : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                    >
-                      {day.getDate()}
-                    </div>
+                  <div key={i} className="flex justify-center">
+                    <div className={cls}>{day.getDate()}</div>
                   </div>
                 );
               })}
