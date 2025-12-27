@@ -18,6 +18,7 @@ import {
   IndianRupee,
   MoreVertical,
 } from "lucide-react";
+import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 
 /* -------------------- Pagination (matches your screenshot) -------------------- */
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
@@ -124,6 +125,9 @@ function PaymentChip({ status }) {
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [openBookingDialog, setOpenBookingDialog] = useState(false);
 
   const [data, setData] = useState(null);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
@@ -343,10 +347,18 @@ export default function Dashboard() {
                     paginatedRows.map((b) => (
                       <tr key={b._id} className="border-b hover:bg-gray-50/60 transition">
                         <td className="py-3 px-4 sm:px-6">
-                          <div className="font-medium text-gray-900">
-                            {b.userId?.firstName} {b.userId?.lastName}
-                          </div>
-                          <div className="text-xs text-gray-500">{b.userId?.mobile}</div>
+                          <button
+                            onClick={() => {
+                              setSelectedBooking(b);
+                              setOpenBookingDialog(true);
+                            }}
+                            className="text-left"
+                          >
+                            <div className="font-medium text-gray-900 hover:underline">
+                              {b.userId?.firstName} {b.userId?.lastName}
+                            </div>
+                            <div className="text-xs text-gray-500">{b.userId?.mobile}</div>
+                          </button>
                         </td>
 
                         <td className="py-3 px-4 sm:px-6">{b.propertyId?.propertyName}</td>
@@ -392,9 +404,8 @@ export default function Dashboard() {
                           >
                             {typeof b.guests === "number"
                               ? `${b.guests} Guests`
-                              : `${b.guests.adults + b.guests.children} Guests${
-                                  b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
-                                }`}
+                              : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                              }`}
                           </button>
                         </td>
 
@@ -413,6 +424,15 @@ export default function Dashboard() {
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent className="w-48">
+                              <DropdownMenuItem
+                                onSelect={() => {
+                                  setSelectedBooking(b);
+                                  setOpenBookingDialog(true);
+                                }}
+                              >
+                                View Booking
+                              </DropdownMenuItem>
+
                               <DropdownMenuItem onSelect={() => navigate(`/invoice/${b._id}`)}>
                                 View Invoice
                               </DropdownMenuItem>
@@ -556,6 +576,14 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      <BookingDetailsDialog
+        open={openBookingDialog}
+        onOpenChange={setOpenBookingDialog}
+        booking={selectedBooking}
+      />
+
     </div>
+
   );
 }
