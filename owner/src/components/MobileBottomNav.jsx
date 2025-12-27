@@ -49,8 +49,8 @@ export default function MobileBottomNav() {
                             <div
                                 className={`flex items-center justify-center rounded-[6px] transition
       ${active
-                                        ? "bg-[#028ea1] w-9 h-9"
-                                        : "w-9 h-9"
+                                        ? "bg-[#028ea1] w-8 h-8"
+                                        : "w-8 h-8"
                                     }`}
                             >
                                 <Icon
