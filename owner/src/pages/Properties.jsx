@@ -256,9 +256,9 @@ export default function Properties() {
                 </span>
               </div>
             </div>
-            <div className="p-4 -mt-[23px]">
+            <div className="p-4 -mt-[25px]">
               <span className="text-[14px] mb-2">Room Breakdown</span>
-              <div className="bg-[#0596691c] p-2 flex flex gap-1 rounded-[8px]">
+              <div className="bg-[#0596691c] p-1 flex flex gap-1 rounded-[8px]">
                 <div className="flex flex-col">
                   <span className="text-[14px]">Ac</span>
                   <span className="font-[500]">
