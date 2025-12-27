@@ -1,3 +1,8 @@
+import {
+  Wifi, Car, Sun, Tv, Snowflake, Utensils, Trees, Key, Bed, Droplets,
+  Shield, Briefcase, PawPrint, Lock, Refrigerator, ShowerHead, CoffeeIcon
+} from "lucide-react";
+
 export const propertyTypeOptions = [
   { label: "Villa", value: "villa" },
   { label: "Tent", value: "tent" },
@@ -11,10 +16,55 @@ export const foodOptions = [
   { label: "Dinner", value: "dinner" },
 ];
 
-export const amenitiesOptions = [
-  { label: "WiFi", value: "wifi" },
-  { label: "Pool", value: "pool" },
-  { label: "Parking", value: "parking" },
+export const amenitiesCategories = [
+  {
+    label: "Basics",
+    key: "basics",
+    items: [
+      { label: "Wi-Fi", value: "wifi", icon: Wifi },
+      { label: "Power Backup", value: "powerBackup", icon: Key },
+      { label: "Air Conditioning", value: "ac", icon: Snowflake },
+      { label: "Ceiling Fan", value: "ceilingFan", icon: Sun },
+    ],
+  },
+  {
+    label: "Outdoor & Nature",
+    key: "outdoor",
+    items: [
+      { label: "Garden", value: "garden", icon: Trees },
+      { label: "Swimming Pool", value: "pool", icon: Droplets },
+    ],
+  },
+  {
+    label: "Kitchen & Dining",
+    key: "kitchen",
+    items: [
+      { label: "Kitchen", value: "kitchen", icon: Utensils },
+      { label: "Refrigerator", value: "fridge", icon: Refrigerator },
+      { label: "Dining Area", value: "diningArea", icon: Utensils },
+    ],
+  },
+  {
+    label: "Entertainment",
+    key: "entertainment",
+    items: [
+      { label: "Television", value: "tv", icon: Tv },
+    ],
+  },
+  {
+    label: "Parking",
+    key: "parking",
+    items: [
+      { label: "Parking", value: "parking", icon: Car },
+    ],
+  },
+  {
+    label: "Pets",
+    key: "pets",
+    items: [
+      { label: "Pet Friendly", value: "petFriendlyAmenity", icon: PawPrint },
+    ],
+  },
 ];
 
 export const confirmationTypeOptions = [

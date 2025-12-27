@@ -16,7 +16,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 
-import { amenitiesCategories, foodOptions } from "@/constants/propertyOptions";
+import { amenitiesCategories, foodOptions } from "@/constants/dropdownOptions";
 
 export default function Properties() {
   const { id } = useParams();
