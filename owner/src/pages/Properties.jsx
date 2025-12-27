@@ -214,15 +214,15 @@ export default function Properties() {
                     <span className="text-[16px]">Weekday Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
-                <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
+                <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                     <span className="text-[16px]">Weekend Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
-                <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
+                <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                     <span className="text-[16px]">Extra Adult Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
-                <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
+                <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                     <span className="text-[16px]">Extra Child Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
