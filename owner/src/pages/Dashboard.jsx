@@ -32,7 +32,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
       <button
         disabled={currentPage === 1}
         onClick={() => setCurrentPage((p) => p - 1)}
-        className="px-4 py-1.5 text-sm rounded-full bg-gray-100 text-gray-400 disabled:cursor-not-allowed"
+        className="px-4 py-1.5 text-sm rounded-lg bg-gray-100 text-gray-400 disabled:cursor-not-allowed"
       >
         Previous
       </button>
@@ -62,7 +62,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
       <button
         disabled={currentPage === totalPages}
         onClick={() => setCurrentPage((p) => p + 1)}
-        className="px-4 py-1.5 text-sm rounded-full bg-gray-100 text-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+        className="px-4 py-1.5 text-sm rounded-lg bg-gray-100 text-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
       >
         Next
       </button>
