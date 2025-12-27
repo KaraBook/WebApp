@@ -213,19 +213,19 @@ export default function Properties() {
             <div className="w-full bg-white rounded-b-xl p-4 gap-2 flex flex-wrap justify-between items-center">
                 <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                     <span className="text-[16px]">Weekday Price</span>
-                    <p className="font-bold text-[18px]">₹ ${pricingPerNightWeekdays}/ night</p>
+                    <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekdays}/ night</p>
                 </div>
                 <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                     <span className="text-[16px]">Weekend Price</span>
-                    <p className="font-bold text-[18px]">₹ ${pricingPerNightWeekend} / night</p>
+                    <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekend} / night</p>
                 </div>
                 <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                     <span className="text-[16px]">Extra Adult Price</span>
-                    <p className="font-bold text-[18px]">₹ ${extraAdultCharge} / night</p>
+                    <p className="font-bold text-[18px]">₹ {property.extraAdultCharge} / night</p>
                 </div>
                 <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                     <span className="text-[16px]">Extra Child Price</span>
-                    <p className="font-bold text-[18px]">₹ ${extraChildCharge} / night</p>
+                    <p className="font-bold text-[18px]">₹ {property.extraChildCharge} / night</p>
                 </div>
             </div>
           </div>
@@ -239,19 +239,19 @@ export default function Properties() {
             <div className="mt-0 p-4 flex gap-2 justify-between">
               <div className="flex flex-col">
                 <span className="text-[14px]">Max Guests</span>
-                <span className="font-[500]">${maxGuests}</span>
+                <span className="font-[500]">{property.maxGuests}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[14px]">Base Guests</span>
-                <span className="font-[500]">${baseGuests}</span>
+                <span className="font-[500]">{property.baseGuests}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[14px]">Min Stays</span>
-                <span className="font-[500]">${minStayNights}</span>
+                <span className="font-[500]">{property.minStayNights}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[14px]">Total Rooms</span>
-                <span className="font-[500]">${roomBreakdown ? total : ""}</span>
+                <span className="font-[500]">{property.roomBreakdown ? total : ""}</span>
               </div>
             </div>
             
