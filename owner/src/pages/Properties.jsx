@@ -133,7 +133,7 @@ export default function Properties() {
               flex items-center gap-2
               px-4 py-2
               rounded-lg
-              bg-[#05966942]
+              bg-[#0596691c]
               text-emerald-700
               text-[13px]
               font-medium
@@ -210,20 +210,20 @@ export default function Properties() {
              <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">Pricing</h2> 
             </div>
             <div className="w-full bg-white rounded-b-xl p-4 gap-2 flex flex-wrap justify-between items-center">
-                <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
+                <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                     <span className="text-[16px]">Weekday Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
                 <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
-                    <span className="text-[16px]">Weekday Price</span>
+                    <span className="text-[16px]">Weekend Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
                 <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
-                    <span className="text-[16px]">Weekday Price</span>
+                    <span className="text-[16px]">Extra Adult Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
                 <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
-                    <span className="text-[16px]">Weekday Price</span>
+                    <span className="text-[16px]">Extra Child Price</span>
                     <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
             </div>
