@@ -266,7 +266,7 @@ export default function Properties() {
                   activeFood.has(value) && (
                     <div
                       key={value}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0596691c] text-[13px] font-medium"
+                      className="flex items-center gap-2 md:px-4 px-2 py-2 rounded-lg bg-[#0596691c] text-[13px] font-medium"
                     >
                       <Icon className="w-4 h-4 text-primary" />
                       {label}
@@ -286,7 +286,7 @@ export default function Properties() {
                 .map(({ label, value, icon: Icon }) => (
                   <div
                     key={value}
-                    className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#E7E3DE] text-[13px] font-medium"
+                    className="flex items-center gap-2 md:px-4 px-2 py-3 rounded-xl border border-[#E7E3DE] text-[13px] font-medium"
                   >
                     <Icon className="w-4 h-4 text-primary" />
                     {label}
