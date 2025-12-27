@@ -132,7 +132,7 @@ export default function Properties() {
           <img
             src={cover}
             alt="Cover"
-            className="max-w-6xl h-[420px] object-cover"
+            className="max-w-6xl w-full h-[420px] object-cover"
           />
         </div>
 
