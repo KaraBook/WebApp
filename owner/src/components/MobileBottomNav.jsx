@@ -50,7 +50,7 @@ export default function MobileBottomNav() {
                className={` ${
                 active ? "bg-[#028ea1] p-[8px] rounded-[5px] text-white h-[20px] w-[20px]" : " "
               }`}
-               size={22} strokeWidth={active ? 2.2 : 1.8} />
+               size={28} strokeWidth={active ? 2.2 : 1.8} />
               <span>{label}</span>
             </NavLink>
           );
