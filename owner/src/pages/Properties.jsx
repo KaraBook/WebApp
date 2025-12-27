@@ -108,6 +108,66 @@ export default function Properties() {
             </div>
           </div>
 
+          {/* CAPACITY AND ADDRESS */}
+          <div className="flex justify-between gap-2">
+            <div className="bg-white rounded-xl p-0 shadow-sm w-[48%]">
+            <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
+              <Users className="w-4 h-4 text-black" />
+              <h2 className="text-black uppercase text-[18px] font-[600] tracking-[1.1px]">Capacity</h2>
+            </div>
+            <Separator />
+            <div className="mt-0 p-4 flex gap-2 justify-between">
+              <div className="flex flex-col">
+                <span className="text-[14px]">Max Guests</span>
+                <span className="font-[500]">{property.maxGuests}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[14px]">Base Guests</span>
+                <span className="font-[500]">{property.baseGuests}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[14px]">Min Stays</span>
+                <span className="font-[500]">{property.minStayNights}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[14px]">Total Rooms</span>
+                <span className="font-[500]">
+                  {property.roomBreakdown?.total ?? 0}
+                </span>
+              </div>
+            </div>
+            <div className="p-4 -mt-[25px]">
+              <span className="text-[14px] mb-2">Room Breakdown</span>
+              <div className="bg-[#0596691c] p-1 pl-4 pr-4 flex flex gap-1 justify-between rounded-[8px]">
+                <div className="flex flex-col">
+                  <span className="text-[14px]">Ac</span>
+                  <span className="font-[500]">
+                    {property.roomBreakdown?.ac ?? 0}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[14px]">Non Ac</span>
+                  <span className="font-[500]">
+                    {property.roomBreakdown?.nonAc ?? 0}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[14px]">Deluxe</span>
+                  <span className="font-[500]">
+                    {property.roomBreakdown?.deluxe ?? 0}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[14px]">Luxury</span>
+                  <span className="font-[500]">
+                    {property.roomBreakdown?.luxury ?? 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+
           {/* AMENITIES & FOOD */}
           <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
 
@@ -228,64 +288,6 @@ export default function Properties() {
                 <p className="font-bold text-[18px]">₹ {property.extraChildCharge} / night</p>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-[380px]">
-            <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
-              <Users className="w-4 h-4 text-black" />
-              <h2 className="text-black uppercase text-[18px] font-[600] tracking-[1.1px]">Capacity</h2>
-            </div>
-            <Separator />
-            <div className="mt-0 p-4 flex gap-2 justify-between">
-              <div className="flex flex-col">
-                <span className="text-[14px]">Max Guests</span>
-                <span className="font-[500]">{property.maxGuests}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[14px]">Base Guests</span>
-                <span className="font-[500]">{property.baseGuests}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[14px]">Min Stays</span>
-                <span className="font-[500]">{property.minStayNights}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[14px]">Total Rooms</span>
-                <span className="font-[500]">
-                  {property.roomBreakdown?.total ?? 0}
-                </span>
-              </div>
-            </div>
-            <div className="p-4 -mt-[25px]">
-              <span className="text-[14px] mb-2">Room Breakdown</span>
-              <div className="bg-[#0596691c] p-1 pl-4 flex flex gap-1 justify-between rounded-[8px]">
-                <div className="flex flex-col">
-                  <span className="text-[14px]">Ac</span>
-                  <span className="font-[500]">
-                    {property.roomBreakdown?.ac ?? 0}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[14px]">Non Ac</span>
-                  <span className="font-[500]">
-                    {property.roomBreakdown?.nonAc ?? 0}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[14px]">Deluxe</span>
-                  <span className="font-[500]">
-                    {property.roomBreakdown?.deluxe ?? 0}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[14px]">Luxury</span>
-                  <span className="font-[500]">
-                    {property.roomBreakdown?.luxury ?? 0}
-                  </span>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
