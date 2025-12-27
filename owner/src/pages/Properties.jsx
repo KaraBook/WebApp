@@ -174,7 +174,9 @@ export default function Properties() {
               <h2 className="text-black uppercase text-[18px] font-[600] tracking-[1.1px]">Address</h2>
             </div>
             <Separator />
-            
+            <div className="p-4">
+              <p>{property.addressLine1}</p>
+            </div>
           </div>
           </div>
 
