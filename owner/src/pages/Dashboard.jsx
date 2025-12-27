@@ -11,64 +11,49 @@ import { Loader2, CheckCircle2, CalendarCheck, Clock, IndianRupee, MoreVertical 
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
 
-  const getPages = () => {
-    const pages = [];
+  const pages = () => {
+    if (totalPages <= 5) return Array.from({ length: totalPages }, (_, i) => i + 1);
 
-    if (totalPages <= 5) {
-      // Show all if pages are small
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      pages.push(1);
-
-      if (currentPage > 3) pages.push("...");
-
-      const start = Math.max(2, currentPage - 1);
-      const end = Math.min(totalPages - 1, currentPage + 1);
-
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      if (currentPage < totalPages - 2) pages.push("...");
-
-      pages.push(totalPages);
-    }
-
-    return pages;
+    return [
+      1,
+      ...(currentPage > 3 ? ["..."] : []),
+      ...[currentPage - 1, currentPage, currentPage + 1].filter(
+        (p) => p > 1 && p < totalPages
+      ),
+      ...(currentPage < totalPages - 2 ? ["..."] : []),
+      totalPages,
+    ];
   };
 
+
   return (
-    <div className="flex justify-end items-center gap-2 px-6 py-4 border-t bg-white rounded-b-xl">
+     <div className="flex justify-end items-center gap-2 px-6 py-4 border-t bg-white rounded-b-xl">
       {/* Previous */}
       <button
         disabled={currentPage === 1}
         onClick={() => setCurrentPage((p) => p - 1)}
-        className={`px-4 py-1.5 rounded-lg border text-sm ${
-          currentPage === 1
-            ? "text-gray-300 border-gray-200"
-            : "text-gray-700 border-gray-300 hover:bg-gray-100"
-        }`}
+        className="px-4 py-1.5 text-sm rounded-full bg-gray-100 text-gray-400 disabled:cursor-not-allowed"
       >
         Previous
       </button>
 
       {/* Pages */}
-      {getPages().map((page, i) =>
-        page === "..." ? (
-          <span key={i} className="px-2 text-gray-400">
+      {pages().map((p, i) =>
+        p === "..." ? (
+          <span key={i} className="px-2 text-gray-400 text-sm">
             …
           </span>
         ) : (
           <button
-            key={page}
-            onClick={() => setCurrentPage(page)}
-            className={`px-3 py-1.5 rounded-lg border text-sm ${
-              page === currentPage
-                ? "bg-gray-900 text-white border-gray-900"
-                : "border-gray-300 text-gray-700 hover:bg-gray-100"
-            }`}
+            key={p}
+            onClick={() => setCurrentPage(p)}
+            className={
+              p === currentPage
+                ? "px-3 py-1.5 text-sm rounded-lg bg-black text-white"
+                : "px-2 text-sm text-gray-700 hover:text-black"
+            }
           >
-            {page}
+            {p}
           </button>
         )
       )}
@@ -77,11 +62,7 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
       <button
         disabled={currentPage === totalPages}
         onClick={() => setCurrentPage((p) => p + 1)}
-        className={`px-4 py-1.5 rounded-lg border text-sm ${
-          currentPage === totalPages
-            ? "text-gray-300 border-gray-200"
-            : "text-gray-700 border-gray-300 hover:bg-gray-100"
-        }`}
+        className="px-4 py-1.5 text-sm rounded-full bg-gray-100 text-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
       >
         Next
       </button>
