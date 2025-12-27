@@ -213,7 +213,7 @@ export default function Properties() {
             <div className="w-full bg-white rounded-b-xl p-4 gap-2 flex flex-wrap justify-between items-center">
               <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                 <span className="text-[16px]">Weekday Price</span>
-                <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekdays}/ night</p>
+                <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekdays} / night</p>
               </div>
               <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
                 <span className="text-[16px]">Weekend Price</span>
@@ -254,6 +254,17 @@ export default function Properties() {
                 <span className="font-[500]">
                   {property.roomBreakdown?.total ?? 0}
                 </span>
+              </div>
+            </div>
+            <div className="p-4">
+              <span className="text-[14px]">Room Breakdown</span>
+              <div className="bg-[#0596691c] p-2 flex flex gap-1 rounded-[8px]">
+                  <div>
+                    <span className="text-[14px]">Total Rooms</span>
+                <span className="font-[500]">
+                  {property.roomBreakdown?.ac ?? 0}
+                </span>
+                </div>
               </div>
             </div>
 
