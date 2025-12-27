@@ -49,6 +49,7 @@ export default function Properties() {
     propertyName,
     city,
     state,
+    area,
     description,
     addressLine1,
     addressLine2,
@@ -82,7 +83,7 @@ export default function Properties() {
     <div className="bg-[#f6f7f8] min-h-screen pb-10">
 
       {/* HEADER */}
-      <div className="pt-4 max-w-7xl mx-auto">
+      <div className="pt-4 max-w-7xl mx-auto px-4">
         <h1 className="text-2xl md:text-3xl font-bold">{propertyName}</h1>
         <p className="flex items-center gap-2 text-sm mt-1">
           <MapPin className="w-4 h-4" />
@@ -91,7 +92,7 @@ export default function Properties() {
       </div>
 
       {/* HERO */}
-      <div className="mt-6 max-w-7xl mx-auto">
+      <div className="mt-6 max-w-7xl mx-auto px-4">
         <img
           src={coverImage}
           alt="cover"
@@ -194,8 +195,9 @@ export default function Properties() {
               <div className="p-4 space-y-1 text-sm">
                 <p>{addressLine1}</p>
                 {addressLine2 && <p>{addressLine2}</p>}
-                <p><strong>City:</strong> {city}</p>
                 <p><strong>State:</strong> {state}</p>
+                <p><strong>City:</strong> {city}</p>
+                <p><strong>Area:</strong> {area}</p>
               </div>
             </div>
 
