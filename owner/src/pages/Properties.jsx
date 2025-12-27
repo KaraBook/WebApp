@@ -64,7 +64,7 @@ export default function Properties() {
         <img
           src={cover}
           alt="cover"
-          className="w-full h-[260px] md:h-[420px] object-cover rounded-b-2xl"
+          className="w-full h-[260px] md:h-[420px] object-cover rounded-2xl"
         />
         <div className="absolute inset-0 bg-black/25 rounded-2xl" />
 
