@@ -132,8 +132,6 @@ export default function Properties() {
 
           {/* CAPACITY + ADDRESS */}
           <div className="flex flex-col md:flex-row gap-4">
-
-            {/* CAPACITY */}
             <div className="bg-white rounded-xl shadow-sm w-full md:w-1/2">
               <div className="flex items-center gap-2 p-4">
                 <Users className="w-4 h-4" />
@@ -141,16 +139,48 @@ export default function Properties() {
                   Capacity
                 </h2>
               </div>
+
               <Separator />
 
+              {/* BASIC INFO */}
               <div className="p-4 grid grid-cols-2 gap-3 text-sm">
                 <div>Max Guests: <strong>{maxGuests}</strong></div>
                 <div>Base Guests: <strong>{baseGuests}</strong></div>
                 <div>Min Stays: <strong>{minStayNights}</strong></div>
                 <div>Total Rooms: <strong>{roomBreakdown?.total ?? 0}</strong></div>
               </div>
-            </div>
 
+              {/* ROOM BREAKDOWN */}
+              {roomBreakdown && (
+                <>
+                  <Separator />
+
+                  <div className="p-4 pt-3">
+                    <p className="text-[11px] text-gray-500 mb-2 tracking-wider uppercase">
+                      Room Breakdown
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      {roomBreakdown.ac > 0 && (
+                        <div>AC Rooms: <strong>{roomBreakdown.ac}</strong></div>
+                      )}
+
+                      {roomBreakdown.nonAc > 0 && (
+                        <div>Non-AC Rooms: <strong>{roomBreakdown.nonAc}</strong></div>
+                      )}
+
+                      {roomBreakdown.deluxe > 0 && (
+                        <div>Deluxe Rooms: <strong>{roomBreakdown.deluxe}</strong></div>
+                      )}
+
+                      {roomBreakdown.luxury > 0 && (
+                        <div>Luxury Rooms: <strong>{roomBreakdown.luxury}</strong></div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
             {/* ADDRESS */}
             <div className="bg-white rounded-xl shadow-sm w-full md:w-1/2">
               <div className="flex items-center gap-2 p-4">
