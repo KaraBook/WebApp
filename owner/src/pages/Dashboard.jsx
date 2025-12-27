@@ -234,14 +234,6 @@ export default function Dashboard() {
     });
   };
 
-  /* -------------------- Loading -------------------- */
-  if (loadingDashboard) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="animate-spin w-8 h-8 text-gray-500" />
-      </div>
-    );
-  }
 
   const { stats, bookings } = data || {};
   const totalPages = Math.ceil((bookings?.length || 0) / rowsPerPage);
@@ -266,6 +258,16 @@ export default function Dashboard() {
     for (let d = 1; d <= last.getDate(); d++) arr.push(new Date(year, month, d));
     return arr;
   }, [today]);
+
+
+  if (loadingDashboard) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="animate-spin w-8 h-8 text-gray-500" />
+      </div>
+    );
+  }
+
 
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
