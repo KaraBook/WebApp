@@ -112,7 +112,7 @@ export default function Properties() {
 
             {/* MAIN TITLE */}
             <div className="flex items-center gap-2">
-              <Utensils className="w-5 h-5 text-emerald-600" />
+              <Utensils className="w-5 h-5 text-primary" />
               <h2 className="text-[16px] font-semibold text-gray-900">
                 Amenities & Food
               </h2>
@@ -133,13 +133,13 @@ export default function Properties() {
               flex items-center gap-2
               px-4 py-2
               rounded-lg
-              bg-emerald-50
+              bg-[#05966942]
               text-emerald-700
               text-[13px]
               font-medium
             "
                     >
-                      <Icon className="w-4 h-4 text-emerald-600" />
+                      <Icon className="w-4 h-4 text-primary" />
                       {label}
                     </div>
                   ) : null
@@ -173,7 +173,7 @@ export default function Properties() {
               text-gray-800
             "
                     >
-                      <Icon className="w-4 h-4 text-emerald-600" />
+                      <Icon className="w-4 h-4 text-primary" />
                       {label}
                     </div>
                   ))}
@@ -185,7 +185,7 @@ export default function Properties() {
           {gallery.length > 0 && (
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">
-                <ImageIcon className="w-5 h-5 text-emerald-600" />
+                <ImageIcon className="w-5 h-5 text-primary" />
                 Gallery ({gallery.length})
               </h2>
 
@@ -204,48 +204,11 @@ export default function Properties() {
 
         {/* RIGHT */}
         <div>
-          <div className="bg-white rounded-xl p-6 shadow-sm lg:sticky lg:top-24">
-            <p className="text-sm text-gray-500">Starting from</p>
-
-            <p className="text-2xl font-bold flex items-center gap-1">
-              <IndianRupee className="w-5 h-5" />
-              {property.pricingPerNightWeekdays}
-              <span className="text-sm font-normal text-gray-500">
-                /night
-              </span>
-            </p>
-
-            <Separator className="my-4" />
-
-            <div className="space-y-2 text-sm">
-              <p><strong>Max Guests:</strong> {property.maxGuests}</p>
-              <p><strong>Type:</strong> {property.propertyType}</p>
-
-              <p className="flex items-center gap-2">
-                <CalendarClock className="w-4 h-4 text-emerald-600" />
-                Check-In: {property.checkInTime}
-              </p>
-
-              <p>Check-Out: {property.checkOutTime}</p>
-
-              <p><strong>Minimum Nights:</strong> {property.minStayNights}</p>
+          <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-24">
+            <div className="flex justify-start gap-2 items-center bg-primary rounded-t-xl p-4">
+             <IndianRupee className="w-5 h-5 text-primary"/>
+             <h2>Pricing</h2> 
             </div>
-
-            <Button
-              className="w-full mt-5 bg-emerald-600 hover:bg-emerald-700"
-              onClick={() => navigate(`/edit-property/${property._id}`)}
-            >
-              Edit Property
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full mt-2"
-              onClick={() => navigate(-1)}
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to List
-            </Button>
           </div>
         </div>
       </div>
