@@ -14,6 +14,7 @@ import {
   CalendarClock,
   ArrowLeft,
   Image as ImageIcon,
+  Utensils
 } from "lucide-react";
 
 import { amenitiesOptions, foodOptions } from "@/constants/dropdownOptions";
