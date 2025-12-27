@@ -206,8 +206,8 @@ export default function Properties() {
         <div>
           <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-24">
             <div className="flex justify-start gap-2 items-center bg-primary rounded-t-xl p-4">
-             <IndianRupee className="w-5 h-5 text-primary"/>
-             <h2>Pricing</h2> 
+             <IndianRupee className="w-5 h-5 text-white"/>
+             <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">Pricing</h2> 
             </div>
           </div>
         </div>
