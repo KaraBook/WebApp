@@ -289,13 +289,13 @@ export default function Dashboard() {
         <div className="flex w-full justify-between gap-6 items-start">
 
           {/* BOOKINGS TABLE */}
-          <div className="w-[60%] bg-white rounded-2xl shadow-sm border border-gray-100">
+          <div className="w-[68%] bg-white rounded-2xl shadow-sm border border-gray-100">
             <div className="px-6 pt-5 pb-3">
               <h2 className="text-sm font-semibold text-gray-900">Last bookings</h2>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1500px] text-sm">
+              <table className="w-full min-w-[1200px] text-sm">
                 <thead className="bg-gray-50 text-gray-500 border-y border-gray-100">
                   <tr className="text-left">
                     <th className="py-3 px-6 text-left">Traveller</th>
