@@ -487,7 +487,7 @@ export default function Dashboard() {
                 const blocked = isDateBlocked(day);
 
                 let cls =
-                  "h-9 w-9 flex items-center justify-center rounded-full text-xs transition";
+                  "h-9 w-9 flex items-center justify-center rounded-lg text-xs transition";
 
                 if (isDateBooked(day)) {
                   cls += " bg-red-200 text-red-700";
