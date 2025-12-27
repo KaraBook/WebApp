@@ -16,7 +16,7 @@ export const foodOptions = [
   { label: "Dinner", value: "dinner" },
 ];
 
-export const amenitiesCategories = [
+export const amenitiesOptions = [
   {
     label: "Basics",
     key: "basics",

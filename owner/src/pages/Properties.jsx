@@ -16,7 +16,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 
-import { amenitiesCategories, foodOptions } from "@/constants/dropdownOptions";
+import { amenitiesOptions, foodOptions } from "@/constants/dropdownOptions";
 
 export default function Properties() {
   const { id } = useParams();
@@ -131,7 +131,7 @@ export default function Properties() {
 
             {/* AMENITIES */}
             <div className="space-y-4">
-              {amenitiesCategories.map((cat) => {
+              {amenitiesOptions.map((cat) => {
                 const items = cat.items.filter((i) =>
                   activeAmenities.has(i.value)
                 );
