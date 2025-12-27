@@ -60,11 +60,11 @@ export default function Properties() {
     <div className="bg-[#f6f7f8] min-h-screen pb-10">
 
       {/* HERO */}
-      <div className="relative">
+      <div className="relative max-w-7xl mx-auto">
         <img
           src={cover}
           alt="cover"
-          className="max-w-7xl w-full h-[260px] md:h-[420px] object-cover rounded-b-2xl"
+          className="w-full h-[260px] md:h-[420px] object-cover rounded-b-2xl"
         />
         <div className="absolute inset-0 bg-black/25 rounded-b-2xl" />
 
@@ -132,7 +132,7 @@ export default function Properties() {
                       className="
               flex items-center gap-2
               px-4 py-2
-              rounded-full
+              rounded-lg
               bg-emerald-50
               text-emerald-700
               text-[13px]
