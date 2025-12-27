@@ -211,17 +211,20 @@ export default function Properties() {
             </div>
             <div className="w-full bg-white rounded-b-xl p-4 gap-2 flex flex-wrap justify-between items-center">
                 <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
-                    <span className="text-[18px]">Weekday Price</span>
-                    <p className="font-bold text-[20px]">₹ 6000 / night</p>
+                    <span className="text-[16px]">Weekday Price</span>
+                    <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
                 <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
-
+                    <span className="text-[16px]">Weekday Price</span>
+                    <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
                 <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
-
+                    <span className="text-[16px]">Weekday Price</span>
+                    <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
                 <div className="bg-gray-200 p-4 rounded-[8px] w-[48%]">
-
+                    <span className="text-[16px]">Weekday Price</span>
+                    <p className="font-bold text-[18px]">₹ 6000 / night</p>
                 </div>
             </div>
           </div>
