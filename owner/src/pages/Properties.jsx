@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   Loader2,
   MapPin,
+  Home,
   Users,
   CalendarClock,
   IndianRupee,
@@ -51,39 +51,38 @@ export default function Properties() {
     })();
   }, [id]);
 
-  if (loading) {
+  if (loading)
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="animate-spin w-8 h-8 text-gray-500" />
+        <Loader2 className="animate-spin text-gray-600 w-8 h-8" />
       </div>
     );
-  }
 
-  if (!property) {
+  if (!property)
     return (
-      <div className="text-center py-20">
-        <p className="text-gray-500">Property not found</p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
-        </Button>
+      <div className="text-center py-20 text-gray-500">
+        Property not found
+        <div className="mt-4">
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-4 h-4 mr-2" /> Go Back
+          </Button>
+        </div>
       </div>
     );
-  }
 
   const cover =
-    property.coverImage ||
-    "https://via.placeholder.com/1600x600?text=No+Cover+Image";
-
+    property.coverImage || "https://via.placeholder.com/900x450?text=No+Cover+Image";
   const gallery = property.galleryPhotos || [];
 
-  const statusBadge = property.isBlocked
-    ? "bg-red-100 text-red-700"
+  const statusColor = property.isBlocked
+    ? "bg-red-50 text-red-600 border border-red-100"
     : property.isDraft
-    ? "bg-yellow-100 text-yellow-800"
-    : "bg-emerald-100 text-emerald-700";
+      ? "bg-yellow-50 text-yellow-700 border border-yellow-100"
+      : "bg-emerald-50 text-emerald-700 border border-emerald-100";
 
-  const handleEditClick = () => {
+  const handleEditClick = (e) => {
     if (property.isDraft || property.isBlocked || !property.publishNow) {
+      e.preventDefault();
       setShowDialog(true);
       return;
     }
@@ -91,200 +90,231 @@ export default function Properties() {
   };
 
   return (
-    <div className="bg-[#f6f7f8] min-h-screen pb-10">
-      {/* HERO */}
-      <div className="relative">
-        <img
-          src={cover}
-          alt="cover"
-          className="w-full h-[280px] md:h-[420px] object-cover"
-        />
+    <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
+      <div className="max-w-6xl mx-auto space-y-8">
 
-        <div className="absolute inset-0 bg-black/30" />
+        {/* PAGE HEADER */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3">
+              {property.propertyName}
+              <Badge className={`${statusColor} rounded-lg px-3 py-1`}>
+                {property.isBlocked
+                  ? "Blocked"
+                  : property.isDraft
+                    ? "Draft"
+                    : "Published"}
+              </Badge>
+            </h1>
 
-        <div className="absolute bottom-6 left-6 right-6 text-white max-w-7xl mx-auto">
-          <div className="flex flex-wrap items-center gap-3">
-            <Badge className={statusBadge}>
-              {property.isBlocked
-                ? "Blocked"
-                : property.isDraft
-                ? "Draft"
-                : "Published"}
-            </Badge>
-
-            <Badge variant="secondary">5-Star Property</Badge>
+            <p className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+              <MapPin className="w-4 h-4 text-primary" />
+              {property.city}, {property.state}
+            </p>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold mt-2">
-            {property.propertyName}
-          </h1>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            </Button>
 
-          <p className="flex items-center gap-2 text-sm mt-1">
-            <MapPin className="w-4 h-4" />
-            {property.city}, {property.state}
-          </p>
+            <Button
+              onClick={handleEditClick}
+              className="bg-primary hover:bg-primary/90 text-white px-6"
+            >
+              Edit Property
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* LEFT CONTENT */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* OVERVIEW */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h2 className="font-semibold text-lg mb-2">Overview</h2>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              {property.description || "No description available."}
+        {/* COVER IMAGE */}
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+          <img
+            src={cover}
+            alt="Cover"
+            className="max-w-6xl h-[420px] object-cover"
+          />
+        </div>
+
+        {/* OVERVIEW SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <Home className="w-4 h-4 text-primary" />
+            <h2 className="text-[18px] font-semibold text-gray-900">Overview</h2>
+          </div>
+
+          <Separator />
+
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {property.description || "No description available."}
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-4 text-sm mt-2">
+            <p><strong>Type:</strong> {property.propertyType}</p>
+            <p><strong>Address:</strong> {property.addressLine1}</p>
+            <p><strong>Rooms:</strong> {property.totalRooms}</p>
+            <p><strong>Max Guests:</strong> {property.maxGuests}</p>
+
+            <p className="flex items-center gap-2">
+              <PawPrint className="w-4 h-4 text-primary" />
+              <strong>Pet Friendly:</strong> {property.petFriendly ? "Yes" : "No"}
+            </p>
+          </div>
+        </div>
+
+        {/* PRICING SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <IndianRupee className="w-4 h-4 text-primary" />
+            <h2 className="text-[18px] font-semibold text-gray-900">
+              Pricing & Stay
+            </h2>
+          </div>
+
+          <Separator />
+
+          <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
+            <p>
+              <strong>Base Price (per night):</strong>{" "}
+              ₹{property.pricingPerNightWeekdays}
             </p>
 
-            <Separator className="my-4" />
+            <p>
+              <strong>Base Guests Included:</strong>{" "}
+              {property.baseGuests}
+            </p>
 
-            <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
-              <p>
-                <strong>Address:</strong> {property.addressLine1}
-              </p>
-              <p>
-                <strong>Type:</strong> {property.propertyType}
-              </p>
-              <p>
-                <strong>Max Guests:</strong> {property.maxGuests}
-              </p>
-              <p className="flex items-center gap-2">
-                <PawPrint className="w-4 h-4 text-primary" />
-                Pet Friendly: {property.petFriendly ? "Yes" : "No"}
-              </p>
-            </div>
+            <p>
+              <strong>Extra Adult Charge:</strong>{" "}
+              ₹{property.extraAdultCharge} / night
+            </p>
+
+            <p>
+              <strong>Extra Child Charge:</strong>{" "}
+              ₹{property.extraChildCharge} / night
+            </p>
+
+            <p>
+              <strong>Maximum Guests Allowed:</strong>{" "}
+              {property.maxGuests}
+            </p>
+
+            <p>
+              <strong>Minimum Nights:</strong>{" "}
+              {property.minStayNights}
+            </p>
+
+            <p className="flex items-center gap-2">
+              <CalendarClock className="w-4 h-4 text-primary" />
+              <strong>Check-In:</strong> {property.checkInTime}
+            </p>
+
+            <p>
+              <strong>Check-Out:</strong> {property.checkOutTime}
+            </p>
+          </div>
+        </div>
+
+        {/* AMENITIES SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-primary" />
+            <h2 className="text-[18px] font-semibold text-gray-900">
+              Amenities & Food
+            </h2>
           </div>
 
-          {/* AMENITIES */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h2 className="font-semibold text-lg mb-4">Amenities & Food</h2>
+          <Separator />
 
-            <h4 className="text-sm font-medium mb-2">Food Availability</h4>
-            <div className="flex flex-wrap gap-2 mb-4">
+          <div>
+            <h4 className="font-semibold text-sm mb-2">Food Availability</h4>
+            <div className="flex flex-wrap gap-2">
               {property.foodAvailability?.length ? (
                 property.foodAvailability.map((f, i) => (
-                  <Badge key={i} variant="secondary" className="capitalize">
+                  <Badge key={i} className="capitalize bg-gray-100 text-gray-700 hover:text-white ">
                     {f}
                   </Badge>
                 ))
               ) : (
-                <span className="text-sm text-gray-500">Not specified</span>
+                <p className="text-gray-500 text-sm">Not specified</p>
               )}
             </div>
+          </div>
 
-            <h4 className="text-sm font-medium mb-2">Amenities</h4>
+          <div>
+            <h4 className="font-semibold text-sm mb-2">Amenities</h4>
             <div className="flex flex-wrap gap-2">
               {property.amenities?.length ? (
                 property.amenities.map((a, i) => (
-                  <Badge key={i} variant="secondary" className="capitalize">
+                  <Badge key={i} className="capitalize bg-gray-100 text-gray-700 hover:text-white ">
                     {a}
                   </Badge>
                 ))
               ) : (
-                <span className="text-sm text-gray-500">Not specified</span>
+                <p className="text-gray-500 text-sm">Not specified</p>
               )}
             </div>
           </div>
+        </div>
 
-          {/* GALLERY */}
-          {gallery.length > 0 && (
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h2 className="font-semibold text-lg flex items-center gap-2 mb-4">
-                <ImageIcon className="w-5 h-5 text-primary" />
+        {/* GALLERY SECTION */}
+        {gallery.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ImageIcon className="w-4 h-4 text-primary" />
+              <h2 className="text-[18px] font-semibold text-gray-900">
                 Gallery ({gallery.length})
               </h2>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {gallery.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt="gallery"
-                    className="h-36 w-full object-cover rounded-lg border hover:opacity-90 transition"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT SIDEBAR */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-xl p-6 shadow-sm lg:sticky lg:top-24">
-            <p className="text-sm text-gray-500">Starting from</p>
-
-            <p className="text-2xl font-bold flex items-center gap-1">
-              <IndianRupee className="w-5 h-5" />
-              {property.pricingPerNightWeekdays}
-              <span className="text-sm text-gray-500 font-normal">/night</span>
-            </p>
-
-            <Separator className="my-4" />
-
-            <div className="space-y-2 text-sm">
-              <p>
-                <strong>Max Guests:</strong> {property.maxGuests}
-              </p>
-              <p>
-                <strong>Base Guests:</strong> {property.baseGuests}
-              </p>
-              <p>
-                <strong>Extra Adult:</strong> ₹{property.extraAdultCharge}/night
-              </p>
-              <p>
-                <strong>Extra Child:</strong> ₹{property.extraChildCharge}/night
-              </p>
-              <p>
-                <strong>Min Nights:</strong> {property.minStayNights}
-              </p>
-
-              <p className="flex items-center gap-2">
-                <CalendarClock className="w-4 h-4 text-primary" />
-                Check-in: {property.checkInTime}
-              </p>
-
-              <p>Check-out: {property.checkOutTime}</p>
             </div>
 
-            <Button className="w-full mt-5" onClick={handleEditClick}>
-              Edit Property
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full mt-2"
-              onClick={() => navigate(-1)}
-            >
-              Back to List
-            </Button>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {gallery.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  className="rounded-xl h-36 w-full object-cover border border-gray-200 hover:opacity-90 transition"
+                  alt="Gallery"
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* RESTRICTED EDIT POPUP */}
+        <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+          <AlertDialogContent className="max-w-md">
+            <AlertDialogHeader>
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="text-yellow-500 w-6 h-6" />
+                <AlertDialogTitle>Edit Restricted</AlertDialogTitle>
+              </div>
+
+              <AlertDialogDescription className="text-gray-600 mt-2">
+                {property.isBlocked
+                  ? "This property has been blocked by the admin and cannot be edited."
+                  : "Your property is currently in Draft mode. Please contact admin to make it live before editing."}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter className="flex justify-end gap-2">
+              <AlertDialogCancel>Close</AlertDialogCancel>
+
+              <AlertDialogAction
+                asChild
+                className="bg-primary hover:bg-primary/90 text-white"
+              >
+                <a
+                  href="mailto:support@karabook.com?subject=Property%20Approval%20Request"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Contact Admin
+                </a>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-
-      {/* RESTRICTED EDIT DIALOG */}
-      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-500" />
-              Edit Restricted
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {property.isBlocked
-                ? "This property has been blocked by the admin."
-                : "Property is in Draft mode. Contact admin to make it live."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Close</AlertDialogCancel>
-            <AlertDialogAction asChild>
-              <a href="mailto:support@karabook.com">Contact Admin</a>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
