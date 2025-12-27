@@ -204,8 +204,8 @@ export default function Properties() {
         </div>
 
         {/* RIGHT */}
-        <div className="flex flex-col gap-[1.5rem] lg:sticky lg:top-24">
-          <div className="bg-white rounded-xl p-0 shadow-sm">
+        <div className="flex flex-col gap-[1.5rem]">
+          <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-24">
             <div className="flex justify-start gap-2 items-center bg-primary rounded-t-xl p-4">
              <IndianRupee className="w-5 h-5 text-white"/>
              <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">Pricing</h2> 
@@ -230,13 +230,13 @@ export default function Properties() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-0 shadow-sm">
+          <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-34">
             <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
              <Users className="w-5 h-5 text-black"/>
              <h2 className="text-black uppercase text-[20px] font-[600] tracking-[1.1px]">Capacity</h2> 
             </div>
             <Separator />
-
+            
           </div>
         </div>
       </div>
