@@ -207,33 +207,33 @@ export default function Properties() {
         <div className="flex flex-col gap-[1.5rem]">
           <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-24">
             <div className="flex justify-start gap-2 items-center bg-primary rounded-t-xl p-4">
-             <IndianRupee className="w-5 h-5 text-white"/>
-             <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">Pricing</h2> 
+              <IndianRupee className="w-5 h-5 text-white" />
+              <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">Pricing</h2>
             </div>
             <div className="w-full bg-white rounded-b-xl p-4 gap-2 flex flex-wrap justify-between items-center">
-                <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
-                    <span className="text-[16px]">Weekday Price</span>
-                    <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekdays}/ night</p>
-                </div>
-                <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
-                    <span className="text-[16px]">Weekend Price</span>
-                    <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekend} / night</p>
-                </div>
-                <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
-                    <span className="text-[16px]">Extra Adult Price</span>
-                    <p className="font-bold text-[18px]">₹ {property.extraAdultCharge} / night</p>
-                </div>
-                <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
-                    <span className="text-[16px]">Extra Child Price</span>
-                    <p className="font-bold text-[18px]">₹ {property.extraChildCharge} / night</p>
-                </div>
+              <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
+                <span className="text-[16px]">Weekday Price</span>
+                <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekdays}/ night</p>
+              </div>
+              <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
+                <span className="text-[16px]">Weekend Price</span>
+                <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekend} / night</p>
+              </div>
+              <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
+                <span className="text-[16px]">Extra Adult Price</span>
+                <p className="font-bold text-[18px]">₹ {property.extraAdultCharge} / night</p>
+              </div>
+              <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
+                <span className="text-[16px]">Extra Child Price</span>
+                <p className="font-bold text-[18px]">₹ {property.extraChildCharge} / night</p>
+              </div>
             </div>
           </div>
 
           <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-[380px]">
             <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
-             <Users className="w-5 h-5 text-black"/>
-             <h2 className="text-black uppercase text-[20px] font-[600] tracking-[1.1px]">Capacity</h2> 
+              <Users className="w-5 h-5 text-black" />
+              <h2 className="text-black uppercase text-[20px] font-[600] tracking-[1.1px]">Capacity</h2>
             </div>
             <Separator />
             <div className="mt-0 p-4 flex gap-2 justify-between">
@@ -251,10 +251,12 @@ export default function Properties() {
               </div>
               <div className="flex flex-col">
                 <span className="text-[14px]">Total Rooms</span>
-                <span className="font-[500]">{property.roomBreakdown ? total : ""}</span>
+                <span className="font-[500]">
+                  {property.roomBreakdown?.total ?? 0}
+                </span>
               </div>
             </div>
-            
+
           </div>
         </div>
       </div>
