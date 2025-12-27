@@ -139,7 +139,7 @@ export default function Properties() {
             </div>
             <div className="p-4 -mt-[25px]">
               <span className="text-[14px] pb-2">Room Breakdown</span>
-              <div className="bg-[#0596691c] p-4 flex flex gap-1 justify-between rounded-[8px]">
+              <div className="bg-[#0596691c] mt-2 pl-4 pr-4 p-2 flex flex gap-1 justify-between rounded-[8px]">
                 <div className="flex flex-col">
                   <span className="text-[14px]">Ac</span>
                   <span className="font-[500]">
