@@ -1,29 +1,25 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 import {
   Loader2,
   MapPin,
   IndianRupee,
-  CalendarClock,
-  ArrowLeft,
   Image as ImageIcon,
   Utensils,
   Users,
-  LocationEdit
+  LocationEdit,
 } from "lucide-react";
 
 import { amenitiesOptions, foodOptions } from "@/constants/dropdownOptions";
 
 export default function Properties() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,40 +45,80 @@ export default function Properties() {
 
   if (!property) return null;
 
-  const cover =
-    property.coverImage ||
-    "https://via.placeholder.com/1600x600?text=No+Image";
+  const {
+    propertyName,
+    city,
+    state,
+    description,
+    addressLine1,
+    addressLine2,
+    maxGuests,
+    baseGuests,
+    minStayNights,
+    roomBreakdown,
+    pricingPerNightWeekdays,
+    pricingPerNightWeekend,
+    extraAdultCharge,
+    extraChildCharge,
+    coverImage,
+    galleryPhotos = [],
+    amenities = [],
+    foodAvailability = [],
+  } = property;
 
-  const gallery = property.galleryPhotos || [];
+  const activeAmenities = new Set(amenities);
+  const activeFood = new Set(foodAvailability);
 
-  const activeAmenities = new Set(property.amenities || []);
-  const activeFood = new Set(property.foodAvailability || []);
+  /* -------------------- UI HELPERS -------------------- */
+  const PriceBox = ({ label, value }) => (
+    <div className="bg-gray-100 p-4 rounded-lg w-[48%]">
+      <span className="text-[16px]">{label}</span>
+      <p className="font-bold text-[18px]">₹ {value} / night</p>
+    </div>
+  );
 
+  /* -------------------- JSX -------------------- */
   return (
     <div className="bg-[#f6f7f8] min-h-screen pb-10">
 
-      <div className="relative flex justify-between items-center pt-4 max-w-7xl mx-auto">
-         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">
-            {property.propertyName}
-          </h1>
-          <p className="flex items-center gap-2 text-sm mt-1">
-            <MapPin className="w-4 h-4" />
-            {property.city}, {property.state}
-          </p>
-         </div>
+      {/* HEADER */}
+      <div className="pt-4 max-w-7xl mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold">{propertyName}</h1>
+        <p className="flex items-center gap-2 text-sm mt-1">
+          <MapPin className="w-4 h-4" />
+          {city}, {state}
+        </p>
       </div>
 
       {/* HERO */}
-      <div className="relative mt-6 max-w-7xl mx-auto">
+      <div className="mt-6 max-w-7xl mx-auto">
         <img
-          src={cover}
+          src={coverImage}
           alt="cover"
           className="w-full h-[260px] md:h-[420px] object-cover rounded-2xl"
         />
       </div>
 
-      {/* CONTENT */}
+      {/* MOBILE PRICING (below cover) */}
+      <div className="block lg:hidden mt-6 px-4">
+        <div className="bg-white rounded-xl shadow-sm">
+          <div className="flex items-center gap-2 bg-primary rounded-t-xl p-4">
+            <IndianRupee className="w-5 h-5 text-white" />
+            <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">
+              Pricing
+            </h2>
+          </div>
+
+          <div className="p-4 flex flex-wrap gap-2 justify-between">
+            <PriceBox label="Weekday Price" value={pricingPerNightWeekdays} />
+            <PriceBox label="Weekend Price" value={pricingPerNightWeekend} />
+            <PriceBox label="Extra Adult Price" value={extraAdultCharge} />
+            <PriceBox label="Extra Child Price" value={extraChildCharge} />
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN GRID */}
       <div className="max-w-7xl mx-auto px-4 md:px-0 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* LEFT */}
@@ -91,129 +127,75 @@ export default function Properties() {
           {/* OVERVIEW */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <h2 className="text-lg font-semibold mb-3">Overview</h2>
-
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {property.description}
-            </p>
-
-            <Separator className="my-4" />
-
-            <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
-              <p><strong>Address:</strong> {property.addressLine1}</p>
-              <p><strong>Type:</strong> {property.propertyType}</p>
-            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
           </div>
 
-          {/* CAPACITY AND ADDRESS */}
-          <div className="flex justify-between gap-2">
-            <div className="bg-white rounded-xl p-0 shadow-sm w-[48%]">
-            <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
-              <Users className="w-4 h-4 text-black" />
-              <h2 className="text-black uppercase text-[18px] font-[600] tracking-[1.1px]">Capacity</h2>
-            </div>
-            <Separator />
-            <div className="mt-0 p-4 flex gap-2 justify-between">
-              <div className="flex flex-col">
-                <span className="text-[14px]">Max Guests</span>
-                <span className="font-[500]">{property.maxGuests}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[14px]">Base Guests</span>
-                <span className="font-[500]">{property.baseGuests}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[14px]">Min Stays</span>
-                <span className="font-[500]">{property.minStayNights}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[14px]">Total Rooms</span>
-                <span className="font-[500]">
-                  {property.roomBreakdown?.total ?? 0}
-                </span>
-              </div>
-            </div>
-            <div className="p-4 -mt-[25px]">
-              <span className="text-[14px] pb-2">Room Breakdown</span>
-              <div className="bg-[#0596691c] mt-2 pl-4 pr-4 p-2 flex flex gap-1 justify-between rounded-[8px]">
-                <div className="flex flex-col">
-                  <span className="text-[14px]">Ac</span>
-                  <span className="font-[500]">
-                    {property.roomBreakdown?.ac ?? 0}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[14px]">Non Ac</span>
-                  <span className="font-[500]">
-                    {property.roomBreakdown?.nonAc ?? 0}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[14px]">Deluxe</span>
-                  <span className="font-[500]">
-                    {property.roomBreakdown?.deluxe ?? 0}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[14px]">Luxury</span>
-                  <span className="font-[500]">
-                    {property.roomBreakdown?.luxury ?? 0}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* CAPACITY + ADDRESS */}
+          <div className="flex flex-col md:flex-row gap-4">
 
-          <div className="bg-white rounded-xl p-0 shadow-sm w-[48%]">
-            <div className="flex justify-start gap-2 items-center rounded-t-xl p-4">
-              <LocationEdit className="w-4 h-4 text-black" />
-              <h2 className="text-black uppercase text-[18px] font-[600] tracking-[1.1px]">Address</h2>
+            {/* CAPACITY */}
+            <div className="bg-white rounded-xl shadow-sm w-full md:w-1/2">
+              <div className="flex items-center gap-2 p-4">
+                <Users className="w-4 h-4" />
+                <h2 className="uppercase text-[18px] font-[600] tracking-[1.1px]">
+                  Capacity
+                </h2>
+              </div>
+              <Separator />
+
+              <div className="p-4 grid grid-cols-2 gap-3 text-sm">
+                <div>Max Guests: <strong>{maxGuests}</strong></div>
+                <div>Base Guests: <strong>{baseGuests}</strong></div>
+                <div>Min Stays: <strong>{minStayNights}</strong></div>
+                <div>Total Rooms: <strong>{roomBreakdown?.total ?? 0}</strong></div>
+              </div>
             </div>
-            <Separator />
-            <div className="p-4 flex flex-col gap-2">
-              <p className="text-sm">{property.addressLine1}</p>
-              <p className="text-sm">{property.addressLine2}</p>
-              <p className="text-sm"><strong>State:</strong> {property.state}</p>
-              <p className="text-sm"><strong>City:</strong> {property.city}</p>
+
+            {/* ADDRESS */}
+            <div className="bg-white rounded-xl shadow-sm w-full md:w-1/2">
+              <div className="flex items-center gap-2 p-4">
+                <LocationEdit className="w-4 h-4" />
+                <h2 className="uppercase text-[18px] font-[600] tracking-[1.1px]">
+                  Address
+                </h2>
+              </div>
+              <Separator />
+
+              <div className="p-4 space-y-1 text-sm">
+                <p>{addressLine1}</p>
+                {addressLine2 && <p>{addressLine2}</p>}
+                <p><strong>City:</strong> {city}</p>
+                <p><strong>State:</strong> {state}</p>
+              </div>
             </div>
-          </div>
+
           </div>
 
           {/* AMENITIES & FOOD */}
           <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
 
-            {/* MAIN TITLE */}
             <div className="flex items-center gap-2">
               <Utensils className="w-5 h-5 text-primary" />
-              <h2 className="text-[16px] font-semibold text-gray-900">
-                Amenities & Food
-              </h2>
+              <h2 className="text-[16px] font-semibold">Amenities & Food</h2>
             </div>
 
-            {/* FOOD AVAILABILITY */}
+            {/* FOOD */}
             <div>
-              <p className="text-[11px] text-gray-500 mb-3 tracking-wider uppercase">
+              <p className="text-[11px] text-gray-500 mb-3 uppercase tracking-wider">
                 Food Availability
               </p>
 
               <div className="flex gap-2 flex-wrap">
                 {foodOptions.map(({ label, value, icon: Icon }) =>
-                  activeFood.has(value) ? (
+                  activeFood.has(value) && (
                     <div
                       key={value}
-                      className="
-              flex items-center gap-2
-              px-4 py-2
-              rounded-lg
-              bg-[#0596691c]
-              text-emerald-700
-              text-[13px]
-              font-medium
-            "
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0596691c] text-[13px] font-medium"
                     >
                       <Icon className="w-4 h-4 text-primary" />
                       {label}
                     </div>
-                  ) : null
+                  )
                 )}
               </div>
             </div>
@@ -221,51 +203,37 @@ export default function Properties() {
             <Separator />
 
             {/* AMENITIES */}
-            <div>
-              <p className="text-[11px] text-gray-500 mb-4 tracking-wider uppercase">
-                Amenities
-              </p>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                {amenitiesOptions
-                  .flatMap((cat) => cat.items)
-                  .filter((item) => activeAmenities.has(item.value))
-                  .map(({ label, value, icon: Icon }) => (
-                    <div
-                      key={value}
-                      className="
-              flex items-center gap-2
-              px-4 py-3
-              rounded-xl
-              bg-white
-              border border-[#E7E3DE]
-              text-[13px]
-              font-medium
-              text-gray-800
-            "
-                    >
-                      <Icon className="w-4 h-4 text-primary" />
-                      {label}
-                    </div>
-                  ))}
-              </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {amenitiesOptions
+                .flatMap((cat) => cat.items)
+                .filter((i) => activeAmenities.has(i.value))
+                .map(({ label, value, icon: Icon }) => (
+                  <div
+                    key={value}
+                    className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#E7E3DE] text-[13px] font-medium"
+                  >
+                    <Icon className="w-4 h-4 text-primary" />
+                    {label}
+                  </div>
+                ))}
             </div>
           </div>
 
           {/* GALLERY */}
-          {gallery.length > 0 && (
+          {galleryPhotos.length > 0 && (
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">
                 <ImageIcon className="w-5 h-5 text-primary" />
-                Gallery ({gallery.length})
+                Gallery ({galleryPhotos.length})
               </h2>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {gallery.map((img, i) => (
+              {/* MOBILE: horizontal scroll */}
+              <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto md:overflow-visible">
+                {galleryPhotos.map((img, i) => (
                   <img
                     key={i}
                     src={img}
-                    className="h-36 w-full rounded-lg object-cover"
+                    className="h-36 w-60 md:w-full flex-shrink-0 rounded-lg object-cover"
                   />
                 ))}
               </div>
@@ -273,33 +241,25 @@ export default function Properties() {
           )}
         </div>
 
-        {/* RIGHT */}
-        <div className="flex flex-col gap-[1.5rem]">
-          <div className="bg-white rounded-xl p-0 shadow-sm lg:sticky lg:top-24">
-            <div className="flex justify-start gap-2 items-center bg-primary rounded-t-xl p-4">
+        {/* RIGHT (DESKTOP PRICING) */}
+        <div className="hidden lg:block">
+          <div className="bg-white rounded-xl shadow-sm sticky top-24">
+            <div className="flex items-center gap-2 bg-primary rounded-t-xl p-4">
               <IndianRupee className="w-5 h-5 text-white" />
-              <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">Pricing</h2>
+              <h2 className="text-white uppercase text-[20px] font-[600] tracking-[1.1px]">
+                Pricing
+              </h2>
             </div>
-            <div className="w-full bg-white rounded-b-xl p-4 gap-2 flex flex-wrap justify-between items-center">
-              <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
-                <span className="text-[16px]">Weekday Price</span>
-                <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekdays} / night</p>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
-                <span className="text-[16px]">Weekend Price</span>
-                <p className="font-bold text-[18px]">₹ {property.pricingPerNightWeekend} / night</p>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
-                <span className="text-[16px]">Extra Adult Price</span>
-                <p className="font-bold text-[18px]">₹ {property.extraAdultCharge} / night</p>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-[8px] w-[48%]">
-                <span className="text-[16px]">Extra Child Price</span>
-                <p className="font-bold text-[18px]">₹ {property.extraChildCharge} / night</p>
-              </div>
+
+            <div className="p-4 flex flex-wrap gap-2 justify-between">
+              <PriceBox label="Weekday Price" value={pricingPerNightWeekdays} />
+              <PriceBox label="Weekend Price" value={pricingPerNightWeekend} />
+              <PriceBox label="Extra Adult Price" value={extraAdultCharge} />
+              <PriceBox label="Extra Child Price" value={extraChildCharge} />
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
