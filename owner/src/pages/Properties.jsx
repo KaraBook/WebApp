@@ -62,6 +62,7 @@ export default function Properties() {
     extraAdultCharge,
     extraChildCharge,
     publishNow,
+    propertyType,
     coverImage,
     galleryPhotos = [],
     amenities = [],
