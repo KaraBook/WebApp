@@ -60,7 +60,7 @@ export default function Properties() {
     <div className="bg-[#f6f7f8] min-h-screen pb-10">
 
       {/* HERO */}
-      <div className="relative max-w-7xl mx-auto">
+      <div className="relative mt-6 max-w-7xl mx-auto">
         <img
           src={cover}
           alt="cover"
@@ -86,7 +86,7 @@ export default function Properties() {
       </div>
 
       {/* CONTENT */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto px-4 md:px-0 mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
