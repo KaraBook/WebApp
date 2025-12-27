@@ -83,16 +83,57 @@ export default function Properties() {
     <div className="bg-[#f6f7f8] min-h-screen pb-10">
 
       {/* HEADER */}
-      <div className="pt-4 max-w-7xl mx-auto px-4">
-        <h1 className="text-2xl md:text-3xl font-bold">{propertyName}</h1>
-        <p className="flex items-center gap-2 text-sm mt-1">
-          <MapPin className="w-4 h-4" />
-          {city}, {state}
-        </p>
+      <div className="pt-4 max-w-7xl mx-auto md:px-0 px-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+
+          {/* LEFT: NAME + LOCATION */}
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              {propertyName}
+            </h1>
+
+            <p className="flex items-center gap-2 text-sm mt-1 text-gray-600">
+              <MapPin className="w-4 h-4" />
+              {city}, {state}
+            </p>
+          </div>
+
+          {/* RIGHT: BADGES */}
+          <div className="flex flex-wrap items-center gap-2">
+
+            {/* PUBLISH STATUS */}
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium
+          ${publishNow
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-gray-200 text-gray-600"
+                }`}
+            >
+              {publishNow ? "Published" : "Unpublished"}
+            </span>
+
+            {/* PROPERTY TYPE */}
+            <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 capitalize">
+              {propertyType}
+            </span>
+
+            {/* KYC STATUS */}
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium
+          ${kycVerified
+                  ? "bg-emerald-100 text-emerald-700"
+                  : "bg-red-100 text-red-700"
+                }`}
+            >
+              {kycVerified ? "KYC Verified" : "KYC Pending"}
+            </span>
+
+          </div>
+        </div>
       </div>
 
       {/* HERO */}
-      <div className="mt-6 max-w-7xl mx-auto px-4">
+      <div className="mt-6 max-w-7xl mx-auto md:px-0 px-4">
         <img
           src={coverImage}
           alt="cover"
