@@ -239,19 +239,19 @@ export default function Properties() {
             <div className="mt-0 p-4 flex gap-2 justify-between">
               <div className="flex flex-col">
                 <span className="text-[14px]">Max Guests</span>
-                <span>16</span>
+                <span className="font-[500]">16</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[14px]">Base Guests</span>
-                <span>16</span>
+                <span className="font-[500]">16</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[14px]">Min Stays</span>
-                <span>1</span>
+                <span className="font-[500]">1</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-[14px]">Total Rooms</span>
-                <span>16</span>
+                <span className="font-[500]">16</span>
               </div>
 
             </div>
