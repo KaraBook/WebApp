@@ -64,6 +64,9 @@ export default function OwnerBookings() {
     booking: null,
   });
 
+  const shortBookingId = (id) =>
+    id ? `#${String(id).slice(-4).toUpperCase()}` : "-";
+
   const openBookingDialog = (booking) => {
     setViewBooking({ open: true, booking });
   };
@@ -72,8 +75,6 @@ export default function OwnerBookings() {
     setViewBooking({ open: false, booking: null });
   };
 
-
-  // CONFIRM DIALOG
   const [confirm, setConfirm] = useState({
     open: false,
     type: "",
@@ -276,6 +277,7 @@ export default function OwnerBookings() {
               <table className="md:min-w-full min-w-[1200px] text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
+                    <th className="py-3 px-4 text-left">Booking ID</th>
                     <th className="py-3 px-4 text-left">Traveller</th>
                     <th className="py-3 px-4 text-left">Property</th>
                     <th className="py-3 px-4 text-left">Check-in</th>
@@ -295,11 +297,21 @@ export default function OwnerBookings() {
                       key={b._id}
                       className="border-b hover:bg-gray-50 transition"
                     >
+
+                      <td className="py-3 px-4">
+                        <button
+                          onClick={() => openBookingDialog(b)}
+                          className="font-semibold text-primary hover:underline"
+                        >
+                          {shortBookingId(b._id)}
+                        </button>
+                      </td>
+
                       {/* Traveller */}
                       <td className="py-3 px-4">
                         <button
                           onClick={() => openBookingDialog(b)}
-                          className="font-semibold text-left text-primary hover:underline"
+                          className="font-semibold text-left text-black hover:underline"
                         >
                           {b?.userId?.firstName} {b?.userId?.lastName}
                         </button>
