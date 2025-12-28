@@ -34,8 +34,8 @@ export default function Login({ userType = "owner" }) {
 
   /* -------------------- INIT RECAPTCHA -------------------- */
   useEffect(() => {
-  buildRecaptcha();
-}, []);
+    buildRecaptcha();
+  }, []);
 
   /* -------------------- SEND OTP -------------------- */
   const sendOtp = async () => {
@@ -120,26 +120,31 @@ export default function Login({ userType = "owner" }) {
       );
     } catch (e) {
       console.error("OTP error:", e);
-      toast.error(e.response?.data?.message || "OTP verification failed");
-      autoVerifyTriggered.current = false;
+
+      toast.error(
+        e.code === "auth/invalid-verification-code"
+          ? "Invalid OTP. Please try again."
+          : "OTP verification failed"
+      );
+
     } finally {
       setLoading(false);
     }
   };
+
 
   /* -------------------- AUTO VERIFY ON 6 DIGITS -------------------- */
   useEffect(() => {
     if (
       phase === "verify" &&
       otp.length === 6 &&
-      !loading &&
       confirmRes &&
       !autoVerifyTriggered.current
     ) {
       autoVerifyTriggered.current = true;
       verifyOtp();
     }
-  }, [otp, phase, loading, confirmRes]);
+  }, [otp, phase, confirmRes]);
 
   /* -------------------- JSX UI -------------------- */
   return (
@@ -174,13 +179,15 @@ export default function Login({ userType = "owner" }) {
                   +91
                 </div>
                 <Input
-                  id="mobile"
-                  placeholder="10-digit mobile"
-                  value={mobile}
-                  maxLength={10}
-                  onChange={(e) =>
-                    setMobile(e.target.value.replace(/\D/g, ""))
-                  }
+                  placeholder="6-digit OTP"
+                  maxLength={6}
+                  value={otp}
+                  autoFocus
+                  onChange={(e) => {
+                    autoVerifyTriggered.current = false; 
+                    setOtp(e.target.value.replace(/\D/g, ""));
+                  }}
+                  className="text-center tracking-widest text-lg"
                 />
               </div>
 
@@ -192,8 +199,8 @@ export default function Login({ userType = "owner" }) {
                 {loading
                   ? "Sending OTP..."
                   : canResend
-                  ? "Send OTP"
-                  : `Resend in ${timer}s`}
+                    ? "Send OTP"
+                    : `Resend in ${timer}s`}
               </Button>
             </div>
           )}
