@@ -39,7 +39,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl w-[95vw] rounded-xl p-0">
         {/* HEADER */}
-        <DialogHeader className="px-6 pt-5 pb-1">
+        <DialogHeader className="px-6 pt-5 pb-0">
           <div className="flex items-start justify-between gap-4">
             <div>
               <DialogTitle className="text-lg font-semibold">
@@ -77,7 +77,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         <Separator />
 
         {/* BODY */}
-        <div className="px-6 py-2 space-y-6 text-sm">
+        <div className="px-6 py-0 space-y-6 text-sm">
 
           {/* TRAVELLER INFO */}
           <section>
@@ -118,7 +118,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
           {/* PROPERTY INFO */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">
+            <h3 className="text-sm font-semibold text-gray-700 mb-1">
               Property Information
             </h3>
 
@@ -139,7 +139,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
           {/* STAY DETAILS */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+            <h3 className="text-sm font-semibold text-gray-700 mb-1">
               Stay Details
             </h3>
 
@@ -165,7 +165,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
           {/* PAYMENT DETAILS */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+            <h3 className="text-sm font-semibold text-gray-700 mb-1">
               Payment Details
             </h3>
 
