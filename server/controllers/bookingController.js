@@ -369,6 +369,7 @@ export const getBookingInvoice = async (req, res) => {
       nights: booking.totalNights,
       guests: booking.guests,
       totalAmount: subtotal,
+      meals,
       taxAmount,
       grandTotal,
       paymentStatus: booking.paymentStatus,

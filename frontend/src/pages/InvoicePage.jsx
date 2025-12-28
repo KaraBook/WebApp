@@ -143,14 +143,30 @@ export default function InvoicePage() {
               <strong>Nights:</strong> {invoice.nights}
             </p>
 
-            <div className="mt-2">
-              <p>
-                <strong>Guests:</strong>
-              </p>
-              <div className="ml-3 text-sm">
-                <p>Adults: {invoice.guests?.adults || 0}</p>
-                <p>Children: {invoice.guests?.children || 0}</p>
-                <p>Infants: {invoice.guests?.infants || 0}</p>
+            <div className="mt-3">
+              <div className="grid grid-cols-2 gap-6 text-sm">
+                {/* Guests */}
+                <div>
+                  <p className="font-semibold mb-1">Guests</p>
+                  <p>Adults: {invoice.guests?.adults || 0}</p>
+                  <p>Children: {invoice.guests?.children || 0}</p>
+                  <p>Infants: {invoice.guests?.infants || 0}</p>
+                </div>
+
+                {/* Meals */}
+                <div>
+                  <p className="font-semibold mb-1">Meals Included</p>
+
+                  {invoice.meals ? (
+                    <>
+                      <p>Veg: {invoice.meals.veg || 0}</p>
+                      <p>Non-Veg: {invoice.meals.nonVeg || 0}</p>
+                      <p>Combo: {invoice.meals.combo || 0}</p>
+                    </>
+                  ) : (
+                    <p className="text-gray-400">Not selected</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
