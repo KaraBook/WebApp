@@ -91,7 +91,7 @@ export default function Properties() {
 
           {/* LEFT: NAME + LOCATION */}
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h1 className="text-[26px] md:text-[26px] font-bold text-gray-900">
               {propertyName}
             </h1>
 

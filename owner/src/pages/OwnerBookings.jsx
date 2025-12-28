@@ -222,7 +222,7 @@ export default function OwnerBookings() {
   return (
     <>
       <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8">
 
           {/* PAGE HEADER */}
           <div className="flex items-center justify-between">
