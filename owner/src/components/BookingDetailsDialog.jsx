@@ -47,7 +47,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
       >
         {/* HEADER */}
         <DialogHeader className="px-6 pt-4 pb-0">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 pt-3">
             <div>
               <DialogTitle className="text-lg font-semibold leading-tight">
                 Booking Details — #{_id?.slice(-6).toUpperCase()}
@@ -89,9 +89,10 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         {/* BODY */}
         <div
           className="
-            px-6 py-3
+            px-6 py-0
             text-sm
             space-y-4
+            pb-2
             overflow-y-auto
           "
         >
