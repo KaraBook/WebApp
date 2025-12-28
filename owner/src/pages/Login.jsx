@@ -39,44 +39,52 @@ export default function Login({ userType = "owner" }) {
 
   /* -------------------- SEND OTP -------------------- */
   const sendOtp = async () => {
-    const num = mobile.replace(/\D/g, "");
-    if (num.length !== 10) return toast.error("Enter valid 10-digit number");
+  const num = mobile.replace(/\D/g, "");
+  if (num.length !== 10) {
+    toast.error("Enter valid 10-digit number");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      await auth.signOut();
-      const verifier = window.recaptchaVerifier;
+  try {
+    const verifier = window.recaptchaVerifier;
 
-      const precheckUrl =
-        userType === "manager"
-          ? SummaryApi.managerPrecheck?.url
-          : SummaryApi.ownerPrecheck?.url;
+    const precheckUrl =
+      userType === "manager"
+        ? SummaryApi.managerPrecheck?.url
+        : SummaryApi.ownerPrecheck?.url;
 
-      await api.post(precheckUrl, { mobile: num });
+    await api.post(precheckUrl, { mobile: num });
 
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        `+91${num}`,
-        verifier
-      );
+    const confirmation = await signInWithPhoneNumber(
+      auth,
+      `+91${num}`,
+      verifier
+    );
 
-      setConfirmRes(confirmation);
-      setPhase("verify");
-      setOtp("");
-      autoVerifyTriggered.current = false;
+    setConfirmRes(confirmation);
+    setPhase("verify");
+    setOtp("");
+    autoVerifyTriggered.current = false;
 
-      setCanResend(false);
-      setTimer(90);
+    setCanResend(false);
+    setTimer(90);
 
-      toast.success("OTP sent successfully");
-    } catch (err) {
-      console.error("sendOtp error:", err);
-      toast.error(err?.response?.data?.message || "Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("OTP sent successfully");
+  } catch (err) {
+    console.error("sendOtp error:", err);
+
+    toast.error(
+      err.code === "auth/too-many-requests"
+        ? "Too many attempts. Try again later."
+        : err?.response?.data?.message || "Failed to send OTP"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   /* -------------------- OTP TIMER -------------------- */
   useEffect(() => {
