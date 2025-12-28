@@ -46,8 +46,8 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         "
       >
         {/* HEADER */}
-        <DialogHeader className="px-6 pt-4 pb-3">
-          <div className="flex items-start justify-between gap-4">
+        <DialogHeader className="px-6 pt-4 pb-0">
+          <div className="flex items-center justify-between gap-4">
             <div>
               <DialogTitle className="text-lg font-semibold leading-tight">
                 Booking Details — #{_id?.slice(-6).toUpperCase()}
@@ -61,7 +61,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
                 className={`inline-block mt-1.5 px-3 py-0.5 rounded-full text-xs font-medium capitalize
                   ${
                     paymentStatus === "paid"
-                      ? "bg-black text-white"
+                      ? "bg-primary text-white"
                       : "bg-gray-200 text-gray-700"
                   }`}
               >
@@ -72,7 +72,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
             <div className="flex flex-col items-end gap-1">
               <Button
                 size="sm"
-                className="bg-black hover:bg-black/90 h-8 px-3 text-xs"
+                className="bg-primary hover:bg-primary h-8 px-3 text-xs"
               >
                 Download Invoice
               </Button>
