@@ -40,50 +40,50 @@ export default function Login({ userType = "owner" }) {
 
   /* -------------------- SEND OTP -------------------- */
   const sendOtp = async () => {
-    const num = mobile.replace(/\D/g, "");
-    if (num.length !== 10) {
-      toast.error("Enter valid 10-digit number");
-      return;
-    }
+  const num = mobile.replace(/\D/g, "");
+  if (num.length !== 10) {
+    toast.error("Enter valid 10-digit number");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      await auth.signOut();
+  try {
+    await auth.signOut();
 
-      verifyingRef.current = false;
-      setConfirmRes(null);
-      setOtp("");
+    verifyingRef.current = false;
+    setConfirmRes(null);
+    setOtp("");
 
-      const verifier = buildRecaptcha();
+    const verifier = buildRecaptcha();
 
-      const precheckUrl =
-        userType === "manager"
-          ? SummaryApi.managerPrecheck?.url
-          : SummaryApi.ownerPrecheck?.url;
+    const precheckUrl =
+      userType === "manager"
+        ? SummaryApi.managerPrecheck?.url
+        : SummaryApi.ownerPrecheck?.url;
 
-      await api.post(precheckUrl, { mobile: num });
+    await api.post(precheckUrl, { mobile: num });
 
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        `+91${num}`,
-        verifier
-      );
+    const confirmation = await signInWithPhoneNumber(
+      auth,
+      `+91${num}`,
+      verifier
+    );
 
-      setConfirmRes(confirmation);
-      setPhase("verify");
+    setConfirmRes(confirmation);
+    setPhase("verify");
 
-      setCanResend(false);
-      setTimer(90);
+    setCanResend(false);
+    setTimer(90);
 
-      toast.success("OTP sent successfully");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("OTP sent successfully");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to send OTP");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 
@@ -99,68 +99,69 @@ export default function Login({ userType = "owner" }) {
 
   /* -------------------- VERIFY OTP -------------------- */
   const verifyOtp = async () => {
-    if (!confirmRes) {
+  if (!confirmRes) {
+    toast.error("OTP expired. Please resend.");
+    return;
+  }
+
+  if (otp.length !== 6) return;
+
+  if (verifyingRef.current) return;
+  verifyingRef.current = true;
+
+  setLoading(true);
+
+  try {
+    const cred = await confirmRes.confirm(otp);
+    const idToken = await cred.user.getIdToken();
+
+    const loginUrl =
+      userType === "manager"
+        ? SummaryApi.managerLogin?.url
+        : SummaryApi.ownerLogin?.url;
+
+    const res = await api.post(loginUrl, null, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
+
+    loginWithTokens(res.data);
+    toast.success("Login successful");
+    navigate("/dashboard", { replace: true });
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.code === "auth/invalid-verification-code") {
+      toast.error("Invalid OTP. Please try again.");
+
+    } else if (err.code === "auth/code-expired") {
       toast.error("OTP expired. Please resend.");
-      return;
-    }
-
-    if (otp.length !== 6) return;
-
-    if (verifyingRef.current) return;
-    verifyingRef.current = true;
-
-    setLoading(true);
-
-    try {
-      const cred = await confirmRes.confirm(otp);
-      const idToken = await cred.user.getIdToken();
-
-      const loginUrl =
-        userType === "manager"
-          ? SummaryApi.managerLogin?.url
-          : SummaryApi.ownerLogin?.url;
-
-      const res = await api.post(loginUrl, null, {
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
-
-      loginWithTokens(res.data);
-
-      toast.success("Login successful");
-      navigate("/dashboard", { replace: true });
-    } catch (err) {
-      console.error(err);
-
-      if (err.code === "auth/code-expired") {
-        toast.error("OTP expired. Please resend.");
-        setPhase("enter");
-      } else if (err.code === "auth/invalid-verification-code") {
-        toast.error("Invalid OTP. Please try again.");
-      } else {
-        toast.error("OTP verification failed");
-      }
-
       setConfirmRes(null);
-    } finally {
-      setLoading(false);
-      verifyingRef.current = false;
+      setPhase("enter");
+
+    } else {
+      toast.error("OTP verification failed");
     }
-  };
+  } finally {
+    setLoading(false);
+    verifyingRef.current = false;
+  }
+};
 
 
 
 
   /* -------------------- AUTO VERIFY ON 6 DIGITS -------------------- */
   useEffect(() => {
-    if (
-      phase === "verify" &&
-      otp.length === 6 &&
-      confirmRes &&
-      !verifyingRef.current
-    ) {
-      verifyOtp();
-    }
-  }, [otp, phase, confirmRes]);
+  if (
+    phase === "verify" &&
+    otp.length === 6 &&
+    confirmRes &&
+    !verifyingRef.current
+  ) {
+    verifyOtp();
+  }
+}, [otp, phase, confirmRes]);
 
   /* -------------------- JSX UI -------------------- */
   return (
