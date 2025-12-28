@@ -373,10 +373,33 @@ export default function Bookings() {
                       </p>
                     </div>
 
-                    <div>
-                      <p className="text-gray-500 text-[14px] uppercase">Guests</p>
-                      <div className="text-[12px] font-medium mt-1">
-                        <p>Adults: {selectedBooking.guests.adults} | Children: {selectedBooking.guests.children}</p>
+                    <div className="col-span-3">
+                      {/* HEADERS */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <p className="text-gray-500 text-xs uppercase">Guests</p>
+                        <p className="text-gray-500 text-xs uppercase">Meals Included</p>
+                      </div>
+
+                      {/* VALUES */}
+                      <div className="grid grid-cols-2 gap-4 mt-1 text-[13px] font-medium">
+                        {/* Guests */}
+                        <div>
+                          Adults: {selectedBooking.guests.adults} | Children:{" "}
+                          {selectedBooking.guests.children}
+                        </div>
+
+                        {/* Meals */}
+                        <div>
+                          {selectedBooking.meals ? (
+                            <>
+                              Veg: {selectedBooking.meals.veg || 0} | Non-Veg:{" "}
+                              {selectedBooking.meals.nonVeg || 0} | Combo:{" "}
+                              {selectedBooking.meals.combo || 0}
+                            </>
+                          ) : (
+                            <span className="text-gray-400">Not selected</span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
