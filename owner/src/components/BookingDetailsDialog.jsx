@@ -37,21 +37,28 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl w-[95vw] rounded-xl p-0">
+      <DialogContent
+        className="
+          max-w-3xl w-[95vw]
+          max-h-[90vh]
+          overflow-hidden
+          rounded-xl p-0
+        "
+      >
         {/* HEADER */}
-        <DialogHeader className="px-6 pt-5 pb-0">
+        <DialogHeader className="px-6 pt-4 pb-3">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <DialogTitle className="text-lg font-semibold">
+              <DialogTitle className="text-lg font-semibold leading-tight">
                 Booking Details — #{_id?.slice(-6).toUpperCase()}
               </DialogTitle>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 mt-0.5">
                 Overview of traveller, property, stay, and payment information
               </p>
 
               <span
-                className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium capitalize
+                className={`inline-block mt-1.5 px-3 py-0.5 rounded-full text-xs font-medium capitalize
                   ${
                     paymentStatus === "paid"
                       ? "bg-black text-white"
@@ -62,12 +69,15 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
               </span>
             </div>
 
-            <div className="flex flex-col items-end gap-2">
-              <Button size="sm" className="bg-black hover:bg-black/90">
+            <div className="flex flex-col items-end gap-1">
+              <Button
+                size="sm"
+                className="bg-black hover:bg-black/90 h-8 px-3 text-xs"
+              >
                 Download Invoice
               </Button>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-[11px] text-gray-500">
                 Created on: {formatDate(createdAt)}
               </p>
             </div>
@@ -77,15 +87,21 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         <Separator />
 
         {/* BODY */}
-        <div className="px-6 py-0 space-y-6 text-sm">
-
+        <div
+          className="
+            px-6 py-3
+            text-sm
+            space-y-4
+            overflow-y-auto
+          "
+        >
           {/* TRAVELLER INFO */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+            <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase">
               Traveller Information
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
               <div>
                 <p className="text-xs text-gray-500">Name</p>
                 <p className="font-medium">
@@ -95,7 +111,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
               <div>
                 <p className="text-xs text-gray-500">Email</p>
-                <p className="font-medium">{userId?.email}</p>
+                <p className="font-medium truncate">{userId?.email}</p>
               </div>
 
               <div>
@@ -118,11 +134,11 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
           {/* PROPERTY INFO */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">
+            <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase">
               Property Information
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
               <div>
                 <p className="text-xs text-gray-500">Property Name</p>
                 <p className="font-medium">{propertyId?.propertyName}</p>
@@ -130,7 +146,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
               <div>
                 <p className="text-xs text-gray-500">Property ID</p>
-                <p className="font-medium">{propertyId?._id}</p>
+                <p className="font-medium break-all">{propertyId?._id}</p>
               </div>
             </div>
           </section>
@@ -139,11 +155,11 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
           {/* STAY DETAILS */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">
+            <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase">
               Stay Details
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
               <div>
                 <p className="text-xs text-gray-500">Check-in</p>
                 <p className="font-medium">{formatDate(checkIn)}</p>
@@ -165,11 +181,11 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
           {/* PAYMENT DETAILS */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">
+            <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase">
               Payment Details
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
               <div>
                 <p className="text-xs text-gray-500">Room Amount</p>
                 <p className="font-medium">
