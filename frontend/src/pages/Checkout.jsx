@@ -23,6 +23,9 @@ export default function Checkout() {
     const [blockedDates, setBlockedDates] = useState([]);
     const guestRef = useRef(null);
 
+    const totalMealsSelected =
+        mealCounts.veg + mealCounts.nonVeg + mealCounts.combo;
+
 
     const normalizeRanges = (ranges) =>
         ranges.map((r) => {
@@ -49,6 +52,13 @@ export default function Checkout() {
     const extraChildCharge = property?.extraChildCharge || 0;
 
     const totalMainGuests = guestData.adults + guestData.children;
+
+    const [includeMeals, setIncludeMeals] = useState(false);
+    const [mealCounts, setMealCounts] = useState({
+        veg: 0,
+        nonVeg: 0,
+        combo: 0,
+    });
 
     const extraAdults = Math.max(0, guestData.adults - baseGuests);
     const remainingBaseAfterAdults = Math.max(0, baseGuests - guestData.adults);
@@ -179,6 +189,12 @@ export default function Checkout() {
             toast.error("Enter a valid 10-digit mobile number");
             return;
         }
+
+        if (includeMeals && totalMealsSelected !== totalGuests) {
+            toast.error("Meal selection must match total guests");
+            return;
+        }
+
         try {
             const res = await Axios.post(
                 SummaryApi.createBookingOrder.url,
@@ -188,6 +204,9 @@ export default function Checkout() {
                     checkOut: endDate,
                     guests: guestData,
                     contactNumber: contact,
+                    meals: includeMeals
+                        ? mealCounts
+                        : null,
                 },
                 {
                     headers: {
@@ -225,6 +244,35 @@ export default function Checkout() {
             toast.error("Unable to create payment");
         }
     };
+
+
+    function MealCounter({ label, value, onChange, max }) {
+        return (
+            <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">{label}</span>
+
+                <div className="flex items-center gap-3">
+                    <button
+                        className="border rounded-full w-7 h-7"
+                        onClick={() => onChange(Math.max(0, value - 1))}
+                    >
+                        −
+                    </button>
+
+                    <span>{value}</span>
+
+                    <button
+                        className="border rounded-full w-7 h-7 disabled:opacity-40"
+                        disabled={value >= max}
+                        onClick={() => onChange(value + 1)}
+                    >
+                        +
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
 
     return (
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-4 py-10">
@@ -355,7 +403,6 @@ export default function Checkout() {
                     </div>
 
 
-                    {/* GUESTS */}
                     {/* GUESTS DROPDOWN */}
                     <div className="flex justify-between text-sm items-center relative" ref={guestRef}>
                         <div>
@@ -437,6 +484,73 @@ export default function Checkout() {
                         )}
                     </div>
 
+                </div>
+
+                {/* MEALS */}
+                <div className="border rounded-[12px] p-5 mb-6">
+                    <h3 className="font-semibold mb-3 text-lg">Meals</h3>
+
+                    <label className="flex items-center gap-3 mb-4 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={includeMeals}
+                            onChange={(e) => {
+                                setIncludeMeals(e.target.checked);
+                                if (!e.target.checked) {
+                                    setMealCounts({ veg: 0, nonVeg: 0, combo: 0 });
+                                }
+                            }}
+                        />
+                        <span className="text-sm font-medium">Include Meals</span>
+                    </label>
+
+                    {includeMeals && (
+                        <div className="space-y-4">
+
+                            {/* Veg */}
+                            <MealCounter
+                                label="Veg Guests"
+                                value={mealCounts.veg}
+                                onChange={(val) =>
+                                    setMealCounts((prev) => ({
+                                        ...prev,
+                                        veg: val,
+                                    }))
+                                }
+                                max={totalGuests - (mealCounts.nonVeg + mealCounts.combo)}
+                            />
+
+                            {/* Non-Veg */}
+                            <MealCounter
+                                label="Non-Veg Guests"
+                                value={mealCounts.nonVeg}
+                                onChange={(val) =>
+                                    setMealCounts((prev) => ({
+                                        ...prev,
+                                        nonVeg: val,
+                                    }))
+                                }
+                                max={totalGuests - (mealCounts.veg + mealCounts.combo)}
+                            />
+
+                            {/* Combo */}
+                            <MealCounter
+                                label="Combo Meal Guests"
+                                value={mealCounts.combo}
+                                onChange={(val) =>
+                                    setMealCounts((prev) => ({
+                                        ...prev,
+                                        combo: val,
+                                    }))
+                                }
+                                max={totalGuests - (mealCounts.veg + mealCounts.nonVeg)}
+                            />
+
+                            <p className="text-xs text-gray-500">
+                                Total meals selected: {totalMealsSelected} / {totalGuests}
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Contact */}

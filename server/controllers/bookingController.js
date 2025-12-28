@@ -29,7 +29,7 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const { propertyId, checkIn, checkOut, guests, contactNumber } = req.body;
+    const { propertyId, checkIn, checkOut, guests, contactNumber, meals } = req.body;
     const userId = req.user.id;
 
     const property = await Property.findById(propertyId).lean();
@@ -65,6 +65,20 @@ export const createOrder = async (req, res) => {
         success: false,
         message: `Maximum ${property.maxGuests} guests allowed`,
       });
+    }
+
+    if (meals?.includeMeals) {
+      const totalMeals =
+        Number(meals.veg || 0) +
+        Number(meals.nonVeg || 0) +
+        Number(meals.combo || 0);
+
+      if (totalMeals !== totalGuests) {
+        return res.status(400).json({
+          success: false,
+          message: "Meal count must match total guests",
+        });
+      }
     }
 
     const baseGuests = Number(property.baseGuests || 0);
@@ -112,7 +126,7 @@ export const createOrder = async (req, res) => {
     console.log("🧾 Creating Razorpay order for:", grandTotal);
 
     const order = await razorpay.orders.create({
-      amount: Math.round(grandTotal * 100), 
+      amount: Math.round(grandTotal * 100),
       currency: "INR",
       receipt: `rcpt_${Date.now()}`,
     });
@@ -127,6 +141,14 @@ export const createOrder = async (req, res) => {
       checkIn,
       checkOut,
       guests: { adults, children, infants },
+      meals: meals
+    ? {
+        includeMeals: true,
+        veg: meals.veg,
+        nonVeg: meals.nonVeg,
+        combo: meals.combo,
+      }
+    : { includeMeals: false },
       totalNights,
       totalAmount: baseTotal,
       taxAmount,

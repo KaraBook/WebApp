@@ -217,17 +217,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
                   Resend OTP
                 </button>
               )}
-
-              <button
-                className="underline"
-                onClick={() => {
-                  setStep("phone");
-                  setOtp("");
-                  setConfirmResult(null);
-                }}
-              >
-                Edit mobile number
-              </button>
             </div>
 
             <Button

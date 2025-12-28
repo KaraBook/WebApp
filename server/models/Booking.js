@@ -17,6 +17,13 @@ const bookingSchema = new mongoose.Schema(
     taxAmount: Number,
     grandTotal: Number,
 
+    meals: {
+      includeMeals: { type: Boolean, default: false },
+      veg: { type: Number, default: 0 },
+      nonVeg: { type: Number, default: 0 },
+      combo: { type: Number, default: 0 },
+    },
+
     contactNumber: String,
 
     paymentId: String,
