@@ -34,14 +34,8 @@ export default function Login({ userType = "owner" }) {
 
   /* -------------------- INIT RECAPTCHA -------------------- */
   useEffect(() => {
-    setTimeout(() => {
-      try {
-        buildRecaptcha();
-      } catch (e) {
-        console.log("Recaptcha error:", e.message);
-      }
-    }, 300);
-  }, []);
+  buildRecaptcha();
+}, []);
 
   /* -------------------- SEND OTP -------------------- */
   const sendOtp = async () => {
@@ -52,7 +46,7 @@ export default function Login({ userType = "owner" }) {
 
     try {
       await auth.signOut();
-      const verifier = await buildRecaptcha();
+      const verifier = window.recaptchaVerifier;
 
       const precheckUrl =
         userType === "manager"

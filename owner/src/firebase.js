@@ -13,8 +13,7 @@ export const auth = getAuth(app);
 
 export const buildRecaptcha = () => {
   if (window.recaptchaVerifier) {
-    try { window.recaptchaVerifier.clear(); } catch {}
-    window.recaptchaVerifier = null;
+    return window.recaptchaVerifier;
   }
 
   window.recaptchaVerifier = new RecaptchaVerifier(
@@ -22,8 +21,8 @@ export const buildRecaptcha = () => {
     "recaptcha-container",
     {
       size: "invisible",
-      callback: (response) => {
-        console.log("reCAPTCHA resolved", response);
+      callback: () => {
+        console.log("reCAPTCHA solved");
       },
     }
   );
