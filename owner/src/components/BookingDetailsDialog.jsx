@@ -52,7 +52,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         <DialogHeader className="px-4 md:px-6 pt-4 pb-0">
           <div className="flex flex-col md:flex-row items-start md:items-end pt-4 md:justify-between gap-3">
             {/* LEFT */}
-            <div className="flex flexx-col items-start">
+            <div className="flex flex-col items-start">
               <DialogTitle className="text-lg font-semibold leading-tight">
                 Booking Details — #{_id?.slice(-6).toUpperCase()}
               </DialogTitle>
