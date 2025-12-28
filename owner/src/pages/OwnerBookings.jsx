@@ -222,11 +222,11 @@ export default function OwnerBookings() {
   return (
     <>
       <div className="bg-[#f5f5f7] min-h-screen md:px-8 px-4 py-6">
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto md:space-y-8 space-y-4">
 
           {/* PAGE HEADER */}
           <div className="flex items-center justify-between">
-            <h1 className="md:text-[26px] text-xl font-bold text-gray-900">Bookings</h1>
+            <h1 className="md:text-[26px] text-[20px] font-bold text-gray-900">Bookings</h1>
           </div>
 
           {/* FILTER BAR */}
