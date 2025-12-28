@@ -39,26 +39,30 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="
-          max-w-3xl w-[95vw]
-          max-h-[90vh]
-          overflow-hidden
-          rounded-xl p-0
+          w-[95vw]
+          max-w-3xl
+          h-[90vh]
+          p-0
+          rounded-xl
+          flex
+          flex-col
         "
       >
         {/* HEADER */}
-        <DialogHeader className="px-6 pt-4 pb-0">
-          <div className="flex items-center justify-between gap-4 pt-3">
+        <DialogHeader className="px-4 md:px-6 pt-4 pb-3">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+            {/* LEFT */}
             <div>
               <DialogTitle className="text-lg font-semibold leading-tight">
                 Booking Details — #{_id?.slice(-6).toUpperCase()}
               </DialogTitle>
 
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-gray-500 mt-1">
                 Overview of traveller, property, stay, and payment information
               </p>
 
               <span
-                className={`inline-block mt-1.5 px-3 py-0.5 rounded-full text-xs font-medium capitalize
+                className={`inline-block mt-2 px-3 py-0.5 rounded-full text-xs font-medium capitalize
                   ${
                     paymentStatus === "paid"
                       ? "bg-primary text-white"
@@ -69,7 +73,8 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
               </span>
             </div>
 
-            <div className="flex flex-col items-end gap-1">
+            {/* RIGHT */}
+            <div className="flex md:flex-col items-start md:items-end gap-2">
               <Button
                 size="sm"
                 className="bg-primary hover:bg-primary h-8 px-3 text-xs"
@@ -86,14 +91,15 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
         <Separator />
 
-        {/* BODY */}
+        {/* BODY (SCROLLABLE) */}
         <div
           className="
-            px-6 py-0
+            flex-1
+            overflow-y-auto
+            px-4 md:px-6
+            py-3
             text-sm
             space-y-4
-            pb-2
-            overflow-y-auto
           "
         >
           {/* TRAVELLER INFO */}
@@ -112,7 +118,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
               <div>
                 <p className="text-xs text-gray-500">Email</p>
-                <p className="font-medium truncate">{userId?.email}</p>
+                <p className="font-medium break-all">{userId?.email}</p>
               </div>
 
               <div>
