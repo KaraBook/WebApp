@@ -22,10 +22,13 @@ export default function Checkout() {
     const [bookedDates, setBookedDates] = useState([]);
     const [blockedDates, setBlockedDates] = useState([]);
     const guestRef = useRef(null);
+    const [includeMeals, setIncludeMeals] = useState(false);
 
-    const totalMealsSelected =
-        mealCounts.veg + mealCounts.nonVeg + mealCounts.combo;
-
+    const [mealCounts, setMealCounts] = useState({
+        veg: 0,
+        nonVeg: 0,
+        combo: 0,
+    });
 
     const normalizeRanges = (ranges) =>
         ranges.map((r) => {
@@ -53,12 +56,8 @@ export default function Checkout() {
 
     const totalMainGuests = guestData.adults + guestData.children;
 
-    const [includeMeals, setIncludeMeals] = useState(false);
-    const [mealCounts, setMealCounts] = useState({
-        veg: 0,
-        nonVeg: 0,
-        combo: 0,
-    });
+    const totalMealsSelected =
+        mealCounts.veg + mealCounts.nonVeg + mealCounts.combo;
 
     const extraAdults = Math.max(0, guestData.adults - baseGuests);
     const remainingBaseAfterAdults = Math.max(0, baseGuests - guestData.adults);
