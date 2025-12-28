@@ -179,15 +179,13 @@ export default function Login({ userType = "owner" }) {
                   +91
                 </div>
                 <Input
-                  placeholder="6-digit OTP"
-                  maxLength={6}
-                  value={otp}
-                  autoFocus
-                  onChange={(e) => {
-                    autoVerifyTriggered.current = false; 
-                    setOtp(e.target.value.replace(/\D/g, ""));
-                  }}
-                  className="text-center tracking-widest text-lg"
+                  id="mobile"
+                  placeholder="10-digit mobile"
+                  value={mobile}
+                  maxLength={10}
+                  onChange={(e) =>
+                    setMobile(e.target.value.replace(/\D/g, ""))
+                  }
                 />
               </div>
 
@@ -215,7 +213,10 @@ export default function Login({ userType = "owner" }) {
                 maxLength={6}
                 value={otp}
                 autoFocus
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                onChange={(e) => {
+                  autoVerifyTriggered.current = false;
+                  setOtp(e.target.value.replace(/\D/g, ""));
+                }}
                 className="text-center tracking-widest text-lg"
               />
 
