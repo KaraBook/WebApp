@@ -221,12 +221,12 @@ export default function OwnerBookings() {
 
   return (
     <>
-      <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
+      <div className="bg-[#f5f5f7] min-h-screen md:px-8 px-4 py-6">
         <div className="max-w-7xl mx-auto space-y-8">
 
           {/* PAGE HEADER */}
           <div className="flex items-center justify-between">
-            <h1 className="text-[26px] font-bold text-gray-900">Bookings</h1>
+            <h1 className="md:text-[26px] text-xl font-bold text-gray-900">Bookings</h1>
           </div>
 
           {/* FILTER BAR */}
@@ -236,7 +236,7 @@ export default function OwnerBookings() {
               <Search className="w-5 h-5 text-gray-500" />
               <Input
                 placeholder="Search booking, traveller, phone, property"
-                className="bg-transparent border-none focus-visible:ring-0"
+                className="bg-transparent shadow-none border-none focus-visible:ring-0"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
