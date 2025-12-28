@@ -5,20 +5,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-
-import {
-  Calendar,
-  Users,
-  Phone,
-  IndianRupee,
-  MapPin,
-  CreditCard,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
   if (!booking) return null;
 
   const {
+    _id,
+    createdAt,
     userId,
     propertyId,
     checkIn,
@@ -30,137 +24,184 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     grandTotal,
     paymentStatus,
     paymentMethod,
+    orderId,
     contactNumber,
   } = booking;
 
+  const formatDate = (d) =>
+    new Date(d).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-[95vw] rounded-2xl p-0">
+      <DialogContent className="max-w-3xl w-[95vw] rounded-xl p-0">
         {/* HEADER */}
         <DialogHeader className="px-6 pt-5 pb-3">
-          <DialogTitle className="text-lg font-semibold">
-            Booking Details
-          </DialogTitle>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <DialogTitle className="text-lg font-semibold">
+                Booking Details — #{_id?.slice(-6).toUpperCase()}
+              </DialogTitle>
+
+              <p className="text-sm text-gray-500 mt-1">
+                Overview of traveller, property, stay, and payment information
+              </p>
+
+              <span
+                className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium capitalize
+                  ${
+                    paymentStatus === "paid"
+                      ? "bg-black text-white"
+                      : "bg-gray-200 text-gray-700"
+                  }`}
+              >
+                {paymentStatus}
+              </span>
+            </div>
+
+            <div className="flex flex-col items-end gap-2">
+              <Button size="sm" className="bg-black hover:bg-black/90">
+                Download Invoice
+              </Button>
+
+              <p className="text-xs text-gray-500">
+                Created on: {formatDate(createdAt)}
+              </p>
+            </div>
+          </div>
         </DialogHeader>
 
         <Separator />
 
         {/* BODY */}
-        <div className="px-6 py-4 space-y-4 text-sm">
-          {/* Traveller */}
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-gray-500 text-xs mb-1">Traveller</p>
-              <p className="font-medium text-gray-900">
-                {userId?.firstName} {userId?.lastName}
-              </p>
-              <div className="flex items-center gap-2 text-gray-600 mt-1">
-                <Phone className="w-3.5 h-3.5" />
-                {contactNumber || userId?.mobile}
+        <div className="px-6 py-5 space-y-6 text-sm">
+
+          {/* TRAVELLER INFO */}
+          <section>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+              Traveller Information
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-gray-500">Name</p>
+                <p className="font-medium">
+                  {userId?.firstName} {userId?.lastName}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Email</p>
+                <p className="font-medium">{userId?.email}</p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Phone</p>
+                <p className="font-medium">
+                  {contactNumber || userId?.mobile}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Guests</p>
+                <p className="font-medium">
+                  {guests?.adults} Adults, {guests?.children} Children
+                </p>
               </div>
             </div>
-
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium capitalize
-                ${
-                  paymentStatus === "paid"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : paymentStatus === "pending"
-                    ? "bg-amber-50 text-amber-700"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-            >
-              {paymentStatus}
-            </span>
-          </div>
+          </section>
 
           <Separator />
 
-          {/* Property */}
-          <div>
-            <p className="text-gray-500 text-xs mb-1">Property</p>
-            <div className="flex items-center gap-2 text-gray-900 font-medium">
-              <MapPin className="w-4 h-4 text-primary" />
-              {propertyId?.propertyName}
-            </div>
-          </div>
+          {/* PROPERTY INFO */}
+          <section>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+              Property Information
+            </h3>
 
-          {/* Dates */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-gray-500 text-xs mb-1">Check-in</p>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
-                {new Date(checkIn).toLocaleDateString("en-GB")}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-gray-500">Property Name</p>
+                <p className="font-medium">{propertyId?.propertyName}</p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Property ID</p>
+                <p className="font-medium">{propertyId?._id}</p>
               </div>
             </div>
-
-            <div>
-              <p className="text-gray-500 text-xs mb-1">Check-out</p>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
-                {new Date(checkOut).toLocaleDateString("en-GB")}
-              </div>
-            </div>
-          </div>
-
-          {/* Guests */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
-              <Users className="w-4 h-4 mx-auto text-primary mb-1" />
-              <p className="text-xs text-gray-500">Adults</p>
-              <p className="font-semibold">{guests?.adults}</p>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-500">Children</p>
-              <p className="font-semibold">{guests?.children}</p>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-500">Infants</p>
-              <p className="font-semibold">{guests?.infants}</p>
-            </div>
-          </div>
+          </section>
 
           <Separator />
 
-          {/* Pricing */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-gray-500 text-xs mb-1">Nights</p>
-              <p className="font-medium">{totalNights}</p>
-            </div>
+          {/* STAY DETAILS */}
+          <section>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+              Stay Details
+            </h3>
 
-            <div>
-              <p className="text-gray-500 text-xs mb-1">Payment Method</p>
-              <div className="flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-primary" />
-                {paymentMethod}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-gray-500">Check-in</p>
+                <p className="font-medium">{formatDate(checkIn)}</p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Check-out</p>
+                <p className="font-medium">{formatDate(checkOut)}</p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Total Nights</p>
+                <p className="font-medium">{totalNights}</p>
               </div>
             </div>
+          </section>
 
-            <div>
-              <p className="text-gray-500 text-xs mb-1">Amount</p>
-              <p className="font-semibold">
-                ₹{totalAmount?.toLocaleString("en-IN")}
-              </p>
+          <Separator />
+
+          {/* PAYMENT DETAILS */}
+          <section>
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">
+              Payment Details
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-gray-500">Room Amount</p>
+                <p className="font-medium">
+                  ₹{totalAmount?.toLocaleString("en-IN")}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Tax</p>
+                <p className="font-medium">
+                  ₹{taxAmount?.toLocaleString("en-IN")}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Grand Total</p>
+                <p className="font-semibold">
+                  ₹{grandTotal?.toLocaleString("en-IN")}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Payment Method</p>
+                <p className="font-medium capitalize">{paymentMethod}</p>
+              </div>
+
+              <div>
+                <p className="text-xs text-gray-500">Order ID</p>
+                <p className="font-medium break-all">{orderId}</p>
+              </div>
             </div>
-
-            <div>
-              <p className="text-gray-500 text-xs mb-1">Tax</p>
-              <p className="font-semibold">
-                ₹{taxAmount?.toLocaleString("en-IN")}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center bg-gray-50 rounded-lg p-3">
-            <span className="text-gray-600">Grand Total</span>
-            <span className="text-lg font-bold text-gray-900">
-              ₹{grandTotal?.toLocaleString("en-IN")}
-            </span>
-          </div>
+          </section>
         </div>
       </DialogContent>
     </Dialog>
