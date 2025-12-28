@@ -49,8 +49,8 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         "
       >
         {/* HEADER */}
-        <DialogHeader className="px-4 md:px-6 pt-4 pb-3">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+        <DialogHeader className="px-4 md:px-6 pt-4 pb-0">
+          <div className="flex flex-col md:flex-row items-start md:items-start pt-4 md:justify-between gap-3">
             {/* LEFT */}
             <div>
               <DialogTitle className="text-lg font-semibold leading-tight">
@@ -74,7 +74,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
             </div>
 
             {/* RIGHT */}
-            <div className="flex md:flex-col items-start md:items-end gap-2">
+            <div className="flex md:flex-col items-center  md:items-end gap-2">
               <Button
                 size="sm"
                 className="bg-primary hover:bg-primary h-8 px-3 text-xs"
@@ -97,7 +97,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
             flex-1
             overflow-y-auto
             px-4 md:px-6
-            py-3
+            py-0
             text-sm
             space-y-4
           "
