@@ -55,7 +55,7 @@ export default function Checkout() {
     const extraChildCharge = property?.extraChildCharge || 0;
 
     const totalMainGuests = guestData.adults + guestData.children;
-
+    const totalGuests = guestData.adults + guestData.children;
     const totalMealsSelected =
         mealCounts.veg + mealCounts.nonVeg + mealCounts.combo;
 
