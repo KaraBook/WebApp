@@ -142,21 +142,23 @@ export default function InvoicePage() {
             <p>
               <strong>Nights:</strong> {invoice.nights}
             </p>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 mt-2">
               {/* Guests */}
               <div>
                 <p className="text-gray-500 text-xs uppercase">Guests</p>
                 <p className="text-sm font-medium mt-1">
-                  Adults: {selectedBooking.guests.adults} | Children: {selectedBooking.guests.children}
+                  Adults: {invoice.guests?.adults || 0} | Children: {invoice.guests?.children || 0}
                 </p>
               </div>
 
               {/* Meals */}
-              {selectedBooking.meals?.includeMeals && (
+              {invoice.meals?.includeMeals && (
                 <div>
                   <p className="text-gray-500 text-xs uppercase">Meals Included</p>
                   <p className="text-sm font-medium mt-1">
-                    Veg: {selectedBooking.meals.veg || 0} | Non-Veg: {selectedBooking.meals.nonVeg || 0} | Combo: {selectedBooking.meals.combo || 0}
+                    Veg: {invoice.meals.veg || 0} |
+                    Non-Veg: {invoice.meals.nonVeg || 0} |
+                    Combo: {invoice.meals.combo || 0}
                   </p>
                 </div>
               )}
