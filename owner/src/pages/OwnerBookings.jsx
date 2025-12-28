@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
+import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 
 
 export default function OwnerBookings() {
@@ -55,9 +56,22 @@ export default function OwnerBookings() {
 
   const navigate = useNavigate();
 
-  // INVOICE
   const [invoiceData, setInvoiceData] = useState(null);
   const invoiceRef = useRef(null);
+
+  const [viewBooking, setViewBooking] = useState({
+    open: false,
+    booking: null,
+  });
+
+  const openBookingDialog = (booking) => {
+    setViewBooking({ open: true, booking });
+  };
+
+  const closeBookingDialog = () => {
+    setViewBooking({ open: false, booking: null });
+  };
+
 
   // CONFIRM DIALOG
   const [confirm, setConfirm] = useState({
@@ -283,10 +297,14 @@ export default function OwnerBookings() {
                     >
                       {/* Traveller */}
                       <td className="py-3 px-4">
-                        <div className="font-semibold">
+                        <button
+                          onClick={() => openBookingDialog(b)}
+                          className="font-semibold text-left text-primary hover:underline"
+                        >
                           {b?.userId?.firstName} {b?.userId?.lastName}
-                        </div>
-                        <div className="text-xs text-gray-500 flex items-center gap-1">
+                        </button>
+
+                        <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
                           <Phone size={12} /> {b?.userId?.mobile}
                         </div>
                       </td>
@@ -325,6 +343,10 @@ export default function OwnerBookings() {
                           </DropdownMenuTrigger>
 
                           <DropdownMenuContent className="w-48">
+
+                            <DropdownMenuItem onSelect={() => openBookingDialog(b)}>
+                              View Booking
+                            </DropdownMenuItem>
 
                             <DropdownMenuItem
                               onSelect={() => navigate(`/invoice/${b._id}`)}
@@ -434,6 +456,13 @@ export default function OwnerBookings() {
           <InvoicePreview invoice={invoiceData} />
         </div>
       )}
+
+      <BookingDetailsDialog
+        open={viewBooking.open}
+        onOpenChange={(o) => !o && closeBookingDialog()}
+        booking={viewBooking.booking}
+      />
+
     </>
   );
 }
