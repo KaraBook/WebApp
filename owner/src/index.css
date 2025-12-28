@@ -66,76 +66,125 @@
     @apply bg-background text-foreground;
   }
 }
-/* ====== CALENDAR CORE ====== */
-
+/* ================================
+   CALENDAR BASE
+================================ */
 .rdrCalendarWrapper {
-  background: #fff !important;
+  background: #ffffff !important;
   border-radius: 16px !important;
+  padding: 12px !important;
 }
 
+.rdrMonth {
+  padding: 0 !important;
+}
+
+/* ================================
+   MONTH HEADER
+================================ */
 .rdrMonthAndYearWrapper {
-  padding: 12px 0 !important;
+  padding: 8px 0 14px !important;
 }
 
-.rdrMonthAndYearWrapper button {
-  background: transparent !important;
+.rdrMonthAndYearPickers {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
 }
 
-.rdrMonthName {
+.rdrMonthPicker,
+.rdrYearPicker {
   font-size: 16px !important;
   font-weight: 600 !important;
   color: #0f172a !important;
 }
 
-/* WEEK DAYS */
-.rdrWeekDay {
-  font-size: 11px !important;
-  color: #64748b !important;
-  font-weight: 500 !important;
-  text-transform: uppercase;
+.rdrNextPrevButton {
+  background: transparent !important;
 }
 
-/* DAY CELL */
+.rdrNextPrevButton i {
+  border-color: #0f766e !important;
+}
+
+/* ================================
+   WEEK DAYS
+================================ */
+.rdrWeekDay {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: #64748b !important;
+  text-transform: uppercase !important;
+  padding-bottom: 6px !important;
+}
+
+/* ================================
+   DAY CELL (NO MARGINS!)
+================================ */
 .rdrDay {
   width: 40px !important;
   height: 40px !important;
-  margin: 3px !important;
+  padding: 0 !important;
+  margin: 0 !important;   /* 🔴 VERY IMPORTANT */
 }
 
 .rdrDayNumber span {
   width: 40px !important;
   height: 40px !important;
-  border-radius: 10px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 0 !important; /* default square */
 }
 
-/* SELECTED */
-.rdrStartEdge .rdrDayNumber span,
+/* ================================
+   SELECTED RANGE (TEAL)
+================================ */
+.rdrStartEdge .rdrDayNumber span {
+  background: #14b8a6 !important;
+  color: #fff !important;
+  border-radius: 10px 0 0 10px !important;
+}
+
 .rdrEndEdge .rdrDayNumber span {
   background: #14b8a6 !important;
   color: #fff !important;
+  border-radius: 0 10px 10px 0 !important;
 }
 
 .rdrInRange .rdrDayNumber span {
-  background: #ccfbf1 !important;
+  background: #99f6e4 !important;
   color: #0f766e !important;
 }
 
-/* BLOCKED */
+/* Single day selection */
+.rdrDaySelected .rdrDayNumber span {
+  background: #14b8a6 !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+}
+
+/* ================================
+   TODAY
+================================ */
+.rdrDayToday .rdrDayNumber span {
+  border: 1.5px solid #14b8a6 !important;
+}
+
+/* ================================
+   BLOCKED DATES (LIGHT RED)
+================================ */
 .rdrDayDisabled .rdrDayNumber span {
   background: #fee2e2 !important;
   color: #ef4444 !important;
 }
 
-/* TODAY */
-.rdrDayToday .rdrDayNumber span {
-  border: 1.5px solid #14b8a6 !important;
-}
-
-/* REMOVE PREVIEW */
+/* ================================
+   REMOVE PREVIEW / HOVER
+================================ */
 .rdrDayHovered span,
 .rdrDayStartPreview span,
 .rdrDayEndPreview span {

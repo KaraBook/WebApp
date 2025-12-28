@@ -148,7 +148,7 @@ export default function OwnerCalendar() {
                 onChange={(item) => setDateRange([item.selection])}
                 minDate={new Date()}
                 months={1}
-                showMonthAndYearPickers={false}
+                showMonthAndYearPickers={false} // ✅ IMPORTANT
                 direction="horizontal"
                 showDateDisplay={false}
                 moveRangeOnFirstSelection={false}
