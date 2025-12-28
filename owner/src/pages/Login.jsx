@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, buildRecaptcha, signInWithPhoneNumber } from "../firebase";
+import { auth, getRecaptcha, signInWithPhoneNumber } from "../firebase";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { useAuth } from "../auth/AuthContext";
@@ -33,11 +33,6 @@ export default function Login({ userType = "owner" }) {
   const { loginWithTokens } = useAuth();
   const navigate = useNavigate();
 
-  /* -------------------- INIT RECAPTCHA -------------------- */
-  useEffect(() => {
-    buildRecaptcha();
-  }, []);
-
   /* -------------------- SEND OTP -------------------- */
  const sendOtp = async () => {
   const num = mobile.replace(/\D/g, "");
@@ -52,7 +47,12 @@ export default function Login({ userType = "owner" }) {
     verifyingRef.current = false;
     setOtp("");
 
-    const verifier = buildRecaptcha();
+    // ✅ IMPORTANT: ensure DOM exists
+    if (!document.getElementById("recaptcha-container")) {
+      throw new Error("reCAPTCHA container not mounted");
+    }
+
+    const verifier = getRecaptcha();
 
     const precheckUrl =
       userType === "manager"
