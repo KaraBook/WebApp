@@ -9,13 +9,14 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 import { format } from "date-fns";
-import { RotateCcw, Calendar as CalendarIcon, Filter, X } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 export default function OwnerCalendar() {
   const [propertyId, setPropertyId] = useState(null);
   const [blockedDates, setBlockedDates] = useState([]);
-  const [bookedDates, setBookedDates] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [bookedDates, setBookedDates] = useState([]);
+
 
   const [dateRange, setDateRange] = useState([
     {
@@ -25,60 +26,59 @@ export default function OwnerCalendar() {
     },
   ]);
 
-  /* LOAD PROPERTY */
+  // LOAD PROPERTY
   useEffect(() => {
-    (async () => {
+    const fetchOwnerProperties = async () => {
       try {
         const res = await api.get(SummaryApi.getOwnerProperties.url);
-        const list = res.data?.data || [];
-        if (list.length > 0) setPropertyId(list[0]._id);
-        else toast.error("No property found");
-      } catch {
+        const list = res.data.data || [];
+        if (list.length > 0) {
+          setPropertyId(list[0]._id);
+        } else {
+          toast.error("No property found for this owner.");
+        }
+      } catch (err) {
         toast.error("Unable to load properties");
       }
-    })();
+    };
+    fetchOwnerProperties();
   }, []);
 
-  /* LOAD DATES */
+  // LOAD BLOCKED DATES
   useEffect(() => {
     if (!propertyId) return;
-    (async () => {
+
+    const fetchBlockedDates = async () => {
       try {
-        const blocked = await api.get(
-          SummaryApi.getPropertyBlockedDates.url(propertyId)
-        );
-        const booked = await api.get(
-          SummaryApi.getBookedDates.url(propertyId)
-        );
-        setBlockedDates(blocked.data?.dates || []);
-        setBookedDates(booked.data?.dates || []);
-      } catch {
-        toast.error("Failed to load calendar data");
+        const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
+        const booked = await api.get(SummaryApi.getBookedDates.url(propertyId));
+
+        setBlockedDates(res.data.dates || []);
+        setBookedDates(booked.data.dates || []);
+      } catch (err) {
+        toast.error("Failed to load dates");
       }
-    })();
+    };
+
+    fetchBlockedDates();
   }, [propertyId]);
 
-  const isDateBlocked = (date) =>
-    blockedDates.some((r) => date >= new Date(r.start) && date <= new Date(r.end));
 
-  const isDateBooked = (date) =>
-    bookedDates.some((r) => date >= new Date(r.start) && date <= new Date(r.end));
-
+  // BLOCK DATE RANGE
   const handleBlockDates = async () => {
-    if (!propertyId) return;
+    if (!propertyId) return toast.error("No property selected");
+    const { startDate, endDate } = dateRange[0];
+
     try {
       setLoading(true);
-      const { startDate, endDate } = dateRange[0];
-      const res = await api.post(
-        SummaryApi.addBlockedDates.url(propertyId),
-        {
-          start: startDate.toISOString(),
-          end: endDate.toISOString(),
-          reason: "Owner blocked these dates",
-        }
-      );
-      setBlockedDates(res.data?.data || []);
-      toast.success("Dates blocked successfully");
+      const res = await api.post(SummaryApi.addBlockedDates.url(propertyId), {
+        start: startDate.toISOString(),
+        end: endDate.toISOString(),
+        reason: "Owner blocked these dates",
+      });
+
+      toast.success("Dates blocked successfully!");
+      setBlockedDates(res.data.data || []);
     } catch {
       toast.error("Unable to block dates");
     } finally {
@@ -86,131 +86,147 @@ export default function OwnerCalendar() {
     }
   };
 
-  const handleUnblock = async (r) => {
+  // UNBLOCK A RANGE
+  const handleUnblockSingle = async (range) => {
+    if (!propertyId) return;
+
     try {
       setLoading(true);
-      const res = await api.delete(
-        SummaryApi.removeBlockedDates.url(propertyId),
-        {
-          data: {
-            start: new Date(r.start).toISOString(),
-            end: new Date(r.end).toISOString(),
-          },
-        }
-      );
-      setBlockedDates(res.data?.data || []);
-      toast.success("Dates unblocked");
+      const res = await api.delete(SummaryApi.removeBlockedDates.url(propertyId), {
+        data: {
+          start: new Date(range.start).toISOString(),
+          end: new Date(range.end).toISOString(),
+        },
+      });
+
+      toast.success("Selected range unblocked!");
+      setBlockedDates(res.data.data || []);
     } catch {
-      toast.error("Unable to unblock dates");
+      toast.error("Unable to unblock selected range");
     } finally {
       setLoading(false);
     }
   };
 
+  const isDateBlocked = (date) => {
+    return blockedDates.some((range) => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      return date >= start && date <= end;
+    });
+  };
+
+  const isDateBooked = (date) => {
+    return bookedDates.some((range) => {
+      const start = new Date(range.start);
+      const end = new Date(range.end);
+      return date >= start && date <= end;
+    });
+  };
+
+
   return (
-    <div className="bg-[#f5f5f7] min-h-screen px-4 md:px-8 py-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="bg-[#f5f5f7] min-h-screen px-8 py-8">
+      <div className="max-w-6xl mx-auto space-y-8">
 
         {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-[26px] font-semibold">Calendar</h1>
-            <p className="text-sm text-gray-500">
-              Manage your property availability and blocked dates
-            </p>
-          </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-[26px] font-semibold text-gray-900">Calendar</h1>
 
-          <Button variant="outline" onClick={() => window.location.reload()}>
-            <RotateCcw size={16} /> Refresh
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={() => window.location.reload()}
+          >
+            <RotateCcw size={16} />
+            Refresh
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* MAIN FLEX CONTAINER */}
+        <div className="flex flex-col lg:flex-row gap-8">
 
-          {/* CALENDAR */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-emerald-50 p-2 rounded-lg">
-                <CalendarIcon className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="font-semibold">Select Dates to Block</h2>
-                <p className="text-sm text-gray-500">
-                  {format(dateRange[0].startDate, "MMM dd, yyyy")} →{" "}
-                  {format(dateRange[0].endDate, "MMM dd, yyyy")}
-                </p>
-              </div>
+          {/* LEFT SIDE – CALENDAR */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 w-full lg:w-1/2">
+
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+              Select Dates to Block
+            </h2>
+
+            {/* CURRENT RANGE */}
+            <div className="text-center mb-4">
+              <p className="text-gray-600 text-sm">
+                {format(dateRange[0].startDate, "MMM dd, yyyy")} →{" "}
+                {format(dateRange[0].endDate, "MMM dd, yyyy")}
+              </p>
             </div>
 
-            <div className="border rounded-xl overflow-hidden">
+            {/* CALENDAR */}
+            <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
               <DateRange
                 ranges={dateRange}
                 onChange={(item) => setDateRange([item.selection])}
                 minDate={new Date()}
                 months={1}
-                showMonthAndYearPickers={false} // ✅ IMPORTANT
                 direction="horizontal"
                 showDateDisplay={false}
                 moveRangeOnFirstSelection={false}
-                dragSelectionEnabled
-                rangeColors={["#14b8a6"]}
-                disabledDay={(date) =>
-                  isDateBlocked(date) || isDateBooked(date)
-                }
+                rangeColors={["#0097A7"]}
+                dragSelectionEnabled={true}
+                disabledDay={(date) => isDateBooked(date) || isDateBlocked(date)}
               />
             </div>
 
-            <Button
-              onClick={handleBlockDates}
-              disabled={loading}
-              className="mt-6 w-full bg-primary"
-            >
-              Block Selected Dates
-            </Button>
+            {/* BUTTON */}
+            <div className="mt-6 flex justify-center">
+              <Button
+                onClick={handleBlockDates}
+                disabled={loading}
+                className="bg-primary text-white px-6"
+              >
+                Block Selected Dates
+              </Button>
+            </div>
           </div>
 
-          {/* BLOCKED LIST */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm max-h-[520px] overflow-y-auto">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-red-50 p-2 rounded-lg">
-                <Filter className="w-5 h-5 text-red-500" />
-              </div>
-              <div>
-                <h2 className="font-semibold">Blocked Date Ranges</h2>
-                <p className="text-sm text-gray-500">
-                  {blockedDates.length} active blocks
-                </p>
-              </div>
-            </div>
+          {/* RIGHT SIDE – BLOCKED LIST */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 w-full lg:w-1/2 max-h-[550px] overflow-y-auto">
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Blocked Date Ranges
+            </h3>
 
             {blockedDates.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center mt-10">
-                No blocked dates yet
+              <p className="text-gray-500 text-sm text-center mt-10">
+                No blocked dates yet.
               </p>
             ) : (
               <ul className="space-y-3">
-                {blockedDates.map((r, i) => (
+                {blockedDates.map((range, idx) => (
                   <li
-                    key={i}
-                    className="flex justify-between items-center border rounded-xl p-4"
+                    key={idx}
+                    className="flex items-center justify-between border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition shadow-sm"
                   >
                     <div>
-                      <p className="text-sm font-medium">
-                        {format(new Date(r.start), "MMM dd, yyyy")} →{" "}
-                        {format(new Date(r.end), "MMM dd, yyyy")}
+                      <p className="text-sm font-medium text-gray-800">
+                        {format(new Date(range.start), "MMM dd, yyyy")} →{" "}
+                        {format(new Date(range.end), "MMM dd, yyyy")}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        Owner blocked these dates
-                      </p>
+                      {range.reason && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {range.reason}
+                        </p>
+                      )}
                     </div>
 
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleUnblock(r)}
-                      className="border-red-300 text-red-600"
+                      disabled={loading}
+                      onClick={() => handleUnblockSingle(range)}
+                      className="border-primary text-primary px-3"
                     >
-                      <X size={14} />
+                      Unblock
                     </Button>
                   </li>
                 ))}
@@ -223,3 +239,7 @@ export default function OwnerCalendar() {
     </div>
   );
 }
+
+
+
+
