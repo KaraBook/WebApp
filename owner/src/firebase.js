@@ -15,7 +15,9 @@ export const buildRecaptcha = () => {
   if (!window.recaptchaVerifier) {
     window.recaptchaVerifier = new RecaptchaVerifier(
       "recaptcha-container",
-      { size: "invisible" },
+      {
+        size: "invisible",
+      },
       auth
     );
   }
