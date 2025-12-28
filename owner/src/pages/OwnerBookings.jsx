@@ -222,7 +222,7 @@ export default function OwnerBookings() {
   return (
     <>
       <div className="bg-[#f5f5f7] min-h-screen md:px-8 px-4 py-6">
-        <div className="max-w-7xl mx-auto md:space-y-8 space-y-4">
+        <div className="max-w-7xl mx-auto md:space-y-4 space-y-4">
 
           {/* PAGE HEADER */}
           <div className="flex items-center justify-between">
@@ -259,7 +259,7 @@ export default function OwnerBookings() {
           {/* TABLE */}
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
+              <table className="md:min-w-full min-w-[1200px] text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="py-3 px-4 text-left">Traveller</th>
