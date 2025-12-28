@@ -50,14 +50,14 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
       >
         {/* HEADER */}
         <DialogHeader className="px-4 md:px-6 pt-4 pb-0">
-          <div className="flex flex-col md:flex-row items-start md:items-start pt-4 md:justify-between gap-3">
+          <div className="flex flex-col md:flex-row items-start md:items-end pt-4 md:justify-between gap-3">
             {/* LEFT */}
-            <div>
+            <div className="flex flexx-col items-start">
               <DialogTitle className="text-lg font-semibold leading-tight">
                 Booking Details — #{_id?.slice(-6).toUpperCase()}
               </DialogTitle>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-left text-gray-500 mt-1">
                 Overview of traveller, property, stay, and payment information
               </p>
 
