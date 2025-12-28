@@ -12,21 +12,15 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 export const buildRecaptcha = () => {
-  if (window.recaptchaVerifier) {
-    window.recaptchaVerifier.clear();
-    window.recaptchaVerifier = null;
+  if (!window.recaptchaVerifier) {
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      { size: "invisible" },
+      auth
+    );
   }
-
-  window.recaptchaVerifier = new RecaptchaVerifier(
-    auth,
-    "recaptcha-container",
-    {
-      size: "invisible",
-    }
-  );
 
   return window.recaptchaVerifier;
 };
-
 
 export { signInWithPhoneNumber };

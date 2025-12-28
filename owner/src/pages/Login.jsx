@@ -39,7 +39,7 @@ export default function Login({ userType = "owner" }) {
   }, []);
 
   /* -------------------- SEND OTP -------------------- */
-  const sendOtp = async () => {
+ const sendOtp = async () => {
   const num = mobile.replace(/\D/g, "");
   if (num.length !== 10) {
     toast.error("Enter valid 10-digit number");
@@ -49,10 +49,7 @@ export default function Login({ userType = "owner" }) {
   setLoading(true);
 
   try {
-    await auth.signOut();
-
     verifyingRef.current = false;
-    setConfirmRes(null);
     setOtp("");
 
     const verifier = buildRecaptcha();
@@ -72,7 +69,6 @@ export default function Login({ userType = "owner" }) {
 
     setConfirmRes(confirmation);
     setPhase("verify");
-
     setCanResend(false);
     setTimer(90);
 
