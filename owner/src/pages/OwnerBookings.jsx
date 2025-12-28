@@ -336,7 +336,7 @@ export default function OwnerBookings() {
                           : `${b.guests.adults + b.guests.children} Guests`}
                       </td>
 
-                      <td className="py-3 px-4 flex items-center gap-1 font-medium">
+                      <td className="py-3 px-4 font-medium">
                         {formatCurrency(b.totalAmount)}
                       </td>
 
