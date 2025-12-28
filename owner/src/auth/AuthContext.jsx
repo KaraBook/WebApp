@@ -1,20 +1,32 @@
 import { createContext, useContext, useMemo, useState, useEffect } from "react";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
+import { useLocation } from "react-router-dom";
 
 const AuthCtx = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [ready, setReady] = useState(false);
+  const location = useLocation();
+  const isAuthPage =
+    location.pathname.startsWith("/login") ||
+    location.pathname.startsWith("/manager/login");
+
+  if (isAuthPage) {
+    return <AuthCtx.Provider value={{ user: null, ready: true }}>{children}</AuthCtx.Provider>;
+  }
 
   useEffect(() => {
     const access = localStorage.getItem("owner_access");
     const expiry = parseInt(localStorage.getItem("owner_access_expiry"), 10);
 
-    if (!access || !expiry || Date.now() > expiry) {
-      console.log("Session expired or not found — forcing logout");
-      logout(false); 
+    if (!access || !expiry) {
+      setReady(true);
+      return;
+    }
+
+    if (Date.now() > expiry) {
+      console.log("Session expired — logging out");
+      logout();
       setReady(true);
       return;
     }
@@ -36,8 +48,8 @@ export function AuthProvider({ children }) {
 
   const loginWithTokens = (payload) => {
     const now = Date.now();
-    const accessExpiry = now + 30 * 60 * 1000; 
-    const refreshExpiry = now + 24 * 60 * 60 * 1000; 
+    const accessExpiry = now + 30 * 60 * 1000;
+    const refreshExpiry = now + 24 * 60 * 60 * 1000;
 
     localStorage.setItem("owner_access", payload.accessToken);
     localStorage.setItem("owner_refresh", payload.refreshToken);
@@ -55,7 +67,9 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("owner_refresh_expiry");
     localStorage.removeItem("owner_user");
     setUser(null);
-    if (redirect) window.location.href = "/owner/login";
+    if (redirect && window.location.pathname !== "/login" && window.location.pathname !== "/manager/login") {
+      window.location.href = "/login";
+    }
   };
 
   useEffect(() => {
@@ -71,7 +85,7 @@ export function AuthProvider({ children }) {
       }
     };
 
-    const interval = setInterval(checkExpiry, 60 * 1000); 
+    const interval = setInterval(checkExpiry, 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -82,7 +96,7 @@ export function AuthProvider({ children }) {
       timer = setTimeout(() => {
         console.log("🕒 Auto-logout due to inactivity");
         logout();
-      }, 15 * 60 * 1000); 
+      }, 15 * 60 * 1000);
     };
 
     window.addEventListener("mousemove", resetTimer);
@@ -122,7 +136,7 @@ export function AuthProvider({ children }) {
           logout();
         }
       }
-    }, 60 * 1000); 
+    }, 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
