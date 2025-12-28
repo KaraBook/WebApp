@@ -147,7 +147,7 @@ export default function ViewProperty() {
   } = property;
 
   return (
-    <div className="p-4 max-w-[1400px] mx-auto space-y-6">
+    <div className="md:p-4 p-0 max-w-[1400px] mx-auto space-y-6">
       {/* Header */}
        <Button className="bg-gray-200 text-black hover:bg-gray-200" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-4 w-4 mr-1" />

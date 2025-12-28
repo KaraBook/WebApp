@@ -110,10 +110,10 @@ const FileUploadsSection = ({
   const totalGalleryCount = existingGallery.length + newGalleryFiles.length;
 
   return (
-    <div className="mt-2 w-full flex justify-between gap-4">
+    <div className="mt-2 w-full flex flex-wrap md:flex-nowrap justify-between gap-4">
       {/* Cover Image */}
       {showFields.coverImage && (
-        <div className="w-[48%]">
+        <div className="md:w-[48%] w-[100%]">
           <Label htmlFor="coverImage" className="font-medium">
             Cover Image <span className="text-red-500">*</span>
           </Label>
@@ -211,7 +211,7 @@ const FileUploadsSection = ({
 
       {/* Gallery Photos */}
       {showFields.galleryPhotos && (
-        <div className="w-[48%]">
+        <div className="md:w-[48%] w-[100%]">
           <Label htmlFor="galleryPhotos" className="font-medium">
             Gallery Photos (Min {minGallery}, Max {maxGallery})
           </Label>

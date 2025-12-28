@@ -289,13 +289,13 @@ const EditProperty = () => {
   }
 
   return (
-    <div className="p-3 w-full mx-auto">
+    <div className="md:p-3 p-0 w-full mx-auto">
       <h2 className="text-2xl font-bold mb-4">Edit Property</h2>
 
       {/* Stepper */}
       <TooltipProvider delayDuration={200}>
-        <div className="flex items-center space-x-0 overflow-x-auto w-full mt-20 mb-8">
-          <div className="w-[25%] text-xl font-semibold text-black">
+        <div className="flex flex-row flex-wrap items-center md:flex-nowrap md:flex-row md:items-start md:items-center space-x-0 overflow-x-auto w-full mt-[30px] md:mt-20 mb-8">
+          <div className="md:w-[25%] mb-4 w-[100%] text-xl font-semibold text-black">
             {formSteps[currentStep - 1].title}
           </div>
           {loading && <FullPageLoader />}
@@ -324,18 +324,18 @@ const EditProperty = () => {
                     <TooltipContent side="top">{step.title}</TooltipContent>
                   </Tooltip>
                 </div>
-                {index !== formSteps.length - 1 && <div className="h-0.5 w-[12%] bg-gray-300 mx-2" />}
+                {index !== formSteps.length - 1 && <div className="h-0.5 w-[8%] md:w-[12%] bg-gray-300 mx-2" />}
               </React.Fragment>
             );
           })}
         </div>
       </TooltipProvider>
 
-      <form onSubmit={handleSubmit} className="flex w-full flex-wrap justify-between gap-4">
+      <form onSubmit={handleSubmit} className="flex w-full flex-wrap justify-between gap-3 md:gap-4">
         {/* STEP 1 */}
         {currentStep === 1 && (
           <>
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="propertyName">
                 Property Name <span className="text-red-500">*</span>
               </Label>
@@ -349,7 +349,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <SingleSelectButtons
                 label="Property Type"
                 options={propertyTypeOptions}
@@ -359,7 +359,7 @@ const EditProperty = () => {
             </div>
 
             {/* First Name */}
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="resortOwnerFirstName" className="text-sm">
                 Resort Owner First Name <span className="text-red-500">*</span>
               </Label>
@@ -375,7 +375,7 @@ const EditProperty = () => {
             </div>
 
             {/* Last Name */}
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="resortOwnerLastName" className="text-sm">
                 Resort Owner Last Name <span className="text-red-500">*</span>
               </Label>
@@ -391,7 +391,7 @@ const EditProperty = () => {
             </div>
 
             {/* Email */}
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="resortOwnerEmail" className="text-sm">
                 Resort Owner Email <span className="text-red-500">*</span>
               </Label>
@@ -407,7 +407,7 @@ const EditProperty = () => {
             </div>
 
             {/* Mobile Number */}
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="resortOwnerMobile" className="text-sm">
                 Resort Owner Mobile Number <span className="text-red-500">*</span>
               </Label>
@@ -427,7 +427,7 @@ const EditProperty = () => {
             </div>
 
             {/* Resort Email */}
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="resortOwnerResortEmail" className="text-sm">
                 Resort Email <span className="text-red-500">*</span>
               </Label>
@@ -443,7 +443,7 @@ const EditProperty = () => {
             </div>
 
             {/* Resort Mobile Number */}
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="resortOwnerResortMobile" className="text-sm">
                 Resort Mobile Number <span className="text-red-500">*</span>
               </Label>
@@ -484,7 +484,7 @@ const EditProperty = () => {
         {/* STEP 2 */}
         {currentStep === 2 && (
           <>
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="addressLine1" className="text-sm">
                 Address Line 1<span className="text-red-500"> *</span>
               </Label>
@@ -499,7 +499,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="addressLine2" className="text-sm">
                 Address Line 2
               </Label>
@@ -514,7 +514,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[32%]">
+            <div className="md:w-[32%] w-[48%]">
               <Label htmlFor="state" className="text-sm">
                 State <span className="text-red-500">*</span>
               </Label>
@@ -540,15 +540,15 @@ const EditProperty = () => {
               </Select>
             </div>
 
-            <div className="w-[32%]">
-              <label className="block font-small mb-1">
+            <div className="md:w-[32%] w-[48%]">
+              <Label htmlFor="city" className="text-sm">
                 City <span className="text-red-500">*</span>
-              </label>
+              </Label>
               <Select
                 value={formData.city}
                 onValueChange={(value) => handleChange({ target: { name: "city", value } })}
               >
-                <SelectTrigger className="w-full border p-2 rounded mt-1">
+                <SelectTrigger className="w-full border p-2 rounded mt-2">
                   <SelectValue placeholder="Select City" />
                 </SelectTrigger>
                 <SelectContent>
@@ -562,7 +562,7 @@ const EditProperty = () => {
             </div>
 
 
-            <div className="w-[32%]">
+            <div className="md:w-[32%] w-[48%]">
               <Label htmlFor="area" className="text-sm">
                 Area <span className="text-red-500">*</span>
               </Label>
@@ -599,7 +599,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="locationLink" className="text-sm">
                 Google Maps Location Link <span className="text-red-500">*</span>
               </Label>
@@ -654,7 +654,7 @@ const EditProperty = () => {
                   </div>
                 ))}
 
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex items-center gap-2 ml-0 md:ml-4">
                   <span className="px-3 py-2 bg-black text-white rounded-md text-sm">
                     Total
                   </span>
@@ -667,7 +667,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[16%]">
+            <div className="md:w-[16%] w-[100%]">
               <Label htmlFor="minStayNights" className="text-sm">
                 Minimum Stay (Nights) <span className="text-red-500">*</span>
               </Label>
@@ -681,7 +681,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[28%]">
+            <div className="md:w-[28%] w-[100%]">
               <SingleSelectDropdown
                 label="Is this property Pet Friendly?"
                 value={formData.petFriendly}
@@ -700,7 +700,7 @@ const EditProperty = () => {
             </div>
 
 
-            <div className="w-[15%]">
+            <div className="md:w-[15%] w-[48%]">
               <Label htmlFor="maxGuests" className="text-sm">
                 Max Guests Allowed <span className="text-red-500">*</span>
               </Label>
@@ -714,7 +714,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[15%]">
+            <div className="md:w-[15%] w-[48%]">
               <Label className="text-sm">
                 Base Guests <span className="text-red-500">*</span>
               </Label>
@@ -730,7 +730,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[22%]">
+            <div className="md:w-[22%] w-[100%]">
               <Label className="text-sm">
                 Extra Adult Charge (₹ / night)
               </Label>
@@ -747,7 +747,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[22%]">
+            <div className="md:w-[22%] w-[100%]">
               <Label className="text-sm">
                 Extra Child Charge (₹ / night)
               </Label>
@@ -764,7 +764,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[22%]">
+            <div className="md:w-[22%] w-[100%]">
               <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
                 Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
               </Label>
@@ -787,7 +787,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="w-[22%]">
+            <div className="md:w-[22%] w-[100%]">
               <Label htmlFor="pricingPerNightWeekend" className="block font-medium mt-2">
                 Price Per Night (Weekend) (₹) <span className="text-red-500">*</span>
               </Label>
@@ -822,7 +822,7 @@ const EditProperty = () => {
               onChange={(val) => setFormData({ ...formData, checkOutTime: val })}
             />
 
-            <div className="w-[48%] flex flex-col gap-2">
+            <div className="md:w-[48%] w-[100%] flex flex-col gap-2">
               <Label className="text-sm">
                 Is this property refundable?
                 <span className="text-red-500">*</span>
@@ -888,7 +888,7 @@ const EditProperty = () => {
 
               <div className="flex flex-wrap items-start justify-start gap-4">
                 {amenitiesCategories.map((cat) => (
-                  <div key={cat.key} className="border rounded-lg w-[48%]">
+                  <div key={cat.key} className="border rounded-lg w-[100%] md:w-[48%]">
 
                     {/* Category Header */}
                     <details className="group">
@@ -964,7 +964,7 @@ const EditProperty = () => {
         {currentStep === 5 && (
           <>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="pan" className="text-sm">
                 Property PAN <span className="text-gray-400 text-xs">(10 characters)</span>
               </Label>
@@ -984,7 +984,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <SingleSelectDropdown
                 label="KYC Verified"
                 value={formData.kycVerified}
@@ -994,7 +994,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="gstin" className="text-sm">
                 GSTIN <span className="text-gray-400 text-xs">(15 characters)</span> <span className="text-red-500">*</span>
               </Label>
@@ -1017,7 +1017,7 @@ const EditProperty = () => {
               )}
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <SingleSelectDropdown
                 label="Approval Status"
                 value={formData.approvalStatus}
@@ -1027,7 +1027,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <SingleSelectDropdown
                 label="Featured Property"
                 value={formData.featured}
@@ -1037,7 +1037,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="internalNotes" className="text-sm">
                 Internal Notes <span className="text-red-500">*</span>
               </Label>
@@ -1075,7 +1075,7 @@ const EditProperty = () => {
             />
 
 
-            <div className="w-[48%] -mt-2">
+            <div className="md:w-[48%] w-[100%] -mt-2">
               <FileUploadsSection
                 setShopActFile={setShopActFile}
                 shopActFile={shopActFile}
@@ -1085,7 +1085,7 @@ const EditProperty = () => {
               />
             </div>
 
-            <div className="w-[48%]">
+            <div className="md:w-[48%] w-[100%]">
               <SingleSelectDropdown
                 label="Publish Now"
                 value={formData.publishNow}
