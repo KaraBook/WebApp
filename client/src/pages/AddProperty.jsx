@@ -290,13 +290,13 @@ const AddProperty = () => {
     }, []);
 
     return (
-        <div className="p-3 w-full mx-auto">
+        <div className="md:p-3 p-0 w-full mx-auto">
             <h2 className="text-2xl font-bold mb-4">Add New Property</h2>
 
             {/* Stepper */}
             <TooltipProvider delayDuration={200}>
-                <div className="flex items-center space-x-0 overflow-x-auto w-full mt-20 mb-8">
-                    <div className="w-[25%] text-xl font-semibold text-black">
+                <div className="flex flex-col md:flex-row items-start md:items-center space-x-0 overflow-x-auto w-full mt-[30px] md:mt-20 mb-8">
+                    <div className="md:w-[25%] w-[100%] text-xl font-semibold text-black">
                         {formSteps[currentStep - 1].title}
                     </div>
                     {loading && <FullPageLoader />}
