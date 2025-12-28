@@ -98,6 +98,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
             overflow-y-auto
             px-4 md:px-6
             py-0
+            pb-[20px]
             text-sm
             space-y-4
           "
@@ -192,7 +193,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
               Payment Details
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-x-4 gap-y-2">
               <div>
                 <p className="text-xs text-gray-500">Room Amount</p>
                 <p className="font-medium">
