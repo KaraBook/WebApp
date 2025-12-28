@@ -13,7 +13,8 @@ export const auth = getAuth(app);
 
 export const buildRecaptcha = () => {
   if (window.recaptchaVerifier) {
-    return window.recaptchaVerifier;
+    window.recaptchaVerifier.clear();
+    window.recaptchaVerifier = null;
   }
 
   window.recaptchaVerifier = new RecaptchaVerifier(
@@ -21,13 +22,11 @@ export const buildRecaptcha = () => {
     "recaptcha-container",
     {
       size: "invisible",
-      callback: () => {
-        console.log("reCAPTCHA solved");
-      },
     }
   );
 
   return window.recaptchaVerifier;
 };
+
 
 export { signInWithPhoneNumber };

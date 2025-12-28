@@ -26,6 +26,7 @@ export default function Login({ userType = "owner" }) {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
   const [canResend, setCanResend] = useState(true);
+  const verifyingRef = useRef(false);
 
   const autoVerifyTriggered = useRef(false);
 
@@ -39,51 +40,51 @@ export default function Login({ userType = "owner" }) {
 
   /* -------------------- SEND OTP -------------------- */
   const sendOtp = async () => {
-  const num = mobile.replace(/\D/g, "");
-  if (num.length !== 10) {
-    toast.error("Enter valid 10-digit number");
-    return;
-  }
+    const num = mobile.replace(/\D/g, "");
+    if (num.length !== 10) {
+      toast.error("Enter valid 10-digit number");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const verifier = window.recaptchaVerifier;
+    try {
+      await auth.signOut();
 
-    const precheckUrl =
-      userType === "manager"
-        ? SummaryApi.managerPrecheck?.url
-        : SummaryApi.ownerPrecheck?.url;
+      verifyingRef.current = false;
+      setConfirmRes(null);
+      setOtp("");
 
-    await api.post(precheckUrl, { mobile: num });
+      const verifier = buildRecaptcha();
 
-    const confirmation = await signInWithPhoneNumber(
-      auth,
-      `+91${num}`,
-      verifier
-    );
+      const precheckUrl =
+        userType === "manager"
+          ? SummaryApi.managerPrecheck?.url
+          : SummaryApi.ownerPrecheck?.url;
 
-    setConfirmRes(confirmation);
-    setPhase("verify");
-    setOtp("");
-    autoVerifyTriggered.current = false;
+      await api.post(precheckUrl, { mobile: num });
 
-    setCanResend(false);
-    setTimer(90);
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        `+91${num}`,
+        verifier
+      );
 
-    toast.success("OTP sent successfully");
-  } catch (err) {
-    console.error("sendOtp error:", err);
+      setConfirmRes(confirmation);
+      setPhase("verify");
 
-    toast.error(
-      err.code === "auth/too-many-requests"
-        ? "Too many attempts. Try again later."
-        : err?.response?.data?.message || "Failed to send OTP"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      setCanResend(false);
+      setTimer(90);
+
+      toast.success("OTP sent successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   /* -------------------- OTP TIMER -------------------- */
@@ -98,8 +99,15 @@ export default function Login({ userType = "owner" }) {
 
   /* -------------------- VERIFY OTP -------------------- */
   const verifyOtp = async () => {
-    if (!confirmRes || loading) return;
+    if (!confirmRes) {
+      toast.error("OTP expired. Please resend.");
+      return;
+    }
+
     if (otp.length !== 6) return;
+
+    if (verifyingRef.current) return;
+    verifyingRef.current = true;
 
     setLoading(true);
 
@@ -118,27 +126,28 @@ export default function Login({ userType = "owner" }) {
 
       loginWithTokens(res.data);
 
-      toast.success(
-        userType === "manager" ? "Manager logged in!" : "Login successful"
-      );
+      toast.success("Login successful");
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      console.error(err);
 
-      navigate(
-        userType === "manager" ? "/manager/dashboard" : "/dashboard",
-        { replace: true }
-      );
-    } catch (e) {
-      console.error("OTP error:", e);
+      if (err.code === "auth/code-expired") {
+        toast.error("OTP expired. Please resend.");
+        setPhase("enter");
+      } else if (err.code === "auth/invalid-verification-code") {
+        toast.error("Invalid OTP. Please try again.");
+      } else {
+        toast.error("OTP verification failed");
+      }
 
-      toast.error(
-        e.code === "auth/invalid-verification-code"
-          ? "Invalid OTP. Please try again."
-          : "OTP verification failed"
-      );
-
+      setConfirmRes(null);
     } finally {
       setLoading(false);
+      verifyingRef.current = false;
     }
   };
+
+
 
 
   /* -------------------- AUTO VERIFY ON 6 DIGITS -------------------- */
@@ -147,9 +156,8 @@ export default function Login({ userType = "owner" }) {
       phase === "verify" &&
       otp.length === 6 &&
       confirmRes &&
-      !autoVerifyTriggered.current
+      !verifyingRef.current
     ) {
-      autoVerifyTriggered.current = true;
       verifyOtp();
     }
   }, [otp, phase, confirmRes]);
