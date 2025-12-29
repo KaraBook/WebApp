@@ -23,22 +23,26 @@ export const getRecaptcha = async () => {
   if (recaptchaVerifier) return recaptchaVerifier;
 
   recaptchaVerifier = new RecaptchaVerifier(
+    auth,                     
     "recaptcha-container",   
     {
       size: "invisible",
-    },
-    auth                   
+    }
   );
 
   await recaptchaVerifier.render();
   return recaptchaVerifier;
 };
 
+
 export const resetRecaptcha = () => {
   if (recaptchaVerifier) {
-    recaptchaVerifier.clear();
+    try {
+      recaptchaVerifier.clear();
+    } catch {}
     recaptchaVerifier = null;
   }
 };
+
 
 export { signInWithPhoneNumber };
