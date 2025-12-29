@@ -1,4 +1,4 @@
-import { initializeApp, getApp, getApps } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import {
   getAuth,
   RecaptchaVerifier,
@@ -13,39 +13,27 @@ const firebaseConfig = {
 };
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-
 export const auth = getAuth(app);
 
+let recaptchaVerifier = null;
+
 export const getRecaptcha = async () => {
-  if (typeof window === "undefined") return null;
+  if (recaptchaVerifier) return recaptchaVerifier;
 
-  if (window.recaptchaVerifier && window.recaptchaVerifier._auth !== auth) {
-    try {
-      window.recaptchaVerifier.clear();
-    } catch (_) {}
-    window.recaptchaVerifier = null;
-  }
+  recaptchaVerifier = new RecaptchaVerifier(
+    "recaptcha-container",
+    { size: "invisible" },
+    auth
+  );
 
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      { size: "invisible" }
-    );
-
-    await window.recaptchaVerifier.render();
-  }
-
-  return window.recaptchaVerifier;
+  await recaptchaVerifier.render();
+  return recaptchaVerifier;
 };
 
 export const resetRecaptcha = () => {
-  if (typeof window === "undefined") return;
-  if (window.recaptchaVerifier) {
-    try {
-      window.recaptchaVerifier.clear();
-    } catch (_) {}
-    window.recaptchaVerifier = null;
+  if (recaptchaVerifier) {
+    recaptchaVerifier.clear();
+    recaptchaVerifier = null;
   }
 };
 
