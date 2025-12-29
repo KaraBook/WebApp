@@ -16,7 +16,10 @@ export const buildRecaptcha = () => {
   if (typeof window === "undefined") return null;
 
   if (window.recaptchaVerifier) {
-    return window.recaptchaVerifier; // DO NOT recreate
+    try {
+      window.recaptchaVerifier.clear();
+    } catch {}
+    window.recaptchaVerifier = null;
   }
 
   window.recaptchaVerifier = new RecaptchaVerifier(
@@ -24,7 +27,9 @@ export const buildRecaptcha = () => {
     "recaptcha-container",
     {
       size: "invisible",
-      callback: () => console.log("reCAPTCHA verified"),
+      callback: () => {
+        console.log("reCAPTCHA verified");
+      },
     }
   );
 
