@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { toast } from "sonner";
+import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
 
 export default function EditProfileDialog({ open, onClose, profile, token, onUpdated }) {
     const [form, setForm] = useState({});
@@ -18,8 +19,10 @@ export default function EditProfileDialog({ open, onClose, profile, token, onUpd
     const [editingMobile, setEditingMobile] = useState(false);
     const [mobile, setMobile] = useState(profile?.mobile || "");
     const [otp, setOtp] = useState("");
-    const [otpSent, setOtpSent] = useState(false);
+    const [confirmResult, setConfirmResult] = useState(null);
+    const [sending, setSending] = useState(false);
     const [verifying, setVerifying] = useState(false);
+    const [timer, setTimer] = useState(0);
 
 
     useEffect(() => {
@@ -37,33 +40,75 @@ export default function EditProfileDialog({ open, onClose, profile, token, onUpd
         }
     }, [profile]);
 
+    useEffect(() => {
+        if (!open) {
+            setEditingMobile(false);
+            setMobile(profile?.mobile || "");
+            setOtp("");
+            setConfirmResult(null);
+            setTimer(0);
+            return;
+        }
+
+        try {
+            buildRecaptcha();
+        } catch { }
+    }, [open, profile]);
+
+
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const sendOtp = async () => {
+        if (mobile.length !== 10) return;
+
+        setSending(true);
         try {
-            await signInWithPhoneNumber(auth, `+91${mobile}`, window.recaptchaVerifier);
-            setOtpSent(true);
-            toast.success("OTP sent");
-        } catch {
-            toast.error("Failed to send OTP");
+            // 🔐 PRECHECK
+            await Axios({
+                method: SummaryApi.travellerPrecheck.method,
+                url: SummaryApi.travellerPrecheck.url,
+                data: { mobile },
+            });
+
+            // 🔐 FIREBASE OTP
+            await auth.signOut().catch(() => { });
+            const verifier = window.recaptchaVerifier || buildRecaptcha();
+
+            const confirmation = await signInWithPhoneNumber(
+                auth,
+                `+91${mobile}`,
+                verifier
+            );
+
+            setConfirmResult(confirmation);
+            setTimer(60);
+            toast.success("OTP sent successfully");
+        } catch (err) {
+            toast.error(err?.response?.data?.message || "Cannot send OTP");
+        } finally {
+            setSending(false);
         }
     };
 
-    const verifyOtpAndUpdate = async () => {
-        try {
-            setVerifying(true);
 
-            await window.confirmationResult.confirm(otp);
+    const verifyOtpAndUpdate = async (code = otp) => {
+        if (!confirmResult || code.length !== 6) return;
+
+        setVerifying(true);
+        try {
+            const credential = await confirmResult.confirm(code);
+            const idToken = await credential.user.getIdToken(true);
 
             const res = await Axios.put(
                 SummaryApi.updateTravellerMobile.url,
                 {},
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                        Authorization: `Bearer ${token}`,
+                        FirebaseToken: idToken,
+                    },
                 }
             );
 
@@ -71,11 +116,20 @@ export default function EditProfileDialog({ open, onClose, profile, token, onUpd
             onUpdated({ ...profile, mobile: res.data.mobile });
             setEditingMobile(false);
         } catch (err) {
-            toast.error(err?.response?.data?.message || "OTP verification failed");
+            toast.error(err?.response?.data?.message || "Invalid OTP");
+            setOtp("");
         } finally {
             setVerifying(false);
         }
     };
+
+
+    useEffect(() => {
+        if (otp.length === 6 && !verifying) {
+            verifyOtpAndUpdate(otp);
+        }
+    }, [otp]);
+
 
     const handleSave = async () => {
         try {
@@ -120,27 +174,53 @@ export default function EditProfileDialog({ open, onClose, profile, token, onUpd
                         ) : (
                             <div className="space-y-3">
                                 <Input
+                                    maxLength={10}
+                                    inputMode="numeric"
                                     placeholder="Enter new mobile number"
                                     value={mobile}
-                                    onChange={(e) => setMobile(e.target.value)}
+                                    onChange={(e) =>
+                                        setMobile(e.target.value.replace(/\D/g, ""))
+                                    }
                                 />
 
-                                {otpSent && (
+                                {confirmResult && (
                                     <Input
+                                        maxLength={6}
+                                        inputMode="numeric"
                                         placeholder="Enter OTP"
                                         value={otp}
-                                        onChange={(e) => setOtp(e.target.value)}
+                                        disabled={verifying}
+                                        onChange={(e) =>
+                                            setOtp(e.target.value.replace(/\D/g, ""))
+                                        }
                                     />
                                 )}
 
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    {timer > 0 ? (
+                                        <span>Resend OTP in {timer}s</span>
+                                    ) : (
+                                        <button
+                                            className="underline text-black"
+                                            onClick={sendOtp}
+                                        >
+                                            Resend OTP
+                                        </button>
+                                    )}
+                                </div>
+
                                 <div className="flex gap-2">
-                                    {!otpSent ? (
-                                        <Button onClick={sendOtp} size="sm">
-                                            Send OTP
+                                    {!confirmResult ? (
+                                        <Button
+                                            size="sm"
+                                            onClick={sendOtp}
+                                            disabled={mobile.length !== 10 || sending}
+                                        >
+                                            {sending ? "Sending..." : "Send OTP"}
                                         </Button>
                                     ) : (
-                                        <Button onClick={verifyOtpAndUpdate} size="sm" disabled={verifying}>
-                                            {verifying ? "Verifying..." : "Verify & Update"}
+                                        <Button size="sm" disabled>
+                                            {verifying ? "Verifying..." : "Waiting for OTP"}
                                         </Button>
                                     )}
 
@@ -150,7 +230,7 @@ export default function EditProfileDialog({ open, onClose, profile, token, onUpd
                                         onClick={() => {
                                             setEditingMobile(false);
                                             setOtp("");
-                                            setOtpSent(false);
+                                            setConfirmResult(null);
                                         }}
                                     >
                                         Cancel
