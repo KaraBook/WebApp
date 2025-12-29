@@ -7,7 +7,7 @@ import { AuthProvider } from "./auth/AuthContext.jsx";
 import { Toaster } from "sonner"; 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+ 
     <BrowserRouter basename="/owner">
       <AuthProvider>
         <App />
@@ -18,5 +18,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         />
       </AuthProvider>
     </BrowserRouter>
-  </React.StrictMode>
+
 );
