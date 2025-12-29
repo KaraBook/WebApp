@@ -56,7 +56,6 @@ export function AuthProvider({ children }) {
     })();
   }, [isAuthPage]);
 
-  /* -------------------- LOGIN -------------------- */
   const loginWithTokens = (payload) => {
     const now = Date.now();
     const accessExpiry = now + 30 * 60 * 1000;
@@ -72,7 +71,6 @@ export function AuthProvider({ children }) {
     setReady(true);
   };
 
-  /* -------------------- LOGOUT -------------------- */
   const logout = (redirect = true) => {
     localStorage.clear();
     setUser(null);
@@ -83,11 +81,10 @@ export function AuthProvider({ children }) {
       !location.pathname.startsWith("/owner/login") &&
       !location.pathname.startsWith("/owner/login")
     ) {
-      window.location.href = "/login";
+      window.location.href = "/owner/login";
     }
   };
 
-  /* -------------------- CONTEXT VALUE -------------------- */
   const value = useMemo(
     () => ({ user, ready, loginWithTokens, logout }),
     [user, ready]

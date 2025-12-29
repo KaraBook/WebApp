@@ -162,7 +162,7 @@ export default function OwnerCalendar() {
             </div>
 
             {/* CALENDAR */}
-            <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+            <div className="rounded-xl border border-gray-200 shadow-sm">
               <DateRange
                 ranges={dateRange}
                 onChange={(item) => setDateRange([item.selection])}
