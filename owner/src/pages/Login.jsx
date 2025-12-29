@@ -46,30 +46,19 @@ export default function Login({ userType = "owner" }) {
   setLoading(true);
   setOtp("");
 
-  // 🔥 RESET OLD STATE
-  confirmRef.current = null;
-  verifyingRef.current = false;
-
   try {
     const verifier = buildRecaptcha();
 
-    const precheckUrl =
-      userType === "manager"
-        ? SummaryApi.managerPrecheck.url
-        : SummaryApi.ownerPrecheck.url;
-
     await api.post(precheckUrl, { mobile: num });
 
-    const confirmation = await signInWithPhoneNumber(
+    confirmRef.current = await signInWithPhoneNumber(
       auth,
       `+91${num}`,
       verifier
     );
 
-    confirmRef.current = confirmation;
     setPhase("verify");
     setTimer(90);
-
     toast.success("OTP sent successfully");
   } catch (err) {
     console.error(err);

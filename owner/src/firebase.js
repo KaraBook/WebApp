@@ -16,10 +16,7 @@ export const buildRecaptcha = () => {
   if (typeof window === "undefined") return null;
 
   if (window.recaptchaVerifier) {
-    try {
-      window.recaptchaVerifier.clear();
-    } catch {}
-    window.recaptchaVerifier = null;
+    return window.recaptchaVerifier; 
   }
 
   window.recaptchaVerifier = new RecaptchaVerifier(
@@ -36,7 +33,6 @@ export const buildRecaptcha = () => {
   window.recaptchaVerifier.render();
   return window.recaptchaVerifier;
 };
-
 
 
 
