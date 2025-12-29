@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
+import { auth, buildRecaptcha, signInWithPhoneNumber } from "../firebase.js"
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { useAuth } from "../auth/AuthContext";
