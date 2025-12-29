@@ -6,10 +6,6 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 
-/**
- * Firebase config
- * Matches your VITE_FB_* environment variables exactly
- */
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FB_API_KEY,
   authDomain: import.meta.env.VITE_FB_AUTH_DOMAIN,
@@ -18,57 +14,31 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-/**
- * Firebase Auth instance
- */
 export const auth = getAuth(app);
 
-/**
- * Create or reuse invisible reCAPTCHA
- * Required element:
- *   <div id="recaptcha-container"></div>
- */
-export const buildRecaptcha = () => {
-  if (window.recaptchaVerifier) {
-    return window.recaptchaVerifier;
-  }
+let recaptchaVerifier = null;
 
-  window.recaptchaVerifier = new RecaptchaVerifier(
+/**
+ * Create reCAPTCHA ONCE
+ */
+export const initRecaptcha = () => {
+  if (recaptchaVerifier) return recaptchaVerifier;
+
+  recaptchaVerifier = new RecaptchaVerifier(
     auth,
     "recaptcha-container",
     {
       size: "invisible",
-      callback: () => {
-        // reCAPTCHA solved
-      },
-      "expired-callback": () => {
-        resetRecaptcha();
-      },
     }
   );
 
-  return window.recaptchaVerifier;
+  return recaptchaVerifier;
 };
 
 /**
- * Reset reCAPTCHA safely
+ * Send OTP safely
  */
-export const resetRecaptcha = () => {
-  try {
-    if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear();
-      window.recaptchaVerifier = null;
-    }
-
-    const el = document.getElementById("recaptcha-container");
-    if (el) el.innerHTML = "";
-  } catch (err) {
-    console.warn("reCAPTCHA reset failed", err);
-  }
+export const sendOtp = async (phoneNumber) => {
+  const verifier = initRecaptcha();
+  return signInWithPhoneNumber(auth, phoneNumber, verifier);
 };
-
-/**
- * Firebase OTP sender
- */
-export { signInWithPhoneNumber };

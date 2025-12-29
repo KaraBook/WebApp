@@ -1,4 +1,3 @@
-// src/pages/OwnerLogin.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -6,7 +5,7 @@ import { toast } from "sonner";
 import api from "@/api/axios";
 import SummaryApi from "@/common/SummaryApi";
 
-import { auth, buildRecaptcha, resetRecaptcha, signInWithPhoneNumber } from "@/firebase";
+import { auth, sendOtp } from "@/firebase";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -81,40 +80,36 @@ export default function OwnerLogin() {
   };
 
   const startOtpFlow = async () => {
-    if (mobile10.length !== 10) {
-      toast.error("Please enter a valid 10-digit mobile number");
-      return;
-    }
+  if (mobile10.length !== 10) {
+    toast.error("Please enter a valid 10-digit mobile number");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      // 1) precheck (blocks traveller etc.)
-      await backendOwnerPrecheck();
+  setLoading(true);
+  try {
+    await backendOwnerPrecheck();
 
-      // 2) firebase otp
-      resetRecaptcha();
-      const verifier = buildRecaptcha();
-      const confirmation = await signInWithPhoneNumber(auth, fullPhone, verifier);
+    const confirmation = await sendOtp(fullPhone);
 
-      setConfirmRes(confirmation);
-      setPhase("otp");
-      setSecondsLeft(60);
-      setOtp("");
-      autoVerifyLock.current = false;
+    setConfirmRes(confirmation);
+    setPhase("otp");
+    setSecondsLeft(60);
+    setOtp("");
+    autoVerifyLock.current = false;
 
-      toast.success("OTP sent successfully");
-      setTimeout(() => otpInputRef.current?.focus(), 50);
-    } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to send OTP. Please try again.";
-      toast.error(msg);
-      resetRecaptcha();
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("OTP sent successfully");
+    setTimeout(() => otpInputRef.current?.focus(), 50);
+  } catch (err) {
+    toast.error(
+      err?.response?.data?.message ||
+      err?.message ||
+      "Failed to send OTP"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const verifyOtp = async (code) => {
     if (!confirmRes) return toast.error("Please request OTP again.");
@@ -164,37 +159,33 @@ export default function OwnerLogin() {
     }
   };
 
-  const resendOtp = async () => {
-    if (secondsLeft > 0) return;
-    if (loading) return;
+const resendOtp = async () => {
+  if (secondsLeft > 0 || loading) return;
 
-    setLoading(true);
-    try {
-      // re-check before resend (still correct role)
-      await backendOwnerPrecheck();
+  setLoading(true);
+  try {
+    await backendOwnerPrecheck();
 
-      resetRecaptcha();
-      const verifier = buildRecaptcha();
-      const confirmation = await signInWithPhoneNumber(auth, fullPhone, verifier);
+    const confirmation = await sendOtp(fullPhone);
 
-      setConfirmRes(confirmation);
-      setSecondsLeft(60);
-      setOtp("");
-      autoVerifyLock.current = false;
+    setConfirmRes(confirmation);
+    setSecondsLeft(60);
+    setOtp("");
+    autoVerifyLock.current = false;
 
-      toast.success("OTP resent");
-      setTimeout(() => otpInputRef.current?.focus(), 50);
-    } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to resend OTP.";
-      toast.error(msg);
-      resetRecaptcha();
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("OTP resent");
+    setTimeout(() => otpInputRef.current?.focus(), 50);
+  } catch (err) {
+    toast.error(
+      err?.response?.data?.message ||
+      err?.message ||
+      "Failed to resend OTP"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const changeNumber = () => {
     setPhase("mobile");
@@ -321,10 +312,6 @@ export default function OwnerLogin() {
           )}
         </CardContent>
 
-
-        <CardFooter>
-          <div id="recaptcha-container"></div>
-        </CardFooter>
       </Card>
     </div>
   );
