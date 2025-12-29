@@ -78,7 +78,10 @@
   width: 100%;
 }
 
-
+.rdrMonth{
+  width: 485px;
+  margin-left: 16px;
+}
 
 
 ::-webkit-scrollbar {
