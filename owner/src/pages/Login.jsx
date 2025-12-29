@@ -1,11 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  auth,
-  getRecaptcha,
-  resetRecaptcha,
-  signInWithPhoneNumber,
-} from "../firebase";
+import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { useAuth } from "../auth/AuthContext";
@@ -32,7 +27,6 @@ export default function Login({ userType = "owner" }) {
   const [canResend, setCanResend] = useState(true);
 
   const verifyingRef = useRef(false);
-  const lastAutoOtpRef = useRef("");
 
   const { loginWithTokens } = useAuth();
   const navigate = useNavigate();
@@ -53,16 +47,11 @@ export default function Login({ userType = "owner" }) {
 
     setLoading(true);
     setOtp("");
+    setConfirmRes(null);
     verifyingRef.current = false;
-    lastAutoOtpRef.current = "";
 
     try {
-      if (!document.getElementById("recaptcha-container")) {
-        throw new Error("reCAPTCHA container not mounted");
-      }
-
-      resetRecaptcha();
-      const verifier = await getRecaptcha();
+      const verifier = buildRecaptcha();
 
       const precheckUrl =
         userType === "manager"
@@ -85,72 +74,51 @@ export default function Login({ userType = "owner" }) {
       toast.success("OTP sent successfully");
     } catch (err) {
       console.error("sendOtp error:", err);
-      resetRecaptcha();
-      toast.error("Failed to send OTP");
+      toast.error(err?.response?.data?.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- VERIFY OTP ---------------- */
-  const verifyOtp = async (value = otp) => {
-    if (!confirmRes) return toast.error("Please resend OTP");
-    if (value.length !== 6) return;
-    if (verifyingRef.current) return;
-
-    verifyingRef.current = true;
-    setLoading(true);
-
-    try {
-      const cred = await confirmRes.confirm(value);
-      const idToken = await cred.user.getIdToken();
-
-      const loginUrl =
-        userType === "manager"
-          ? SummaryApi.managerLogin.url
-          : SummaryApi.ownerLogin.url;
-
-      const res = await api.post(loginUrl, null, {
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
-
-      loginWithTokens(res.data);
-      toast.success("Login successful");
-      navigate(
-        userType === "manager" ? "/manager/dashboard" : "/dashboard",
-        { replace: true }
-      );
-    } catch (err) {
-      console.error("verifyOtp error:", err);
-
-      if (err.code === "auth/invalid-verification-code") {
-        toast.error("Invalid OTP");
-      } else if (
-        err.code === "auth/code-expired" ||
-        err.code === "auth/session-expired"
-      ) {
-        toast.error("OTP expired. Please resend.");
-        setConfirmRes(null);
-        setPhase("enter");
-      } else {
-        toast.error("OTP verification failed");
-      }
-    } finally {
-      verifyingRef.current = false;
-      setLoading(false);
-    }
-  };
-
-  /* ---------------- AUTO VERIFY ---------------- */
+  /* ---------------- AUTO VERIFY OTP (ONLY PLACE) ---------------- */
   useEffect(() => {
     if (phase !== "verify") return;
     if (!confirmRes) return;
     if (otp.length !== 6) return;
     if (verifyingRef.current) return;
-    if (lastAutoOtpRef.current === otp) return;
 
-    lastAutoOtpRef.current = otp;
-    verifyOtp(otp);
+    verifyingRef.current = true;
+    setLoading(true);
+
+    (async () => {
+      try {
+        const cred = await confirmRes.confirm(otp);
+        const idToken = await cred.user.getIdToken(true);
+
+        const loginUrl =
+          userType === "manager"
+            ? SummaryApi.managerLogin.url
+            : SummaryApi.ownerLogin.url;
+
+        const res = await api.post(loginUrl, null, {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+
+        loginWithTokens(res.data);
+        toast.success("Login successful");
+
+        navigate(
+          userType === "manager" ? "/manager/dashboard" : "/dashboard",
+          { replace: true }
+        );
+      } catch (err) {
+        console.error("verifyOtp error:", err);
+        toast.error("Invalid or expired OTP");
+        verifyingRef.current = false;
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [otp, phase, confirmRes]);
 
   /* ---------------- UI (UNCHANGED) ---------------- */
@@ -194,15 +162,9 @@ export default function Login({ userType = "owner" }) {
                 value={otp}
                 maxLength={6}
                 autoFocus
-                onChange={(e) => {
-                  lastAutoOtpRef.current = "";
-                  setOtp(e.target.value.replace(/\D/g, ""));
-                }}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                 className="text-center tracking-widest text-lg"
               />
-              <Button onClick={() => verifyOtp()} disabled={loading || otp.length !== 6} className="w-full">
-                {loading ? "Verifying..." : "Verify & Continue"}
-              </Button>
             </div>
           )}
         </CardContent>
