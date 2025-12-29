@@ -26,6 +26,7 @@ export default function Login({ userType = "owner" }) {
 
   const verifierRef = useRef(null);
   const confirmRef = useRef(null);
+  const verifyingRef = useRef(false);
 
   const { loginWithTokens } = useAuth();
   const navigate = useNavigate();
@@ -38,78 +39,83 @@ export default function Login({ userType = "owner" }) {
   }, [timer]);
 
   /* ---------------- SEND OTP ---------------- */
- const sendOtp = async () => {
-  const num = mobile.replace(/\D/g, "");
-  if (num.length !== 10) return toast.error("Enter valid 10-digit number");
+  const sendOtp = async () => {
+    const num = mobile.replace(/\D/g, "");
+    if (num.length !== 10) return toast.error("Enter valid 10-digit number");
 
-  setLoading(true);
-  setOtp("");
+    setLoading(true);
+    setOtp("");
 
-  try {
-    const verifier = window.recaptchaVerifier || buildRecaptcha();
+    try {
+      const verifier = window.recaptchaVerifier || buildRecaptcha();
 
-    const precheckUrl =
-      userType === "manager"
-        ? SummaryApi.managerPrecheck.url
-        : SummaryApi.ownerPrecheck.url;
+      const precheckUrl =
+        userType === "manager"
+          ? SummaryApi.managerPrecheck.url
+          : SummaryApi.ownerPrecheck.url;
 
-    await api.post(precheckUrl, { mobile: num });
+      await api.post(precheckUrl, { mobile: num });
 
-    const confirmation = await signInWithPhoneNumber(
-      auth,
-      `+91${num}`,
-      verifier
-    );
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        `+91${num}`,
+        verifier
+      );
 
-    window.confirmationResult = confirmation; 
-    setPhase("verify");
-    setTimer(90);
+      window.confirmationResult = confirmation;
+      setPhase("verify");
+      setTimer(90);
 
-    toast.success("OTP sent successfully");
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to send OTP");
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.success("OTP sent successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   /* ---------------- VERIFY OTP ---------------- */
   const verifyOtp = async (code = otp) => {
-  if (!window.confirmationResult || code.length !== 6) return;
+    if (!window.confirmationResult || code.length !== 6) return;
+    if (verifyingRef.current) return;
 
-  setLoading(true);
-  try {
-    const cred = await window.confirmationResult.confirm(code);
-    const idToken = await cred.user.getIdToken(true);
+    verifyingRef.current = true;
+    setLoading(true);
 
-    const loginUrl =
-      userType === "manager"
-        ? SummaryApi.managerLogin.url
-        : SummaryApi.ownerLogin.url;
+    try {
+      const cred = await window.confirmationResult.confirm(code);
+      const idToken = await cred.user.getIdToken(true);
 
-    const res = await api.post(loginUrl, null, {
-      headers: { Authorization: `Bearer ${idToken}` },
-    });
+      const loginUrl =
+        userType === "manager"
+          ? SummaryApi.managerLogin.url
+          : SummaryApi.ownerLogin.url;
 
-    loginWithTokens(res.data);
-    toast.success("Login successful");
-    navigate("/dashboard", { replace: true });
-  } catch {
-    toast.error("Invalid OTP. Please try again.");
-    setOtp("");
-  } finally {
-    setLoading(false);
-  }
-};
+      const res = await api.post(loginUrl, null, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+
+      loginWithTokens(res.data);
+      toast.success("Login successful");
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      console.error(err);
+      toast.error("Invalid OTP. Please try again.");
+      verifyingRef.current = false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
-useEffect(() => {
-  if (otp.length === 6 && phase === "verify") {
-    verifyOtp(otp);
-  }
-}, [otp]);
+
+  useEffect(() => {
+    if (otp.length === 6 && phase === "verify" && !verifyingRef.current) {
+      verifyOtp(otp);
+    }
+  }, [otp, phase]);
 
   /* ---------------- UI (UNCHANGED) ---------------- */
   return (
@@ -155,8 +161,8 @@ useEffect(() => {
               />
 
               <Button
-                onClick={verifyOtp}
                 disabled={loading || otp.length !== 6}
+                onClick={() => verifyOtp(otp)}
                 className="w-full"
               >
                 {loading ? "Verifying..." : "Verify & Continue"}
