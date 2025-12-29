@@ -1,5 +1,9 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { initializeApp, getApp, getApps } from "firebase/app";
+import {
+  getAuth,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FB_API_KEY,
@@ -8,20 +12,41 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FB_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
 
-export const getRecaptcha = () => {
+export const getRecaptcha = async () => {
+  if (typeof window === "undefined") return null;
+
+  if (window.recaptchaVerifier && window.recaptchaVerifier._auth !== auth) {
+    try {
+      window.recaptchaVerifier.clear();
+    } catch (_) {}
+    window.recaptchaVerifier = null;
+  }
+
   if (!window.recaptchaVerifier) {
     window.recaptchaVerifier = new RecaptchaVerifier(
-      auth, 
+      auth,
       "recaptcha-container",
-      {
-        size: "invisible",
-      }
+      { size: "invisible" }
     );
+
+    await window.recaptchaVerifier.render();
   }
+
   return window.recaptchaVerifier;
+};
+
+export const resetRecaptcha = () => {
+  if (typeof window === "undefined") return;
+  if (window.recaptchaVerifier) {
+    try {
+      window.recaptchaVerifier.clear();
+    } catch (_) {}
+    window.recaptchaVerifier = null;
+  }
 };
 
 export { signInWithPhoneNumber };
