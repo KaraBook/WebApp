@@ -39,77 +39,81 @@ export default function Login({ userType = "owner" }) {
   }, [timer]);
 
   /* ---------------- SEND OTP ---------------- */
-  const sendOtp = async () => {
-    const num = mobile.replace(/\D/g, "");
-    if (num.length !== 10) return toast.error("Enter valid 10-digit number");
+ const sendOtp = async () => {
+  const num = mobile.replace(/\D/g, "");
+  if (num.length !== 10) return toast.error("Enter valid 10-digit number");
 
-    setLoading(true);
-    setOtp("");
+  setLoading(true);
+  setOtp("");
 
-    try {
-      const verifier = window.recaptchaVerifier || buildRecaptcha();
+  try {
+    const verifier = buildRecaptcha();
 
-      const precheckUrl =
-        userType === "manager"
-          ? SummaryApi.managerPrecheck.url
-          : SummaryApi.ownerPrecheck.url;
+    const precheckUrl =
+      userType === "manager"
+        ? SummaryApi.managerPrecheck.url
+        : SummaryApi.ownerPrecheck.url;
 
-      await api.post(precheckUrl, { mobile: num });
+    // ⚠️ precheck can use api (NO firebase token here)
+    await api.post(precheckUrl, { mobile: num });
 
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        `+91${num}`,
-        verifier
-      );
+    const confirmation = await signInWithPhoneNumber(
+      auth,
+      `+91${num}`,
+      verifier
+    );
 
-      window.confirmationResult = confirmation;
-      setPhase("verify");
-      setTimer(90);
+    confirmRef.current = confirmation;
+    setPhase("verify");
+    setTimer(90);
 
-      toast.success("OTP sent successfully");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("OTP sent successfully");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to send OTP");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
   /* ---------------- VERIFY OTP ---------------- */
   const verifyOtp = async (code = otp) => {
-    if (!window.confirmationResult || code.length !== 6) return;
-    if (verifyingRef.current) return;
+  if (!confirmRef.current || code.length !== 6) return;
+  if (verifyingRef.current) return;
 
-    verifyingRef.current = true;
-    setLoading(true);
+  verifyingRef.current = true;
+  setLoading(true);
 
-    try {
-      const cred = await window.confirmationResult.confirm(code);
-      const idToken = await cred.user.getIdToken(true);
+  try {
+    const cred = await confirmRef.current.confirm(code);
+    const idToken = await cred.user.getIdToken(true);
 
-      const loginUrl =
-        userType === "manager"
-          ? SummaryApi.managerLogin.url
-          : SummaryApi.ownerLogin.url;
+    const loginUrl =
+      userType === "manager"
+        ? SummaryApi.managerLogin.url
+        : SummaryApi.ownerLogin.url;
 
-      const res = await api.post(loginUrl, null, {
+    const res = await axios.post(
+      import.meta.env.VITE_API_BASE + loginUrl,
+      null,
+      {
         headers: { Authorization: `Bearer ${idToken}` },
-      });
+      }
+    );
 
-      loginWithTokens(res.data);
-      toast.success("Login successful");
-      navigate("/dashboard", { replace: true });
-    } catch (err) {
-      console.error(err);
-      toast.error("Invalid OTP. Please try again.");
-      verifyingRef.current = false;
-    } finally {
-      setLoading(false);
-    }
-  };
+    loginWithTokens(res.data);
+    toast.success("Login successful");
+    navigate("/dashboard", { replace: true });
 
-
+  } catch (err) {
+    console.error(err);
+    toast.error("Invalid OTP. Please try again.");
+    verifyingRef.current = false;
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     if (otp.length === 6 && phase === "verify" && !verifyingRef.current) {

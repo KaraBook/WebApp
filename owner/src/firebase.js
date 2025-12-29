@@ -16,24 +16,22 @@ export const buildRecaptcha = () => {
   if (typeof window === "undefined") return null;
 
   if (window.recaptchaVerifier) {
-    try { window.recaptchaVerifier.clear(); } catch {}
-    window.recaptchaVerifier = null;
+    return window.recaptchaVerifier; // DO NOT recreate
   }
+
   window.recaptchaVerifier = new RecaptchaVerifier(
     auth,
     "recaptcha-container",
     {
       size: "invisible",
       callback: () => console.log("reCAPTCHA verified"),
-      "expired-callback": () => {
-        console.log("Recaptcha expired");
-        window.recaptchaVerifier = null;
-      }
     }
   );
+
   window.recaptchaVerifier.render();
   return window.recaptchaVerifier;
 };
+
 
 
 
