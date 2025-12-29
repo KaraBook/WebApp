@@ -24,8 +24,8 @@ export default function Login({ userType = "owner" }) {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
 
-  const verifierRef = useRef(null);        // 🔥 reCAPTCHA
-  const confirmRef = useRef(null);         // 🔥 ConfirmationResult
+  const verifierRef = useRef(null);
+  const confirmRef = useRef(null);
 
   const { loginWithTokens } = useAuth();
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ export default function Login({ userType = "owner" }) {
         verifierRef.current
       );
 
-      confirmRef.current = confirmation;
+      window.__confirmationResult = confirmation;
       setPhase("verify");
       setTimer(90);
 
@@ -80,7 +80,7 @@ export default function Login({ userType = "owner" }) {
 
   /* ---------------- VERIFY OTP ---------------- */
   const verifyOtp = async () => {
-    if (!confirmRef.current) {
+    if (!window.__confirmationResult) {
       toast.error("OTP session expired. Please resend.");
       return;
     }
@@ -90,7 +90,7 @@ export default function Login({ userType = "owner" }) {
     setLoading(true);
 
     try {
-      const cred = await confirmRef.current.confirm(otp);
+     const cred = await window.__confirmationResult.confirm(otp);
       const idToken = await cred.user.getIdToken(true);
 
       const loginUrl =
