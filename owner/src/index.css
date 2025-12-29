@@ -67,24 +67,22 @@
     @apply bg-background text-foreground;
   }
 }
-/* ================== AIRBNB-LIKE DATE RANGE (react-date-range) ================== */
+/* ================= AIRBNB STYLE — react-date-range ================= */
 
-/* Wrapper clean */
+/* Wrapper */
 .rdrCalendarWrapper {
-  width: 100% !important;
   background: #fff !important;
-  border-radius: 14px !important;
+  border-radius: 16px !important;
 }
 
-/* Month spacing */
+/* Month padding */
 .rdrMonth {
-  padding: 12px 12px 8px !important;
+  padding: 16px !important;
 }
 
 /* Weekday header */
 .rdrWeekDays {
-  margin-top: 8px !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 10px !important;
 }
 .rdrWeekDay {
   font-size: 12px !important;
@@ -92,27 +90,25 @@
   color: #6b7280 !important;
 }
 
-/* Remove default outlines / weird highlights */
-.rdrDayToday .rdrDayNumber span:after {
-  display: none !important;
-}
-
-/* ================== GRID SIZE ================== */
+/* ================= GRID ================= */
 .rdrDay {
   width: 44px !important;
   height: 44px !important;
   margin: 0 !important;
+  position: relative !important;
 }
 
+/* Day number wrapper */
 .rdrDayNumber {
   width: 44px !important;
   height: 44px !important;
   display: grid !important;
   place-items: center !important;
   position: relative !important;
-  z-index: 5 !important;
+  z-index: 2 !important;
 }
 
+/* Day circle */
 .rdrDayNumber span {
   width: 36px !important;
   height: 36px !important;
@@ -124,85 +120,75 @@
   color: #111827 !important;
 }
 
-/* ================== RANGE BACKGROUND (CONTINUOUS STRIP) ==================
-   Library paints the range via .rdrInRange on the day cell.
-   We apply background to the DAY itself, not the number. */
-.rdrInRange,
-.rdrStartEdge,
-.rdrEndEdge {
-  background: transparent !important;
+/* ================= RANGE STRIP ================= */
+.rdrInRange .rdrDayNumber::before,
+.rdrStartEdge .rdrDayNumber::before,
+.rdrEndEdge .rdrDayNumber::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 36px;
+  background: #0097a7;
+  z-index: 1;
 }
 
-/* Continuous background strip behind the number */
-.rdrInRange .rdrDayNumber:before,
-.rdrStartEdge .rdrDayNumber:before,
-.rdrEndEdge .rdrDayNumber:before {
-  content: "" !important;
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  height: 36px !important;
-  background: #0097a7 !important;
-  z-index: 1 !important;
+/* Rounded ends */
+.rdrStartEdge .rdrDayNumber::before {
+  border-radius: 999px 0 0 999px;
+}
+.rdrEndEdge .rdrDayNumber::before {
+  border-radius: 0 999px 999px 0;
 }
 
-/* Start edge rounded */
-.rdrStartEdge .rdrDayNumber:before {
-  border-radius: 999px 0 0 999px !important;
+/* Single day */
+.rdrStartEdge.rdrEndEdge .rdrDayNumber::before {
+  border-radius: 999px;
 }
 
-/* End edge rounded */
-.rdrEndEdge .rdrDayNumber:before {
-  border-radius: 0 999px 999px 0 !important;
-}
-
-/* Single day selection (start=end) */
-.rdrStartEdge.rdrEndEdge .rdrDayNumber:before {
-  border-radius: 999px !important;
-}
-
-/* White text inside selected range */
+/* White text in range */
 .rdrInRange .rdrDayNumber span,
 .rdrStartEdge .rdrDayNumber span,
 .rdrEndEdge .rdrDayNumber span {
   color: #fff !important;
-  background: transparent !important;
   z-index: 2 !important;
-  position: relative !important;
 }
 
-/* ================== HOVER (Airbnb subtle) ================== */
-.rdrDay:not(.rdrDayDisabled):not(.rdrInRange):not(.rdrStartEdge):not(.rdrEndEdge):hover
-  .rdrDayNumber
-  span {
-  background: rgba(0, 151, 167, 0.12) !important;
+/* ================= HOVER ================= */
+.rdrDay:not(.rdrDayDisabled):not(.rdrInRange):hover
+  .rdrDayNumber span {
+  background: rgba(0, 151, 167, 0.12);
 }
 
-/* ================== DISABLED DAYS (Booked / Blocked) ================== */
+/* ================= DISABLED (BOOKED / BLOCKED) ================= */
 .rdrDayDisabled {
   opacity: 1 !important;
-  cursor: not-allowed !important;
+  pointer-events: none !important;
 }
 
-/* Kill range strip if disabled (very important) */
-.rdrDayDisabled .rdrDayNumber:before {
+/* Remove range strip if disabled */
+.rdrDayDisabled .rdrDayNumber::before {
   display: none !important;
 }
 
-/* Grey pill like Airbnb disabled */
+/* Disabled pill */
 .rdrDayDisabled .rdrDayNumber span {
   background: #f3f4f6 !important;
   color: #9ca3af !important;
-  border-radius: 12px !important;
 }
 
-/* Also dim days outside current month */
+/* Outside month */
 .rdrDayPassive .rdrDayNumber span {
   color: #cbd5e1 !important;
   background: transparent !important;
 }
+
+/* Remove default today ring */
+.rdrDayToday .rdrDayNumber span:after {
+  display: none !important;
+}
+
 
 
 ::-webkit-scrollbar {
