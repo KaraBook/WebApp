@@ -67,82 +67,91 @@
     @apply bg-background text-foreground;
   }
 }
-/* ---------- BASE CELL STYLE ---------- */
+/* ================= BASE DAY CELL ================= */
 .rdrDay {
   width: 40px !important;
   height: 40px !important;
-  margin: 2px !important;
+  margin: 0 !important;
   padding: 0 !important;
-  border-radius: 8px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 }
 
-/* Day number */
+/* Remove internal stretching */
+.rdrDay > div {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+/* ================= DAY NUMBER ================= */
+.rdrDayNumber {
+  width: 40px !important;
+  height: 40px !important;
+}
+
 .rdrDayNumber span {
   width: 40px !important;
   height: 40px !important;
+  line-height: 40px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border-radius: 8px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
+  border-radius: 10px !important;
 }
 
-/* ---------- SELECTED RANGE ---------- */
+/* ================= RANGE ================= */
 .rdrInRange .rdrDayNumber span {
-  background: #0097A7 !important;
-  color: #fff !important;
-  opacity: 1 !important;
-  border-radius: 0px !important; /* Middle dates = square */
+  background-color: #0097a7 !important;
+  color: white !important;
+  border-radius: 0 !important;
 }
 
 .rdrStartEdge .rdrDayNumber span {
-  background: #0097A7 !important;
-  color: #fff !important;
-  border-radius: 8px 0 0 8px !important;
+  background-color: #0097a7 !important;
+  color: white !important;
+  border-radius: 10px 0 0 10px !important;
 }
 
 .rdrEndEdge .rdrDayNumber span {
-  background: #0097A7 !important;
-  color: #fff !important;
-  border-radius: 0 8px 8px 0 !important;
+  background-color: #0097a7 !important;
+  color: white !important;
+  border-radius: 0 10px 10px 0 !important;
 }
 
 .rdrDaySelected .rdrDayNumber span {
-  background: #0097A7 !important;
-  color: #fff !important;
-  border-radius: 8px !important; /* If single date selected */
+  background-color: #0097a7 !important;
+  color: white !important;
+  border-radius: 10px !important;
 }
 
-/* Remove ugly preview dotted/hover stuff */
+/* ================= DISABLED DAYS ================= */
+.rdrDayDisabled {
+  opacity: 1 !important;
+}
+
+.rdrDayDisabled .rdrDayNumber span {
+  background-color: #e5e7eb !important;
+  color: #9ca3af !important;
+  border-radius: 10px !important;
+}
+
+/* ================= HOVER / PREVIEW ================= */
 .rdrDayHovered .rdrDayNumber span,
 .rdrDayStartPreview .rdrDayNumber span,
 .rdrDayEndPreview .rdrDayNumber span {
-  background: none !important;
+  background: transparent !important;
   border: none !important;
 }
 
-/* ---------- DISABLED DATES ---------- */
-.rdrDayDisabled .rdrDayNumber span {
-  background: #e5e7eb !important;
-  color: #9ca3af !important;
-  border-radius: 8px !important;
+/* ================= REMOVE DEFAULT RANGE BG ================= */
+.rdrInRange::before,
+.rdrInRange::after {
+  display: none !important;
 }
 
-.rdrDayDisabled {
-  pointer-events: none !important;
-}
-
-/* Remove default shadows */
-.rdrDateRangeWrapper,
-.rdrCalendarWrapper,
-.rdrMonth {
-  box-shadow: none !important;
-  border-radius: 12px !important;
-}
 
 ::-webkit-scrollbar {
   width: 6px;
