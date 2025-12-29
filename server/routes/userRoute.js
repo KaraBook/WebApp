@@ -13,6 +13,7 @@ import {
   checkResortOwnerNumber,
   managerPrecheck,
   managerLogin,
+  removeTravellerAvatar
 } from "../controllers/userController.js";
 import { verifyFirebaseToken } from "../middlewares/verifyFirebaseToken.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
@@ -32,6 +33,11 @@ router.post(
   requireAuth,
   upload.single("image"),
   uploadTravellerAvatar
+);
+router.delete(
+  "/traveller/avatar",
+  requireAuth,
+  removeTravellerAvatar
 );
 
 

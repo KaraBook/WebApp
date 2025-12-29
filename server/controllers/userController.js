@@ -421,3 +421,39 @@ export const managerLogin = async (req, res) => {
 
   res.json(tokens);
 };
+
+
+
+export const removeTravellerAvatar = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.avatarUrl) {
+      return res.status(400).json({ message: "No avatar to remove" });
+    }
+
+    try {
+      const filePath = user.avatarUrl.split("/").slice(-2).join("/"); // uploads/avatar.png
+      const fullPath = path.join(process.cwd(), filePath);
+
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+      }
+    } catch (err) {
+      console.warn("Avatar file delete failed:", err.message);
+    }
+    user.avatarUrl = "";
+    await user.save();
+
+    return res.status(200).json({
+      message: "Avatar removed successfully",
+      avatarUrl: "",
+    });
+  } catch (err) {
+    console.error("Remove avatar error:", err);
+    return res.status(500).json({ message: "Failed to remove avatar" });
+  }
+};

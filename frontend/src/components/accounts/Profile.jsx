@@ -77,6 +77,20 @@ export default function Profile() {
     })
     : "—";
 
+  const handleRemoveAvatar = async () => {
+    try {
+      await Axios.delete(SummaryApi.removeTravellerAvatar.url, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+
+      setAvatarPreview("");
+      toast.success("Profile photo removed");
+    } catch {
+      toast.error("Failed to remove photo");
+    }
+  };
+
+
   return (
     <div className="max-w-5xl px-2 py-2 space-y-8">
 
@@ -84,7 +98,7 @@ export default function Profile() {
 
       <div className="border shadow-sm rounded-[12px] bg-white p-6 flex items-center gap-6">
 
-        <div className="relative">
+        <div className="relative group">
           {avatarPreview ? (
             <img
               src={avatarPreview}
@@ -92,17 +106,29 @@ export default function Profile() {
             />
           ) : (
             <div className="w-[180px] h-[150px] rounded-[12px] border shadow-sm bg-gray-100 
-                    flex items-center justify-center text-5xl font-semibold text-[#233b19]">
+      flex items-center justify-center text-5xl font-semibold text-[#233b19]">
               {profile?.name?.charAt(0)?.toUpperCase()}
             </div>
           )}
 
+          {/* Upload */}
           <button
             onClick={() => fileRef.current.click()}
-            className="absolute rounded-[8px] bottom-0 right-0 bg-white p-1 shadow border hover:bg-gray-100"
+            className="absolute bottom-2 right-2 bg-white p-1 rounded-[8px] shadow border"
           >
             <Camera size={16} />
           </button>
+
+          {/* Remove */}
+          {avatarPreview && (
+            <button
+              onClick={handleRemoveAvatar}
+              className="absolute top-2 right-2 bg-red-50 text-red-600 
+        px-2 py-1 text-xs rounded-[6px] border hover:bg-red-100"
+            >
+              Remove
+            </button>
+          )}
 
           <input
             hidden

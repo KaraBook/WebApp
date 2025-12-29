@@ -21,6 +21,10 @@ const SummaryApi = {
     url: "/api/auth/traveller/upload-avatar",
     method: "post"
   },
+  removeTravellerAvatar: {
+  url: "/api/auth/traveller/avatar",
+  method: "delete"
+},
   refreshToken: {
     url: "/api/auth/refresh-token",
     method: "post"
