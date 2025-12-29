@@ -67,89 +67,102 @@
     @apply bg-background text-foreground;
   }
 }
-/* ================= BASE DAY CELL ================= */
-.rdrDay {
-  width: 40px !important;
-  height: 40px !important;
-  margin: 0 !important;
+/* ================= BASE GRID ================= */
+.rdrMonth {
   padding: 0 !important;
+}
+
+.rdrWeekDays,
+.rdrDays {
+  gap: 0 !important;
+}
+
+/* ================= DAY CELL ================= */
+.rdrDay {
+  width: 44px !important;
+  height: 44px !important;
+  margin: 0 !important;
+  position: relative !important;
+}
+
+/* Number wrapper */
+.rdrDayNumber {
+  width: 44px !important;
+  height: 44px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-}
-
-/* Remove internal stretching */
-.rdrDay > div {
-  width: 40px !important;
-  height: 40px !important;
-}
-
-/* ================= DAY NUMBER ================= */
-.rdrDayNumber {
-  width: 40px !important;
-  height: 40px !important;
+  position: relative !important;
+  z-index: 2 !important;
 }
 
 .rdrDayNumber span {
-  width: 40px !important;
-  height: 40px !important;
-  line-height: 40px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
   font-size: 14px !important;
   font-weight: 500 !important;
-  border-radius: 10px !important;
+  color: #111827 !important;
 }
 
-/* ================= RANGE ================= */
-.rdrInRange .rdrDayNumber span {
-  background-color: #0097a7 !important;
-  color: white !important;
-  border-radius: 0 !important;
+/* ================= RANGE BACKGROUND (AIRBNB STYLE) ================= */
+.rdrInRange::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: #0097a7 !important;
+  z-index: 1 !important;
 }
 
-.rdrStartEdge .rdrDayNumber span {
-  background-color: #0097a7 !important;
-  color: white !important;
-  border-radius: 10px 0 0 10px !important;
+.rdrStartEdge::before {
+  border-radius: 999px 0 0 999px !important;
 }
 
-.rdrEndEdge .rdrDayNumber span {
-  background-color: #0097a7 !important;
-  color: white !important;
-  border-radius: 0 10px 10px 0 !important;
+.rdrEndEdge::before {
+  border-radius: 0 999px 999px 0 !important;
 }
 
+.rdrDaySelected::before {
+  border-radius: 999px !important;
+}
+
+/* White text inside range */
+.rdrInRange .rdrDayNumber span,
+.rdrStartEdge .rdrDayNumber span,
+.rdrEndEdge .rdrDayNumber span,
 .rdrDaySelected .rdrDayNumber span {
-  background-color: #0097a7 !important;
   color: white !important;
-  border-radius: 10px !important;
 }
 
-/* ================= DISABLED DAYS ================= */
+/* ================= DISABLED (BOOKED / BLOCKED) ================= */
 .rdrDayDisabled {
   opacity: 1 !important;
 }
 
-.rdrDayDisabled .rdrDayNumber span {
-  background-color: #e5e7eb !important;
-  color: #9ca3af !important;
-  border-radius: 10px !important;
-}
-
-/* ================= HOVER / PREVIEW ================= */
-.rdrDayHovered .rdrDayNumber span,
-.rdrDayStartPreview .rdrDayNumber span,
-.rdrDayEndPreview .rdrDayNumber span {
-  background: transparent !important;
-  border: none !important;
-}
-
-/* ================= REMOVE DEFAULT RANGE BG ================= */
-.rdrInRange::before,
-.rdrInRange::after {
+.rdrDayDisabled::before {
   display: none !important;
+}
+
+.rdrDayDisabled .rdrDayNumber span {
+  background: #f3f4f6 !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  color: #9ca3af !important;
+}
+
+/* ================= HOVER ================= */
+.rdrDay:hover:not(.rdrDayDisabled):not(.rdrInRange)::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 4px !important;
+  border-radius: 999px !important;
+  background: rgba(0, 151, 167, 0.12) !important;
+  z-index: 0 !important;
+}
+
+/* ================= CLEANUP ================= */
+.rdrDayStartPreview,
+.rdrDayEndPreview,
+.rdrDayHovered {
+  background: none !important;
 }
 
 
