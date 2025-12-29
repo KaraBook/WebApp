@@ -141,7 +141,6 @@ export default function OwnerLogin() {
     const clean = onlyDigits(val).slice(0, OTP_LEN);
     setOtp(clean);
 
-    // auto-verify when complete (professional UX)
     if (clean.length === OTP_LEN && !autoVerifyLock.current) {
       autoVerifyLock.current = true;
       verifyOtp(clean);

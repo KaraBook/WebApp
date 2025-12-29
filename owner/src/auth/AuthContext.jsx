@@ -80,8 +80,8 @@ export function AuthProvider({ children }) {
 
     if (
       redirect &&
-      !location.pathname.startsWith("/login") &&
-      !location.pathname.startsWith("/manager/login")
+      !location.pathname.startsWith("/owner/login") &&
+      !location.pathname.startsWith("/owner/login")
     ) {
       window.location.href = "/login";
     }
