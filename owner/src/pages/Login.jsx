@@ -21,11 +21,12 @@ export default function Login({ userType = "owner" }) {
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [phase, setPhase] = useState("enter");
-  const [confirmRes, setConfirmRes] = useState(null);
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
 
-  const confirmRef = useRef(null); // 🔥 important
+  const verifierRef = useRef(null);        // 🔥 reCAPTCHA
+  const confirmRef = useRef(null);         // 🔥 ConfirmationResult
+
   const { loginWithTokens } = useAuth();
   const navigate = useNavigate();
 
@@ -43,11 +44,13 @@ export default function Login({ userType = "owner" }) {
 
     setLoading(true);
     setOtp("");
-    setConfirmRes(null);
     confirmRef.current = null;
 
     try {
-      const verifier = buildRecaptcha(); // ONLY HERE
+      // 🔥 BUILD RECAPTCHA ONLY ONCE
+      if (!verifierRef.current) {
+        verifierRef.current = buildRecaptcha();
+      }
 
       const precheckUrl =
         userType === "manager"
@@ -59,11 +62,10 @@ export default function Login({ userType = "owner" }) {
       const confirmation = await signInWithPhoneNumber(
         auth,
         `+91${num}`,
-        verifier
+        verifierRef.current
       );
 
-      confirmRef.current = confirmation; // 🔥 store safely
-      setConfirmRes(true);
+      confirmRef.current = confirmation;
       setPhase("verify");
       setTimer(90);
 
@@ -115,7 +117,7 @@ export default function Login({ userType = "owner" }) {
     }
   };
 
-  /* ---------------- UI ---------------- */
+  /* ---------------- UI (UNCHANGED) ---------------- */
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
       <Card className="w-full max-w-md border border-border shadow-sm">
