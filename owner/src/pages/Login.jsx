@@ -1,198 +1,329 @@
-import React, { useEffect, useState, useRef } from "react";
+// src/pages/OwnerLogin.jsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, buildRecaptcha, signInWithPhoneNumber } from "../firebase.js";
-import api from "../api/axios";
-import SummaryApi from "../common/SummaryApi";
-import { useAuth } from "../auth/AuthContext";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { toast } from "sonner";
+
+import api from "@/api/axios";
+import SummaryApi from "@/common/SummaryApi";
+
+import { auth, buildRecaptcha, resetRecaptcha, signInWithPhoneNumber } from "@/firebase";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
 
-export default function Login({ userType = "owner" }) {
-  const [mobile, setMobile] = useState("");
-  const [otp, setOtp] = useState("");
-  const [phase, setPhase] = useState("enter");
-  const [loading, setLoading] = useState(false);
-  const [timer, setTimer] = useState(0);
+const OTP_LEN = 6;
 
-  const verifierRef = useRef(null);
-  const confirmRef = useRef(null);
-  const verifyingRef = useRef(false);
+const onlyDigits = (v) => (v || "").replace(/\D/g, "");
+const normalize10 = (v) => onlyDigits(v).slice(-10);
 
-  const { loginWithTokens } = useAuth();
+function formatTimer(sec) {
+  const s = Math.max(0, sec);
+  const mm = String(Math.floor(s / 60)).padStart(2, "0");
+  const ss = String(s % 60).padStart(2, "0");
+  return `${mm}:${ss}`;
+}
+
+export default function OwnerLogin() {
   const navigate = useNavigate();
 
-  /* ---------------- TIMER ---------------- */
+  const [phase, setPhase] = useState("mobile"); // mobile | otp
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
+  const [confirmRes, setConfirmRes] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+
+  const [secondsLeft, setSecondsLeft] = useState(60);
+
+  const otpInputRef = useRef(null);
+  const autoVerifyLock = useRef(false);
+
+  const mobile10 = useMemo(() => normalize10(mobile), [mobile]);
+  const fullPhone = useMemo(() => (mobile10.length === 10 ? `+91${mobile10}` : ""), [mobile10]);
+
+  // timer for resend
   useEffect(() => {
-    if (timer <= 0) return;
-    const t = setTimeout(() => setTimer((s) => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [timer]);
+    if (phase !== "otp") return;
+    if (secondsLeft <= 0) return;
 
-  /* ---------------- SEND OTP ---------------- */
-  const sendOtp = async () => {
-  const num = mobile.replace(/\D/g, "");
-  if (num.length !== 10) {
-    toast.error("Enter valid 10-digit number");
-    return;
-  }
+    const t = setInterval(() => setSecondsLeft((p) => p - 1), 1000);
+    return () => clearInterval(t);
+  }, [phase, secondsLeft]);
 
-  setLoading(true);
-  setOtp("");
+  // cleanup recaptcha when leaving
+  useEffect(() => {
+    return () => resetRecaptcha();
+  }, []);
 
-  try {
-    const verifier = buildRecaptcha();
+  const backendOwnerPrecheck = async () => {
+    // your SummaryApi uses BASE_URL + /api/auth/resort-owner/precheck
+    const { url, method } = SummaryApi.ownerPrecheck;
+    const res = await api.request({
+      url,
+      method,
+      data: { mobile: mobile10 },
+    });
+    return res.data;
+  };
 
-    const precheckUrl =
-      userType === "manager"
-        ? SummaryApi.managerPrecheck.url
-        : SummaryApi.ownerPrecheck.url;
+  const backendOwnerLogin = async (firebaseIdToken) => {
+    const { url, method } = SummaryApi.ownerLogin;
+    const res = await api.request({
+      url,
+      method,
+      headers: {
+        Authorization: `Bearer ${firebaseIdToken}`,
+      },
+    });
+    return res.data;
+  };
 
-    await api.post(precheckUrl, { mobile: num });
+  const startOtpFlow = async () => {
+    if (mobile10.length !== 10) {
+      toast.error("Please enter a valid 10-digit mobile number");
+      return;
+    }
 
-    confirmRef.current = await signInWithPhoneNumber(
-      auth,
-      `+91${num}`,
-      verifier
-    );
+    setLoading(true);
+    try {
+      // 1) precheck (blocks traveller etc.)
+      await backendOwnerPrecheck();
 
-    setPhase("verify");
-    setTimer(90);
-    toast.success("OTP sent successfully");
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to send OTP");
-  } finally {
-    setLoading(false);
-  }
-};
+      // 2) firebase otp
+      resetRecaptcha();
+      const verifier = buildRecaptcha();
+      const confirmation = await signInWithPhoneNumber(auth, fullPhone, verifier);
 
+      setConfirmRes(confirmation);
+      setPhase("otp");
+      setSecondsLeft(60);
+      setOtp("");
+      autoVerifyLock.current = false;
 
+      toast.success("OTP sent successfully");
+      setTimeout(() => otpInputRef.current?.focus(), 50);
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to send OTP. Please try again.";
+      toast.error(msg);
+      resetRecaptcha();
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const verifyOtp = async (code) => {
+    if (!confirmRes) return toast.error("Please request OTP again.");
+    if (code.length !== OTP_LEN) return;
 
-  /* ---------------- VERIFY OTP ---------------- */
-  const verifyOtp = async () => {
-  if (!confirmRef.current) {
-    toast.error("Please resend OTP");
-    return;
-  }
+    if (verifying) return;
+    setVerifying(true);
 
-  if (verifyingRef.current) return;
+    try {
+      const cred = await confirmRes.confirm(code);
+      const idToken = await cred.user.getIdToken(true);
 
-  verifyingRef.current = true;
-  setLoading(true);
+      const data = await backendOwnerLogin(idToken);
 
-  try {
-    const cred = await confirmRef.current.confirm(otp);
-    const idToken = await cred.user.getIdToken(true);
+      // store tokens (adjust to your auth store if you have one)
+      localStorage.setItem("accessToken", data?.accessToken || "");
+      localStorage.setItem("refreshToken", data?.refreshToken || "");
+      localStorage.setItem("user", JSON.stringify(data?.user || null));
 
-    const loginUrl =
-      userType === "manager"
-        ? SummaryApi.managerLogin.url
-        : SummaryApi.ownerLogin.url;
+      toast.success("Login successful");
+      navigate("/dashboard");
+    } catch (err) {
+      // if firebase otp wrong OR backend rejects traveller etc.
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Invalid OTP. Please try again.";
+      toast.error(msg);
 
-    const res = await api.post(
-      loginUrl,
-      null,
-      {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-      }
-    );
+      // UX: keep OTP typed but allow retry
+      autoVerifyLock.current = false;
+    } finally {
+      setVerifying(false);
+    }
+  };
 
-    loginWithTokens(res.data);
-    toast.success("Login successful");
-    navigate("/dashboard", { replace: true });
+  const onOtpChange = (val) => {
+    const clean = onlyDigits(val).slice(0, OTP_LEN);
+    setOtp(clean);
 
-  } catch (err) {
-    console.error(err);
-    toast.error("Invalid or expired OTP");
+    // auto-verify when complete (professional UX)
+    if (clean.length === OTP_LEN && !autoVerifyLock.current) {
+      autoVerifyLock.current = true;
+      verifyOtp(clean);
+    } else if (clean.length < OTP_LEN) {
+      autoVerifyLock.current = false;
+    }
+  };
 
-    // 🔥 Allow retry
-    verifyingRef.current = false;
-  } finally {
-    setLoading(false);
-  }
-};
+  const resendOtp = async () => {
+    if (secondsLeft > 0) return;
+    if (loading) return;
 
+    setLoading(true);
+    try {
+      // re-check before resend (still correct role)
+      await backendOwnerPrecheck();
 
-  /* ---------------- UI (UNCHANGED) ---------------- */
+      resetRecaptcha();
+      const verifier = buildRecaptcha();
+      const confirmation = await signInWithPhoneNumber(auth, fullPhone, verifier);
+
+      setConfirmRes(confirmation);
+      setSecondsLeft(60);
+      setOtp("");
+      autoVerifyLock.current = false;
+
+      toast.success("OTP resent");
+      setTimeout(() => otpInputRef.current?.focus(), 50);
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to resend OTP.";
+      toast.error(msg);
+      resetRecaptcha();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changeNumber = () => {
+    setPhase("mobile");
+    setOtp("");
+    setConfirmRes(null);
+    setSecondsLeft(60);
+    autoVerifyLock.current = false;
+    resetRecaptcha();
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
-      <Card className="w-full max-w-md border border-border shadow-sm">
-        <CardHeader className="text-center space-y-2">
-          <img src="/owner/KarabookLogo.png" alt="Karabook" className="h-10 mx-auto" />
-          <CardTitle className="text-xl font-semibold">
-            {userType === "manager" ? "Manager Login" : "Resort Owner Login"}
+    <div className="min-h-screen w-full bg-[#f6f7fb] flex items-center justify-center px-4">
+      {/* required for Firebase reCAPTCHA */}
+      <div id="recaptcha-container" />
+
+      <Card className="w-full max-w-xl rounded-2xl shadow-sm border bg-white">
+        <CardHeader className="pt-8 pb-4 flex flex-col items-center text-center">
+          {/* Replace with your logo */}
+          <img
+            src="/logo.png"
+            alt="KaraBook"
+            className="h-10 w-auto mb-3"
+          />
+          <CardTitle className="text-2xl font-semibold">
+            Resort Owner Login
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="mt-1">
             Sign in securely using your registered mobile number
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-5">
-          {phase === "enter" && (
-            <div className="space-y-3">
-              <Label>Mobile Number</Label>
-              <div className="flex gap-2">
-                <div className="px-3 py-2 rounded-md border bg-muted text-sm">+91</div>
-                <Input
-                  value={mobile}
-                  maxLength={10}
-                  onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
-                />
-              </div>
-              <Button onClick={sendOtp} disabled={loading} className="w-full">
-                {loading ? "Sending OTP..." : "Send OTP"}
-              </Button>
-            </div>
-          )}
-
-          {phase === "verify" && (
+        <CardContent className="px-8 pb-8">
+          {phase === "mobile" ? (
             <div className="space-y-4">
-              <Label>Enter OTP</Label>
-              <Input
-                value={otp}
-                maxLength={6}
-                autoFocus
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="text-center tracking-widest text-lg"
-              />
+              <div className="space-y-2">
+                <Label>Mobile Number</Label>
+
+                <div className="flex gap-2">
+                  <div className="w-[70px] flex items-center justify-center rounded-md border bg-muted/40 text-sm">
+                    +91
+                  </div>
+
+                  <Input
+                    value={mobile10}
+                    onChange={(e) => setMobile(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="Enter mobile number"
+                    className="h-11"
+                    maxLength={10}
+                  />
+                </div>
+              </div>
 
               <Button
-                disabled={loading || otp.length !== 6}
-                onClick={verifyOtp}
-                className="w-full"
+                onClick={startOtpFlow}
+                disabled={loading || mobile10.length !== 10}
+                className="w-full h-11 rounded-md"
               >
-                {loading ? "Verifying..." : "Verify & Continue"}
+                {loading ? "Sending..." : "Send OTP"}
               </Button>
 
-              <div className="text-center text-sm text-muted-foreground">
-                {timer > 0 ? (
-                  <>Resend OTP in {timer}s</>
-                ) : (
-                  <button onClick={sendOtp} className="underline text-primary">
-                    Resend OTP
-                  </button>
-                )}
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Protected by Google reCAPTCHA
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="text-sm text-muted-foreground text-center">
+                OTP sent to <span className="font-medium text-foreground">{fullPhone}</span>
               </div>
+
+              <div className="space-y-2">
+                <Label>Enter OTP</Label>
+                <Input
+                  ref={otpInputRef}
+                  value={otp}
+                  onChange={(e) => onOtpChange(e.target.value)}
+                  inputMode="numeric"
+                  placeholder="••••••"
+                  className="h-11 text-center tracking-[0.35em] font-semibold"
+                  maxLength={OTP_LEN}
+                  disabled={verifying}
+                />
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <button
+                    type="button"
+                    onClick={changeNumber}
+                    className="underline underline-offset-4 hover:text-foreground"
+                    disabled={loading || verifying}
+                  >
+                    Change number
+                  </button>
+
+                  <span>
+                    {secondsLeft > 0 ? (
+                      <>Resend in <span className="font-medium">{formatTimer(secondsLeft)}</span></>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={resendOtp}
+                        className="underline underline-offset-4 hover:text-foreground"
+                        disabled={loading}
+                      >
+                        Resend OTP
+                      </button>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* This button exists (like many pro websites) but OTP also auto-verifies */}
+              <Button
+                onClick={() => verifyOtp(otp)}
+                disabled={otp.length !== OTP_LEN || verifying}
+                className="w-full h-11 rounded-md"
+              >
+                {verifying ? "Verifying..." : "Verify and continue"}
+              </Button>
+
+              <p className="text-xs text-muted-foreground text-center">
+                OTP will verify automatically once completed
+              </p>
             </div>
           )}
         </CardContent>
 
-        <CardFooter className="flex flex-col items-center gap-1">
-          <p className="text-xs text-muted-foreground">Protected by Google reCAPTCHA</p>
-          <div id="recaptcha-container" />
+
+        <CardFooter>
+          <div id="recaptcha-container"></div>
         </CardFooter>
       </Card>
     </div>
