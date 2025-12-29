@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
+import { useAuth } from "@/auth/AuthContext";
 import api from "@/api/axios";
 import SummaryApi from "@/common/SummaryApi";
-
 import { auth, sendOtp } from "@/firebase";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,6 +29,7 @@ export default function OwnerLogin() {
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [confirmRes, setConfirmRes] = useState(null);
+  const { loginWithTokens } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -120,21 +120,17 @@ export default function OwnerLogin() {
 
       const data = await backendOwnerLogin(idToken);
 
-      localStorage.setItem("accessToken", data?.accessToken || "");
-      localStorage.setItem("refreshToken", data?.refreshToken || "");
-      localStorage.setItem("user", JSON.stringify(data?.user || null));
+      loginWithTokens(data);
 
-      toast.success("Login successful");
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
+
     } catch (err) {
-      // if firebase otp wrong OR backend rejects traveller etc.
       const msg =
         err?.response?.data?.message ||
         err?.message ||
         "Invalid OTP. Please try again.";
       toast.error(msg);
 
-      // UX: keep OTP typed but allow retry
       autoVerifyLock.current = false;
     } finally {
       setVerifying(false);
@@ -183,12 +179,12 @@ export default function OwnerLogin() {
 
 
   const changeNumber = () => {
-  setPhase("mobile");
-  setOtp("");
-  setConfirmRes(null);
-  setSecondsLeft(60);
-  autoVerifyLock.current = false;
-};
+    setPhase("mobile");
+    setOtp("");
+    setConfirmRes(null);
+    setSecondsLeft(60);
+    autoVerifyLock.current = false;
+  };
 
 
   return (
