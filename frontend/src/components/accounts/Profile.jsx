@@ -5,6 +5,7 @@ import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth";
+import EditProfileDialog from "../EditProfileDialog";
 
 export default function Profile() {
   const { accessToken, clearAuth } = useAuthStore();
@@ -14,6 +15,7 @@ export default function Profile() {
   const [avatarPreview, setAvatarPreview] = useState("");
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef(null);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -151,13 +153,22 @@ export default function Profile() {
           </div>
         </div>
 
-        <Button
-          onClick={clearAuth}
-          variant="outline"
-          className="rounded-[8px] border-gray-300 text-gray-800 hover:bg-gray-50 flex items-center gap-2"
-        >
-          <LogOut size={16} /> Logout
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => setEditOpen(true)}
+            className="rounded-[8px] bg-[#233b19] text-white hover:bg-[#1b2e13]"
+          >
+            Edit Profile
+          </Button>
+
+          <Button
+            onClick={clearAuth}
+            variant="outline"
+            className="rounded-[8px] border-gray-300 text-gray-800 hover:bg-gray-50 flex items-center gap-2"
+          >
+            <LogOut size={16} /> Logout
+          </Button>
+        </div>
       </div>
 
       <div className="border rounded-[8px] shadow-sm bg-white p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -171,6 +182,15 @@ export default function Profile() {
         <InfoRow icon={<MapPin />} label="Pin Code" value={profile.pinCode || "—"} />
 
       </div>
+
+      <EditProfileDialog
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        profile={profile}
+        token={accessToken}
+        onUpdated={(updatedUser) => setProfile(updatedUser)}
+      />
+
     </div>
   );
 }
@@ -184,6 +204,7 @@ function InfoRow({ icon, label, value }) {
         <p className="font-medium text-gray-800">{value}</p>
       </div>
     </div>
+
   );
 }
 

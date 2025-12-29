@@ -290,6 +290,38 @@ export const updateTravellerMobile = async (req, res) => {
 };
 
 
+export const updateTravellerProfile = async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const {
+    firstName,
+    lastName,
+    email,
+    dateOfBirth,
+    address,
+    city,
+    state,
+    pinCode
+  } = req.body;
+
+  user.firstName = firstName;
+  user.lastName = lastName;
+  user.name = `${firstName} ${lastName}`;
+  user.email = email;
+  user.dateOfBirth = dateOfBirth;
+  user.address = address;
+  user.city = city;
+  user.state = state;
+  user.pinCode = pinCode;
+
+  await user.save();
+
+  res.json({ user });
+};
+
+
+
 export const resortOwnerLogin = async (req, res) => {
   try {
     const { firebaseUser } = req;

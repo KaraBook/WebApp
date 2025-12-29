@@ -13,7 +13,8 @@ import {
   checkResortOwnerNumber,
   managerPrecheck,
   managerLogin,
-  removeTravellerAvatar
+  removeTravellerAvatar,
+  updateTravellerProfile
 } from "../controllers/userController.js";
 import { verifyFirebaseToken } from "../middlewares/verifyFirebaseToken.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
@@ -28,6 +29,7 @@ router.post("/traveller/login", verifyFirebaseToken, travellerLogin);
 router.post("/traveller/precheck", travellerPrecheck);
 router.post("/traveller/check", verifyFirebaseToken, travellerCheck);
 router.post("/traveller/signup", verifyFirebaseToken, travellerSignup);
+router.put("/traveller/profile", requireAuth, updateTravellerProfile);
 router.post(
   "/traveller/upload-avatar",
   requireAuth,
