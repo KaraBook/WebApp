@@ -12,6 +12,7 @@ import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { toast } from "sonner";
 import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
+import { baseURL } from "@/common/SummaryApi";
 
 export default function EditProfileDialog({ open, onClose, profile, token, onUpdated }) {
     const [form, setForm] = useState({});
@@ -65,14 +66,13 @@ export default function EditProfileDialog({ open, onClose, profile, token, onUpd
 
         setSending(true);
         try {
-            // 🔐 PRECHECK
-            await Axios({
+
+            await axios({
                 method: SummaryApi.travellerPrecheck.method,
-                url: SummaryApi.travellerPrecheck.url,
+                url: baseURL + SummaryApi.travellerPrecheck.url,
                 data: { mobile },
             });
 
-            // 🔐 FIREBASE OTP
             await auth.signOut().catch(() => { });
             const verifier = window.recaptchaVerifier || buildRecaptcha();
 
@@ -106,9 +106,8 @@ export default function EditProfileDialog({ open, onClose, profile, token, onUpd
                 {},
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
-                        FirebaseToken: idToken,
-                    },
+                        Authorization: `Bearer ${idToken}`,
+                    }
                 }
             );
 
@@ -123,6 +122,15 @@ export default function EditProfileDialog({ open, onClose, profile, token, onUpd
         }
     };
 
+    useEffect(() => {
+        if (timer <= 0) return;
+
+        const i = setInterval(() => {
+            setTimer(t => t - 1);
+        }, 1000);
+
+        return () => clearInterval(i);
+    }, [timer]);
 
     useEffect(() => {
         if (otp.length === 6 && !verifying) {
