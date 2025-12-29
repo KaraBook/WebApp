@@ -279,7 +279,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                         <Input name="lastName" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
                     </div>
 
-                    <div className="sm:col-span-2">
+                    <div>
                         <Label>Email</Label>
                         <Input name="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                     </div>
@@ -290,13 +290,13 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                     </div>
 
                     <div>
-                        <Label>Pin Code</Label>
-                        <Input name="pinCode" value={form.pinCode} onChange={(e) => setForm({ ...form, pinCode: e.target.value })} />
-                    </div>
-
-                    <div className="sm:col-span-2">
                         <Label>Address</Label>
                         <Input name="address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+                    </div>
+
+                    <div>
+                        <Label>Pin Code</Label>
+                        <Input name="pinCode" value={form.pinCode} onChange={(e) => setForm({ ...form, pinCode: e.target.value })} />
                     </div>
 
                     <div>

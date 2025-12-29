@@ -156,7 +156,7 @@ export default function Profile() {
         <div className="flex gap-3">
           <Button
             onClick={() => setEditOpen(true)}
-            className="rounded-[8px] bg-primary text-white hover:bg-[#1b2e13]"
+            className="rounded-[8px] bg-primary text-white hover:bg-primary"
           >
             Edit Profile
           </Button>
