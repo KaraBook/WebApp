@@ -18,12 +18,16 @@ export const auth = getAuth(app);
 let recaptchaVerifier = null;
 
 export const getRecaptcha = async () => {
+  if (typeof window === "undefined") return null;
+
   if (recaptchaVerifier) return recaptchaVerifier;
 
   recaptchaVerifier = new RecaptchaVerifier(
-    "recaptcha-container",
-    { size: "invisible" },
-    auth
+    "recaptcha-container",   
+    {
+      size: "invisible",
+    },
+    auth                   
   );
 
   await recaptchaVerifier.render();
