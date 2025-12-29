@@ -163,6 +163,7 @@ export default function OwnerCalendar() {
 
             {/* CALENDAR */}
             <div className="rounded-xl border border-gray-200 shadow-sm">
+              <div className="calendar-wrapper">
               <DateRange
                 ranges={dateRange}
                 onChange={(item) => setDateRange([item.selection])}
@@ -175,6 +176,7 @@ export default function OwnerCalendar() {
                 dragSelectionEnabled={true}
                 disabledDay={(date) => isDateBooked(date) || isDateBlocked(date)}
               />
+              </div>
             </div>
 
             {/* BUTTON */}
