@@ -38,84 +38,78 @@ export default function Login({ userType = "owner" }) {
   }, [timer]);
 
   /* ---------------- SEND OTP ---------------- */
-  const sendOtp = async () => {
-    const num = mobile.replace(/\D/g, "");
-    if (num.length !== 10) return toast.error("Enter valid 10-digit number");
+ const sendOtp = async () => {
+  const num = mobile.replace(/\D/g, "");
+  if (num.length !== 10) return toast.error("Enter valid 10-digit number");
 
-    setLoading(true);
-    setOtp("");
-    confirmRef.current = null;
+  setLoading(true);
+  setOtp("");
 
-    try {
-      // 🔥 BUILD RECAPTCHA ONLY ONCE
-      if (!verifierRef.current) {
-        verifierRef.current = buildRecaptcha();
-      }
+  try {
+    const verifier = window.recaptchaVerifier || buildRecaptcha();
 
-      const precheckUrl =
-        userType === "manager"
-          ? SummaryApi.managerPrecheck.url
-          : SummaryApi.ownerPrecheck.url;
+    const precheckUrl =
+      userType === "manager"
+        ? SummaryApi.managerPrecheck.url
+        : SummaryApi.ownerPrecheck.url;
 
-      await api.post(precheckUrl, { mobile: num });
+    await api.post(precheckUrl, { mobile: num });
 
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        `+91${num}`,
-        verifierRef.current
-      );
+    const confirmation = await signInWithPhoneNumber(
+      auth,
+      `+91${num}`,
+      verifier
+    );
 
-      window.__confirmationResult = confirmation;
-      setPhase("verify");
-      setTimer(90);
+    window.confirmationResult = confirmation; 
+    setPhase("verify");
+    setTimer(90);
 
-      toast.success("OTP sent successfully");
-    } catch (err) {
-      console.error("sendOtp error:", err);
-      toast.error("Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("OTP sent successfully");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to send OTP");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   /* ---------------- VERIFY OTP ---------------- */
-  const verifyOtp = async () => {
-    if (!window.__confirmationResult) {
-      toast.error("OTP session expired. Please resend.");
-      return;
-    }
+  const verifyOtp = async (code = otp) => {
+  if (!window.confirmationResult || code.length !== 6) return;
 
-    if (otp.length !== 6) return;
+  setLoading(true);
+  try {
+    const cred = await window.confirmationResult.confirm(code);
+    const idToken = await cred.user.getIdToken(true);
 
-    setLoading(true);
+    const loginUrl =
+      userType === "manager"
+        ? SummaryApi.managerLogin.url
+        : SummaryApi.ownerLogin.url;
 
-    try {
-     const cred = await window.__confirmationResult.confirm(otp);
-      const idToken = await cred.user.getIdToken(true);
+    const res = await api.post(loginUrl, null, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
 
-      const loginUrl =
-        userType === "manager"
-          ? SummaryApi.managerLogin.url
-          : SummaryApi.ownerLogin.url;
+    loginWithTokens(res.data);
+    toast.success("Login successful");
+    navigate("/dashboard", { replace: true });
+  } catch {
+    toast.error("Invalid OTP. Please try again.");
+    setOtp("");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      const res = await api.post(loginUrl, null, {
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
 
-      loginWithTokens(res.data);
-      toast.success("Login successful");
-
-      navigate(
-        userType === "manager" ? "/manager/dashboard" : "/dashboard",
-        { replace: true }
-      );
-    } catch (err) {
-      console.error("verifyOtp error:", err);
-      toast.error("Invalid or expired OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
+useEffect(() => {
+  if (otp.length === 6 && phase === "verify") {
+    verifyOtp(otp);
+  }
+}, [otp]);
 
   /* ---------------- UI (UNCHANGED) ---------------- */
   return (
