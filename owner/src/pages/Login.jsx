@@ -41,7 +41,10 @@ export default function Login({ userType = "owner" }) {
   /* ---------------- SEND OTP ---------------- */
   const sendOtp = async () => {
   const num = mobile.replace(/\D/g, "");
-  if (num.length !== 10) return toast.error("Enter valid 10-digit number");
+  if (num.length !== 10) {
+    toast.error("Enter valid 10-digit number");
+    return;
+  }
 
   setLoading(true);
   setOtp("");
@@ -49,8 +52,16 @@ export default function Login({ userType = "owner" }) {
   try {
     const verifier = buildRecaptcha();
 
+    // ✅ DEFINE PRECHECK URL (THIS WAS MISSING)
+    const precheckUrl =
+      userType === "manager"
+        ? SummaryApi.managerPrecheck.url
+        : SummaryApi.ownerPrecheck.url;
+
+    // ✅ precheck (NO firebase token here)
     await api.post(precheckUrl, { mobile: num });
 
+    // ✅ send OTP
     confirmRef.current = await signInWithPhoneNumber(
       auth,
       `+91${num}`,
@@ -67,6 +78,7 @@ export default function Login({ userType = "owner" }) {
     setLoading(false);
   }
 };
+
 
 
 
