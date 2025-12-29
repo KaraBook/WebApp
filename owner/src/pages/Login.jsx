@@ -96,10 +96,12 @@ export default function Login({ userType = "owner" }) {
         : SummaryApi.ownerLogin.url;
 
     const res = await axios.post(
-      import.meta.env.VITE_API_BASE + loginUrl,
+      loginUrl,
       null,
       {
-        headers: { Authorization: `Bearer ${idToken}` },
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
       }
     );
 
@@ -115,6 +117,7 @@ export default function Login({ userType = "owner" }) {
     setLoading(false);
   }
 };
+
 
   useEffect(() => {
     if (otp.length === 6 && phase === "verify" && !verifyingRef.current) {
