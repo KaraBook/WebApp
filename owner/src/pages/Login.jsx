@@ -51,10 +51,6 @@ export default function OwnerLogin() {
     return () => clearInterval(t);
   }, [phase, secondsLeft]);
 
-  // cleanup recaptcha when leaving
-  useEffect(() => {
-    return () => resetRecaptcha();
-  }, []);
 
   const backendOwnerPrecheck = async () => {
     // your SummaryApi uses BASE_URL + /api/auth/resort-owner/precheck
@@ -80,35 +76,35 @@ export default function OwnerLogin() {
   };
 
   const startOtpFlow = async () => {
-  if (mobile10.length !== 10) {
-    toast.error("Please enter a valid 10-digit mobile number");
-    return;
-  }
+    if (mobile10.length !== 10) {
+      toast.error("Please enter a valid 10-digit mobile number");
+      return;
+    }
 
-  setLoading(true);
-  try {
-    await backendOwnerPrecheck();
+    setLoading(true);
+    try {
+      await backendOwnerPrecheck();
 
-    const confirmation = await sendOtp(fullPhone);
+      const confirmation = await sendOtp(fullPhone);
 
-    setConfirmRes(confirmation);
-    setPhase("otp");
-    setSecondsLeft(60);
-    setOtp("");
-    autoVerifyLock.current = false;
+      setConfirmRes(confirmation);
+      setPhase("otp");
+      setSecondsLeft(60);
+      setOtp("");
+      autoVerifyLock.current = false;
 
-    toast.success("OTP sent successfully");
-    setTimeout(() => otpInputRef.current?.focus(), 50);
-  } catch (err) {
-    toast.error(
-      err?.response?.data?.message ||
-      err?.message ||
-      "Failed to send OTP"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.success("OTP sent successfully");
+      setTimeout(() => otpInputRef.current?.focus(), 50);
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to send OTP"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const verifyOtp = async (code) => {
@@ -124,7 +120,6 @@ export default function OwnerLogin() {
 
       const data = await backendOwnerLogin(idToken);
 
-      // store tokens (adjust to your auth store if you have one)
       localStorage.setItem("accessToken", data?.accessToken || "");
       localStorage.setItem("refreshToken", data?.refreshToken || "");
       localStorage.setItem("user", JSON.stringify(data?.user || null));
@@ -159,42 +154,42 @@ export default function OwnerLogin() {
     }
   };
 
-const resendOtp = async () => {
-  if (secondsLeft > 0 || loading) return;
+  const resendOtp = async () => {
+    if (secondsLeft > 0 || loading) return;
 
-  setLoading(true);
-  try {
-    await backendOwnerPrecheck();
+    setLoading(true);
+    try {
+      await backendOwnerPrecheck();
 
-    const confirmation = await sendOtp(fullPhone);
+      const confirmation = await sendOtp(fullPhone);
 
-    setConfirmRes(confirmation);
-    setSecondsLeft(60);
-    setOtp("");
-    autoVerifyLock.current = false;
+      setConfirmRes(confirmation);
+      setSecondsLeft(60);
+      setOtp("");
+      autoVerifyLock.current = false;
 
-    toast.success("OTP resent");
-    setTimeout(() => otpInputRef.current?.focus(), 50);
-  } catch (err) {
-    toast.error(
-      err?.response?.data?.message ||
-      err?.message ||
-      "Failed to resend OTP"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.success("OTP resent");
+      setTimeout(() => otpInputRef.current?.focus(), 50);
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to resend OTP"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const changeNumber = () => {
-    setPhase("mobile");
-    setOtp("");
-    setConfirmRes(null);
-    setSecondsLeft(60);
-    autoVerifyLock.current = false;
-    resetRecaptcha();
-  };
+  setPhase("mobile");
+  setOtp("");
+  setConfirmRes(null);
+  setSecondsLeft(60);
+  autoVerifyLock.current = false;
+};
+
 
   return (
     <div className="min-h-screen w-full bg-[#f6f7fb] flex items-center justify-center px-4">
