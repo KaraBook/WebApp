@@ -70,32 +70,12 @@
 
 
 .calendar-wrapper {
-  transform: scale(1.15);     
+  transform: scale(1.1);     
   transform-origin: top center;
 }
 
 .calendar-wrapper .rdrCalendarWrapper {
   width: 100%;
-}
-/* Increase overall calendar width */
-.rdrCalendarWrapper {
-  font-size: 16px;
-}
-
-/* Bigger date cells */
-.rdrDay {
-  height: 48px;
-  width: 48px;
-}
-
-/* Bigger numbers */
-.rdrDayNumber span {
-  font-size: 15px;
-}
-
-/* Bigger weekday names */
-.rdrWeekDay {
-  font-size: 14px;
 }
 
 
