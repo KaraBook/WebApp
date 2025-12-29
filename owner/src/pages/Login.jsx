@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, buildRecaptcha, signInWithPhoneNumber } from "../firebase.js"
+import { auth, buildRecaptcha, signInWithPhoneNumber } from "../firebase.js";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { useAuth } from "../auth/AuthContext";
@@ -24,21 +24,17 @@ export default function Login({ userType = "owner" }) {
   const [confirmRes, setConfirmRes] = useState(null);
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
-  const [canResend, setCanResend] = useState(true);
 
-  const verifyingRef = useRef(false);
-
+  const confirmRef = useRef(null); // 🔥 important
   const { loginWithTokens } = useAuth();
   const navigate = useNavigate();
 
   /* ---------------- TIMER ---------------- */
   useEffect(() => {
-    if (!canResend && timer > 0) {
-      const t = setTimeout(() => setTimer((s) => s - 1), 1000);
-      return () => clearTimeout(t);
-    }
-    if (timer === 0 && !canResend) setCanResend(true);
-  }, [timer, canResend]);
+    if (timer <= 0) return;
+    const t = setTimeout(() => setTimer((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [timer]);
 
   /* ---------------- SEND OTP ---------------- */
   const sendOtp = async () => {
@@ -48,10 +44,10 @@ export default function Login({ userType = "owner" }) {
     setLoading(true);
     setOtp("");
     setConfirmRes(null);
-    verifyingRef.current = false;
+    confirmRef.current = null;
 
     try {
-      const verifier = buildRecaptcha();
+      const verifier = buildRecaptcha(); // ONLY HERE
 
       const precheckUrl =
         userType === "manager"
@@ -66,62 +62,60 @@ export default function Login({ userType = "owner" }) {
         verifier
       );
 
-      setConfirmRes(confirmation);
+      confirmRef.current = confirmation; // 🔥 store safely
+      setConfirmRes(true);
       setPhase("verify");
-      setCanResend(false);
       setTimer(90);
 
       toast.success("OTP sent successfully");
     } catch (err) {
       console.error("sendOtp error:", err);
-      toast.error(err?.response?.data?.message || "Failed to send OTP");
+      toast.error("Failed to send OTP");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- AUTO VERIFY OTP (ONLY PLACE) ---------------- */
-  useEffect(() => {
-    if (phase !== "verify") return;
-    if (!confirmRes) return;
-    if (otp.length !== 6) return;
-    if (verifyingRef.current) return;
+  /* ---------------- VERIFY OTP ---------------- */
+  const verifyOtp = async () => {
+    if (!confirmRef.current) {
+      toast.error("OTP session expired. Please resend.");
+      return;
+    }
 
-    verifyingRef.current = true;
+    if (otp.length !== 6) return;
+
     setLoading(true);
 
-    (async () => {
-      try {
-        const cred = await confirmRes.confirm(otp);
-        const idToken = await cred.user.getIdToken(true);
+    try {
+      const cred = await confirmRef.current.confirm(otp);
+      const idToken = await cred.user.getIdToken(true);
 
-        const loginUrl =
-          userType === "manager"
-            ? SummaryApi.managerLogin.url
-            : SummaryApi.ownerLogin.url;
+      const loginUrl =
+        userType === "manager"
+          ? SummaryApi.managerLogin.url
+          : SummaryApi.ownerLogin.url;
 
-        const res = await api.post(loginUrl, null, {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
+      const res = await api.post(loginUrl, null, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
 
-        loginWithTokens(res.data);
-        toast.success("Login successful");
+      loginWithTokens(res.data);
+      toast.success("Login successful");
 
-        navigate(
-          userType === "manager" ? "/manager/dashboard" : "/dashboard",
-          { replace: true }
-        );
-      } catch (err) {
-        console.error("verifyOtp error:", err);
-        toast.error("Invalid or expired OTP");
-        verifyingRef.current = false;
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [otp, phase, confirmRes]);
+      navigate(
+        userType === "manager" ? "/manager/dashboard" : "/dashboard",
+        { replace: true }
+      );
+    } catch (err) {
+      console.error("verifyOtp error:", err);
+      toast.error("Invalid or expired OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  /* ---------------- UI (UNCHANGED) ---------------- */
+  /* ---------------- UI ---------------- */
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
       <Card className="w-full max-w-md border border-border shadow-sm">
@@ -131,9 +125,7 @@ export default function Login({ userType = "owner" }) {
             {userType === "manager" ? "Manager Login" : "Resort Owner Login"}
           </CardTitle>
           <CardDescription>
-            {userType === "manager"
-              ? "Managers login using the number assigned by the owner"
-              : "Sign in securely using your registered mobile number"}
+            Sign in securely using your registered mobile number
           </CardDescription>
         </CardHeader>
 
@@ -149,8 +141,8 @@ export default function Login({ userType = "owner" }) {
                   onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
                 />
               </div>
-              <Button onClick={sendOtp} disabled={loading || !canResend} className="w-full">
-                {loading ? "Sending OTP..." : canResend ? "Send OTP" : `Resend in ${timer}s`}
+              <Button onClick={sendOtp} disabled={loading} className="w-full">
+                {loading ? "Sending OTP..." : "Send OTP"}
               </Button>
             </div>
           )}
@@ -165,6 +157,24 @@ export default function Login({ userType = "owner" }) {
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                 className="text-center tracking-widest text-lg"
               />
+
+              <Button
+                onClick={verifyOtp}
+                disabled={loading || otp.length !== 6}
+                className="w-full"
+              >
+                {loading ? "Verifying..." : "Verify & Continue"}
+              </Button>
+
+              <div className="text-center text-sm text-muted-foreground">
+                {timer > 0 ? (
+                  <>Resend OTP in {timer}s</>
+                ) : (
+                  <button onClick={sendOtp} className="underline text-primary">
+                    Resend OTP
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </CardContent>
