@@ -67,57 +67,88 @@
     @apply bg-background text-foreground;
   }
 }
-/* ---------- BASE CELL STYLE ---------- */
-.rdrDay {
+/* ===============================
+   FORCE ALL DAYS TO SAME SIZE
+================================ */
+
+/* Outer day cell */
+.rdrDay,
+.rdrDayDisabled,
+.rdrDayPassive {
   width: 40px !important;
   height: 40px !important;
   margin: 2px !important;
-  padding: 0 !important;
-  border-radius: 8px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 }
 
-/* Day number */
+/* Inner number wrapper */
+.rdrDayNumber,
 .rdrDayNumber span {
   width: 40px !important;
   height: 40px !important;
+  line-height: 40px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   border-radius: 8px !important;
   font-size: 14px !important;
   font-weight: 500 !important;
+  box-sizing: border-box !important;
 }
 
-/* ---------- SELECTED RANGE ---------- */
+/* ===============================
+   REMOVE DISABLED OVERLAY (KEY FIX)
+================================ */
+.rdrDayDisabledOverlay {
+  display: none !important;
+}
+
+/* Remove default disabled background */
+.rdrDayDisabled::after {
+  display: none !important;
+}
+
+/* ===============================
+   DISABLED DAY STYLE (CLEAN)
+================================ */
+.rdrDayDisabled .rdrDayNumber span {
+  background-color: #e5e7eb !important;
+  color: #9ca3af !important;
+  border-radius: 8px !important;
+}
+
+/* ===============================
+   SELECTED RANGE (UNCHANGED LOGIC)
+================================ */
 .rdrInRange .rdrDayNumber span {
-  background: #0097A7 !important;
+  background: #0097a7 !important;
   color: #fff !important;
-  opacity: 1 !important;
-  border-radius: 0px !important; /* Middle dates = square */
+  border-radius: 0 !important;
 }
 
 .rdrStartEdge .rdrDayNumber span {
-  background: #0097A7 !important;
+  background: #0097a7 !important;
   color: #fff !important;
   border-radius: 8px 0 0 8px !important;
 }
 
 .rdrEndEdge .rdrDayNumber span {
-  background: #0097A7 !important;
+  background: #0097a7 !important;
   color: #fff !important;
   border-radius: 0 8px 8px 0 !important;
 }
 
 .rdrDaySelected .rdrDayNumber span {
-  background: #0097A7 !important;
+  background: #0097a7 !important;
   color: #fff !important;
-  border-radius: 8px !important; /* If single date selected */
+  border-radius: 8px !important;
 }
 
-/* Remove ugly preview dotted/hover stuff */
+/* ===============================
+   REMOVE PREVIEW / HOVER NOISE
+================================ */
 .rdrDayHovered .rdrDayNumber span,
 .rdrDayStartPreview .rdrDayNumber span,
 .rdrDayEndPreview .rdrDayNumber span {
@@ -125,24 +156,6 @@
   border: none !important;
 }
 
-/* ---------- DISABLED DATES ---------- */
-.rdrDayDisabled .rdrDayNumber span {
-  background: #e5e7eb !important;
-  color: #9ca3af !important;
-  border-radius: 8px !important;
-}
-
-.rdrDayDisabled {
-  pointer-events: none !important;
-}
-
-/* Remove default shadows */
-.rdrDateRangeWrapper,
-.rdrCalendarWrapper,
-.rdrMonth {
-  box-shadow: none !important;
-  border-radius: 12px !important;
-}
 
 ::-webkit-scrollbar {
   width: 6px;
