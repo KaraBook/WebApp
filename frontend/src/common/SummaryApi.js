@@ -29,6 +29,10 @@ updateTravellerProfile: {
   url: "/api/auth/traveller/profile",
   method: "put"
 },
+updateTravellerMobile: {
+  url: "/api/auth/traveller/mobile",
+  method: "put"
+},
   refreshToken: {
     url: "/api/auth/refresh-token",
     method: "post"
