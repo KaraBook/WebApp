@@ -15,34 +15,24 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
-let recaptchaVerifier = null;
+let verifier = null;
 
-export const getRecaptcha = async () => {
-  if (typeof window === "undefined") return null;
+export const buildRecaptcha = async () => {
+  if (verifier) return verifier;
 
-  if (recaptchaVerifier) return recaptchaVerifier;
+  verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+    size: "invisible",
+  });
 
-  recaptchaVerifier = new RecaptchaVerifier(
-    auth,                     
-    "recaptcha-container",   
-    {
-      size: "invisible",
-    }
-  );
-
-  await recaptchaVerifier.render();
-  return recaptchaVerifier;
+  await verifier.render();
+  return verifier;
 };
 
-
-export const resetRecaptcha = () => {
-  if (recaptchaVerifier) {
-    try {
-      recaptchaVerifier.clear();
-    } catch {}
-    recaptchaVerifier = null;
+export const clearRecaptcha = () => {
+  if (verifier) {
+    verifier.clear();
+    verifier = null;
   }
 };
-
 
 export { signInWithPhoneNumber };
