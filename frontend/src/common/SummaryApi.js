@@ -1,6 +1,10 @@
 export const baseURL = import.meta.env.VITE_BASE_URL;
 
 const SummaryApi = {
+  travellerPrecheck: {
+    url: "/api/auth/traveller/precheck",
+    method: "post",
+  },
   travellerCheck: {
     url: "/api/auth/traveller/check",
     method: "post"

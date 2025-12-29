@@ -7,6 +7,7 @@ import {
   resortOwnerLogin,
   updateTravellerMobile,
   travellerCheck,
+  travellerPrecheck,
   me,
   uploadTravellerAvatar,
   checkResortOwnerNumber,
@@ -24,6 +25,7 @@ router.post("/refresh-token", refreshToken);
 
 router.post("/traveller/login", verifyFirebaseToken, travellerLogin);
 router.post("/traveller/check", verifyFirebaseToken, travellerCheck);
+router.post("/traveller/precheck", verifyFirebaseToken, travellerPrecheck);
 router.post("/traveller/signup", verifyFirebaseToken, travellerSignup);
 router.post(
   "/traveller/upload-avatar",

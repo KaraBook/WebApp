@@ -64,32 +64,41 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   /* ================= SEND OTP ================= */
   const sendOtp = async () => {
-    if (phone.length !== 10) return;
+  if (phone.length !== 10) return;
 
-    setSending(true);
-    try {
-      try {
-        await auth.signOut();
-      } catch { }
+  setSending(true);
+  try {
+    // 🔐 PRECHECK (via SummaryApi)
+    await axios({
+      method: SummaryApi.travellerPrecheck.method,
+      url: baseURL + SummaryApi.travellerPrecheck.url,
+      data: { mobile: phone },
+    });
 
-      let verifier = window.recaptchaVerifier || buildRecaptcha();
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        `+91${phone}`,
-        verifier
-      );
+    // 🔐 ONLY IF ALLOWED → SEND OTP
+    await auth.signOut().catch(() => {});
+    const verifier = window.recaptchaVerifier || buildRecaptcha();
 
-      setConfirmResult(confirmation);
-      setStep("otp");
-      setTimer(60);
+    const confirmation = await signInWithPhoneNumber(
+      auth,
+      `+91${phone}`,
+      verifier
+    );
 
-      toast.success("OTP sent successfully");
-    } catch (err) {
-      toast.error(err?.message || "Failed to send OTP");
-    } finally {
-      setSending(false);
-    }
-  };
+    setConfirmResult(confirmation);
+    setStep("otp");
+    setTimer(60);
+
+    toast.success("OTP sent successfully");
+  } catch (err) {
+    toast.error(
+      err?.response?.data?.message || "Cannot send OTP"
+    );
+  } finally {
+    setSending(false);
+  }
+};
+
 
   /* ================= VERIFY OTP ================= */
   const verifyOtp = async (code = otp) => {

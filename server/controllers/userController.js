@@ -148,6 +148,29 @@ export const travellerCheck = async (req, res) => {
 };
 
 
+export const travellerPrecheck = async (req, res) => {
+  const { mobile } = req.body;
+  const normalized = normalizeMobile(mobile);
+
+  if (!normalized || normalized.length !== 10) {
+    return res.status(400).json({ message: "Invalid mobile number" });
+  }
+
+  const user = await User.findOne({ mobile: normalized });
+
+  if (user && user.role !== "traveller") {
+    return res.status(403).json({
+      message:
+        user.role === "resortOwner"
+          ? "This number belongs to a Resort Owner account"
+          : "This number is not allowed for traveller login",
+    });
+  }
+
+  return res.status(200).json({ allowOtp: true });
+};
+
+
 export const travellerSignup = async (req, res) => {
   try {
     const mobile = normalizeMobile(req.firebaseUser?.phone_number);
