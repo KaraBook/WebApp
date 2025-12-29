@@ -24,8 +24,8 @@ router.post("/login", login);
 router.post("/refresh-token", refreshToken);
 
 router.post("/traveller/login", verifyFirebaseToken, travellerLogin);
+router.post("/traveller/precheck", travellerPrecheck);
 router.post("/traveller/check", verifyFirebaseToken, travellerCheck);
-router.post("/traveller/precheck", verifyFirebaseToken, travellerPrecheck);
 router.post("/traveller/signup", verifyFirebaseToken, travellerSignup);
 router.post(
   "/traveller/upload-avatar",

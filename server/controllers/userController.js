@@ -171,6 +171,7 @@ export const travellerPrecheck = async (req, res) => {
 };
 
 
+
 export const travellerSignup = async (req, res) => {
   try {
     const mobile = normalizeMobile(req.firebaseUser?.phone_number);
