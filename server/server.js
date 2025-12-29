@@ -30,6 +30,7 @@ const allowedOrigin = [
   "http://88.222.244.26",
   "https://karabookdev.cloud",
   "https://karabookdev.cloud/admin",
+  "https://karabookdev.cloud/owner",
 ];
 
 app.use(

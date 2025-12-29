@@ -52,16 +52,13 @@ export default function Login({ userType = "owner" }) {
   try {
     const verifier = buildRecaptcha();
 
-    // ✅ DEFINE PRECHECK URL (THIS WAS MISSING)
     const precheckUrl =
       userType === "manager"
         ? SummaryApi.managerPrecheck.url
         : SummaryApi.ownerPrecheck.url;
 
-    // ✅ precheck (NO firebase token here)
     await api.post(precheckUrl, { mobile: num });
 
-    // ✅ send OTP
     confirmRef.current = await signInWithPhoneNumber(
       auth,
       `+91${num}`,
