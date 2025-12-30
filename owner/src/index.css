@@ -90,12 +90,12 @@
 .rdrEndEdge{
   border-top-right-radius: 0.8em!important;
   border-bottom-right-radius: 0.8em!important;
-  background-color: var(--primary)!important;
+  background-color: #028EA0!important;
 }
 .rdrStartEdge{
   border-top-left-radius: 0.8em!important;
   border-bottom-left-radius: 0.8em!important;
-  background-color: var(--primary)!important;
+  background-color: #028EA0!important;
 }
 .rdrDayHovered {
   border-radius: 8px!important;  
