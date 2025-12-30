@@ -19,6 +19,7 @@ import {
   MoreVertical,
 } from "lucide-react";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
+import { Link } from "react-router-dom";
 
 /* -------------------- Pagination (matches your screenshot) -------------------- */
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
