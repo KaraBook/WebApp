@@ -110,6 +110,23 @@
 .rdrDay:not(.rdrDayPassive) .rdrInRange~.rdrDayNumber span{
 color: #000!important;
 }
+
+@media screen and (max-width:578px){
+  .rdrMonth{
+  width: auto;
+  margin-left: 0px;
+}
+.calendar-wrapper {
+  transform: none;    
+}
+
+}
+
+
+
+
+
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
