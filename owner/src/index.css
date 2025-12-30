@@ -103,8 +103,8 @@
 .rdrInRange{
   background-color: rgb(0 151 167 / 12%);
 }
-.rdrInRange span{
-  color: #000!important;
+.rdrDayInRange .rdrDayNumber span {
+  color: #000000;   /* 🔥 black */
 }
 ::-webkit-scrollbar {
   width: 6px;
