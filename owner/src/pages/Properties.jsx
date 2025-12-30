@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { amenitiesOptions, foodOptions } from "@/constants/dropdownOptions";
+import { Button } from "@/components/ui/button";
 
 export default function Properties() {
   const { id } = useParams();
@@ -130,6 +131,10 @@ export default function Properties() {
             >
               {kycVerified ? "KYC Verified" : "KYC Pending"}
             </span>
+
+            <Link to={property ? `/edit-property/${property._id}` : "#"}>
+              <Button>Edit Property</Button>
+            </Link>
 
           </div>
         </div>
