@@ -122,6 +122,69 @@ function PaymentChip({ status }) {
   return <span className={map[status] || base}>{status}</span>;
 }
 
+
+
+function MobileRecentBookings({ bookings, onOpen }) {
+  return (
+    <div className="md:hidden bg-white rounded-2xl border border-gray-100 shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <h3 className="text-sm font-semibold text-gray-900">Recent Bookings</h3>
+        <button className="text-xs text-primary font-medium">
+          View all →
+        </button>
+      </div>
+
+      {/* List */}
+      <div className="divide-y">
+        {bookings.slice(0, 3).map((b) => {
+          const name = `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim();
+          const initials =
+            (b.userId?.firstName?.[0] || "") +
+            (b.userId?.lastName?.[0] || "");
+
+          return (
+            <button
+              key={b._id}
+              onClick={() => onOpen(b)}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition"
+            >
+              {/* Avatar */}
+              <div className="h-10 w-10 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">
+                {initials || "U"}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {name || "Guest"}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {b.propertyId?.propertyName}
+                </p>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  {new Date(b.createdAt).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+
+              {/* Status + Arrow */}
+              <div className="flex items-center gap-2">
+                <PaymentChip status={b.paymentStatus} />
+                <span className="text-gray-400 text-lg">›</span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -320,8 +383,18 @@ export default function Dashboard() {
 
         {/* GRID — BOOKINGS + CALENDAR */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          {/* MOBILE – RECENT BOOKINGS */}
+          <MobileRecentBookings
+            bookings={bookings || []}
+            onOpen={(b) => {
+              setSelectedBooking(b);
+              setOpenBookingDialog(true);
+            }}
+          />
+
           {/* BOOKINGS TABLE */}
-          <div className="lg:col-span-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="hidden md:block lg:col-span-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-4 sm:px-6 pt-5 pb-3">
               <h2 className="text-sm font-semibold text-gray-900">Last bookings</h2>
             </div>
