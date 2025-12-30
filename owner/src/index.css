@@ -123,6 +123,17 @@ color: #000!important;
   height: 3em!important;
   border-radius: 5px!important;
 }
+.rdrEndEdge{
+  border-top-right-radius: 0.5em!important;
+  border-bottom-right-radius: 0.5em!important;
+  background-color: #028EA0!important;
+}
+.rdrStartEdge{
+  border-top-left-radius: 0.5em!important;
+  border-bottom-left-radius: 0.5em!important;
+  background-color: #028EA0!important;
+}
+
 
 }
 
