@@ -6,10 +6,14 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  if (config.headers?.["x-firebase-auth"]) {
+    return config;
+  }
   const token = localStorage.getItem("owner_access");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
 
 let refreshing = false;
 let queue = [];

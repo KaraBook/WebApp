@@ -64,16 +64,17 @@ export default function OwnerLogin() {
   };
 
   const backendOwnerLogin = async (firebaseIdToken) => {
-    const { url, method } = SummaryApi.ownerLogin;
-    const res = await api.request({
-      url,
-      method,
-      headers: {
-        Authorization: `Bearer ${firebaseIdToken}`,
-      },
-    });
-    return res.data;
-  };
+  const { url, method } = SummaryApi.ownerLogin;
+  const res = await api.request({
+    url,
+    method,
+    headers: {
+      Authorization: `Bearer ${firebaseIdToken}`,
+      "x-firebase-auth": "true", 
+    },
+  });
+  return res.data;
+};
 
   const startOtpFlow = async () => {
     if (mobile10.length !== 10) {
