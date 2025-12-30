@@ -180,7 +180,7 @@ export default function OwnerCalendar() {
             </div>
 
             {/* BUTTON */}
-            <div className="mt-6 flex justify-center">
+            <div className="mt-12 flex justify-center">
               <Button
                 onClick={handleBlockDates}
                 disabled={loading}
