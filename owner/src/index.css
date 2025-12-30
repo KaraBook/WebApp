@@ -95,9 +95,8 @@
   border-top-left-radius: 0.8em!important;
   border-bottom-left-radius: 0.8em!important;
 }
-/* Reduce border radius on hover (outline day) */
-.rdrDayHovered {
-  border-radius: 8px!important;   /* 🔥 same value as selected dates */
+.rdrDay .rdrDayHovered {
+  border-radius: 8px!important;  
 }
 
 ::-webkit-scrollbar {
