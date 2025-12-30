@@ -11,6 +11,7 @@ import "react-date-range/dist/theme/default.css";
 
 import { format } from "date-fns";
 import { RotateCcw } from "lucide-react";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 
 export default function OwnerCalendar() {
   const [propertyId, setPropertyId] = useState(null);
@@ -114,7 +115,7 @@ export default function OwnerCalendar() {
 
         {/* HEADER */}
         <div className="flex items-center justify-between">
-          <h1 className="text-[26px] font-semibold text-gray-900">Calendar</h1>
+          <h1 className="text-xl sm:text-[26px] font-bold text-gray-900">Calendar</h1>
 
           <Button
             variant="outline"
@@ -131,14 +132,16 @@ export default function OwnerCalendar() {
 
           {/* LEFT CARD */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 text-center">
+            <h2 className="text-lg font-semibold text-gray-900 text-left">
               Select Dates to Block
             </h2>
 
-            <p className="text-center text-sm text-emerald-600 mt-1">
+            <p className="text-left text-sm text-emerald-600 mt-1">
               {format(dateRange[0].startDate, "MMM dd, yyyy")} →{" "}
               {format(dateRange[0].endDate, "MMM dd, yyyy")}
             </p>
+
+            <Separator />
 
             <div className="mt-6 calendar-shell">
               <DateRange
@@ -157,7 +160,7 @@ export default function OwnerCalendar() {
               <Button
                 onClick={handleBlockDates}
                 disabled={loading}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8"
+                className="bg-primary hover:primary text-white px-8"
               >
                 Block Selected Dates
               </Button>
