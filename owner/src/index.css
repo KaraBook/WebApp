@@ -92,8 +92,8 @@
   border-bottom-right-radius: 0.8em!important;
 }
 .rdrStartEdge{
-  border-top-right-radius: 0.8em!important;
-  border-bottom-right-radius: 0.8em!important;
+  border-top-left-radius: 0.8em!important;
+  border-bottom-left-radius: 0.8em!important;
 }
 ::-webkit-scrollbar {
   width: 6px;
