@@ -196,7 +196,7 @@ export default function OwnerLogin() {
         <CardHeader className="pt-8 pb-4 flex flex-col items-center text-center">
           {/* Replace with your logo */}
           <img
-            src="/logo.png"
+            src="/KarabookLogo.png"
             alt="KaraBook"
             className="h-10 w-auto mb-3"
           />
