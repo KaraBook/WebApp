@@ -172,7 +172,6 @@ export default function OwnerCalendar() {
                 direction="horizontal"
                 showDateDisplay={false}
                 moveRangeOnFirstSelection={false}
-                rangeColors={["#0097A7"]}
                 dragSelectionEnabled={true}
                 disabledDay={(date) => isDateBooked(date) || isDateBlocked(date)}
               />
