@@ -97,9 +97,12 @@
   border-bottom-left-radius: 0.8em!important;
   background-color: #028EA0!important;
 }
-.rdrDayHovered {
-  border-radius: 8px!important;  
+/* Reduce hover outline radius */
+.rdrDayHovered,
+.rdrDayHovered .rdrDayNumber {
+  border-radius: 8px !important; /* 🔧 adjust value */
 }
+
 .rdrInRange{
   background-color: rgb(0 151 167 / 12%);
 }
