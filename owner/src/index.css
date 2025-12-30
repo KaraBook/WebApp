@@ -87,7 +87,14 @@
   height: 4em!important;
   border-radius: 8px!important;
 }
-
+.rdrEndEdge{
+  border-top-right-radius: 0.8em!important;
+  border-bottom-right-radius: 0.8em!important;
+}
+.rdrStartEdge{
+  border-top-right-radius: 0.8em!important;
+  border-bottom-right-radius: 0.8em!important;
+}
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
