@@ -19,7 +19,7 @@ import {
   MoreVertical,
 } from "lucide-react";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 /* -------------------- Pagination (matches your screenshot) -------------------- */
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
@@ -95,7 +95,7 @@ function StatCard({
   iconColor = "text-gray-700",
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 sm:px-6 py-5 flex flex-col gap-3">
+    <div onClick={onClick} className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 sm:px-6 py-5 flex flex-col gap-3">
       <div
         className={`h-8 w-8 rounded-full ${iconBg} flex items-center justify-center`}
       >
@@ -357,6 +357,7 @@ export default function Dashboard() {
             label="Total Bookings"
             value={stats?.totalBookings}
             caption="All bookings so far"
+            onClick={() => navigate("/bookings?status=all")}
           />
           <StatCard
             icon={CalendarCheck}
@@ -365,6 +366,7 @@ export default function Dashboard() {
             caption="Ready to check-in"
             iconBg="bg-emerald-50"
             iconColor="text-emerald-600"
+            onClick={() => navigate("/bookings?status=paid")}
           />
           <StatCard
             icon={Clock}
@@ -373,6 +375,7 @@ export default function Dashboard() {
             caption="Awaiting confirmation"
             iconBg="bg-amber-50"
             iconColor="text-amber-600"
+            onClick={() => navigate("/bookings?status=pending")}
           />
           <StatCard
             icon={IndianRupee}

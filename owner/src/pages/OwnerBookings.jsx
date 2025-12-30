@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import api from "../api/axios";
 import SummaryApi from "@/common/SummaryApi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -49,7 +49,11 @@ export default function OwnerBookings() {
   const [filtered, setFiltered] = useState([]);
   const [query, setQuery] = useState("");
 
-  const [paymentFilter, setPaymentFilter] = useState("all");
+  const [searchParams] = useSearchParams();
+  const statusFromUrl = searchParams.get("status") || "all";
+  const [statusFilter, setStatusFilter] = useState(statusFromUrl);
+
+  const [paymentFilter, setPaymentFilter] = useState(statusFromUrl);
 
   const pageSize = 10;
   const [page, setPage] = useState(1);
@@ -91,6 +95,10 @@ export default function OwnerBookings() {
   useEffect(() => {
     fetchBookings();
   }, []);
+
+  useEffect(() => {
+  setStatusFilter(statusFromUrl);
+}, [statusFromUrl]);
 
   const fetchBookings = async () => {
     try {
@@ -258,7 +266,11 @@ export default function OwnerBookings() {
             </div>
 
             {/* Payment Filter */}
-            <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+            <Select value={paymentFilter} onValueChange={(val) => { 
+              setPaymentFilter(val);
+              navigate(`/bookings?status=${val}`);
+             }}
+              >
               <SelectTrigger className="md:w-[160px] w-[100%] bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Payment" />
               </SelectTrigger>
