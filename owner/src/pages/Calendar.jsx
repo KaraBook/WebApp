@@ -182,7 +182,7 @@ export default function OwnerCalendar() {
                 {blockedDates.map((r, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 hover:bg-gray-50 transition"
+                    className="flex items-center justify-between border bg-gray-50 border-gray-200 rounded-xl px-4 py-3 hover:bg-gray-50 transition"
                   >
                     <div>
                       <p className="text-sm font-medium text-gray-800">
@@ -197,7 +197,7 @@ export default function OwnerCalendar() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+                      className="border-primary text-emerald-600 hover:primary"
                       onClick={() => handleUnblock(r)}
                       disabled={loading}
                     >
