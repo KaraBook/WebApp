@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   Home,
   Calendar,
-  Users,
+  ClipboardList,
 } from "lucide-react";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
@@ -42,12 +42,12 @@ export default function MobileBottomNav() {
     {
       label: "Bookings",
       path: "/bookings",
-      icon: Calendar,
+      icon: ClipboardList,
     },
     {
-      label: "Users",
-      path: "/users",
-      icon: Users,
+      label: "Calendar",
+      path: "/calendar",
+      icon: Calendar,
     },
   ];
 
@@ -77,16 +77,14 @@ export default function MobileBottomNav() {
             <NavLink
               key={label}
               to={path}
-              className={`flex flex-col items-center justify-center gap-0 text-xs transition ${
-                active ? "text-black font-medium" : "text-gray-500"
-              }`}
+              className={`flex flex-col items-center justify-center gap-0 text-xs transition ${active ? "text-black font-medium" : "text-gray-500"
+                }`}
             >
               <div
-                className={`flex items-center justify-center rounded-[6px] transition ${
-                  active
-                    ? "bg-[#028ea1] w-8 h-8 p-[7px]"
-                    : "w-8 h-6"
-                }`}
+                className={`flex items-center justify-center rounded-[6px] transition ${active
+                  ? "bg-[#028ea1] w-8 h-8 p-[7px]"
+                  : "w-8 h-6"
+                  }`}
               >
                 <Icon
                   size={22}
