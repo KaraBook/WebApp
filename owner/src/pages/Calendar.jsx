@@ -7,7 +7,7 @@ import SummaryApi from "../common/SummaryApi";
 
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import "./calendar-overrides.css";
+
 
 import { format } from "date-fns";
 import { RotateCcw } from "lucide-react";
