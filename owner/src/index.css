@@ -90,17 +90,21 @@
 .rdrEndEdge{
   border-top-right-radius: 0.8em!important;
   border-bottom-right-radius: 0.8em!important;
+  background-color: var(--primary)!important;
 }
 .rdrStartEdge{
   border-top-left-radius: 0.8em!important;
   border-bottom-left-radius: 0.8em!important;
+  background-color: var(--primary)!important;
 }
 .rdrDayHovered {
   border-radius: 8px!important;  
 }
 .rdrInRange{
   background-color: rgb(0 151 167 / 12%);
-  color:#000;
+}
+.rdrInRange span{
+  color: #000!important;
 }
 ::-webkit-scrollbar {
   width: 6px;
