@@ -92,9 +92,14 @@ function StatCard({
   caption,
   iconBg = "bg-gray-100",
   iconColor = "text-gray-700",
+  onClick,
 }) {
   return (
-    <div onClick={onClick} className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 sm:px-6 py-5 flex flex-col gap-3">
+    <div
+      onClick={onClick}
+      className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 sm:px-6 py-5
+             flex flex-col gap-3 cursor-pointer hover:shadow-md transition"
+    >
       <div
         className={`h-8 w-8 rounded-full ${iconBg} flex items-center justify-center`}
       >
@@ -131,9 +136,9 @@ function MobileRecentBookings({ bookings, onOpen }) {
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <h3 className="text-sm font-semibold text-gray-900">Recent Bookings</h3>
         <Link to="/bookings">
-        <button className="text-xs text-primary font-medium">
-          View all →
-        </button>
+          <button className="text-xs text-primary font-medium">
+            View all →
+          </button>
         </Link>
       </div>
 
