@@ -130,9 +130,11 @@ function MobileRecentBookings({ bookings, onOpen }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <h3 className="text-sm font-semibold text-gray-900">Recent Bookings</h3>
+        <Link to="/owner/bookings">
         <button className="text-xs text-primary font-medium">
           View all →
         </button>
+        </Link>
       </div>
 
       {/* List */}
@@ -150,7 +152,7 @@ function MobileRecentBookings({ bookings, onOpen }) {
               className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition"
             >
               {/* Avatar */}
-              <div className="h-10 w-10 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">
+              <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold">
                 {initials || "U"}
               </div>
 
