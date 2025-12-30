@@ -113,11 +113,15 @@ color: #000!important;
 
 @media screen and (max-width:578px){
   .rdrMonth{
-  width: auto;
+  width: 100%;
   margin-left: 0px;
 }
 .calendar-wrapper {
   transform: none;    
+}
+.rdrDay{
+  height: 3em!important;
+  border-radius: 5px!important;
 }
 
 }
