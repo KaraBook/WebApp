@@ -83,6 +83,10 @@
   margin-left: 16px;
 }
 
+.rdrDay{
+  height: 4em!important;
+  border-radius: 8px!important;
+}
 
 ::-webkit-scrollbar {
   width: 6px;
