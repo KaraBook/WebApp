@@ -131,7 +131,7 @@ function MobileRecentBookings({ bookings, onOpen }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <h3 className="text-sm font-semibold text-gray-900">Recent Bookings</h3>
-        <Link to="/owner/bookings">
+        <Link to="/bookings">
         <button className="text-xs text-primary font-medium">
           View all →
         </button>
