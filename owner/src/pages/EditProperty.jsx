@@ -374,15 +374,11 @@ export default function EditProperty() {
                 setCoverImageFile={setCoverImageFile}
                 coverImagePreview={coverImagePreview}
                 setCoverImagePreview={setCoverImagePreview}
-                showFields={{ coverImage: true }}
-              />
-              <FileUploadsSection
-              className="w-[48%]"
                 shopActFile={shopActFile}
                 setShopActFile={setShopActFile}
                 shopActPreview={shopActPreview}
                 setShopActPreview={setShopActPreview}
-                showFields={{ shopAct: true }}
+                showFields={{ coverImage: true, shopAct: true  }}
               />
               <FileUploadsSection
                 setGalleryImageFiles={setGalleryImageFiles}
