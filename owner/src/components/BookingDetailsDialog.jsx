@@ -42,6 +42,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     fixed
     right-0
     top-0
+    bottom-0
     h-screen
     w-[420px]
     max-w-[95vw]
