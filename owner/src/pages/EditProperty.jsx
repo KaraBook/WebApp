@@ -236,8 +236,9 @@ export default function EditProperty() {
               {/* Guests */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="mb-2">Max Guests</Label>
+                  <Label>Max Guests</Label>
                   <QuantityBox
+                    className="pt-2"
                     value={formData.maxGuests}
                     onChange={(val) =>
                       setFormData({ ...formData, maxGuests: val })
@@ -246,8 +247,9 @@ export default function EditProperty() {
                 </div>
 
                 <div>
-                  <Label className="mb-2">Base Guests</Label>
+                  <Label>Base Guests</Label>
                   <QuantityBox
+                    className="pt-2"
                     value={formData.baseGuests}
                     onChange={(val) =>
                       setFormData({ ...formData, baseGuests: val })
