@@ -206,7 +206,7 @@ export default function EditProperty() {
             </div>
 
             {/* ROOMS & STAY DETAILS */}
-            <div className="bg-white rounded-2xl border p-6 space-y-6">
+            <div className="bg-white rounded-2xl border p-6 space-y-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
                 Rooms & Stay Details
@@ -236,7 +236,7 @@ export default function EditProperty() {
               {/* Guests */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Max Guests</Label>
+                  <Label className="mb-2">Max Guests</Label>
                   <QuantityBox
                     value={formData.maxGuests}
                     onChange={(val) =>
@@ -246,7 +246,7 @@ export default function EditProperty() {
                 </div>
 
                 <div>
-                  <Label>Base Guests</Label>
+                  <Label className="mb-2">Base Guests</Label>
                   <QuantityBox
                     value={formData.baseGuests}
                     onChange={(val) =>
@@ -257,7 +257,7 @@ export default function EditProperty() {
               </div>
 
               {/* Check In / Out */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-wrap justify-between">
                 <CustomTimePicker
                   label="Check-In Time"
                   value={formData.checkInTime}
