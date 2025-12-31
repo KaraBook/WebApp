@@ -66,7 +66,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 >
 
         {/* HEADER */}
-        <DialogHeader className="px-5 py-4 border-b">
+        <DialogHeader className="px-5 py-6 border-b">
   <div className="flex items-start justify-between">
     <div>
       <DialogTitle className="text-lg font-semibold">
@@ -92,9 +92,6 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     </span>
   </div>
 </DialogHeader>
-
-
-        <Separator />
 
         {/* BODY (SCROLLABLE) */}
         <div
