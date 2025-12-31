@@ -11,9 +11,9 @@ const MultiSelectButtons = ({ label, options, selected, onChange }) => {
   };
 
   return (
-    <div className="w-full -mt-[11px]">
+    <div className="w-full">
       <label className="block mb-2 text-sm font-medium">{label}</label>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 -mt-[11px]">
         {options.map((option) => {
           const isSelected = selected.includes(option.value);
           return (
