@@ -282,7 +282,6 @@ export default function EditProperty() {
               <h2 className="text-lg font-semibold">Food</h2>
               {/* Food */}
               <MultiSelectButtons
-                label="Food Availability"
                 selected={formData.foodAvailability}
                 onChange={(val) =>
                   setFormData({ ...formData, foodAvailability: val })
