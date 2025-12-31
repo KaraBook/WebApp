@@ -407,7 +407,7 @@ export default function EditProperty() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="px-8 py-4 rounded-[12px] bg-primary text-white"
+                className="p-[24px] rounded-[12px] bg-primary text-white"
               >
                 {loading ? "Updating..." : "Update Property"}
               </Button>
