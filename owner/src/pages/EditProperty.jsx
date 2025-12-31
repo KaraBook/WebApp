@@ -313,6 +313,7 @@ export default function EditProperty() {
                 <div>
                   <Label>Weekday Price</Label>
                   <Input
+                    className="bg-[#bec3ff26] text-[15px] p-[20px] mt-[7px]"
                     value={formData.pricingPerNightWeekdays}
                     onChange={(e) =>
                       setFormData({
@@ -326,6 +327,7 @@ export default function EditProperty() {
                 <div>
                   <Label>Weekend Price</Label>
                   <Input
+                    className="bg-[#bec3ff26] text-[15px] p-[20px] mt-[7px]"
                     value={formData.pricingPerNightWeekend}
                     onChange={(e) =>
                       setFormData({
@@ -339,6 +341,7 @@ export default function EditProperty() {
                 <div>
                   <Label>Extra Adult (₹ / night)</Label>
                   <Input
+                    className="bg-[#bec3ff26] text-[15px] p-[20px] mt-[7px]"
                     value={formData.extraAdultCharge}
                     onChange={(e) =>
                       setFormData({
@@ -352,6 +355,7 @@ export default function EditProperty() {
                 <div>
                   <Label>Extra Child (₹ / night)</Label>
                   <Input
+                    className="bg-[#bec3ff26] text-[15px] p-[20px] mt-[7px]"
                     value={formData.extraChildCharge}
                     onChange={(e) =>
                       setFormData({
