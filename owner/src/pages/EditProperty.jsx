@@ -277,7 +277,7 @@ export default function EditProperty() {
             </div>
 
             {/* AMENITIES & FOOD */}
-            <div className="bg-white rounded-2xl border p-6 space-y-6">
+            <div className="bg-white rounded-2xl border lg:col-span-2 p-6 space-y-6">
               <h2 className="text-lg font-semibold">Amenities & Food</h2>
 
               {/* Food */}
