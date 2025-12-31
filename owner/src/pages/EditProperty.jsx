@@ -3,18 +3,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-
 import SingleSelectDropdown from "../components/SingleSelectDropdown";
 import MultiSelectButtons from "../components/MultiSelectButtons";
 import FileUploadsSection from "../components/FileUploadsSection";
 import CustomTimePicker from "../components/CustomTimePicker";
 import { QuantityBox } from "@/components/QuantityBox";
 import FullPageLoader from "@/components/FullPageLoader";
+import AmenitiesAccordion from "@/components/AmenitiesAccordion";
 
 import {
   Home,
@@ -281,6 +280,7 @@ export default function EditProperty() {
             <div className="bg-white rounded-2xl border p-6 space-y-6">
               <h2 className="text-lg font-semibold">Amenities & Food</h2>
 
+              {/* Food */}
               <MultiSelectButtons
                 label="Food Availability"
                 selected={formData.foodAvailability}
@@ -290,14 +290,18 @@ export default function EditProperty() {
                 options={foodOptions}
               />
 
-              <MultiSelectButtons
-                label="Amenities"
-                selected={formData.amenities}
-                onChange={(val) =>
-                  setFormData({ ...formData, amenities: val })
-                }
-                options={amenitiesOptions}
-              />
+              {/* Amenities */}
+              <div>
+                <Label className="mb-2 block">Amenities</Label>
+
+                <AmenitiesAccordion
+                  options={amenitiesOptions}
+                  selected={formData.amenities}
+                  onChange={(val) =>
+                    setFormData({ ...formData, amenities: val })
+                  }
+                />
+              </div>
             </div>
           </div>
 
@@ -384,7 +388,7 @@ export default function EditProperty() {
                 setShopActFile={setShopActFile}
                 shopActPreview={shopActPreview}
                 setShopActPreview={setShopActPreview}
-                showFields={{ coverImage: true, shopAct: true  }}
+                showFields={{ coverImage: true, shopAct: true }}
               />
               <FileUploadsSection
                 setGalleryImageFiles={setGalleryImageFiles}
