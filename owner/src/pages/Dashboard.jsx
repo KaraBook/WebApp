@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import { Link, useNavigate } from "react-router-dom";
+import MobileBookingsList from "@/components/MobileBookingList";
 
 /* -------------------- Pagination (matches your screenshot) -------------------- */
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
@@ -128,94 +129,6 @@ function PaymentChip({ status }) {
   return <span className={map[status] || base}>{status}</span>;
 }
 
-
-
-function MobileRecentBookings({ bookings, onOpen }) {
-  return (
-    <div className="md:hidden space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between px-1">
-        <h2 className="text-lg font-semibold text-gray-900">All Bookings</h2>
-
-        <Link
-          to="/bookings"
-          className="text-sm text-primary font-medium"
-        >
-          View all →
-        </Link>
-      </div>
-
-      {/* Booking Cards */}
-      <div className="space-y-4">
-        {bookings.map((b) => {
-          const name = `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim();
-          const email = b.userId?.email || "";
-          const nights = b.totalNights || 1;
-          const guests =
-            typeof b.guests === "number"
-              ? b.guests
-              : (b.guests?.adults || 0) + (b.guests?.children || 0);
-
-          return (
-            <div
-              key={b._id}
-              onClick={() => onOpen(b)}
-              className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4
-                         active:scale-[0.99] transition cursor-pointer"
-            >
-              {/* Top Row */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-base font-semibold text-gray-900">
-                    {name || "Guest"}
-                  </p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {email}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <PaymentChip status={b.paymentStatus} />
-                  <MoreVertical className="w-5 h-5 text-gray-400" />
-                </div>
-              </div>
-
-              {/* Property */}
-              <div className="mt-3">
-                <span className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-lg">
-                  {b.propertyId?.propertyName}
-                </span>
-              </div>
-
-              {/* Meta Row */}
-              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <CalendarCheck className="w-4 h-4" />
-                  <span>
-                    {new Date(b.checkIn).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                    })}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{nights} nights</span>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <Users className="w-4 h-4" />
-                  <span>{guests} guests</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 
 
