@@ -26,14 +26,14 @@ export default function AmenitiesAccordion({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex flex-wrap items-start justify-between gap-4">
       {options.map((group) => {
         const isOpen = openKeys.includes(group.key);
 
         return (
           <div
             key={group.key}
-            className="bg-white border border-gray-200 rounded-[12px] overflow-hidden"
+            className="bg-white border border-gray-200 rounded-[12px] overflow-hidden w-[48%]"
           >
             {/* HEADER */}
             <button
