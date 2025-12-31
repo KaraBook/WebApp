@@ -45,7 +45,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-  className="
+        className="
     fixed
     inset-y-0
     right-0
@@ -70,7 +70,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     data-[state=closed]:slide-out-to-right
     duration-300
   "
->
+      >
 
 
         {/* ================= HEADER ================= */}
@@ -87,10 +87,9 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
             <span
               className={`px-3 py-1 rounded-full text-xs font-medium capitalize
-                ${
-                  paymentStatus === "paid"
-                    ? "bg-emerald-100 text-emerald-700"
-                    : paymentStatus === "confirmed"
+                ${paymentStatus === "paid"
+                  ? "bg-emerald-100 text-emerald-700"
+                  : paymentStatus === "confirmed"
                     ? "bg-blue-100 text-blue-700"
                     : "bg-gray-100 text-gray-600"
                 }`}
@@ -103,25 +102,20 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         {/* ================= BODY ================= */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 text-sm">
 
-          {/* ROOM */}
-          <InfoCard
-            icon={<Home size={18} />}
-            label="Room"
-            value={propertyId?.propertyName || "—"}
-          />
-
           {/* DATES */}
           <div className="grid grid-cols-2 gap-4">
-            <InfoCard
-              icon={<Calendar size={18} />}
-              label="Check-in"
-              value={formatDate(checkIn)}
-            />
-            <InfoCard
-              icon={<Calendar size={18} />}
-              label="Check-out"
-              value={formatDate(checkOut)}
-            />
+            <Section title="Stay Details">
+              <InfoCard
+                icon={<Calendar size={18} />}
+                label="Check-in"
+                value={formatDate(checkIn)}
+              />
+              <InfoCard
+                icon={<Calendar size={18} />}
+                label="Check-out"
+                value={formatDate(checkOut)}
+              />
+            </Section>
           </div>
 
           {/* META */}
@@ -134,7 +128,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
             <InfoCard
               icon={<Users size={18} />}
               label="Guests"
-              value={`${guests?.adults || 0} Adults`}
+              value={`${adults} Adult${adults !== 1 ? "s" : ""}, ${children} Child${children !== 1 ? "ren" : ""}`}
             />
           </div>
 
@@ -214,9 +208,8 @@ function KeyValue({ label, value, bold, mono }) {
     <div className="flex justify-between gap-4">
       <span className="text-muted-foreground text-sm">{label}</span>
       <span
-        className={`text-sm text-right ${
-          bold ? "font-semibold" : "font-medium"
-        } ${mono ? "font-mono text-xs" : ""}`}
+        className={`text-sm text-right ${bold ? "font-semibold" : "font-medium"
+          } ${mono ? "font-mono text-xs" : ""}`}
       >
         {value}
       </span>
