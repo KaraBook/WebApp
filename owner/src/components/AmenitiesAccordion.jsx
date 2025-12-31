@@ -17,11 +17,11 @@ export default function AmenitiesAccordion({
   };
 
   return (
-    <div className="space-y-4 grid grid-cols-2">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {options.map((group) => (
         <div
           key={group.key}
-          className="border rounded-xl overflow-hidden"
+          className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
         >
           {/* HEADER */}
           <button
@@ -29,11 +29,11 @@ export default function AmenitiesAccordion({
             onClick={() =>
               setOpenKey(openKey === group.key ? null : group.key)
             }
-            className="w-full flex justify-between items-center px-4 py-3 bg-gray-50 text-sm font-medium"
+            className="w-full flex justify-between items-center px-5 py-4 bg-gray-50 text-sm font-semibold text-gray-800"
           >
             {group.label}
             <ChevronDown
-              className={`w-4 h-4 transition ${
+              className={`w-4 h-4 transition-transform ${
                 openKey === group.key ? "rotate-180" : ""
               }`}
             />
@@ -41,7 +41,7 @@ export default function AmenitiesAccordion({
 
           {/* BODY */}
           {openKey === group.key && (
-            <div className="p-4 grid grid-cols-2 sm:grid-cols-2 gap-3">
+            <div className="px-5 pt-3 pb-5 grid grid-cols-2 gap-3">
               {group.items.map((item) => {
                 const Icon = item.icon;
                 const active = selected.includes(item.value);
@@ -51,15 +51,20 @@ export default function AmenitiesAccordion({
                     type="button"
                     key={item.value}
                     onClick={() => toggleAmenity(item.value)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-sm transition
+                    className={`
+                      flex items-center gap-3
+                      px-3 py-2.5
+                      rounded-xl border text-sm
+                      transition-all
                       ${
                         active
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-gray-200 hover:bg-gray-50"
-                      }`}
+                          ? "border-primary bg-primary/10 text-primary shadow-sm"
+                          : "border-gray-200 text-gray-700 hover:bg-gray-50"
+                      }
+                    `}
                   >
-                    <Icon className="w-4 h-4" />
-                    {item.label}
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span className="text-left">{item.label}</span>
                   </button>
                 );
               })}
