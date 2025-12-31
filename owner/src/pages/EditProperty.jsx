@@ -277,6 +277,19 @@ export default function EditProperty() {
                 />
               </div>
             </div>
+
+            <div className="bg-white rounded-2xl border p-6 space-y-6">
+              <h2 className="text-lg font-semibold">Food</h2>
+              {/* Food */}
+              <MultiSelectButtons
+                label="Food Availability"
+                selected={formData.foodAvailability}
+                onChange={(val) =>
+                  setFormData({ ...formData, foodAvailability: val })
+                }
+                options={foodOptions}
+              />
+            </div>
           </div>
 
           {/* RIGHT COLUMN */}
@@ -387,7 +400,7 @@ export default function EditProperty() {
           </div>
 
           {/* AMENITIES & FOOD */}
-             <div className="lg:col-span-2">
+          <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl border p-6 space-y-6">
               <h2 className="text-lg font-semibold">Amenities & Food</h2>
 
@@ -414,7 +427,7 @@ export default function EditProperty() {
                 />
               </div>
             </div>
-            </div>
+          </div>
         </form>
       </div>
     </div>
