@@ -132,13 +132,17 @@ export default function MobileBookingsList({
                             </div>
 
                             {mobile && (
-                                <div className="mt-[5px]">
+                                <div className="mt-[5px] flex items-center gap-3 ">
                                     <a
                                         href={`tel:${mobile}`}
                                         className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition"
                                     >
                                         📞 {mobile}
                                     </a>
+                                    <div className="flex items-center gap-1">
+                                        <Users className="w-4 h-4" />
+                                        <span>{guests} guests</span>
+                                    </div>
                                 </div>
                             )}
                             {/* Meta */}
@@ -163,11 +167,6 @@ export default function MobileBookingsList({
                                 <div className="flex items-center gap-1">
                                     <Clock className="w-4 h-4" />
                                     <span>{nights} nights</span>
-                                </div>
-
-                                <div className="flex items-center gap-1">
-                                    <Users className="w-4 h-4" />
-                                    <span>{guests} guests</span>
                                 </div>
                             </div>
                         </div>
