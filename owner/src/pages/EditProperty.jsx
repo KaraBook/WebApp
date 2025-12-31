@@ -386,7 +386,23 @@ export default function EditProperty() {
               />
             </div>
 
-            {/* SUBMIT */}
+          </div>
+
+          {/* AMENITIES & FOOD */}
+          <div className="w-[100%]">
+            <div className="bg-white rounded-2xl border p-6 space-y-6">
+              <h2 className="text-lg font-semibold">Amenities </h2>
+                <AmenitiesAccordion
+                  options={amenitiesOptions}
+                  selected={formData.amenities}
+                  onChange={(val) =>
+                    setFormData({ ...formData, amenities: val })
+                  }
+                />
+            </div>
+          </div>
+
+           {/* SUBMIT */}
             <div className="flex justify-end">
               <Button
                 type="submit"
@@ -397,37 +413,6 @@ export default function EditProperty() {
               </Button>
             </div>
 
-          </div>
-
-          {/* AMENITIES & FOOD */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl border p-6 space-y-6">
-              <h2 className="text-lg font-semibold">Amenities & Food</h2>
-
-              {/* Food */}
-              <MultiSelectButtons
-                label="Food Availability"
-                selected={formData.foodAvailability}
-                onChange={(val) =>
-                  setFormData({ ...formData, foodAvailability: val })
-                }
-                options={foodOptions}
-              />
-
-              {/* Amenities */}
-              <div>
-                <Label className="mb-2 block">Amenities</Label>
-
-                <AmenitiesAccordion
-                  options={amenitiesOptions}
-                  selected={formData.amenities}
-                  onChange={(val) =>
-                    setFormData({ ...formData, amenities: val })
-                  }
-                />
-              </div>
-            </div>
-          </div>
         </form>
       </div>
     </div>
