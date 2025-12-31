@@ -39,55 +39,50 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="
-          w-[95vw]
-          max-w-3xl
-          h-[90vh]
-          p-0
-          rounded-xl
-          flex
-          flex-col
-        "
+    fixed
+    right-0
+    top-0
+    h-screen
+    w-[420px]
+    max-w-[95vw]
+    p-0
+    rounded-none
+    flex
+    flex-col
+    border-l
+    animate-in
+    slide-in-from-right
+    duration-300
+  "
       >
         {/* HEADER */}
-        <DialogHeader className="px-4 md:px-6 pt-4 pb-0">
-          <div className="flex flex-col md:flex-row items-start md:items-end pt-4 md:justify-between gap-3">
-            {/* LEFT */}
-            <div className="flex flex-col items-start">
-              <DialogTitle className="text-lg font-semibold leading-tight">
-                Booking Details — #{_id?.slice(-6).toUpperCase()}
-              </DialogTitle>
+        <DialogHeader className="px-5 py-4 border-b">
+  <div className="flex items-start justify-between">
+    <div>
+      <DialogTitle className="text-lg font-semibold">
+        {userId?.firstName} {userId?.lastName}
+      </DialogTitle>
 
-              <p className="text-sm text-left text-gray-500 mt-1">
-                Overview of traveller, property, stay, and payment information
-              </p>
+      <p className="text-sm text-gray-500">
+        {userId?.email}
+      </p>
+    </div>
 
-              <span
-                className={`inline-block mt-2 px-3 py-0.5 rounded-full text-xs font-medium capitalize
-                  ${
-                    paymentStatus === "paid"
-                      ? "bg-primary text-white"
-                      : "bg-gray-200 text-gray-700"
-                  }`}
-              >
-                {paymentStatus}
-              </span>
-            </div>
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-medium capitalize
+        ${
+          paymentStatus === "paid"
+            ? "bg-emerald-100 text-emerald-700"
+            : paymentStatus === "confirmed"
+            ? "bg-blue-100 text-blue-700"
+            : "bg-gray-100 text-gray-600"
+        }`}
+    >
+      {paymentStatus}
+    </span>
+  </div>
+</DialogHeader>
 
-            {/* RIGHT */}
-            <div className="flex md:flex-col items-center  md:items-end gap-2">
-              <Button
-                size="sm"
-                className="bg-primary hover:bg-primary h-8 px-3 text-xs"
-              >
-                Download Invoice
-              </Button>
-
-              <p className="text-[11px] text-gray-500">
-                Created on: {formatDate(createdAt)}
-              </p>
-            </div>
-          </div>
-        </DialogHeader>
 
         <Separator />
 
