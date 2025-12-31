@@ -95,7 +95,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 text-sm">
 
           {/* DATES */}
-          <div className="grid grid-cols-2 gap-4">
+          <div>
             <Section title="Stay Details" className="grid grid-cols-2 gap-4">
               <InfoCard
                 icon={<Calendar size={18} />}
