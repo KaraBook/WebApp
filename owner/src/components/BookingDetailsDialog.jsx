@@ -35,6 +35,9 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     contactNumber,
   } = booking;
 
+  const adults = guests?.adults || 0;
+  const children = guests?.children || 0;
+
   const formatDate = (d) =>
     new Date(d).toLocaleDateString("en-GB", {
       day: "2-digit",
