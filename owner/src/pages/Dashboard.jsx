@@ -335,9 +335,9 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
           {/* MOBILE – RECENT BOOKINGS */}
-          <MobileRecentBookings
+          <MobileBookingsList
             bookings={bookings || []}
-            onOpen={(b) => {
+            onOpenBooking={(b) => {
               setSelectedBooking(b);
               setOpenBookingDialog(true);
             }}
