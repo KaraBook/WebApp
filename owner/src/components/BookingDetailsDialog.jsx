@@ -95,8 +95,8 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 text-sm">
 
           {/* DATES */}
-          <div>
-            <Section title="Stay Details" className="grid grid-cols-2 gap-4">
+            <Section title="Stay Details" >
+              <div className="grid grid-cols-2 gap-4">
               <InfoCard
                 icon={<Calendar size={18} />}
                 label="Check-in"
@@ -107,8 +107,8 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
                 label="Check-out"
                 value={formatDate(checkOut)}
               />
+              </div>
             </Section>
-          </div>
 
           {/* META */}
           <div className="grid grid-cols-2 gap-4">
