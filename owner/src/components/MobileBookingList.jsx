@@ -91,27 +91,30 @@ export default function MobileBookingsList({
                                     <PaymentChip status={b.paymentStatus} />
 
                                     {/* 3-dot menu */}
-                                    <DropdownMenu className="w-[218px]">
+                                    <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button className="p-1 rounded-full hover:bg-gray-100">
                                                 <MoreVertical className="w-5 h-5 text-gray-500" />
                                             </button>
                                         </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end" className="w-44">
+                                        <DropdownMenuContent align="end" className="w-[218px]">
                                             <DropdownMenuItem
                                                 onSelect={() => onOpenBooking?.(b)}
+                                                className="p-[15px] text-[16px]"
                                             >
                                                 View Booking
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
+                                                className="p-[15px] text-[16px]"
                                                 onSelect={() => navigate(`/invoice/${b._id}`)}
                                             >
                                                 View Invoice
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
+                                                className="p-[15px] text-[16px]"
                                                 onSelect={() =>
                                                     navigator.clipboard.writeText(email)
                                                 }
@@ -120,6 +123,7 @@ export default function MobileBookingsList({
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
+                                                className="p-[15px] text-[16px]"
                                                 onSelect={() =>
                                                     navigator.clipboard.writeText(mobile)
                                                 }
