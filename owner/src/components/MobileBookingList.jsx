@@ -101,20 +101,20 @@ export default function MobileBookingsList({
                                         <DropdownMenuContent align="end" className="w-[218px]">
                                             <DropdownMenuItem
                                                 onSelect={() => onOpenBooking?.(b)}
-                                                className="p-[15px] text-[16px]"
+                                                className="p-[14px] text-[16px]"
                                             >
                                                 View Booking
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
-                                                className="p-[15px] text-[16px]"
+                                                className="p-[14px] text-[16px]"
                                                 onSelect={() => navigate(`/invoice/${b._id}`)}
                                             >
                                                 View Invoice
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
-                                                className="p-[15px] text-[16px]"
+                                                className="p-[14px] text-[16px]"
                                                 onSelect={() =>
                                                     navigator.clipboard.writeText(email)
                                                 }
@@ -123,7 +123,7 @@ export default function MobileBookingsList({
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
-                                                className="p-[15px] text-[16px]"
+                                                className="p-[14px] text-[16px]"
                                                 onSelect={() =>
                                                     navigator.clipboard.writeText(mobile)
                                                 }
