@@ -155,7 +155,7 @@ export default function Header() {
             {!isManager && (
               <Link
                 to="/manager/create"
-                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] w-full text-gray-700"
+                className="flex items-center gap-2 px-4 py-4 md:py-2 hover:bg-gray-50 text-[14px] w-full text-gray-700"
               >
                 ➕ Add Manager
               </Link>
@@ -163,7 +163,7 @@ export default function Header() {
 
             <button
               onClick={logout}
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px] text-red-600 w-full text-left"
+              className="flex items-center gap-2 px-4 py-4 md:py-2 hover:bg-gray-50 text-[14px] text-red-600 w-full text-left"
             >
               <LogOut size={16} /> Logout
             </button>
