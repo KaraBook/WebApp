@@ -236,7 +236,7 @@ export default function EditProperty() {
               {/* Guests */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Max Guests</Label>
+                  <Label className="pb-2">Max Guests</Label>
                   <QuantityBox
                     className="pt-2"
                     value={formData.maxGuests}
@@ -247,7 +247,7 @@ export default function EditProperty() {
                 </div>
 
                 <div>
-                  <Label>Base Guests</Label>
+                  <Label className="pb-2">Base Guests</Label>
                   <QuantityBox
                     className="pt-2"
                     value={formData.baseGuests}
