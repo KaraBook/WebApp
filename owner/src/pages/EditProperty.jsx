@@ -185,10 +185,12 @@ export default function EditProperty() {
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
         </div>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+
+        <form onSubmit={handleSubmit} className="flex flex-wrap items-start justify-start gap-8">
 
           {/* LEFT COLUMN */}
-          <div className="space-y-8">
+          <div className="space-y-8 w-[48%]">
 
             {/* DESCRIPTION */}
             <div className="bg-white rounded-2xl border p-6">
@@ -275,40 +277,10 @@ export default function EditProperty() {
                 />
               </div>
             </div>
-
-            {/* AMENITIES & FOOD */}
-             <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl border p-6 space-y-6">
-              <h2 className="text-lg font-semibold">Amenities & Food</h2>
-
-              {/* Food */}
-              <MultiSelectButtons
-                label="Food Availability"
-                selected={formData.foodAvailability}
-                onChange={(val) =>
-                  setFormData({ ...formData, foodAvailability: val })
-                }
-                options={foodOptions}
-              />
-
-              {/* Amenities */}
-              <div>
-                <Label className="mb-2 block">Amenities</Label>
-
-                <AmenitiesAccordion
-                  options={amenitiesOptions}
-                  selected={formData.amenities}
-                  onChange={(val) =>
-                    setFormData({ ...formData, amenities: val })
-                  }
-                />
-              </div>
-            </div>
-            </div>
           </div>
 
           {/* RIGHT COLUMN */}
-          <div className="space-y-8">
+          <div className="space-y-8 w-[48%]">
 
             {/* PRICING */}
             <div className="bg-white rounded-2xl border p-6 space-y-4">
@@ -413,6 +385,36 @@ export default function EditProperty() {
             </div>
 
           </div>
+
+          {/* AMENITIES & FOOD */}
+             <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl border p-6 space-y-6">
+              <h2 className="text-lg font-semibold">Amenities & Food</h2>
+
+              {/* Food */}
+              <MultiSelectButtons
+                label="Food Availability"
+                selected={formData.foodAvailability}
+                onChange={(val) =>
+                  setFormData({ ...formData, foodAvailability: val })
+                }
+                options={foodOptions}
+              />
+
+              {/* Amenities */}
+              <div>
+                <Label className="mb-2 block">Amenities</Label>
+
+                <AmenitiesAccordion
+                  options={amenitiesOptions}
+                  selected={formData.amenities}
+                  onChange={(val) =>
+                    setFormData({ ...formData, amenities: val })
+                  }
+                />
+              </div>
+            </div>
+            </div>
         </form>
       </div>
     </div>
