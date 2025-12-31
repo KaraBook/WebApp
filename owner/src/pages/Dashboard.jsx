@@ -131,65 +131,91 @@ function PaymentChip({ status }) {
 
 function MobileRecentBookings({ bookings, onOpen }) {
   return (
-    <div className="md:hidden bg-white rounded-2xl border border-gray-100 shadow-sm">
+    <div className="md:hidden space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <h3 className="text-sm font-semibold text-gray-900">Recent Bookings</h3>
-        <Link to="/bookings">
-          <button className="text-xs text-primary font-medium">
-            View all →
-          </button>
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-lg font-semibold text-gray-900">All Bookings</h2>
+
+        <Link
+          to="/bookings"
+          className="text-sm text-primary font-medium"
+        >
+          View all →
         </Link>
       </div>
 
-      {/* List */}
-      <div className="divide-y">
-        {bookings.slice(0, 3).map((b) => {
+      {/* Booking Cards */}
+      <div className="space-y-4">
+        {bookings.map((b) => {
           const name = `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim();
-          const initials =
-            (b.userId?.firstName?.[0] || "") +
-            (b.userId?.lastName?.[0] || "");
+          const email = b.userId?.email || "";
+          const nights = b.totalNights || 1;
+          const guests =
+            typeof b.guests === "number"
+              ? b.guests
+              : (b.guests?.adults || 0) + (b.guests?.children || 0);
 
           return (
-            <button
+            <div
               key={b._id}
               onClick={() => onOpen(b)}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition"
+              className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4
+                         active:scale-[0.99] transition cursor-pointer"
             >
-              {/* Avatar */}
-              <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold">
-                {initials || "U"}
+              {/* Top Row */}
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-base font-semibold text-gray-900">
+                    {name || "Guest"}
+                  </p>
+                  <p className="text-sm text-gray-500 truncate">
+                    {email}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <PaymentChip status={b.paymentStatus} />
+                  <MoreVertical className="w-5 h-5 text-gray-400" />
+                </div>
               </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {name || "Guest"}
-                </p>
-                <p className="text-xs text-gray-500 truncate">
+              {/* Property */}
+              <div className="mt-3">
+                <span className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-lg">
                   {b.propertyId?.propertyName}
-                </p>
-                <p className="text-[11px] text-gray-400 mt-0.5">
-                  {new Date(b.createdAt).toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </p>
+                </span>
               </div>
 
-              {/* Status + Arrow */}
-              <div className="flex items-center gap-2">
-                <PaymentChip status={b.paymentStatus} />
-                <span className="text-gray-400 text-lg">›</span>
+              {/* Meta Row */}
+              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                <div className="flex items-center gap-1">
+                  <CalendarCheck className="w-4 h-4" />
+                  <span>
+                    {new Date(b.checkIn).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                    })}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{nights} nights</span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <Users className="w-4 h-4" />
+                  <span>{guests} guests</span>
+                </div>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>
     </div>
   );
 }
+
 
 
 export default function Dashboard() {
