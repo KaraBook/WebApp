@@ -1,19 +1,8 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import {
-  Home,
-  Calendar,
-  Moon,
-  Users,
-  Mail,
-  Phone,
-  Clock,
-} from "lucide-react";
+import { Home, Calendar, Moon, Users, Mail, Phone, Clock} from "lucide-react";
+
+
 
 export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
   if (!booking) return null;
@@ -107,7 +96,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
           {/* DATES */}
           <div className="grid grid-cols-2 gap-4">
-            <Section title="Stay Details">
+            <Section title="Stay Details" className="grid grid-cols-2 gap-4">
               <InfoCard
                 icon={<Calendar size={18} />}
                 label="Check-in"
