@@ -167,7 +167,7 @@ export default function MobileBookingsList({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-between items-center pt-2">
+        <div className="flex justify-between items-center bg-white p-[10px] rounded-[12px] pt-2">
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
