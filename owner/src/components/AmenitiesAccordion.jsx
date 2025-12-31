@@ -33,7 +33,7 @@ export default function AmenitiesAccordion({
         return (
           <div
             key={group.key}
-            className="bg-white border border-gray-200 rounded-[12px] overflow-hidden w-[48%]"
+            className="bg-white border border-gray-200 rounded-[12px] overflow-hidden w-[49%]"
           >
             {/* HEADER */}
             <button
