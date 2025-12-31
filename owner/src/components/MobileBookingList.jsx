@@ -14,11 +14,23 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-import PaymentChip from "@/components/PaymentChip";
+
+function PaymentChip({ status }) {
+  const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
+  const map = {
+    paid: `${base} bg-emerald-50 text-emerald-700`,
+    pending: `${base} bg-amber-50 text-amber-700`,
+    initiated: `${base} bg-gray-100 text-gray-600`,
+    failed: `${base} bg-red-50 text-red-600`,
+  };
+  return <span className={map[status] || base}>{status}</span>;
+}
+
+
 
 export default function MobileBookingsList({
   bookings = [],
-  onOpenBooking, // callback: open booking drawer/modal
+  onOpenBooking, 
   showHeader = true,
 }) {
   const navigate = useNavigate();
