@@ -74,8 +74,10 @@ export default function MobileBookingsList({
                     return (
                         <div
                             key={b._id}
-                            className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4"
+                            onClick={() => onOpenBooking?.(b)}
+                            className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 cursor-pointer active:scale-[0.99] transition"
                         >
+
                             {/* Top Row */}
                             <div className="flex items-start justify-between">
                                 <div>
