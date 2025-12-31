@@ -376,16 +376,14 @@ export default function EditProperty() {
                 setCoverImagePreview={setCoverImagePreview}
                 showFields={{ coverImage: true }}
               />
-              <div className="w-[48%]">
               <FileUploadsSection
+              className="w-[48%]"
                 shopActFile={shopActFile}
                 setShopActFile={setShopActFile}
                 shopActPreview={shopActPreview}
                 setShopActPreview={setShopActPreview}
                 showFields={{ shopAct: true }}
               />
-              </div>
-              <div className="w-[100%]">
               <FileUploadsSection
                 setGalleryImageFiles={setGalleryImageFiles}
                 galleryImagePreviews={galleryImagePreviews}
@@ -393,7 +391,6 @@ export default function EditProperty() {
                 setRemovedGalleryImages={setRemovedGalleryImages}
                 showFields={{ galleryPhotos: true }}
               />
-              </div>
             </div>
 
             {/* SUBMIT */}
