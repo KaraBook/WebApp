@@ -170,7 +170,7 @@ export default function EditProperty() {
   if (fetching) return <FullPageLoader />;
 
   return (
-    <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
+    <div className="bg-[#f9fafb] min-h-screen px-8 py-6">
       <div className="max-w-6xl mx-auto space-y-8">
 
         {/* HEADER */}
@@ -190,12 +190,12 @@ export default function EditProperty() {
         <form onSubmit={handleSubmit} className="space-y-8">
 
           {/* DESCRIPTION */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-[#e5e7eb] p-6">
             <Label className="font-medium text-gray-900">Description *</Label>
             <Textarea
               name="description"
               rows={4}
-              className="mt-2"
+              className="mt-2 bg-[#f9fafb]"
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })

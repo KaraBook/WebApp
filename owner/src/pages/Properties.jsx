@@ -2,20 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
-
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-import {
-  Loader2,
-  MapPin,
-  IndianRupee,
-  Image as ImageIcon,
-  Utensils,
-  Users,
-  LocationEdit,
-} from "lucide-react";
-
+import { Loader2, MapPin, IndianRupee, Image as ImageIcon, Utensils, Users, LocationEdit} from "lucide-react";
 import { amenitiesOptions, foodOptions } from "@/constants/dropdownOptions";
 import { Button } from "@/components/ui/button";
 
