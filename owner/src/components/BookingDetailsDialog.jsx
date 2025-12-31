@@ -38,24 +38,33 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="
+  className="
     fixed
+    inset-y-0
     right-0
-    top-0
-    bottom-0
-    h-screen
+    z-50
+    h-full
     w-[420px]
     max-w-[95vw]
     p-0
     rounded-none
-    flex
-    flex-col
     border-l
-    animate-in
-    slide-in-from-right
+    bg-white
+    shadow-xl
+
+    !translate-x-0
+    !translate-y-0
+    !left-auto
+    !top-0
+
+    data-[state=open]:animate-in
+    data-[state=open]:slide-in-from-right
+    data-[state=closed]:animate-out
+    data-[state=closed]:slide-out-to-right
     duration-300
   "
-      >
+>
+
         {/* HEADER */}
         <DialogHeader className="px-5 py-4 border-b">
   <div className="flex items-start justify-between">
