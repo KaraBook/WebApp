@@ -91,7 +91,7 @@ export default function MobileBookingsList({
                                     <PaymentChip status={b.paymentStatus} />
 
                                     {/* 3-dot menu */}
-                                    <DropdownMenu>
+                                    <DropdownMenu className="w-[218px]">
                                         <DropdownMenuTrigger asChild>
                                             <button className="p-1 rounded-full hover:bg-gray-100">
                                                 <MoreVertical className="w-5 h-5 text-gray-500" />
@@ -149,6 +149,13 @@ export default function MobileBookingsList({
                                         {new Date(b.checkIn).toLocaleDateString("en-GB", {
                                             day: "2-digit",
                                             month: "short",
+                                            year: "2-digit",
+                                        })}{" "}
+                                        -{" "}
+                                        {new Date(b.checkOut).toLocaleDateString("en-GB", {
+                                            day: "2-digit",
+                                            month: "short",
+                                            year: "2-digit",
                                         })}
                                     </span>
                                 </div>
