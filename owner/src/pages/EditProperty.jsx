@@ -279,9 +279,10 @@ export default function EditProperty() {
             </div>
 
             <div className="bg-white rounded-2xl border p-6 space-y-6">
-              <h2 className="text-lg font-semibold">Food</h2>
+              <h2 className="text-lg font-semibold -mt-[11px]">Food</h2>
               {/* Food */}
               <MultiSelectButtons
+              className="mt-[0px]"
                 selected={formData.foodAvailability}
                 onChange={(val) =>
                   setFormData({ ...formData, foodAvailability: val })
