@@ -186,208 +186,191 @@ export default function EditProperty() {
             <ArrowLeft className="w-4 h-4 mr-2" /> Back
           </Button>
         </div>
+<form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-        <form onSubmit={handleSubmit} className="space-y-8 flex flex-wrap items-start">
+  {/* LEFT COLUMN */}
+  <div className="space-y-8">
 
-          {/* DESCRIPTION */}
-          <div className="w-[48%] bg-white rounded-2xl shadow-sm border border-[#e5e7eb] p-6">
-            <Label className="font-medium text-gray-900">Description *</Label>
-            <Textarea
-              name="description"
-              rows={4}
-              className="mt-2 bg-[#f9fafb]"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              required
-            />
-          </div>
+    {/* DESCRIPTION */}
+    <div className="bg-white rounded-2xl border p-6">
+      <Label>Description *</Label>
+      <Textarea
+        rows={4}
+        className="mt-2"
+        value={formData.description}
+        onChange={(e) =>
+          setFormData({ ...formData, description: e.target.value })
+        }
+        required
+      />
+    </div>
 
-          {/* ROOMS & BASICS */}
-          <div className="w-[48%] bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-semibold">Rooms & Stay Details</h2>
-            </div>
+    {/* ROOMS & STAY DETAILS */}
+    <div className="bg-white rounded-2xl border p-6 space-y-6">
+      <h2 className="text-lg font-semibold flex items-center gap-2">
+        <Users className="w-5 h-5 text-primary" />
+        Rooms & Stay Details
+      </h2>
 
-            <div className="grid sm:grid-cols-2 gap-6">
+      {/* Room Breakdown */}
+      {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
+        <div key={key} className="flex items-center justify-between">
+          <span className="capitalize">
+            {key === "nonAc" ? "Non AC" : key}
+          </span>
+          <QuantityBox
+            value={formData.roomBreakdown[key]}
+            onChange={(val) =>
+              setFormData({
+                ...formData,
+                roomBreakdown: {
+                  ...formData.roomBreakdown,
+                  [key]: val,
+                },
+              })
+            }
+          />
+        </div>
+      ))}
 
-              <div className="space-y-3">
-                {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
-                  <div key={key} className="flex items-center justify-between">
-                    <span className="capitalize text-gray-600 text-sm">
-                      {key === "nonAc" ? "Non AC" : key}
-                    </span>
+      {/* Guests */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Max Guests</Label>
+          <QuantityBox
+            value={formData.maxGuests}
+            onChange={(val) =>
+              setFormData({ ...formData, maxGuests: val })
+            }
+          />
+        </div>
 
-                    <QuantityBox
-                      value={formData.roomBreakdown[key]}
-                      onChange={(val) =>
-                        setFormData({
-                          ...formData,
-                          roomBreakdown: {
-                            ...formData.roomBreakdown,
-                            [key]: val,
-                          },
-                        })
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
+        <div>
+          <Label>Base Guests</Label>
+          <QuantityBox
+            value={formData.baseGuests}
+            onChange={(val) =>
+              setFormData({ ...formData, baseGuests: val })
+            }
+          />
+        </div>
+      </div>
 
-              <div className="space-y-4">
+      {/* Check In / Out */}
+      <div className="grid grid-cols-2 gap-4">
+        <CustomTimePicker
+          label="Check-In Time"
+          value={formData.checkInTime}
+          onChange={(val) =>
+            setFormData({ ...formData, checkInTime: val })
+          }
+        />
+        <CustomTimePicker
+          label="Check-Out Time"
+          value={formData.checkOutTime}
+          onChange={(val) =>
+            setFormData({ ...formData, checkOutTime: val })
+          }
+        />
+      </div>
+    </div>
 
-                <div>
-                  <Label>Max Guests</Label>
-                  <QuantityBox
-                    value={formData.maxGuests}
-                    onChange={(val) =>
-                      setFormData({ ...formData, maxGuests: val })
-                    }
-                    min={1}
-                  />
-                </div>
+    {/* AMENITIES & FOOD */}
+    <div className="bg-white rounded-2xl border p-6 space-y-6">
+      <h2 className="text-lg font-semibold">Amenities & Food</h2>
 
-                <div>
-                  <Label>Base Guests Included</Label>
-                  <QuantityBox
-                    value={formData.baseGuests}
-                    min={1}
-                    max={formData.maxGuests || 999}
-                    onChange={(val) =>
-                      setFormData({ ...formData, baseGuests: val })
-                    }
-                  />
-                </div>
+      <MultiSelectButtons
+        label="Food Availability"
+        selected={formData.foodAvailability}
+        onChange={(val) =>
+          setFormData({ ...formData, foodAvailability: val })
+        }
+        options={foodOptions}
+      />
 
-                <div>
-                  <Label>Extra Adult Charge (₹ / night)</Label>
-                  <Input
-                    value={formData.extraAdultCharge}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        extraAdultCharge: e.target.value,
-                      })
-                    }
-                  />
-                </div>
+      <MultiSelectButtons
+        label="Amenities"
+        selected={formData.amenities}
+        onChange={(val) =>
+          setFormData({ ...formData, amenities: val })
+        }
+        options={amenitiesOptions}
+      />
+    </div>
+  </div>
 
-                <div>
-                  <Label>Extra Child Charge (₹ / night)</Label>
-                  <Input
-                    value={formData.extraChildCharge}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        extraChildCharge: e.target.value,
-                      })
-                    }
-                  />
-                </div>
+  {/* RIGHT COLUMN */}
+  <div className="space-y-8">
 
-                <SingleSelectDropdown
-                  label="Pet Friendly"
-                  value={formData.petFriendly}
-                  options={petFriendlyOptions}
-                  onChange={(val) =>
-                    setFormData({ ...formData, petFriendly: val })
-                  }
-                />
-              </div>
-            </div>
-          </div>
+    {/* PRICING */}
+    <div className="bg-white rounded-2xl border p-6 space-y-4">
+      <h2 className="text-lg font-semibold flex items-center gap-2">
+        <IndianRupee className="w-5 h-5 text-primary" />
+        Pricing
+      </h2>
 
-          {/* PRICING */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-            <div className="flex items-center gap-2">
-              <IndianRupee className="w-5 h-5 text-primary" />
-              <h2 className="text-lg font-semibold">Pricing</h2>
-            </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Weekday Price</Label>
+          <Input
+            value={formData.pricingPerNightWeekdays}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                pricingPerNightWeekdays: e.target.value,
+              })
+            }
+          />
+        </div>
 
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div>
-                <Label>Weekday Price</Label>
-                <Input
-                  name="pricingPerNightWeekdays"
-                  value={formData.pricingPerNightWeekdays}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      pricingPerNightWeekdays: e.target.value,
-                    })
-                  }
-                />
-              </div>
+        <div>
+          <Label>Weekend Price</Label>
+          <Input
+            value={formData.pricingPerNightWeekend}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                pricingPerNightWeekend: e.target.value,
+              })
+            }
+          />
+        </div>
 
-              <div>
-                <Label>Weekend Price</Label>
-                <Input
-                  name="pricingPerNightWeekend"
-                  value={formData.pricingPerNightWeekend}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      pricingPerNightWeekend: e.target.value,
-                    })
-                  }
-                />
-              </div>
+        <div>
+          <Label>Extra Adult (₹ / night)</Label>
+          <Input
+            value={formData.extraAdultCharge}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                extraAdultCharge: e.target.value,
+              })
+            }
+          />
+        </div>
 
-            </div>
+        <div>
+          <Label>Extra Child (₹ / night)</Label>
+          <Input
+            value={formData.extraChildCharge}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                extraChildCharge: e.target.value,
+              })
+            }
+          />
+        </div>
+      </div>
+    </div>
 
-            <CustomTimePicker
-              label="Check-In Time"
-              value={formData.checkInTime}
-              onChange={(val) => setFormData({ ...formData, checkInTime: val })}
-            />
+    {/* IMAGES */}
+    <div className="bg-white rounded-2xl border p-6">
+      <h2 className="text-lg font-semibold mb-4">
+        Images & Documents
+      </h2>
 
-            <CustomTimePicker
-              label="Check-Out Time"
-              value={formData.checkOutTime}
-              onChange={(val) =>
-                setFormData({ ...formData, checkOutTime: val })
-              }
-            />
-          </div>
-
-          {/* AMENITIES & FOOD */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              Amenities & Food
-            </h2>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-              <MultiSelectButtons
-                label="Food Availability"
-                selected={formData.foodAvailability}
-                onChange={(val) =>
-                  setFormData({ ...formData, foodAvailability: val })
-                }
-                options={foodOptions}
-              />
-
-              <MultiSelectButtons
-                label="Amenities"
-                selected={formData.amenities}
-                onChange={(val) =>
-                  setFormData({ ...formData, amenities: val })
-                }
-                options={amenitiesOptions}
-              />
-            </div>
-          </div>
-
-          {/* IMAGES */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-              <Images className="w-5 h-5 text-primary" />
-              Images & Documents
-            </h2>
-
-            <FileUploadsSection
+      <FileUploadsSection
               setCoverImageFile={setCoverImageFile}
               coverImagePreview={coverImagePreview}
               setCoverImagePreview={setCoverImagePreview}
@@ -401,20 +384,21 @@ export default function EditProperty() {
               setShopActPreview={setShopActPreview}
               showFields={{ coverImage: true, galleryPhotos: true, shopAct: true }}
             />
-          </div>
+    </div>
 
-          {/* SUBMIT */}
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-[10px]"
-              disabled={loading}
-            >
-              {loading ? "Updating..." : "Update Property"}
-            </Button>
-          </div>
+    {/* SUBMIT */}
+    <div className="flex justify-end">
+      <Button
+        type="submit"
+        disabled={loading}
+        className="px-8 py-3 rounded-xl bg-primary text-white"
+      >
+        {loading ? "Updating..." : "Update Property"}
+      </Button>
+    </div>
 
-        </form>
+  </div>
+</form>
       </div>
     </div>
   );
