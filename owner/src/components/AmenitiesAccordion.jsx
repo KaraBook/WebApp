@@ -41,7 +41,7 @@ export default function AmenitiesAccordion({
 
           {/* BODY */}
           {openKey === group.key && (
-            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="p-4 grid grid-cols-2 sm:grid-cols-2 gap-3">
               {group.items.map((item) => {
                 const Icon = item.icon;
                 const active = selected.includes(item.value);
