@@ -725,7 +725,7 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                        <div className="md:w-[16%] w-[100%]">
+                        <div className="md:w-[16%] w-[48%]">
                             <Label htmlFor="bedrooms" className="text-sm">
                                 Bedrooms <span className="text-red-500">*</span>
                             </Label>
@@ -741,7 +741,7 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                        <div className="md:w-[16%] w-[100%]">
+                        <div className="md:w-[16%] w-[48%]">
                             <Label htmlFor="bathrooms" className="text-sm">
                                 Bathrooms <span className="text-red-500">*</span>
                             </Label>
