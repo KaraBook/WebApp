@@ -299,6 +299,8 @@ export default function ViewProperty() {
                 { type: "NonAC", category: "NonAc", count: property?.roomBreakdown?.nonAc ?? 0 },
                 { type: "Luxury", category: "Luxury", count: property?.roomBreakdown?.luxury ?? 0 },
                 { type: "Deluxe", category: "Deluxe", count: property?.roomBreakdown?.deluxe ?? 0 },
+                { type: "Bedrooms", category: "Bedrooms", count: property?.bedrooms ?? 0 },
+                { type: "Bathrooms", category: "Bathrooms", count: property?.bathrooms ?? 0 },
               ].map((row, idx) => (
                 <div
                   key={idx}
