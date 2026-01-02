@@ -789,23 +789,6 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                        <div className="md:w-[28%] w-[100%] flex flex-col gap-2">
-                            <Label htmlFor="minStayNights" className="text-sm pb-2!important">
-                                Is this proprty Pet Friendly?<span className="text-red-500">*</span>
-                            </Label>
-                            <SingleSelectDropdown
-                                value={formData.petFriendly}
-                                options={petFriendlyOptions}
-                                onChange={(val) =>
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        petFriendly: val,
-                                    }))
-                                }
-                                placeholder="Select Option"
-                            />
-                        </div>
-
                         <div className="md:w-[22%] w-[100%]">
                             <Label className="text-sm">
                                 Extra Adult Charge (₹ / night)
@@ -883,6 +866,24 @@ const AddProperty = () => {
                                     required
                                 />
                             </div>
+                        </div>
+
+
+                        <div className="md:w-[32%] w-[100%] flex flex-col gap-2">
+                            <Label htmlFor="minStayNights" className="text-sm pb-2!important">
+                                Is this proprty Pet Friendly?<span className="text-red-500">*</span>
+                            </Label>
+                            <SingleSelectDropdown
+                                value={formData.petFriendly}
+                                options={petFriendlyOptions}
+                                onChange={(val) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        petFriendly: val,
+                                    }))
+                                }
+                                placeholder="Select Option"
+                            />
                         </div>
 
 

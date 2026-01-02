@@ -21,7 +21,7 @@ const CustomTimePicker = ({ label, value, onChange }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="w-[48%]">
+    <div className="w-[32%]">
       <Label className="mb-1 block font-medium">
         {label} <span className="text-red-500">*</span>
       </Label>
