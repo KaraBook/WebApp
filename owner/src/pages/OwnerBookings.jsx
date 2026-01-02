@@ -26,7 +26,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-
+import MobileBookingsList from "@/components/MobileBookingList";
 import {
   Select,
   SelectTrigger,
@@ -97,8 +97,8 @@ export default function OwnerBookings() {
   }, []);
 
   useEffect(() => {
-  setStatusFilter(statusFromUrl);
-}, [statusFromUrl]);
+    setStatusFilter(statusFromUrl);
+  }, [statusFromUrl]);
 
   const fetchBookings = async () => {
     try {
@@ -266,11 +266,11 @@ export default function OwnerBookings() {
             </div>
 
             {/* Payment Filter */}
-            <Select value={paymentFilter} onValueChange={(val) => { 
+            <Select value={paymentFilter} onValueChange={(val) => {
               setPaymentFilter(val);
               navigate(`/bookings?status=${val}`);
-             }}
-              >
+            }}
+            >
               <SelectTrigger className="md:w-[160px] w-[100%] bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Payment" />
               </SelectTrigger>
@@ -284,7 +284,14 @@ export default function OwnerBookings() {
           </div>
 
           {/* TABLE */}
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+          <div className="block md:hidden">
+            <MobileBookingsList
+              bookings={filtered}
+              onOpenBooking={openBookingDialog}
+              showHeader={false}
+            />
+          </div>
+          <div className="hidden md:block bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="md:min-w-full min-w-[1200px] text-sm">
                 <thead className="bg-gray-50 border-b">
