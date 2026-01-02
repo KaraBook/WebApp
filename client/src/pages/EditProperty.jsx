@@ -31,6 +31,7 @@ import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
 import { Button } from "../components/ui/button";
+import { MdBathroom } from "react-icons/md";
 
 
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
@@ -69,6 +70,8 @@ const EditProperty = () => {
     pinCode: "",
     locationLink: "",
     roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
+    bedrooms: 0,
+    bathrooms: 0,
     maxGuests: "",
     baseGuests: "",
     pricingPerNightWeekdays: "",
@@ -155,6 +158,8 @@ const EditProperty = () => {
           pinCode: prop.pinCode || "",
           locationLink: prop.locationLink || "",
           roomBreakdown: prop.roomBreakdown || { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
+          bedrooms: prop.bedrooms || "",
+          bathrooms: prop.bathrooms || "",
           maxGuests: prop.maxGuests || "",
           baseGuests: prop.baseGuests || "",
           pricingPerNightWeekdays: prop.pricingPerNightWeekdays?.toString?.() || "",
@@ -681,22 +686,34 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="md:w-[28%] w-[100%]">
-              <SingleSelectDropdown
-                label="Is this property Pet Friendly?"
-                value={formData.petFriendly}
-                options={[
-                  { label: "Yes", value: true },
-                  { label: "No", value: false },
-                ]}
-                onChange={(val) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    petFriendly: val,
-                  }))
-                }
-                placeholder="Select Option"
-              />
+
+            <div className="md:w-[16%] w-[100%]">
+              <Label htmlFor="bedrooms" className="text-sm">
+                Bedrooms <span className="text-red-500">*</span>
+              </Label>
+              <div className="mt-2">
+                <QuantityBox
+                  value={formData.bedrooms}
+                  onChange={(val) => setFormData((prev) => ({ ...prev, bedrooms: val }))}
+                  min={1}
+                  max={999}
+                />
+              </div>
+            </div>
+
+
+            <div className="md:w-[16%] w-[100%]">
+              <Label htmlFor="bathrooms" className="text-sm">
+                Bathrooms <span className="text-red-500">*</span>
+              </Label>
+              <div className="mt-2">
+                <QuantityBox
+                  value={formData.bathrooms}
+                  onChange={(val) => setFormData((prev) => ({ ...prev, bathrooms: val }))}
+                  min={1}
+                  max={999}
+                />
+              </div>
             </div>
 
 
@@ -808,6 +825,24 @@ const EditProperty = () => {
                   required
                 />
               </div>
+            </div>
+
+            <div className="md:w-[32%] w-[100%]">
+              <SingleSelectDropdown
+                label="Is this property Pet Friendly?"
+                value={formData.petFriendly}
+                options={[
+                  { label: "Yes", value: true },
+                  { label: "No", value: false },
+                ]}
+                onChange={(val) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    petFriendly: val,
+                  }))
+                }
+                placeholder="Select Option"
+              />
             </div>
 
             <CustomTimePicker
