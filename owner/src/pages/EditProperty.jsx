@@ -189,7 +189,7 @@ export default function EditProperty() {
               </div>
 
                 {/* Guests */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-6">
                 <div>
                   <Label className="pb-2">Max Guests</Label>
                   <QuantityBox
