@@ -173,7 +173,7 @@ export default function EditProperty() {
 
              <div className="flex flex-wrap gap-2 justify-between items-center">
               {["ac", "nonAc", "deluxe", "luxury", "hall", "total"].map((key) => (
-                <div key={key} className="flex flex-col justify-between items-start">
+                <div key={key} className="flex flex-col gap-2 justify-between items-start">
                   <span className="capitalize">{key === "nonAc" ? "Non AC" : key}</span>
                   <QuantityBox
                     value={formData.roomBreakdown[key]}
