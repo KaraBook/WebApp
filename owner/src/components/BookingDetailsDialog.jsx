@@ -76,7 +76,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
                 {userId?.email}
               </p>
               <span
-              className={`px-3 text-start py-1 rounded-full text-xs font-medium capitalize
+              className={`px-3 w-fit text-start py-1 rounded-full text-xs font-medium capitalize
                 ${paymentStatus === "paid"
                   ? "bg-emerald-100 text-emerald-700"
                   : paymentStatus === "confirmed"
