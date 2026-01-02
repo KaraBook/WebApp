@@ -109,7 +109,7 @@ const FileUploadsSection = ({
   };
 
   return (
-    <div className="mt-2 w-full flex justify-between gap-4">
+    <div className="mt-2 w-full flex-wrap flex justify-between gap-4">
       {/* Cover Image */}
       {showFields.coverImage && (
         <div className="w-full">
