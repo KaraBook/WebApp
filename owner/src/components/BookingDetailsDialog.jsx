@@ -68,7 +68,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
         {/* ================= HEADER ================= */}
         <DialogHeader className="px-6 py-5 border-b">
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="flex flex-col ">
               <DialogTitle className="text-[18px] font-semibold leading-tight">
                 {userId?.firstName} {userId?.lastName}
               </DialogTitle>
@@ -76,7 +76,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
                 {userId?.email}
               </p>
               <span
-              className={`px-3 w-full text-start py-1 rounded-full text-xs font-medium capitalize
+              className={`px-3 text-start py-1 rounded-full text-xs font-medium capitalize
                 ${paymentStatus === "paid"
                   ? "bg-emerald-100 text-emerald-700"
                   : paymentStatus === "confirmed"
