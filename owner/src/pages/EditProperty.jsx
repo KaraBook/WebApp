@@ -171,8 +171,8 @@ export default function EditProperty() {
                 Rooms & Stay Details
               </h2>
 
-             <div className="flex flex-wrap justify-between items-center">
-              {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
+             <div className="flex flex-wrap gap-2 justify-between items-center">
+              {["ac", "nonAc", "deluxe", "luxury", "total"].map((key) => (
                 <div key={key} className="flex flex-col justify-between items-start">
                   <span className="capitalize">{key === "nonAc" ? "Non AC" : key}</span>
                   <QuantityBox

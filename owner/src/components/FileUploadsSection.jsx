@@ -112,7 +112,7 @@ const FileUploadsSection = ({
     <div className="mt-2 w-full flex justify-between gap-4">
       {/* Cover Image */}
       {showFields.coverImage && (
-        <div className="w-[48%]">
+        <div className="w-full">
           <Label htmlFor="coverImage" className="font-medium">
             Cover Image <span className="text-red-500">*</span>
           </Label>
@@ -157,7 +157,7 @@ const FileUploadsSection = ({
 
       {/* Shop Act */}
       {showFields.shopAct && (
-        <div className="w-[100%]">
+        <div className="w-full">
           <Label htmlFor="shopAct" className="font-medium">
             Shop Act (Optional)
           </Label>
@@ -202,7 +202,7 @@ const FileUploadsSection = ({
 
       {/* Gallery Photos */}
       {showFields.galleryPhotos && (
-        <div className="w-[48%]">
+        <div className="w-full">
           <Label htmlFor="galleryPhotos" className="font-medium">
             Gallery Photos (Min {minGallery}, Max {maxGallery})
           </Label>
