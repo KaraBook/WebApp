@@ -401,7 +401,7 @@ export default function PropertyDetails() {
 
                   <div>
                     <p className="font-semibold text-gray-900">
-                      {property?.roomBreakdown?.total || 0} Bedrooms
+                      {property?.bedrooms || 0} Bedrooms
                     </p>
                     <p className="text-sm text-gray-500">
                       Comfortable beds
@@ -417,7 +417,7 @@ export default function PropertyDetails() {
 
                   <div>
                     <p className="font-semibold text-gray-900">
-                      {property?.bathrooms || 3} Bathrooms
+                      {property?.bathrooms ?? 0} Bathrooms
                     </p>
                     <p className="text-sm text-gray-500">
                       Modern fixtures
