@@ -43,7 +43,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     right-0
     z-50
     h-full
-    w-[400px]
+    w-[420px]
     max-w-[90vw]
     p-0
     rounded-none
@@ -75,9 +75,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
               <p className="text-sm text-muted-foreground mt-1">
                 {userId?.email}
               </p>
-            </div>
-
-            <span
+              <span
               className={`px-3 py-1 rounded-full text-xs font-medium capitalize
                 ${paymentStatus === "paid"
                   ? "bg-emerald-100 text-emerald-700"
@@ -88,6 +86,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
             >
               {paymentStatus}
             </span>
+            </div>
           </div>
         </DialogHeader>
 
