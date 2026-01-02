@@ -110,7 +110,7 @@ export default function OwnerCalendar() {
 
   /* ================= UI ================= */
   return (
-    <div className="min-h-screen bg-[#f5f6f8] px-6 py-8">
+    <div className="min-h-screen bg-[#f5f6f8] px-6 md:px-6 py-5 md:py-8">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* HEADER */}
@@ -197,7 +197,7 @@ export default function OwnerCalendar() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="border-primary text-emerald-600 hover:primary"
+                      className="border-primary text-primary hover:primary"
                       onClick={() => handleUnblock(r)}
                       disabled={loading}
                     >
