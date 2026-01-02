@@ -44,7 +44,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     z-50
     h-full
     w-[400px]
-    max-w-[95vw]
+    max-w-[90vw]
     p-0
     rounded-none
     border-l
