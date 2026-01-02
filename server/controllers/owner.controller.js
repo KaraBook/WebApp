@@ -203,16 +203,18 @@ export const updateOwnerProperty = async (req, res) => {
       body["roomBreakdown[ac]"] ||
       body["roomBreakdown[nonAc]"] ||
       body["roomBreakdown[deluxe]"] ||
-      body["roomBreakdown[luxury]"]
+      body["roomBreakdown[luxury]"] ||
+      body["roomBreakdown[hall]"]
     ) {
       const rb = {
         ac: Number(body["roomBreakdown[ac]"] ?? 0),
         nonAc: Number(body["roomBreakdown[nonAc]"] ?? 0),
         deluxe: Number(body["roomBreakdown[deluxe]"] ?? 0),
         luxury: Number(body["roomBreakdown[luxury]"] ?? 0),
+        hall: Number(body["roomBreakdown[hall]"] ?? 0),
       };
 
-      rb.total = rb.ac + rb.nonAc + rb.deluxe + rb.luxury;
+      rb.total = rb.ac + rb.nonAc + rb.deluxe + rb.luxury + rb.hall;
       updatedData.roomBreakdown = rb;
       updatedData.totalRooms = rb.total;
     }
