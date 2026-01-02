@@ -68,6 +68,8 @@ const AddProperty = () => {
         pinCode: "",
         locationLink: "",
         roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
+        bedrooms,
+        bathrooms,
         maxGuests: "",
         pricingPerNightWeekdays: "",
         pricingPerNightWeekend: "",
@@ -156,6 +158,8 @@ const AddProperty = () => {
                 Number(formData.roomBreakdown.nonAc || 0) +
                 Number(formData.roomBreakdown.deluxe || 0) +
                 Number(formData.roomBreakdown.luxury || 0),
+            bedrooms: num(formData.bedrooms),
+            bathrooms: num(formData.bathrooms),
             maxGuests: num(formData.maxGuests),
             pricingPerNightWeekdays: num(formData.pricingPerNightWeekdays),
             pricingPerNightWeekend: num(formData.pricingPerNightWeekend),
@@ -721,21 +725,36 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                        <div className="md:w-[28%] w-[100%] flex flex-col gap-2">
-                            <Label htmlFor="minStayNights" className="text-sm pb-2!important">
-                                Is this proprty Pet Friendly?<span className="text-red-500">*</span>
+                        <div className="md:w-[16%] w-[100%]">
+                            <Label htmlFor="bedrooms" className="text-sm">
+                                Bedrooms <span className="text-red-500">*</span>
                             </Label>
-                            <SingleSelectDropdown
-                                value={formData.petFriendly}
-                                options={petFriendlyOptions}
-                                onChange={(val) =>
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        petFriendly: val,
-                                    }))
-                                }
-                                placeholder="Select Option"
-                            />
+                            <div className="mt-2">
+                                <QuantityBox
+                                    value={formData.bedrooms}
+                                    onChange={(val) =>
+                                        setFormData((prev) => ({ ...prev, bedrooms: val }))
+                                    }
+                                    min={1}
+                                    max={999}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:w-[16%] w-[100%]">
+                            <Label htmlFor="bathrooms" className="text-sm">
+                                Bathrooms <span className="text-red-500">*</span>
+                            </Label>
+                            <div className="mt-2">
+                                <QuantityBox
+                                    value={formData.bathrooms}
+                                    onChange={(val) =>
+                                        setFormData((prev) => ({ ...prev, bathrooms: val }))
+                                    }
+                                    min={1}
+                                    max={999}
+                                />
+                            </div>
                         </div>
 
                         <div className="md:w-[15%] w-[48%]">
@@ -754,7 +773,7 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                        <div className="md:w-[15%] w-[48%]">
+                         <div className="md:w-[15%] w-[48%]">
                             <Label className="text-sm">
                                 Base Guests <span className="text-red-500">*</span>
                             </Label>
@@ -768,6 +787,23 @@ const AddProperty = () => {
                                     max={formData.maxGuests || 999}
                                 />
                             </div>
+                        </div>
+
+                        <div className="md:w-[28%] w-[100%] flex flex-col gap-2">
+                            <Label htmlFor="minStayNights" className="text-sm pb-2!important">
+                                Is this proprty Pet Friendly?<span className="text-red-500">*</span>
+                            </Label>
+                            <SingleSelectDropdown
+                                value={formData.petFriendly}
+                                options={petFriendlyOptions}
+                                onChange={(val) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        petFriendly: val,
+                                    }))
+                                }
+                                placeholder="Select Option"
+                            />
                         </div>
 
                         <div className="md:w-[22%] w-[100%]">

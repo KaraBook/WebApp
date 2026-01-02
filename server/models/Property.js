@@ -77,6 +77,8 @@ const propertySchema = new mongoose.Schema({
     hall: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
   },
+  bedrooms: { type: Number, required: true, min: 0, max: 100},
+  bathrooms: { type: Number, required: true, min: 0, max: 100},
   petFriendly: { type: Boolean, required: true, default: false },
   maxGuests: { type: Number, required: true },
   baseGuests: { type: Number, required: true },
@@ -93,8 +95,8 @@ const propertySchema = new mongoose.Schema({
   foodAvailability: { type: [String], default: [] },
   amenities: { type: [String], default: [] },
 
-  pan: { type: String, uppercase: true, trim: true, sparse: true, unique: true},
-  gstin: { type: String, uppercase: true, trim: true, sparse: true, match: [GSTIN_REGEX, "Invalid GSTIN format"]},
+  pan: { type: String, uppercase: true, trim: true, sparse: true, unique: true },
+  gstin: { type: String, uppercase: true, trim: true, sparse: true, match: [GSTIN_REGEX, "Invalid GSTIN format"] },
 
   isRefundable: {
     type: Boolean,

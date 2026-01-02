@@ -162,6 +162,8 @@ export const createPropertyDraft = async (req, res) => {
         coverImage: undefined,
         shopAct: undefined,
         galleryPhotos: undefined,
+        bedrooms: Number(req.body.bedrooms),
+        bathrooms: Number(req.body.bathrooms),
       });
 
       await propertyDoc.save({ session });
@@ -411,6 +413,8 @@ export const updateProperty = async (req, res) => {
         "pricingPerNightWeekend",
         "extraAdultCharge",
         "extraChildCharge",
+        "bedrooms",
+        "bathrooms",
       ].forEach((f) => {
         if (updatedData[f] !== undefined) {
           updatedData[f] = Number(updatedData[f]);

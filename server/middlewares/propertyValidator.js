@@ -79,6 +79,24 @@ const baseFields = {
     total: Joi.number().min(0).max(999).default(0),
   }).required(),
 
+  bedrooms: Joi.number()
+    .min(0)
+    .max(100)
+    .required()
+    .messages({
+      "number.base": "Bedrooms must be a number",
+      "any.required": "Bedrooms is required",
+    }),
+
+  bathrooms: Joi.number()
+    .min(0)
+    .max(100)
+    .required()
+    .messages({
+      "number.base": "Bathrooms must be a number",
+      "any.required": "Bathrooms is required",
+    }),
+
   maxGuests: Joi.number().min(1).max(999).required(),
 
   baseGuests: Joi.number()
@@ -122,15 +140,15 @@ const baseFields = {
   foodAvailability: Joi.array().items(Joi.string()),
   amenities: Joi.array().items(Joi.string().trim().min(1).max(50)).default([]),
 
-  pan: Joi.string() .length(10) .optional() .allow("")
-  .messages({
-    "string.length": "PAN must be exactly 10 characters",
-  }),
+  pan: Joi.string().length(10).optional().allow("")
+    .messages({
+      "string.length": "PAN must be exactly 10 characters",
+    }),
 
-  gstin: Joi.string() .length(15) .pattern(GSTIN_REGEX) .optional() .allow("")
-  .messages({
-    "string.pattern.base": "GSTIN format is invalid",
-  }),
+  gstin: Joi.string().length(15).pattern(GSTIN_REGEX).optional().allow("")
+    .messages({
+      "string.pattern.base": "GSTIN format is invalid",
+    }),
 
   kycVerified: Joi.boolean().required(),
 
@@ -227,6 +245,8 @@ function normalizeArraysAndTypes(body) {
     "extraChildCharge",
     "extraGuestCharge",
     "minStayNights",
+    "bedrooms",
+    "bathrooms",
   ].forEach((n) => {
     if (body[n] !== undefined && body[n] !== "") {
       body[n] = Number(body[n]);

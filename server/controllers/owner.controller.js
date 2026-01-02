@@ -164,6 +164,8 @@ export const updateOwnerProperty = async (req, res) => {
       "amenities",
       "petFriendly",
       "roomBreakdown",
+      "bedrooms",
+      "bathrooms",
     ];
 
     const body = req.body;
