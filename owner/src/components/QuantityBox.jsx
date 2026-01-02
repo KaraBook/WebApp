@@ -33,7 +33,7 @@ export function QuantityBox({ value, onChange, min = 0, max = 999 }) {
         type="number"
         value={value}
         onChange={handleInputChange}
-        className="w-14 h-7 text-center no-spinner p-[16px]"
+        className="w-12 h-7 text-center no-spinner p-[16px]"
       />
 
       <Button

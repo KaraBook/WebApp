@@ -171,8 +171,9 @@ export default function EditProperty() {
                 Rooms & Stay Details
               </h2>
 
+             <div className="flex jsutify-between items-center">
               {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
-                <div key={key} className="flex justify-between items-center">
+                <div key={key} className="flex flex-col justify-between items-start">
                   <span className="capitalize">{key === "nonAc" ? "Non AC" : key}</span>
                   <QuantityBox
                     value={formData.roomBreakdown[key]}
@@ -185,6 +186,7 @@ export default function EditProperty() {
                   />
                 </div>
               ))}
+              </div>
 
                 {/* Guests */}
               <div className="grid grid-cols-2 gap-4">
