@@ -136,8 +136,9 @@ export const createPropertyDraft = async (req, res) => {
       const nonAc = Number(roomBreakdown.nonAc || 0);
       const deluxe = Number(roomBreakdown.deluxe || 0);
       const luxury = Number(roomBreakdown.luxury || 0);
-      const total = ac + nonAc + deluxe + luxury;
-      roomBreakdown = { ac, nonAc, deluxe, luxury, total };
+      const hall = Number(roomBreakdown.hall || 0);
+      const total = ac + nonAc + deluxe + luxury + hall;
+      roomBreakdown = { ac, nonAc, deluxe, luxury, total, hall };
 
       req.body.totalRooms = total;
       req.body.roomBreakdown = roomBreakdown;
@@ -432,9 +433,10 @@ export const updateProperty = async (req, res) => {
         const nonAc = Number(rb.nonAc || 0);
         const deluxe = Number(rb.deluxe || 0);
         const luxury = Number(rb.luxury || 0);
-        const total = ac + nonAc + deluxe + luxury;
+        const hall = Number(rb.hall || 0);
+        const total = ac + nonAc + deluxe + luxury + hall;
 
-        updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, total };
+        updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, hall, total };
         updatedData.totalRooms = total;
       }
 
@@ -472,9 +474,10 @@ export const updateProperty = async (req, res) => {
         const nonAc = Number(rb.nonAc || 0);
         const deluxe = Number(rb.deluxe || 0);
         const luxury = Number(rb.luxury || 0);
+        const hall = Number(rb.luxury || 0);
         const total = ac + nonAc + deluxe + luxury;
 
-        updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, total };
+        updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, hall, total };
         updatedData.totalRooms = total;
       }
 

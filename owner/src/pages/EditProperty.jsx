@@ -42,7 +42,7 @@ export default function EditProperty() {
 
   const [formData, setFormData] = useState({
     description: "",
-    roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
+    roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, hall: 0, total: 0 },
     maxGuests: "",
     baseGuests: "",
     pricingPerNightWeekdays: "",
@@ -98,7 +98,7 @@ export default function EditProperty() {
       const data = new FormData();
 
       const rb = formData.roomBreakdown;
-      rb.total = Number(rb.ac) + Number(rb.nonAc) + Number(rb.deluxe) + Number(rb.luxury);
+      rb.total = Number(rb.ac) + Number(rb.nonAc) + Number(rb.deluxe) + Number(rb.luxury) + Number(rb.hall);
 
       Object.entries(formData).forEach(([key, val]) => {
         if (key === "roomBreakdown") {
@@ -172,7 +172,7 @@ export default function EditProperty() {
               </h2>
 
              <div className="flex flex-wrap gap-2 justify-between items-center">
-              {["ac", "nonAc", "deluxe", "luxury", "total"].map((key) => (
+              {["ac", "nonAc", "deluxe", "luxury", "hall", "total"].map((key) => (
                 <div key={key} className="flex flex-col justify-between items-start">
                   <span className="capitalize">{key === "nonAc" ? "Non AC" : key}</span>
                   <QuantityBox

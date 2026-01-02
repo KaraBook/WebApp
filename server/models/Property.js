@@ -74,6 +74,7 @@ const propertySchema = new mongoose.Schema({
     nonAc: { type: Number, default: 0 },
     deluxe: { type: Number, default: 0 },
     luxury: { type: Number, default: 0 },
+    hall: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
   },
   petFriendly: { type: Boolean, required: true, default: false },

@@ -75,6 +75,7 @@ const baseFields = {
     nonAc: Joi.number().min(0).max(999).default(0),
     deluxe: Joi.number().min(0).max(999).default(0),
     luxury: Joi.number().min(0).max(999).default(0),
+    hall: Joi.number().min(0).max(999).default(0),
     total: Joi.number().min(0).max(999).default(0),
   }).required(),
 
