@@ -22,7 +22,7 @@ const MultiSelectButtons = ({ label, options, selected, onChange }) => {
               type="button"
               onClick={() => toggleOption(option.value)}
               className={cn(
-                "px-4 py-1 rounded-[8px] text-sm border transition mt-2",
+                "px-4 py-2 rounded-[8px] text-m border transition mt-2",
                 isSelected
                   ? "bg-black text-white"
                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
