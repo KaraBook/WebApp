@@ -110,7 +110,7 @@ export default function OwnerCalendar() {
 
   /* ================= UI ================= */
   return (
-    <div className="min-h-screen bg-[#f5f6f8] px-6 md:px-6 py-5 md:py-8">
+    <div className="min-h-screen bg-[#f5f6f8] px-4 md:px-6 py-5 md:py-8">
       <div className="max-w-7xl mx-auto space-y-8">
 
         {/* HEADER */}
