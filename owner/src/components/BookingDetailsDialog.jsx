@@ -43,7 +43,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     right-0
     z-50
     h-full
-    w-[420px]
+    w-[400px]
     max-w-[95vw]
     p-0
     rounded-none
