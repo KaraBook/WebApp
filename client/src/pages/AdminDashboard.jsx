@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Users, CalendarCheck, Clock, Wallet, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
+import MobileBookingCard from "@/components/MobileBookingCard.jsx";
 
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
@@ -110,33 +111,33 @@ const DashboardPage = () => {
           />
         </Link>
         <Link to="/bookings?status=pending">
-        <StatCard
-          title="Pending"
-          value={stats.pending}
-          icon={Clock}
-          color="text-yellow-700"
-        />
+          <StatCard
+            title="Pending"
+            value={stats.pending}
+            icon={Clock}
+            color="text-yellow-700"
+          />
         </Link>
         <Link to="/bookings?status=cancelled">
-        <StatCard
-          title="Cancelled"
-          value={stats.failed}
-          icon={Clock}
-          color="text-red-700"
-        />
+          <StatCard
+            title="Cancelled"
+            value={stats.failed}
+            icon={Clock}
+            color="text-red-700"
+          />
         </Link>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link to="/users">
-        <StatCard title="Total Users" value={stats.totalUsers} icon={Users} />
+          <StatCard title="Total Users" value={stats.totalUsers} icon={Users} />
         </Link>
         <Link to="/properties">
-        <StatCard
-          title="Total Properties"
-          value={stats.totalProperties}
-          icon={Home}
-        />
+          <StatCard
+            title="Total Properties"
+            value={stats.totalProperties}
+            icon={Home}
+          />
         </Link>
         <StatCard
           title="Total Revenue"
@@ -149,8 +150,35 @@ const DashboardPage = () => {
         Recent Bookings
       </h2>
 
-      <div className="border rounded-lg shadow-sm overflow-x-auto">
-        <Table className="w-[650px] md:w-full text-sm">
+      {/* MOBILE VIEW */}
+      <div className="space-y-4 md:hidden">
+        {stats.recentBookings.length === 0 && (
+          <p className="text-center text-sm text-neutral-500">
+            No recent bookings
+          </p>
+        )}
+
+        {stats.recentBookings.map((b) => (
+          <MobileBookingCard
+            booking={b}
+            onView={(booking) => {
+              setSelectedBooking(booking);
+              setOpenModal(true);
+            }}
+            onInvoice={() => {
+              window.open(
+                SummaryApi.getBookingInvoice(b._id).url,
+                "_blank"
+              );
+            }}
+          />
+
+        ))}
+      </div>
+
+      {/* DESKTOP VIEW */}
+      <div className="hidden md:block border rounded-lg shadow-sm overflow-x-auto">
+        <Table className="w-full text-sm">
           <TableHeader>
             <TableRow>
               <TableHead>Sr. No</TableHead>
@@ -163,14 +191,6 @@ const DashboardPage = () => {
           </TableHeader>
 
           <TableBody>
-            {stats.recentBookings.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-6">
-                  No recent bookings
-                </TableCell>
-              </TableRow>
-            )}
-
             {stats.recentBookings.map((b, index) => (
               <TableRow key={b._id}>
                 <TableCell>{index + 1}</TableCell>
@@ -181,6 +201,7 @@ const DashboardPage = () => {
                       setSelectedBooking(b);
                       setOpenModal(true);
                     }}
+                    className="font-medium"
                   >
                     {b?.userId?.firstName} {b?.userId?.lastName}
                   </button>
@@ -190,29 +211,19 @@ const DashboardPage = () => {
                   {b?.propertyId?.propertyName || "—"}
                 </TableCell>
 
-                <TableCell>
-                  {formatCurrency(b.totalAmount)}
-                </TableCell>
+                <TableCell>{formatCurrency(b.totalAmount)}</TableCell>
 
                 <TableCell>
                   {b.paymentStatus === "paid" ? (
-                    <span className="text-green-600 font-medium">
-                      Paid
-                    </span>
+                    <span className="text-green-600 font-medium">Paid</span>
                   ) : b.paymentStatus === "pending" ? (
-                    <span className="text-yellow-600 font-medium">
-                      Pending
-                    </span>
+                    <span className="text-yellow-600 font-medium">Pending</span>
                   ) : (
-                    <span className="text-red-600 font-medium">
-                      Failed
-                    </span>
+                    <span className="text-red-600 font-medium">Failed</span>
                   )}
                 </TableCell>
 
-                <TableCell>
-                  {formatDate(b.createdAt)}
-                </TableCell>
+                <TableCell>{formatDate(b.createdAt)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -220,15 +231,15 @@ const DashboardPage = () => {
       </div>
 
       <BookingDetailsDialog
-      open={openModal}
-      booking={selectedBooking}
-      onClose={(open) => {
-        if (!open) {
-          setOpenModal(false);
-          setSelectedBooking(null);
-        }
-      }}
-    />
+        open={openModal}
+        booking={selectedBooking}
+        onClose={(open) => {
+          if (!open) {
+            setOpenModal(false);
+            setSelectedBooking(null);
+          }
+        }}
+      />
     </div>
 
   );
