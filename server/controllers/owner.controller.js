@@ -439,7 +439,7 @@ export const addBlockedDates = async (req, res) => {
 export const removeBlockedDates = async (req, res) => {
   try {
     const { id } = req.params;
-    const { start, end } = req.query; // 👈 IMPORTANT
+    const { start, end } = req.query;
 
     if (!start || !end) {
       return res.status(400).json({
@@ -449,7 +449,10 @@ export const removeBlockedDates = async (req, res) => {
     }
 
     const startDate = new Date(start);
+    startDate.setHours(0, 0, 0, 0);
+
     const endDate = new Date(end);
+    endDate.setHours(23, 59, 59, 999);
 
     const property = await Property.findById(id);
     if (!property) {
@@ -464,8 +467,6 @@ export const removeBlockedDates = async (req, res) => {
     property.blockedDates = property.blockedDates.filter((b) => {
       const bStart = new Date(b.start);
       const bEnd = new Date(b.end);
-
-      // remove overlapping range
       return !(startDate <= bEnd && endDate >= bStart);
     });
 
@@ -476,14 +477,13 @@ export const removeBlockedDates = async (req, res) => {
       });
     }
 
-    await property.save();
+    await property.save({ validateBeforeSave: false });
 
     return res.json({
       success: true,
       message: "Dates unblocked",
       data: property.blockedDates,
     });
-
   } catch (err) {
     console.error("❌ removeBlockedDates error:", err);
     return res.status(500).json({
