@@ -193,6 +193,9 @@ color: #000!important;
   .rdrWeekDay {
     font-size: 0.8rem;
   }
+  .rdrDayDisabled::after {
+    inset: 1px;
+  }
 
 }
 
