@@ -111,35 +111,7 @@
 color: #000!important;
 }
 
-/* Target ONLY disabled days */
-.rdrDayDisabled {
-  pointer-events: none;
-}
 
-/* Shrink the disabled day button */
-.rdrDayDisabled .rdrDayNumber {
-  transform: scale(0.82);
-  margin: auto;
-}
-
-/* Add visual gap effect */
-.rdrDayDisabled .rdrDayNumber span {
-  background: #f2f3f5;
-  border-radius: 10px;
-  width: 85%;
-  height: 85%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Prevent disabled days from merging visually */
-.rdrDayDisabled .rdrDayNumber span::after {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border-radius: 12px;
-}
 
 
 @media screen and (max-width:578px){
