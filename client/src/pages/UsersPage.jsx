@@ -14,6 +14,7 @@ import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 import UserDetailsDialog from "@/components/UserDetailsDialog";
+import MobileUserCard from "@/components/MobileUserCard";
 
 const filterOptions = [
   { label: "All Users", value: "all" },
@@ -188,7 +189,7 @@ const UsersPage = () => {
                 <IoIosArrowDropdown className="ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
+            <DropdownMenuContent className="w-80 md:w-48 py-2 flex flex-col gap-2">
               {filterOptions.map((option) => (
                 <DropdownMenuItem
                   key={option.value}
@@ -202,11 +203,33 @@ const UsersPage = () => {
         </div>
       </div>
 
+
+      {/* ---------- MOBILE LIST ---------- */}
+      <div className="space-y-3 md:hidden mt-4">
+        {loading && <p className="text-center py-6">Loading users…</p>}
+
+        {!loading &&
+          paginated.map((user) => (
+            <MobileUserCard
+              key={user._id}
+              user={user}
+              onView={openView}
+            />
+          ))}
+
+        {!loading && paginated.length === 0 && (
+          <p className="text-center py-6 text-neutral-500">
+            No users found
+          </p>
+        )}
+      </div>
+
+
       {/* Table */}
       <div className="mt-6 w-full">
-        <div className=" border rounded-lg">
+        <div className="hidden md:block border rounded-lg">
           <div>
-            <Table className="whitespace-nowrap min-w-[750px] overflow-x-auto md:min-w-full text-sm">
+            <Table className="whitespace-nowrap  min-w-[750px] overflow-x-auto md:min-w-full text-sm">
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-center hidden md:table-cell">Sr. No</TableHead>

@@ -1,153 +1,144 @@
 import {
-    Users,
-    CalendarCheck,
-    Clock,
-    Phone,
-    MoreVertical,
+  Calendar,
+  Moon,
+  Users,
+  MoreVertical,
 } from "lucide-react";
 
 import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-function StatusBadge({ status }) {
-    const map = {
-        paid: "bg-emerald-50 text-emerald-700",
-        initiated: "bg-amber-50 text-amber-700",
-        pending: "bg-amber-50 text-amber-700",
-        failed: "bg-red-50 text-red-700",
-    };
+/* ---------- STATUS PILL (EXACT STYLE) ---------- */
+function StatusPill({ status }) {
+  const normalizedStatus =
+    status === "initiated" ? "pending" : status;
 
-    return (
-        <span
-            className={`px-3 py-1 rounded-full text-[11px] font-medium capitalize ${map[status] || "bg-gray-100 text-gray-600"
-                }`}
-        >
-            {status}
-        </span>
-    );
+  const map = {
+    confirmed: "border-green-300 text-green-600 bg-green-50",
+    paid: "border-green-300 text-green-600 bg-green-50",
+    pending: "border-orange-300 text-orange-600 bg-orange-50",
+    failed: "border-red-300 text-red-600 bg-red-50",
+  };
+
+  return (
+    <span
+      className={`
+        px-3 py-[2px]
+        rounded-full
+        text-[11px]
+        font-medium
+        capitalize
+        border
+        ${map[normalizedStatus] || "border-neutral-300 text-neutral-600"}
+      `}
+    >
+      {normalizedStatus}
+    </span>
+  );
 }
 
 
-/* ---------------- CARD ---------------- */
+/* ---------- MOBILE CARD ---------- */
 export default function MobileBookingCard({
-    booking,
-    onView,
-    onInvoice,
+  booking,
+  onView,
+  onInvoice,
 }) {
-    if (!booking) return null;
+  if (!booking) return null;
 
-    const {
-        userId = {},
-        guests = {},
-        checkIn,
-        checkOut,
-        totalNights,
-        paymentStatus,
-    } = booking;
+  const {
+    userId = {},
+    guests = {},
+    checkIn,
+    totalNights,
+    paymentStatus,
+    propertyId,
+  } = booking;
 
-    const mobileNumber = userId.mobile || "—";
+  const totalGuests =
+    (guests.adults || 0) + (guests.children || 0);
 
+  const formatDate = (d) =>
+    new Date(d).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+    });
 
-    const totalGuests =
-        (guests.adults || 0) +
-        (guests.children || 0) +
-        (guests.infants || 0);
-
-    const formatDate = (d) =>
-        new Date(d).toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "2-digit",
-        });
-
-    return (
-        <div className="bg-white border rounded-xl p-4 shadow-sm">
-            {/* ---------- HEADER ---------- */}
-            <div className="flex items-start justify-between">
-                <h3 className="font-semibold text-sm leading-tight">
-                    {userId?.firstName} {userId?.lastName}
-                </h3>
-
-                <div className="flex items-center gap-4">
-                    <StatusBadge status={paymentStatus} />
-
-                    <DropdownMenu modal={false}>
-                        <DropdownMenuTrigger asChild>
-                            <button
-                                onClick={(e) => e.stopPropagation()}
-                                className="p-1 rounded-full hover:bg-neutral-100"
-                            >
-                                <MoreVertical className="w-4 h-4 text-neutral-600" />
-                            </button>
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end" className="w-48 flex flex-col gap-3 text-lg">
-                            <DropdownMenuItem
-                                onClick={() => {
-                                    setTimeout(() => {
-                                        onView?.(booking);
-                                    }, 0);
-                                }}
-                            >
-                                View Booking
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem onClick={onInvoice}>
-                                View Invoice
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    navigator.clipboard.writeText(
-                                        userId?.email || ""
-                                    )
-                                }
-                            >
-                                Copy Email
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    navigator.clipboard.writeText(mobileNumber || "")
-                                }
-                            >
-                                Copy Mobile
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-            </div>
-
-            {/* ---------- PHONE + GUESTS ---------- */}
-            <div className="flex items-center gap-4 mt-3 text-sm text-neutral-700">
-                <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    {mobileNumber}
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    {totalGuests} guests
-                </div>
-            </div>
-
-            {/* ---------- DATES ---------- */}
-            <div className="flex justify-start gap-6">
-            <div className="flex items-center gap-2 mt-3 text-sm text-neutral-700">
-                <CalendarCheck className="w-4 h-4" />
-                {formatDate(checkIn)} - {formatDate(checkOut)}
-            </div>
-
-            {/* ---------- NIGHTS ---------- */}
-            <div className="flex items-center gap-2 mt-2 text-sm text-neutral-700">
-                <Clock className="w-4 h-4" />
-                {totalNights} nights
-            </div>
-            </div>
+  return (
+    <div className="md:hidden bg-white border rounded-xl p-4 shadow-sm space-y-3">
+      {/* ---------- HEADER ---------- */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="font-semibold text-sm text-neutral-900">
+            {userId?.firstName} {userId?.lastName}
+          </h3>
+          <p className="text-xs text-neutral-500">
+            {userId?.email}
+          </p>
         </div>
-    );
+
+        <div className="flex items-center gap-2">
+          <StatusPill status={paymentStatus} />
+
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button className="p-1 rounded-full hover:bg-neutral-100">
+                <MoreVertical className="w-4 h-4 text-neutral-600" />
+              </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-48 py-2 ">
+              <DropdownMenuItem onClick={() => onView?.(booking)} className="mb-1">
+                View Booking
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onInvoice} className="mb-1"> 
+                View Invoice
+              </DropdownMenuItem>
+              <DropdownMenuItem className="mb-1"
+                onClick={() =>
+                  navigator.clipboard.writeText(userId?.email || "")
+                }
+              >
+                Copy Email
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  navigator.clipboard.writeText(userId?.mobile || "")
+                }
+              >
+                Copy Mobile
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* ---------- PROPERTY PILL ---------- */}
+      <div className="bg-neutral-50 rounded-lg px-3 py-2 text-sm font-medium text-neutral-800">
+        {propertyId?.propertyName}
+      </div>
+
+      {/* ---------- META ROW ---------- */}
+      <div className="flex items-center gap-5 text-sm text-neutral-600">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-4 h-4" />
+          {formatDate(checkIn)} - {formatDate(booking.checkOut)}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Moon className="w-4 h-4" />
+          {totalNights} nights
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4" />
+          {totalGuests} guests
+        </div>
+      </div>
+    </div>
+  );
 }

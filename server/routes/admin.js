@@ -33,18 +33,51 @@ router.get("/bookings", requireAuth, requireAdmin, async (_req, res) => {
 
 router.get("/users", requireAuth, requireAdmin, async (_req, res) => {
   try {
-    const users = await User.find({
-      role: { $in: ["traveller", "resortOwner", "admin"] },
-    })
-      .select("firstName lastName email mobile city state createdAt avatarUrl role")
-      .sort({ createdAt: -1 });
+    const users = await User.aggregate([
+      {
+        $match: {
+          role: { $in: ["traveller", "resortOwner", "admin"] },
+        },
+      },
 
-    return res.status(200).json({ message: "OK", data: users });
+      {
+        $lookup: {
+          from: "bookings",        
+          localField: "_id",
+          foreignField: "userId",
+          as: "bookings",
+        },
+      },
+
+      {
+        $addFields: {
+          bookingCount: { $size: "$bookings" },
+        },
+      },
+
+      {
+        $project: {
+          password: 0,
+          bookings: 0,
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+    ]);
+
+    return res.status(200).json({
+      message: "OK",
+      data: users,
+    });
   } catch (err) {
     console.error("Admin users error:", err);
-    return res.status(500).json({ message: "Failed to fetch users" });
+    return res.status(500).json({
+      message: "Failed to fetch users",
+    });
   }
 });
+
 
 router.get('/invoice/:bookingId', requireAuth, requireAdmin, getBookingInvoice);
 

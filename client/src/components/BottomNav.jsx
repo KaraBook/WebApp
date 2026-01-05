@@ -28,7 +28,7 @@ export default function BottomNav() {
             >
               <Icon size={20}
                className={`flex flex-col items-center justify-center text-xs ${
-                active ? "text-white p-2 rounded bg-black w-[30px] h-[30px]" : "text-neutral-500"
+                active ? "text-white p-1 rounded bg-black w-[30px] h-[30px]" : "h-[30px] text-neutral-500"
               }`} />
               {item.label}
             </Link>

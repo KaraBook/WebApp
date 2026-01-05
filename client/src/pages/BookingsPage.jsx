@@ -19,6 +19,7 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
 import { useRef } from "react";
+import MobileBookingCard from "@/components/MobileBookingCard";
 
 const itemsPerPageDefault = 8;
 
@@ -157,14 +158,34 @@ const BookingsPage = () => {
 
     const shortId = (id = "") => `#${String(id).slice(-6).toUpperCase()}`;
 
-    const statusBadge = (status) => {
-        const common = "rounded-full px-3 py-0.5 text-xs font-medium";
+    const statusBadge = (rawStatus) => {
+        const status =
+            rawStatus === "initiated" || rawStatus === "pending"
+                ? "pending"
+                : rawStatus;
 
-        if (status === "paid")
-            return <Badge className={`${common} !bg-green-100 !text-green-700`}>Paid</Badge>;
-        if (status === "failed")
-            return <Badge className={`${common} !bg-red-100 !text-red-700`}>Failed</Badge>;
-        return <Badge className={`${common} !bg-yellow-100 !text-yellow-800`}>Pending</Badge>;
+        const map = {
+            paid: "border-green-300 text-green-600 bg-green-50",
+            confirmed: "border-green-300 text-green-600 bg-green-50",
+            pending: "border-orange-300 text-orange-600 bg-orange-50",
+            failed: "border-red-300 text-red-600 bg-red-50",
+        };
+
+        return (
+            <span
+                className={`
+        inline-flex items-center
+        px-3 py-[2px]
+        text-xs font-medium
+        rounded-full
+        border
+        capitalize
+        ${map[status] || "border-neutral-300 text-neutral-600"}
+      `}
+            >
+                {status}
+            </span>
+        );
     };
 
     const statusDot = (status) => {
@@ -396,7 +417,7 @@ const BookingsPage = () => {
 
             {/* Table */}
             <div className="mt-6 w-full">
-                <div className="overflow-x-auto border rounded-lg">
+                <div className="overflow-x-auto hidden md:block border rounded-lg">
                     <div className="min-w-[1200px]">
                         <Table className="whitespace-nowrap text-sm">
                             <TableHeader>
@@ -565,6 +586,26 @@ const BookingsPage = () => {
                         </Table>
                     </div>
                 </div>
+
+
+                {/* MOBILE BOOKINGS */}
+                <div className="md:hidden space-y-3 mt-4">
+                    {paginated.map((booking) => (
+                        <MobileBookingCard
+                            key={booking._id}
+                            booking={booking}
+                            onView={(b) => openView(b)}
+                            onInvoice={() => navigate(`/invoice/${booking._id}`)}
+                        />
+                    ))}
+
+                    {!loading && paginated.length === 0 && (
+                        <div className="text-center text-sm text-neutral-500 py-10">
+                            No bookings found
+                        </div>
+                    )}
+                </div>
+
 
                 {/* Shadcn-style Ellipsis Pagination */}
                 {!loading && totalPages > 1 && (

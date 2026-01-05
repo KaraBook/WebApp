@@ -257,7 +257,7 @@ const PropertiesPage = () => {
                 <IoIosArrowDropdown className="ml-2" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64">
+            <DropdownMenuContent className=" w-80 md:w-64 py-2 flex flex-col gap-2">
               {filterOptions.map((option) => (
                 <DropdownMenuItem
                   key={option.value}
@@ -331,20 +331,20 @@ const PropertiesPage = () => {
                           <HiDotsVertical className="w-5 h-5" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
+                      <DropdownMenuContent className="w-48 md:w-auto py-2">
+                        <DropdownMenuItem className="mb-1"
                           onSelect={() => navigate(`/view-property/${property._id}`)}
                         >
                           View
                         </DropdownMenuItem>
-                        <DropdownMenuItem
+                        <DropdownMenuItem className="mb-1"
                           disabled={property.isBlocked}
                           onSelect={() => navigate(`/edit-property/${property._id}`)}
                         >
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          className={property.isBlocked ? "text-green-600" : "text-red-600"}
+                          className={property.isBlocked ? "text-green-600 mb-1" : "text-red-600 mb-1"}
                           onSelect={(e) => {
                             e.preventDefault();
                             openConfirm("block", property);
