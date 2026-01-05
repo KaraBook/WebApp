@@ -439,7 +439,7 @@ export const addBlockedDates = async (req, res) => {
 export const removeBlockedDates = async (req, res) => {
   try {
     const { id } = req.params;
-    const { start, end } = req.body;
+    const { start, end } = req.query; // 👈 IMPORTANT
 
     if (!start || !end) {
       return res.status(400).json({
@@ -465,7 +465,7 @@ export const removeBlockedDates = async (req, res) => {
       const bStart = new Date(b.start);
       const bEnd = new Date(b.end);
 
-      // remove if overlapping
+      // remove overlapping range
       return !(startDate <= bEnd && endDate >= bStart);
     });
 

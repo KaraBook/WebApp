@@ -94,14 +94,11 @@ export default function OwnerCalendar() {
   try {
     setLoading(true);
 
+    const start = new Date(range.start).toISOString();
+    const end = new Date(range.end).toISOString();
+
     const res = await api.delete(
-      SummaryApi.removeBlockedDates.url(propertyId),
-      {
-        data: {
-          start: new Date(range.start).toISOString(),
-          end: new Date(range.end).toISOString(),
-        },
-      }
+      `${SummaryApi.removeBlockedDates.url(propertyId)}?start=${start}&end=${end}`
     );
 
     toast.success("Dates unblocked");
@@ -115,6 +112,7 @@ export default function OwnerCalendar() {
     setLoading(false);
   }
 };
+
 
 
   /* ================= UI ================= */
