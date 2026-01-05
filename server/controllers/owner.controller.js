@@ -441,20 +441,59 @@ export const removeBlockedDates = async (req, res) => {
     const { id } = req.params;
     const { start, end } = req.body;
 
-    const property = await Property.findById(id);
-    if (!property) return res.status(404).json({ success: false, message: "Property not found" });
+    if (!start || !end) {
+      return res.status(400).json({
+        success: false,
+        message: "Start and end dates required",
+      });
+    }
 
-    property.blockedDates = property.blockedDates.filter(
-      (b) => !(new Date(b.start).getTime() === new Date(start).getTime() &&
-        new Date(b.end).getTime() === new Date(end).getTime())
-    );
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const property = await Property.findById(id);
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found",
+      });
+    }
+
+    const beforeCount = property.blockedDates.length;
+
+    property.blockedDates = property.blockedDates.filter((b) => {
+      const bStart = new Date(b.start);
+      const bEnd = new Date(b.end);
+
+      // remove if overlapping
+      return !(startDate <= bEnd && endDate >= bStart);
+    });
+
+    if (property.blockedDates.length === beforeCount) {
+      return res.status(404).json({
+        success: false,
+        message: "No matching blocked range found",
+      });
+    }
+
     await property.save();
 
-    res.json({ success: true, message: "Dates unblocked", data: property.blockedDates });
+    return res.json({
+      success: true,
+      message: "Dates unblocked",
+      data: property.blockedDates,
+    });
+
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to unblock dates", error: err.message });
+    console.error("❌ removeBlockedDates error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to unblock dates",
+      error: err.message,
+    });
   }
 };
+
 
 
 export const createRazorpayOrder = async (req, res) => {

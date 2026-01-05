@@ -91,27 +91,31 @@ export default function OwnerCalendar() {
   };
 
   const handleUnblock = async (range) => {
-    try {
-      setLoading(true);
-      const res = await api.delete(SummaryApi.removeBlockedDates.url(propertyId), {
-        data: {
-          start: range.start,
-          end: range.end,
-        },
-      });
-      toast.success("Dates unblocked");
-      setBlockedDates(res.data?.data || []);
-    } catch (err) {
-      const msg =
-        err.response?.data?.message ||
-        "Unable to block dates";
+  try {
+    setLoading(true);
 
-      toast.error(msg);
-    }
-    finally {
-      setLoading(false);
-    }
-  };
+    const res = await api.delete(
+      SummaryApi.removeBlockedDates.url(propertyId),
+      {
+        data: {
+          start: new Date(range.start).toISOString(),
+          end: new Date(range.end).toISOString(),
+        },
+      }
+    );
+
+    toast.success("Dates unblocked");
+    setBlockedDates(res.data?.data || []);
+
+  } catch (err) {
+    toast.error(
+      err.response?.data?.message || "Failed to unblock dates"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   /* ================= UI ================= */
   return (
