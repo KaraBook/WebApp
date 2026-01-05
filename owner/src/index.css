@@ -194,7 +194,7 @@ color: #000!important;
     font-size: 0.8rem;
   }
   .rdrDayDisabled::after {
-    inset: 1px;
+    inset: 3px;
   }
 
 }
