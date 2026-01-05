@@ -168,7 +168,31 @@ color: #000!important;
   border-bottom-left-radius: 0.5em!important;
   background-color: #028EA0!important;
 }
+ .calendar-shell {
+    transform: scale(1.15);
+    transform-origin: top center;
+  }
 
+  .rdrCalendarWrapper {
+    width: 100% !important;
+  }
+
+  .rdrMonth {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .rdrDay {
+    height: 3.6em !important;
+  }
+
+  .rdrDayNumber span {
+    font-size: 0.95rem;
+  }
+
+  .rdrWeekDay {
+    font-size: 0.8rem;
+  }
 
 }
 

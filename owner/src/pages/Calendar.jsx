@@ -138,7 +138,7 @@ export default function OwnerCalendar() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* LEFT CARD */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm md:p-6 p-4">
             <h2 className="text-lg font-semibold text-gray-900 text-left">
               Select Dates to Block
             </h2>
@@ -150,7 +150,7 @@ export default function OwnerCalendar() {
 
             <Separator />
 
-            <div className="mt-6 calendar-shell">
+            <div className="mt-6 calendar-shell w-full flex justify-center">
               <DateRange
                 ranges={dateRange}
                 onChange={(item) => setDateRange([item.selection])}
@@ -175,7 +175,7 @@ export default function OwnerCalendar() {
           </div>
 
           {/* RIGHT CARD */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm md:p-6 p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Blocked Date Ranges
             </h3>
@@ -189,7 +189,7 @@ export default function OwnerCalendar() {
                 {blockedDates.map((r, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between border bg-gray-50 border-gray-200 rounded-xl px-4 py-3 hover:bg-gray-50 transition"
+                    className="flex items-center justify-between border bg-gray-50 border-gray-200 rounded-xl md:px-4 md:py-3 px-2 py-2 hover:bg-gray-50 transition"
                   >
                     <div>
                       <p className="text-sm font-medium text-gray-800">
