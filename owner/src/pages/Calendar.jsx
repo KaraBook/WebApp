@@ -101,9 +101,14 @@ export default function OwnerCalendar() {
       });
       toast.success("Dates unblocked");
       setBlockedDates(res.data?.data || []);
-    } catch {
-      toast.error("Unable to unblock");
-    } finally {
+    } catch (err) {
+      const msg =
+        err.response?.data?.message ||
+        "Unable to block dates";
+
+      toast.error(msg);
+    }
+    finally {
       setLoading(false);
     }
   };
