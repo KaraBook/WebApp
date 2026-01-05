@@ -114,6 +114,36 @@ color: #000!important;
   display: none;
 }
 
+/* ================= SAFE DISABLED DATE SPACING ================= */
+
+/* Do NOT change layout of the day cell */
+.rdrDayDisabled {
+  pointer-events: none;
+}
+
+/* Create spacing illusion INSIDE the cell */
+.rdrDayDisabled .rdrDayNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Shrink the inner box */
+.rdrDayDisabled .rdrDayNumber span {
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  background: #f2f3f5;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Optional: soften disabled text */
+.rdrDayDisabled .rdrDayNumber span {
+  color: #b5b8bd !important;
+}
+
 
 
 @media screen and (max-width:578px){
