@@ -124,17 +124,17 @@ export default function MobileBookingCard({
 
       {/* ---------- META ROW ---------- */}
       <div className="flex items-center gap-5 text-sm text-neutral-600">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-[13px]">
           <Calendar className="w-4 h-4" />
           {formatDate(checkIn)} - {formatDate(booking.checkOut)}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-[13px]">
           <Moon className="w-4 h-4" />
           {totalNights} nights
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-[13px]">
           <Users className="w-4 h-4" />
           {totalGuests} guests
         </div>
