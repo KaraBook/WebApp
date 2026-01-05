@@ -110,7 +110,9 @@
 .rdrDay:not(.rdrDayPassive) .rdrInRange~.rdrDayNumber span{
 color: #000!important;
 }
-
+.rdrDayNumber span::after{
+  display: none;
+}
 
 
 
