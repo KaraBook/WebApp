@@ -23,6 +23,24 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
   const traveller =
     `${booking?.userId?.firstName || ""} ${booking?.userId?.lastName || ""}`.trim();
 
+  const guestLabel = (() => {
+  const adults = booking.guests?.adults ?? 0;
+  const children = booking.guests?.children ?? 0;
+  const infants = booking.guests?.infants ?? 0;
+
+  const parts = [
+    `${adults} Adult${adults !== 1 ? "s" : ""}`,
+    `${children} Child${children !== 1 ? "ren" : ""}`,
+  ];
+
+  if (infants > 0) {
+    parts.push(`${infants} Infant${infants !== 1 ? "s" : ""}`);
+  }
+
+  return parts.join(", ");
+})();
+
+
   return (
     <Dialog
       open={open}
@@ -113,10 +131,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
               muted
               icon={Users}
               label="Guests"
-              value={
-                (booking.guests?.adults || 0) +
-                (booking.guests?.children || 0)
-              }
+              value={guestLabel}
             />
           </div>
 
