@@ -329,7 +329,7 @@ const DashboardPage = () => {
 
       {/* DESKTOP VIEW */}
       <div className="hidden md:block rounded-xl border bg-white overflow-x-auto">
-        <table className="min-w-[1100px] text-sm">
+        <table className="min-w-[1100px] w-[100%] text-sm">
           <thead className="bg-neutral-50 border-b">
             <tr className="text-left text-neutral-600">
               <th className="px-6 py-4 font-medium">Guest</th>
