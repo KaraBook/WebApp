@@ -301,7 +301,7 @@ export default function OwnerUsers() {
 
             {/* ================= PAGINATION ================= */}
                 {totalPages > 1 && (
-                    <div className="flex justify-center mt-6">
+                    <div className="flex md:justify-end justify-center mt-6">
                         <div className="flex items-center gap-2 text-sm">
 
                             {/* Previous */}
