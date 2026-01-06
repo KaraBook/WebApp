@@ -9,12 +9,21 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import OwnerUserDetailsDialog from "@/components/OwnerUserDetailsDialog";
 
 export default function OwnerUsers() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const ITEMS_PER_PAGE = 8;
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [openUserDialog, setOpenUserDialog] = useState(false);
+
+    const openUser = (u) => {
+        setSelectedUser(u);
+        setOpenUserDialog(true);
+    };
+
 
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("all"); // all | traveller | owner
@@ -226,7 +235,7 @@ export default function OwnerUsers() {
                                         </DropdownMenuTrigger>
 
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => openUser(u)}>
                                                 <Eye size={14} className="mr-2" /> View
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => copy(u.email)}>
@@ -300,70 +309,77 @@ export default function OwnerUsers() {
 
 
             {/* ================= PAGINATION ================= */}
-                {totalPages > 1 && (
-                    <div className="flex md:justify-end justify-center mt-6">
-                        <div className="flex items-center gap-2 text-sm">
+            {totalPages > 1 && (
+                <div className="flex md:justify-end justify-center mt-6">
+                    <div className="flex items-center gap-2 text-sm">
 
-                            {/* Previous */}
-                            <button
-                                disabled={currentPage === 1}
-                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                className={`
+                        {/* Previous */}
+                        <button
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            className={`
           px-3 py-2 rounded-lg border
           ${currentPage === 1
-                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        : "bg-white hover:bg-gray-50"}
+                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                    : "bg-white hover:bg-gray-50"}
         `}
-                            >
-                                Previous
-                            </button>
+                        >
+                            Previous
+                        </button>
 
-                            {/* Page Numbers */}
-                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                .filter(p =>
-                                    p === 1 ||
-                                    p === totalPages ||
-                                    Math.abs(p - currentPage) <= 1
-                                )
-                                .map((page, idx, arr) => (
-                                    <span key={page} className="flex items-center gap-2">
-                                        {idx > 0 && page - arr[idx - 1] > 1 && (
-                                            <span className="px-1 text-gray-400">…</span>
-                                        )}
+                        {/* Page Numbers */}
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                            .filter(p =>
+                                p === 1 ||
+                                p === totalPages ||
+                                Math.abs(p - currentPage) <= 1
+                            )
+                            .map((page, idx, arr) => (
+                                <span key={page} className="flex items-center gap-2">
+                                    {idx > 0 && page - arr[idx - 1] > 1 && (
+                                        <span className="px-1 text-gray-400">…</span>
+                                    )}
 
-                                        <button
-                                            onClick={() => setCurrentPage(page)}
-                                            className={`
+                                    <button
+                                        onClick={() => setCurrentPage(page)}
+                                        className={`
                 w-9 h-9 rounded-lg border
                 ${page === currentPage
-                                                    ? "bg-black text-white border-black"
-                                                    : "bg-white hover:bg-gray-50"}
+                                                ? "bg-black text-white border-black"
+                                                : "bg-white hover:bg-gray-50"}
               `}
-                                        >
-                                            {page}
-                                        </button>
-                                    </span>
-                                ))}
+                                    >
+                                        {page}
+                                    </button>
+                                </span>
+                            ))}
 
-                            {/* Next */}
-                            <button
-                                disabled={currentPage === totalPages}
-                                onClick={() =>
-                                    setCurrentPage(p => Math.min(totalPages, p + 1))
-                                }
-                                className={`
+                        {/* Next */}
+                        <button
+                            disabled={currentPage === totalPages}
+                            onClick={() =>
+                                setCurrentPage(p => Math.min(totalPages, p + 1))
+                            }
+                            className={`
           px-3 py-2 rounded-lg border
           ${currentPage === totalPages
-                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                        : "bg-white hover:bg-gray-50"}
+                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                    : "bg-white hover:bg-gray-50"}
         `}
-                            >
-                                Next
-                            </button>
+                        >
+                            Next
+                        </button>
 
-                        </div>
                     </div>
-                )}
+                </div>
+            )}
+
+            <OwnerUserDetailsDialog
+                open={openUserDialog}
+                user={selectedUser}
+                onClose={() => setOpenUserDialog(false)}
+            />
+
         </div>
     );
 }
