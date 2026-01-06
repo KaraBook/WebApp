@@ -17,17 +17,21 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
   return (
     <div
       ref={ref}
-      className="bg-white max-w-4xl mx-auto border rounded-lg px-8 py-10 text-sm text-gray-800"
+      className="bg-white max-w-4xl mx-auto border rounded-lg 
+      px-4 sm:px-6 md:px-8 
+      py-6 sm:py-8 md:py-10 
+      text-sm text-gray-800"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
+
       {/* ================= HEADER ================= */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div className="flex gap-3">
-          <div className=" h-10 w-10 text-[20px] rounded-md bg-primary flex items-center justify-center text-white font-semibold uppercase">
+          <div className="h-10 w-10 sm:h-11 sm:w-11 text-lg rounded-md bg-primary flex items-center justify-center text-white font-semibold uppercase shrink-0">
             {invoice.propertyName?.charAt(0) || "P"}
           </div>
           <div>
-            <h1 className="font-semibold text-[20px]">
+            <h1 className="font-semibold text-base sm:text-lg">
               {invoice.propertyName}
             </h1>
             <p className="text-xs text-gray-500 leading-relaxed max-w-xs">
@@ -36,7 +40,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
           </div>
         </div>
 
-        <h2 className="text-lg font-bold tracking-wide">
+        <h2 className="text-base sm:text-lg font-bold tracking-wide text-right">
           TAX INVOICE
         </h2>
       </div>
@@ -44,127 +48,113 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       <hr className="my-6" />
 
       {/* ================= BILL TO + META ================= */}
-      <div className="flex justify-between">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-6">
         <div>
           <p className="text-xs text-gray-500 mb-1">BILL TO</p>
-          <p className="font-[600] mb-[5px]">{user.name}</p>
-          <p className="text-s mb-[5px]">{user.mobile}</p>
-          <p className="text-s">{user.email}</p>
+          <p className="font-semibold">{user.name}</p>
+          <p className="text-xs">{user.mobile}</p>
+          <p className="text-xs break-all">{user.email}</p>
         </div>
 
         <div className="text-xs space-y-2">
-          <div className="flex gap-3">
-            <span className="text-gray-500 text-s w-24">Invoice No:</span>
-            <span className="font-[600]">{invoice.invoiceNumber}</span>
-          </div>
-          <div className="flex gap-3">
-            <span className="text-gray-500 text-s w-24">Invoice Date:</span>
-            <span className="font-[600]">{safeFormat(invoice.invoiceDate)}</span>
-          </div>
-          <div className="flex gap-3">
-            <span className="text-gray-500 text-s w-24">Booking Date:</span>
-            <span className="font-[600]">{safeFormat(invoice.bookingDate)}</span>
-          </div>
-          <div className="flex gap-3">
-            <span className="text-gray-500 text-s w-24">Order ID:</span>
-            <span className="break-all font-[600]">{invoice.orderId}</span>
-          </div>
+          {[
+            ["Invoice No", invoice.invoiceNumber],
+            ["Invoice Date", safeFormat(invoice.invoiceDate)],
+            ["Booking Date", safeFormat(invoice.bookingDate)],
+            ["Order ID", invoice.orderId],
+          ].map(([label, value]) => (
+            <div key={label} className="flex gap-2">
+              <span className="text-gray-500 w-24 shrink-0">{label}:</span>
+              <span className="font-semibold break-all">{value}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* ================= BOOKING DETAILS BOX ================= */}
-      <div className="mt-6 bg-[#f9f9f9] border rounded-lg p-4 grid grid-cols-4 gap-4 text-xs">
-
-        {/* FULL WIDTH TITLE */}
-        <p className="col-span-full text-xs font-semibold text-gray-600 mb-1">
+      {/* ================= BOOKING DETAILS ================= */}
+      <div
+        className="mt-6 bg-[#f9f9f9] border rounded-lg p-4 
+        grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs"
+      >
+        <p className="col-span-full font-semibold text-gray-600">
           BOOKING DETAILS
         </p>
 
-        <div>
-          <p className="text-gray-500 mb-1">Check-in</p>
-          <p className="font-[600] text-[13px]">
-            {safeFormat(invoice.checkIn)}
-          </p>
-          <p className="text-gray-400">2:00 PM</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500 mb-1">Check-out</p>
-          <p className="font-[600] text-[13px]">
-            {safeFormat(invoice.checkOut)}
-          </p>
-          <p className="text-gray-400">11:00 AM</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500 mb-1">Duration</p>
-          <p className="font-[600] text-[13px]">{nights} Nights</p>
-        </div>
-
-        <div>
-          <p className="text-gray-500 mb-1">Guests</p>
-          <p className="font-[600] text-[13px]">
-            {invoice.guests.adults + invoice.guests.children} Guests
-          </p>
-          <p className="text-gray-400">
-            {invoice.guests.adults} Adults, {invoice.guests.children} Children
-          </p>
-        </div>
-
+        <Detail label="Check-in" value={safeFormat(invoice.checkIn)} sub="2:00 PM" />
+        <Detail label="Check-out" value={safeFormat(invoice.checkOut)} sub="11:00 AM" />
+        <Detail label="Duration" value={`${nights} Nights`} />
+        <Detail
+          label="Guests"
+          value={`${invoice.guests.adults + invoice.guests.children} Guests`}
+          sub={`${invoice.guests.adults} Adults, ${invoice.guests.children} Children`}
+        />
       </div>
 
       {/* ================= TABLE ================= */}
-      <table className="w-full mt-8 text-xs border-t">
-        <thead>
-          <tr className="border-b text-left text-[14px]">
-            <th className="py-4">S.No</th>
-            <th>Description</th>
-            <th className="text-right">Qty</th>
-            <th className="text-right">Rate</th>
-            <th className="text-right">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border-b text-[14px]">
-            <td className="py-3">1</td>
-            <td className="py-3">
-              <p className="font-[600]">
-                Room / Accommodation Charges
-              </p>
-              <p className="text-gray-500 mt-1 text-[12px]">
-                {invoice.propertyType} at {invoice.propertyName}
-              </p>
-            </td>
-            <td className="text-right">{nights} Nights</td>
-            <td className="text-right">
-              ₹{rate.toFixed(2)}
-            </td>
-            <td className="text-right">
-              ₹{invoice.totalAmount.toLocaleString("en-IN")}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="mt-8">
+        {/* Desktop table */}
+        <table className="hidden md:table w-full text-xs border-t">
+          <thead>
+            <tr className="border-b text-left text-sm">
+              <th className="py-4">S.No</th>
+              <th>Description</th>
+              <th className="text-right">Qty</th>
+              <th className="text-right">Rate</th>
+              <th className="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b text-sm">
+              <td className="py-3">1</td>
+              <td>
+                <p className="font-semibold">Room / Accommodation Charges</p>
+                <p className="text-gray-500 text-xs">
+                  {invoice.propertyType} at {invoice.propertyName}
+                </p>
+              </td>
+              <td className="text-right">{nights} Nights</td>
+              <td className="text-right">₹{rate.toFixed(2)}</td>
+              <td className="text-right">
+                ₹{invoice.totalAmount.toLocaleString("en-IN")}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* Mobile card */}
+        <div className="md:hidden border rounded-lg p-4 space-y-2 text-xs">
+          <p className="font-semibold">Room / Accommodation Charges</p>
+          <p className="text-gray-500">
+            {invoice.propertyType} at {invoice.propertyName}
+          </p>
+          <div className="flex justify-between">
+            <span>Qty</span>
+            <span>{nights} Nights</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Rate</span>
+            <span>₹{rate.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-semibold">
+            <span>Amount</span>
+            <span>₹{invoice.totalAmount.toLocaleString("en-IN")}</span>
+          </div>
+        </div>
+      </div>
 
       {/* ================= TOTALS ================= */}
       <div className="flex justify-end mt-6">
-        <div className="w-72 text-s space-y-2">
-          <div className="flex justify-between">
-            <span className="text-gray-500">Sub Total</span>
-            <span>₹{invoice.totalAmount.toLocaleString("en-IN")}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Tax (0%)</span>
-            <span>₹0.00</span>
-          </div>
-          <div className="flex justify-between font-semibold text-sm border-t pt-2">
+        <div className="w-full sm:w-72 text-xs space-y-2">
+          <Row label="Sub Total" value={invoice.totalAmount} />
+          <Row label="Tax (0%)" value="0.00" />
+          <div className="flex justify-between font-semibold border-t pt-2">
             <span>Grand Total</span>
             <span>₹{invoice.totalAmount.toLocaleString("en-IN")}</span>
           </div>
         </div>
       </div>
 
-      {/* ================= AMOUNT IN WORDS ================= */}
+      {/* ================= FOOTER ================= */}
       <p className="mt-6 text-xs">
         <span className="text-gray-500">Amount in Words:</span>{" "}
         <strong>{invoice.amountInWords}</strong>
@@ -172,32 +162,20 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
 
       <hr className="my-6" />
 
-      {/* ================= PAYMENT + SIGN ================= */}
-      <div className="flex justify-between text-xs">
-        <div className="space-y-1">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-6 text-xs">
+        <div>
           <p className="text-gray-500">PAYMENT INFORMATION</p>
           <p>Status: <strong>{invoice.paymentStatus}</strong></p>
           <p>Method: {invoice.paymentMethod}</p>
-          <p>Transaction ID: {invoice.transactionId}</p>
+          <p className="break-all">Transaction ID: {invoice.transactionId}</p>
         </div>
 
         <div className="text-right">
-          <div className="border-t w-40 ml-auto mt-8 pt-1">
+          <div className="border-t w-40 ml-auto pt-1">
             Authorized Signatory
           </div>
-          <p className="text-gray-500 mt-1">
-            {invoice.propertyName}
-          </p>
+          <p className="text-gray-500">{invoice.propertyName}</p>
         </div>
-      </div>
-
-      <hr className="my-6" />
-
-      {/* ================= TERMS ================= */}
-      <div className="text-xs text-gray-500 space-y-1">
-        <p>• This is a computer-generated invoice and does not require a physical signature.</p>
-        <p>• Check-in and check-out times are subject to property policies.</p>
-        <p>• Please retain this invoice for your records.</p>
       </div>
 
       <p className="text-center text-xs text-gray-500 mt-6">
@@ -206,5 +184,20 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
     </div>
   );
 });
+
+const Detail = ({ label, value, sub }) => (
+  <div>
+    <p className="text-gray-500 mb-1">{label}</p>
+    <p className="font-semibold text-sm">{value}</p>
+    {sub && <p className="text-gray-400">{sub}</p>}
+  </div>
+);
+
+const Row = ({ label, value }) => (
+  <div className="flex justify-between">
+    <span className="text-gray-500">{label}</span>
+    <span>₹{typeof value === "number" ? value.toLocaleString("en-IN") : value}</span>
+  </div>
+);
 
 export default InvoicePreview;
