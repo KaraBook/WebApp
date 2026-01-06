@@ -583,7 +583,7 @@ export default function Checkout() {
                         <img
                             src={property.coverImage}
                             alt={property.propertyName}
-                            className="w-24 h-24 object-cover rounded-[0]"
+                            className="w-24 h-24 object-cover rounded-[8x]"
                         />
                         <div>
                             <h4 className="font-semibold">{property.propertyName}</h4>
