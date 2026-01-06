@@ -242,8 +242,64 @@ export default function OwnerUsers() {
                         ))}
                     </tbody>
                 </table>
+            </div>
 
-                {/* ================= PAGINATION ================= */}
+            {/* ================= MOBILE CARDS ================= */}
+            <div className="md:hidden space-y-3">
+                {paginatedUsers.map((u) => (
+                    <div
+                        key={u.userId}
+                        className="bg-white border rounded-xl p-4 flex justify-between items-start"
+                    >
+                        <div className="flex gap-3">
+                            <div className="h-11 w-11 rounded-full bg-black text-white flex items-center justify-center font-semibold">
+                                {u.name?.charAt(0)}
+                            </div>
+
+                            <div>
+                                <p className="font-semibold">{u.name}</p>
+
+                                <div className="text-sm text-gray-600 flex items-center gap-2 mt-1">
+                                    <Mail size={14} /> {u.email || "—"}
+                                </div>
+
+                                <div className="flex items-center justify-start gap-3">
+                                    <div className="text-sm text-gray-600 flex items-center gap-2">
+                                        <Phone size={14} /> {u.mobile}
+                                    </div>
+                                    <p className="text-center text-[12px]">.</p>
+                                    <p className="text-xs text-gray-500 text-600 mt-1">
+                                        {u.totalBookings} bookings
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button>
+                                    <MoreVertical className="text-gray-500" />
+                                </button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                    <Eye size={14} className="mr-2" /> View
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => copy(u.email)}>
+                                    <Copy size={14} className="mr-2" /> Copy Email
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => copy(u.mobile)}>
+                                    <Copy size={14} className="mr-2" /> Copy Mobile
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                ))}
+            </div>
+
+
+            {/* ================= PAGINATION ================= */}
                 {totalPages > 1 && (
                     <div className="flex justify-center mt-6">
                         <div className="flex items-center gap-2 text-sm">
@@ -308,62 +364,6 @@ export default function OwnerUsers() {
                         </div>
                     </div>
                 )}
-
-            </div>
-
-            {/* ================= MOBILE CARDS ================= */}
-            <div className="md:hidden space-y-3">
-                {paginatedUsers.map((u) => (
-                    <div
-                        key={u.userId}
-                        className="bg-white border rounded-xl p-4 flex justify-between items-start"
-                    >
-                        <div className="flex gap-3">
-                            <div className="h-11 w-11 rounded-full bg-black text-white flex items-center justify-center font-semibold">
-                                {u.name?.charAt(0)}
-                            </div>
-
-                            <div>
-                                <p className="font-semibold">{u.name}</p>
-
-                                <div className="text-sm text-gray-600 flex items-center gap-2 mt-1">
-                                    <Mail size={14} /> {u.email || "—"}
-                                </div>
-
-                                <div className="flex items-center justify-start gap-3">
-                                    <div className="text-sm text-gray-600 flex items-center gap-2">
-                                        <Phone size={14} /> {u.mobile}
-                                    </div>
-                                    <p className="text-center text-[12px]">.</p>
-                                    <p className="text-xs text-gray-500 text-600 mt-1">
-                                        {u.totalBookings} bookings
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button>
-                                    <MoreVertical className="text-gray-500" />
-                                </button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                    <Eye size={14} className="mr-2" /> View
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => copy(u.email)}>
-                                    <Copy size={14} className="mr-2" /> Copy Email
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => copy(u.mobile)}>
-                                    <Copy size={14} className="mr-2" /> Copy Mobile
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                ))}
-            </div>
         </div>
     );
 }
