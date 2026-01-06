@@ -196,6 +196,9 @@ color: #000!important;
   .rdrDayDisabled::after {
     inset: 3px;
   }
+  .rdrDayDisabled {
+    background: #fff !important;
+  }
 
 }
 
