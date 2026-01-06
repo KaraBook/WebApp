@@ -47,6 +47,17 @@ const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
 
 
+const isShopActImage = (url) => {
+  if (!url) return false;
+  const u = url.toLowerCase();
+  return (
+    u.includes("/properties/shopact/") ||
+    u.includes("aadhaar") ||
+    u.includes("aadhar") ||
+    u.includes("shopact")
+  );
+};
+
 
 export const checkDuplicateFields = async (raw) => {
   const fields = Object.fromEntries(
@@ -254,16 +265,15 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
         });
       }
     } else if (prop.galleryPhotos?.length) {
-      // fallback for safety
       finalGallery = prop.galleryPhotos;
     }
 
-    // normalize URLs
-    finalGallery = finalGallery.map((url) =>
-      url.startsWith("/uploads/") ? `${BASE_URL}${url}` : url
-    );
+    finalGallery = finalGallery
+      .map((url) =>
+        url.startsWith("/uploads/") ? `${BASE_URL}${url}` : url
+      )
+      .filter((url) => !isShopActImage(url));
 
-    // ✅ 2. append new gallery files
     if (galleryFiles.length > 0) {
       const newGalleryUrls = galleryFiles.map(
         (file) => `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
@@ -535,7 +545,9 @@ export const updateProperty = async (req, res) => {
         finalGallery.push(...newGalleryUrls);
       }
 
-      updatedData.galleryPhotos = finalGallery;
+      updatedData.galleryPhotos = finalGallery.filter(
+        (url) => !isShopActImage(url)
+      );
     }
 
     const effectiveCover =
