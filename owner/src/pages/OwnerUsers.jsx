@@ -1,12 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
-import { MoreVertical, Mail, Phone } from "lucide-react";
+import { MoreVertical, Mail, Phone, Eye, Copy } from "lucide-react";
 import { format } from "date-fns";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 export default function OwnerUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all"); // all | traveller | owner
 
   const fetchUsers = async () => {
     try {
@@ -24,6 +33,34 @@ export default function OwnerUsers() {
     fetchUsers();
   }, []);
 
+  /* ================= FILTER + SEARCH ================= */
+  const filteredUsers = useMemo(() => {
+    return users.filter((u) => {
+      const q = search.toLowerCase();
+
+      const matchesSearch =
+        !q ||
+        u.name?.toLowerCase().includes(q) ||
+        u.email?.toLowerCase().includes(q) ||
+        u.mobile?.includes(q) ||
+        u.city?.toLowerCase().includes(q) ||
+        u.state?.toLowerCase().includes(q);
+
+      const role = u.role || "traveller";
+
+      const matchesRole =
+        roleFilter === "all" ||
+        (roleFilter === "traveller" && role === "traveller") ||
+        (roleFilter === "owner" && role !== "traveller");
+
+      return matchesSearch && matchesRole;
+    });
+  }, [users, search, roleFilter]);
+
+  const copy = async (text) => {
+    await navigator.clipboard.writeText(text);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-40">
@@ -35,7 +72,7 @@ export default function OwnerUsers() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
 
-      {/* HEADER */}
+      {/* ================= HEADER ================= */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-semibold">Users</h1>
         <button
@@ -46,18 +83,42 @@ export default function OwnerUsers() {
         </button>
       </div>
 
-      {/* SEARCH + FILTER (UI ONLY) */}
+      {/* ================= SEARCH + FILTER ================= */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search: name / email / mobile / city / state"
           className="border rounded-lg px-4 py-2 w-full"
         />
-        <select className="border rounded-lg px-4 py-2 w-full sm:w-40">
-          <option>All Users</option>
-        </select>
+
+        {/* SHADCN FILTER DROPDOWN */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="border rounded-lg px-4 py-2 w-full sm:w-44 flex justify-between items-center text-sm">
+              {roleFilter === "all"
+                ? "All Users"
+                : roleFilter === "traveller"
+                ? "Traveller"
+                : "Resort Owner"}
+            </button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent className="w-44">
+            <DropdownMenuItem onClick={() => setRoleFilter("all")}>
+              All Users
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setRoleFilter("traveller")}>
+              Traveller
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setRoleFilter("owner")}>
+              Resort Owner
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* DESKTOP TABLE */}
+      {/* ================= DESKTOP TABLE ================= */}
       <div className="hidden md:block bg-white rounded-xl border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-600">
@@ -71,8 +132,9 @@ export default function OwnerUsers() {
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
+
           <tbody>
-            {users.map((u, i) => (
+            {filteredUsers.map((u, i) => (
               <tr key={u.userId} className="border-t">
                 <td className="px-4 py-4">{i + 1}</td>
 
@@ -83,7 +145,9 @@ export default function OwnerUsers() {
                     </div>
                     <div>
                       <p className="font-medium">{u.name}</p>
-                      <p className="text-xs text-gray-500">Traveller</p>
+                      <p className="text-xs text-gray-500">
+                        {u.role || "Traveller"}
+                      </p>
                     </div>
                   </div>
                 </td>
@@ -97,8 +161,27 @@ export default function OwnerUsers() {
                     : "—"}
                 </td>
 
+                {/* ACTION MENU */}
                 <td className="px-4 py-4 text-right">
-                  <MoreVertical className="w-4 h-4 text-gray-500 cursor-pointer" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button>
+                        <MoreVertical className="w-4 h-4 text-gray-500" />
+                      </button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Eye size={14} className="mr-2" /> View
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => copy(u.email)}>
+                        <Copy size={14} className="mr-2" /> Copy Email
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => copy(u.mobile)}>
+                        <Copy size={14} className="mr-2" /> Copy Mobile
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </td>
               </tr>
             ))}
@@ -106,9 +189,9 @@ export default function OwnerUsers() {
         </table>
       </div>
 
-      {/* MOBILE CARDS */}
+      {/* ================= MOBILE CARDS ================= */}
       <div className="md:hidden space-y-3">
-        {users.map((u) => (
+        {filteredUsers.map((u) => (
           <div
             key={u.userId}
             className="bg-white border rounded-xl p-4 flex justify-between items-start"
@@ -135,7 +218,25 @@ export default function OwnerUsers() {
               </div>
             </div>
 
-            <MoreVertical className="text-gray-500" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button>
+                  <MoreVertical className="text-gray-500" />
+                </button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Eye size={14} className="mr-2" /> View
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => copy(u.email)}>
+                  <Copy size={14} className="mr-2" /> Copy Email
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => copy(u.mobile)}>
+                  <Copy size={14} className="mr-2" /> Copy Mobile
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         ))}
       </div>
