@@ -313,14 +313,6 @@ export default function Dashboard() {
 
         {/* STATS */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* USERS */}
-          <StatCard
-            icon={Users}
-            label="Users"
-            value={stats?.totalUsers}
-            caption="Total travellers"
-            onClick={() => navigate("/users")}
-          />
 
           {/* TOTAL BOOKINGS (PRIMARY BG) */}
           <StatCard
@@ -334,6 +326,15 @@ export default function Dashboard() {
             iconBg="bg-white/20"
             iconColor="text-white"
             onClick={() => navigate("/bookings?status=all")}
+          />
+
+          {/* USERS */}
+          <StatCard
+            icon={Users}
+            label="Users"
+            value={stats?.totalUsers}
+            caption="Total travellers"
+            onClick={() => navigate("/users")}
           />
 
           {/* CONFIRMED */}

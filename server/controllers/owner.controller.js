@@ -34,9 +34,16 @@ export const getOwnerDashboard = async (req, res) => {
       .populate("userId", "firstName lastName mobile")
       .populate("propertyId", "propertyName");
 
+    const uniqueUserIds = new Set(
+      bookings
+        .map((b) => b.userId?._id?.toString())
+        .filter(Boolean)
+    );
+
     const stats = {
       totalProperties: properties.length,
       totalBookings: bookings.length,
+      totalUsers: uniqueUserIds.size,
       confirmed: bookings.filter((b) => b.paymentStatus === "paid").length,
       pending: bookings.filter((b) => b.paymentStatus === "pending").length,
       failed: bookings.filter((b) => b.paymentStatus === "failed").length,
