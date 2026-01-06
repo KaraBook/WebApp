@@ -116,7 +116,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       {/* ================= TABLE ================= */}
       <table className="w-full mt-8 text-xs border-t">
         <thead>
-          <tr className="border-b text-left">
+          <tr className="border-b text-left text-[14px]">
             <th className="py-2">S.No</th>
             <th>Description</th>
             <th className="text-right">Qty</th>
@@ -125,13 +125,13 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b">
+          <tr className="border-b text-[14px]">
             <td className="py-3">1</td>
-            <td>
-              <p className="font-medium">
+            <td className="py-3">
+              <p className="font-[600]">
                 Room / Accommodation Charges
               </p>
-              <p className="text-gray-500">
+              <p className="text-gray-500 text-[12px]">
                 {invoice.propertyType} at {invoice.propertyName}
               </p>
             </td>
