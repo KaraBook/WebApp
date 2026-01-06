@@ -107,7 +107,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
             {invoice.guests.adults + invoice.guests.children} Guests
           </p>
           <p className="text-gray-400">
-            {invoice.guests.adults} Adults
+            {invoice.guests.adults} Adults, {invoice.guests.children} Children
           </p>
         </div>
 
