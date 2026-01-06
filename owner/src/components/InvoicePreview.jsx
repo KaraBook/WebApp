@@ -4,6 +4,12 @@ import { format } from "date-fns";
 const InvoicePreview = forwardRef(({ invoice }, ref) => {
   if (!invoice) return null;
 
+  const safeFormat = (date, pattern = "dd MMM yyyy") => {
+    if (!date) return "—";
+    const d = new Date(date);
+    return isNaN(d.getTime()) ? "—" : format(d, pattern);
+  };
+
   const user = invoice.user || {};
   const nights = invoice.nights || 0;
   const rate = nights ? invoice.totalAmount / nights : 0;
@@ -53,11 +59,11 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
           </div>
           <div className="flex gap-3">
             <span className="text-gray-500 w-24">Invoice Date:</span>
-            <span>{format(new Date(invoice.invoiceDate), "dd MMM yyyy")}</span>
+            <span>safeFormat(invoice.invoiceDate)</span>
           </div>
           <div className="flex gap-3">
             <span className="text-gray-500 w-24">Booking Date:</span>
-            <span>{format(new Date(invoice.bookingDate), "dd MMM yyyy")}</span>
+            <span>{safeFormat(invoice.bookingDate)}</span>
           </div>
           <div className="flex gap-3">
             <span className="text-gray-500 w-24">Order ID:</span>
@@ -71,14 +77,14 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
         <div>
           <p className="text-gray-500 mb-1">Check-in</p>
           <p className="font-medium">
-            {format(new Date(invoice.checkIn), "dd MMM yyyy")}
+            {safeFormat(invoice.checkIn)}
           </p>
           <p className="text-gray-400">2:00 PM</p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Check-out</p>
           <p className="font-medium">
-            {format(new Date(invoice.checkOut), "dd MMM yyyy")}
+            {safeFormat(invoice.checkOut)}
           </p>
           <p className="text-gray-400">11:00 AM</p>
         </div>
