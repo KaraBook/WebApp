@@ -6,9 +6,9 @@ import { bookingConfirmationTemplate } from "../utils/emailTemplates.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
-import numberToWords from "number-to-words";
+import pkg from "number-to-words";
 
-const { toWords } = numberToWords;
+const { toWords } = pkg;
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -335,36 +335,17 @@ export const getBookingInvoice = async (req, res) => {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
-    if (req.user.role === "owner") {
-      const property = booking.propertyId;
-
-      const isOwner =
-        property.ownerUserId?.toString() === requesterId ||
-        property.resortOwner?.mobile === req.user.mobile ||
-        property.resortOwner?.email === req.user.email;
-
-      if (!isOwner) {
-        return res.status(403).json({
-          success: false,
-          message: "Access denied — not your booking",
-        });
-      }
-    }
-
-    const weekdayPrice = Number(booking.propertyId.pricingPerNightWeekdays);
-    const weekendPrice = Number(
-      booking.propertyId.pricingPerNightWeekend || weekdayPrice
-    );
-
-    const subtotal = Number(booking.totalAmount);             
+    /* ---------- CALCULATIONS (ORDER IS IMPORTANT) ---------- */
+    const subtotal = Number(booking.totalAmount);
     const taxAmount = Number(booking.taxAmount ?? Math.round(subtotal * 0.10));
     const grandTotal = Number(booking.grandTotal ?? subtotal + taxAmount);
+    const perNight = Math.floor(subtotal / booking.totalNights);
 
     const amountInWords =
       toWords(grandTotal)
         .replace(/\b\w/g, (l) => l.toUpperCase()) + " Only";
-    const perNight = Math.floor(subtotal / booking.totalNights);
 
+    /* ---------- INVOICE DATA ---------- */
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
 
@@ -375,9 +356,7 @@ export const getBookingInvoice = async (req, res) => {
         booking.propertyId.address,
         booking.propertyId.city,
         booking.propertyId.state,
-      ]
-        .filter(Boolean)
-        .join(", "),
+      ].filter(Boolean).join(", "),
 
       checkIn: booking.checkIn,
       checkOut: booking.checkOut,
@@ -387,7 +366,6 @@ export const getBookingInvoice = async (req, res) => {
       totalAmount: subtotal,
       taxAmount,
       grandTotal,
-
       amountInWords,
 
       orderId: booking.orderId,
@@ -418,3 +396,4 @@ export const getBookingInvoice = async (req, res) => {
     });
   }
 };
+
