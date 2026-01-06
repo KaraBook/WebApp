@@ -126,7 +126,7 @@ export default function OwnerUsers() {
                     <DropdownMenuContent
                         align="start"
                         className="
-      w-80
+      w-80 md:w-44
       py-2
       bg-white
       border border-gray-200
