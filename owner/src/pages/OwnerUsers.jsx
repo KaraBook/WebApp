@@ -13,7 +13,7 @@ import {
 export default function OwnerUsers() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const ITEMS_PER_PAGE = 3;
+    const ITEMS_PER_PAGE = 8;
     const [currentPage, setCurrentPage] = useState(1);
 
     const [search, setSearch] = useState("");

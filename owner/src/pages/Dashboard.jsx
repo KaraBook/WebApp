@@ -94,13 +94,23 @@ function StatCard({
   caption,
   iconBg = "bg-gray-100",
   iconColor = "text-gray-700",
+  cardBg = "bg-white",
+  textColor = "text-gray-900",
+  subTextColor = "text-gray-400",
   onClick,
+  fullWidthMobile = false,
 }) {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-2xl border border-gray-100 shadow-sm px-5 sm:px-6 py-5
-             flex flex-col gap-3 cursor-pointer hover:shadow-md transition"
+      className={`
+        ${cardBg}
+        ${fullWidthMobile ? "col-span-2 sm:col-span-1" : ""}
+        rounded-2xl border border-gray-100 shadow-sm
+        px-5 sm:px-6 py-5
+        flex flex-col gap-3 cursor-pointer
+        hover:shadow-md transition
+      `}
     >
       <div
         className={`h-8 w-8 rounded-full ${iconBg} flex items-center justify-center`}
@@ -108,14 +118,21 @@ function StatCard({
         <Icon className={`w-4 h-4 ${iconColor}`} />
       </div>
 
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className="text-2xl sm:text-[28px] font-[700] text-gray-900 leading-tight">
+      <p className={`text-xs ${subTextColor}`}>{label}</p>
+
+      <p className={`text-2xl sm:text-[28px] font-[700] leading-tight ${textColor}`}>
         {value ?? 0}
       </p>
-      {caption && <p className="text-[11px] text-gray-400">{caption}</p>}
+
+      {caption && (
+        <p className={`text-[11px] ${subTextColor}`}>
+          {caption}
+        </p>
+      )}
     </div>
   );
 }
+
 
 /* -------------------- Payment Chip -------------------- */
 function PaymentChip({ status }) {
@@ -295,14 +312,31 @@ export default function Dashboard() {
         </div>
 
         {/* STATS */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* USERS */}
+          <StatCard
+            icon={Users}
+            label="Users"
+            value={stats?.totalUsers}
+            caption="Total travellers"
+            onClick={() => navigate("/users")}
+          />
+
+          {/* TOTAL BOOKINGS (PRIMARY BG) */}
           <StatCard
             icon={CheckCircle2}
             label="Total Bookings"
             value={stats?.totalBookings}
             caption="All bookings so far"
+            cardBg="bg-primary"
+            textColor="text-white"
+            subTextColor="text-white/70"
+            iconBg="bg-white/20"
+            iconColor="text-white"
             onClick={() => navigate("/bookings?status=all")}
           />
+
+          {/* CONFIRMED */}
           <StatCard
             icon={CalendarCheck}
             label="Confirmed"
@@ -312,6 +346,8 @@ export default function Dashboard() {
             iconColor="text-emerald-600"
             onClick={() => navigate("/bookings?status=paid")}
           />
+
+          {/* PENDING */}
           <StatCard
             icon={Clock}
             label="Pending"
@@ -321,13 +357,19 @@ export default function Dashboard() {
             iconColor="text-amber-600"
             onClick={() => navigate("/bookings?status=pending")}
           />
+
+          {/* TOTAL REVENUE (PRIMARY + FULL WIDTH ON MOBILE) */}
           <StatCard
             icon={IndianRupee}
             label="Total Revenue"
             value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
             caption="From all bookings"
-            iconBg="bg-indigo-50"
-            iconColor="text-indigo-600"
+            cardBg="bg-primary"
+            textColor="text-white"
+            subTextColor="text-white/70"
+            iconBg="bg-white/20"
+            iconColor="text-white"
+            fullWidthMobile
           />
         </div>
 
