@@ -284,7 +284,7 @@ export default function OwnerUsers() {
                             </div>
                         </div>
 
-                        <DropdownMenu>
+                        <DropdownMenu className="w-44">
                             <DropdownMenuTrigger asChild>
                                 <button>
                                     <MoreVertical className="text-gray-500" />
@@ -292,7 +292,7 @@ export default function OwnerUsers() {
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => openUser(u)}>
                                     <Eye size={14} className="mr-2" /> View
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => copy(u.email)}>
