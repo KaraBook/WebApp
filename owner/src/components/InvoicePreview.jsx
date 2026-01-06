@@ -47,9 +47,9 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       <div className="flex justify-between">
         <div>
           <p className="text-xs text-gray-500 mb-1">BILL TO</p>
-          <p className="font-medium">{user.name}</p>
-          <p className="text-xs">{user.mobile}</p>
-          <p className="text-xs">{user.email}</p>
+          <p className="font-600 mb-[5px]">{user.name}</p>
+          <p className="text-s mb-[5px]">{user.mobile}</p>
+          <p className="text-s">{user.email}</p>
         </div>
 
         <div className="text-xs space-y-1">
@@ -59,7 +59,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
           </div>
           <div className="flex gap-3">
             <span className="text-gray-500 w-24">Invoice Date:</span>
-            <span>safeFormat(invoice.invoiceDate)</span>
+            <span>{safeFormat(invoice.invoiceDate)}</span>
           </div>
           <div className="flex gap-3">
             <span className="text-gray-500 w-24">Booking Date:</span>
