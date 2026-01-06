@@ -126,7 +126,7 @@ export default function OwnerUsers() {
                     <DropdownMenuContent
                         align="start"
                         className="
-      w-44
+      w-[225px]
       bg-white
       border border-gray-200
       rounded-lg
