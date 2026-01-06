@@ -26,7 +26,10 @@ export default function OwnerUsers() {
 
 
     const [search, setSearch] = useState("");
-    const [roleFilter, setRoleFilter] = useState("all"); // all | traveller | owner
+    const [roleFilter, setRoleFilter] = useState("all"); 
+
+    const getFullName = (u) =>
+  `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Guest";
 
     const fetchUsers = async () => {
         try {
@@ -51,7 +54,7 @@ export default function OwnerUsers() {
 
             const matchesSearch =
                 !q ||
-                u.name?.toLowerCase().includes(q) ||
+                `${u.firstName || ""} ${u.lastName || ""}`.toLowerCase().includes(q)||
                 u.email?.toLowerCase().includes(q) ||
                 u.mobile?.includes(q) ||
                 u.city?.toLowerCase().includes(q) ||
@@ -205,10 +208,10 @@ export default function OwnerUsers() {
                                 <td className="px-4 py-4">
                                     <div className="flex items-center gap-3">
                                         <div className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center font-semibold">
-                                            {u.name?.charAt(0)}
+                                            {getFullName(u).charAt(0)}
                                         </div>
                                         <div>
-                                            <p className="font-medium">{u.name}</p>
+                                            <p className="font-medium">{getFullName(u)}</p>
                                             <p className="text-xs text-gray-500">
                                                 {u.role || "Traveller"}
                                             </p>
@@ -262,11 +265,11 @@ export default function OwnerUsers() {
                     >
                         <div className="flex gap-3">
                             <div className="h-11 w-11 rounded-full bg-black text-white flex items-center justify-center font-semibold">
-                                {u.name?.charAt(0)}
+                                {getFullName(u).charAt(0)}
                             </div>
 
                             <div>
-                                <p className="font-semibold">{u.name}</p>
+                                <p className="font-semibold">{getFullName(u)}</p>
 
                                 <div className="text-sm text-gray-600 flex items-center gap-2 mt-1">
                                     <Mail size={14} /> {u.email || "—"}
