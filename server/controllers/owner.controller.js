@@ -847,11 +847,15 @@ export const getOwnerBookedUsers = async (req, res) => {
           createdAt: b.userId.createdAt,
           totalBookings: 0,
           lastBookingDate: b.createdAt,
+          properties: new Set(),
         };
       }
 
       usersMap[uid].totalBookings += 1;
-      usersMap[uid].properties.add(b.propertyId?.propertyName);
+
+      if (b.propertyId?.propertyName) {
+        usersMap[uid].properties.add(b.propertyId.propertyName);
+      }
 
       if (new Date(b.createdAt) > new Date(usersMap[uid].lastBookingDate)) {
         usersMap[uid].lastBookingDate = b.createdAt;
