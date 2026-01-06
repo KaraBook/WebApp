@@ -43,7 +43,7 @@ export default function ViewInvoice() {
     try {
       toast.info("Generating invoice…");
 
-      await new Promise((r) => setTimeout(r, 300)); 
+      await new Promise((r) => setTimeout(r, 300));
 
       const element = invoiceRef.current;
       const canvas = await html2canvas(element, { scale: 2 });
@@ -120,8 +120,14 @@ export default function ViewInvoice() {
         </div>
 
         {/* INVOICE CARD */}
-        <div className="bg-white shadow-lg rounded-xl max-w-3xl p-2 border border-gray-100">
-          <div ref={invoiceRef}>
+        <div className="bg-white shadow-lg rounded-xl border border-gray-100 overflow-x-auto">
+          <div
+            ref={invoiceRef}
+            className="
+      min-w-[900px] 
+      mx-auto
+    "
+          >
             <InvoicePreview invoice={invoice} />
           </div>
         </div>
