@@ -293,7 +293,7 @@ export default function OwnerUsers() {
 
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => openUser(u)} className="mb-2 mt-1">
-                                    <Eye size={14} className="mr-2" /> View
+                                    <Eye size={14} className="mr-2" /> View Details
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => copy(u.email)} className="mb-2">
                                     <Copy size={14} className="mr-2" /> Copy Email
