@@ -795,3 +795,71 @@ export const getBookedDates = async (req, res) => {
     });
   }
 };
+
+
+export const getOwnerBookedUsers = async (req, res) => {
+  try {
+    const ownerId = await getEffectiveOwnerId(req);
+    const owner = await User.findById(ownerId).select("mobile email");
+
+    const properties = await Property.find({
+      $or: [
+        { ownerUserId: ownerId },
+        { "resortOwner.mobile": owner?.mobile },
+        { "resortOwner.email": owner?.email },
+      ],
+    }).select("_id propertyName");
+
+    const propertyIds = properties.map((p) => p._id);
+
+    const bookings = await Booking.find({
+      propertyId: { $in: propertyIds },
+      paymentStatus: { $in: ["paid", "initiated"] },
+    })
+      .populate("userId", "firstName lastName email mobile")
+      .populate("propertyId", "propertyName")
+      .lean();
+
+    const usersMap = {};
+
+    bookings.forEach((b) => {
+      if (!b.userId) return;
+
+      const uid = b.userId._id.toString();
+
+      if (!usersMap[uid]) {
+        usersMap[uid] = {
+          userId: b.userId._id,
+          name: `${b.userId.firstName || ""} ${b.userId.lastName || ""}`.trim(),
+          email: b.userId.email,
+          mobile: b.userId.mobile,
+          totalBookings: 0,
+          lastBookingDate: b.createdAt,
+          properties: new Set(),
+        };
+      }
+
+      usersMap[uid].totalBookings += 1;
+      usersMap[uid].properties.add(b.propertyId?.propertyName);
+
+      if (new Date(b.createdAt) > new Date(usersMap[uid].lastBookingDate)) {
+        usersMap[uid].lastBookingDate = b.createdAt;
+      }
+    });
+    const users = Object.values(usersMap).map((u) => ({
+      ...u,
+      properties: Array.from(u.properties),
+    }));
+
+    res.json({
+      success: true,
+      data: users,
+    });
+  } catch (err) {
+    console.error("getOwnerBookedUsers error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to load booked users",
+    });
+  }
+};

@@ -17,6 +17,7 @@ import Header from "./components/Header";
 import MyProfile from "./pages/MyProfile";
 import CreateManager from "./pages/CreateManager";
 import MobileBottomNav from "./components/MobileBottomNav";
+import OwnerUsers from "./pages/OwnerUsers";
 
 
 function AutoPropertyRedirect() {
@@ -91,6 +92,7 @@ export default function App() {
         <Route path="my-profile" element={<MyProfile />} />
         <Route path="invoice/:id" element={<ViewInvoice />} />
         <Route path="/manager/create" element={<CreateManager />} />
+        <Route path="users" element={<OwnerUsers />} />
       </Route>
 
       {/* CATCH-ALL */}

@@ -64,6 +64,7 @@ export default function Header() {
       { label: "Dashboard", path: "/manager/dashboard" },
       { label: "Bookings", path: "/bookings" },
       { label: "Calendar", path: "/calendar" },
+      { label: "Users", path: "/users" },
     ]
     : [
       { label: "Dashboard", path: "/dashboard" },
@@ -74,6 +75,7 @@ export default function Header() {
         label: "Customize",
         path: propertyId ? `/offline-booking/${propertyId}` : null,
       },
+      { label: "Users", path: "/users" },
     ];
 
   const handlePropertyClick = (e) => {

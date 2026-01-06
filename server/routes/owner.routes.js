@@ -15,6 +15,7 @@ import {
   getBookedDates,
   createRazorpayOrder,
   verifyRazorpayPayment,
+  getOwnerBookedUsers
 } from "../controllers/owner.controller.js";
 import { getBookingInvoice } from "../controllers/bookingController.js";
 import { createManager } from "../controllers/managerController.js";
@@ -45,6 +46,7 @@ router.get("/invoice/:bookingId", requireAuth, getBookingInvoice);
 router.post("/check-owner-mobile", requireAuth, checkOwnerByMobile);
 router.get("/property/:id/booked-dates", requireAuth, getBookedDates);
 router.post("/offline-booking/create-order", requireAuth, createRazorpayOrder);
+router.get("/owner/booked-users", requireAuth, getOwnerBookedUsers);
 router.post("/offline-booking/verify", requireAuth, verifyRazorpayPayment);
 router.post("/manager/create", requireAuth, createManager);
 

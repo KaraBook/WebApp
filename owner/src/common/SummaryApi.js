@@ -98,6 +98,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/auth/manager/login`,
         method: "POST",
     },
+    getOwnerBookedUsers: {
+        url: `${BASE_URL}/api/owner/booked-users`,
+        method: "GET",
+    },
 
 
 };
