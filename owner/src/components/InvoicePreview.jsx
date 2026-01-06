@@ -23,7 +23,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       {/* ================= HEADER ================= */}
       <div className="flex justify-between items-start">
         <div className="flex gap-3">
-          <div className=" h-10 w-10 rounded-md bg-primary flex items-center justify-center text-white font-semibold uppercase">
+          <div className=" h-10 w-10 text-[20px] rounded-md bg-primary flex items-center justify-center text-white font-semibold uppercase">
             {invoice.propertyName?.charAt(0) || "P"}
           </div>
           <div>
@@ -73,28 +73,29 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       </div>
 
       {/* ================= BOOKING DETAILS BOX ================= */}
-      <div className="mt-6 border rounded-lg p-4 grid grid-cols-4 gap-4 text-xs">
+      <div className="mt-6 bg-[#e0e5eb] border rounded-lg p-4 grid grid-cols-4 gap-4 text-xs">
+       <p className="text-xs text-gray-500 mb-1">BOOKING DETAILS</p>
         <div>
           <p className="text-gray-500 mb-1">Check-in</p>
-          <p className="font-medium">
+          <p className="font-[600] text-[13px]">
             {safeFormat(invoice.checkIn)}
           </p>
           <p className="text-gray-400">2:00 PM</p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Check-out</p>
-          <p className="font-medium">
+          <p className="font-[600] text-[13px]">
             {safeFormat(invoice.checkOut)}
           </p>
           <p className="text-gray-400">11:00 AM</p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Duration</p>
-          <p className="font-medium">{nights} Nights</p>
+          <p className="font-[600] text-[13px]">{nights} Nights</p>
         </div>
         <div>
           <p className="text-gray-500 mb-1">Guests</p>
-          <p className="font-medium">
+          <p className="font-[600] text-[13px]">
             {invoice.guests.adults + invoice.guests.children} Guests
           </p>
           <p className="text-gray-400">
