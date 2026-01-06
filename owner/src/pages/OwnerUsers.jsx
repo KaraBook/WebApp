@@ -97,7 +97,7 @@ export default function OwnerUsers() {
                     <DropdownMenuTrigger asChild>
                         <button
                             className="
-        w-full sm:w-44
+        w-full sm:w-[225px]
         bg-white
         border border-gray-300
         rounded-lg
@@ -126,7 +126,7 @@ export default function OwnerUsers() {
                     <DropdownMenuContent
                         align="start"
                         className="
-      w-[225px]
+      w-44
       bg-white
       border border-gray-200
       rounded-lg
