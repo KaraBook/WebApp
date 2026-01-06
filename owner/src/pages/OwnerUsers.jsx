@@ -13,6 +13,8 @@ import {
 export default function OwnerUsers() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const ITEMS_PER_PAGE = 8;
+    const [currentPage, setCurrentPage] = useState(1);
 
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("all"); // all | traveller | owner
@@ -56,6 +58,18 @@ export default function OwnerUsers() {
             return matchesSearch && matchesRole;
         });
     }, [users, search, roleFilter]);
+
+
+    const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+
+    const paginatedUsers = useMemo(() => {
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        return filteredUsers.slice(start, start + ITEMS_PER_PAGE);
+    }, [filteredUsers, currentPage]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, roleFilter]);
 
     const copy = async (text) => {
         await navigator.clipboard.writeText(text);
@@ -175,7 +189,7 @@ export default function OwnerUsers() {
                     </thead>
 
                     <tbody>
-                        {filteredUsers.map((u, i) => (
+                        {paginatedUsers.map((u, i) => (
                             <tr key={u.userId} className="border-t">
                                 <td className="px-4 py-4">{i + 1}</td>
 
@@ -228,11 +242,78 @@ export default function OwnerUsers() {
                         ))}
                     </tbody>
                 </table>
+
+                {/* ================= PAGINATION ================= */}
+                {totalPages > 1 && (
+                    <div className="flex justify-center mt-6">
+                        <div className="flex items-center gap-2 text-sm">
+
+                            {/* Previous */}
+                            <button
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                className={`
+          px-3 py-2 rounded-lg border
+          ${currentPage === 1
+                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                        : "bg-white hover:bg-gray-50"}
+        `}
+                            >
+                                Previous
+                            </button>
+
+                            {/* Page Numbers */}
+                            {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                .filter(p =>
+                                    p === 1 ||
+                                    p === totalPages ||
+                                    Math.abs(p - currentPage) <= 1
+                                )
+                                .map((page, idx, arr) => (
+                                    <span key={page} className="flex items-center gap-2">
+                                        {idx > 0 && page - arr[idx - 1] > 1 && (
+                                            <span className="px-1 text-gray-400">…</span>
+                                        )}
+
+                                        <button
+                                            onClick={() => setCurrentPage(page)}
+                                            className={`
+                w-9 h-9 rounded-lg border
+                ${page === currentPage
+                                                    ? "bg-black text-white border-black"
+                                                    : "bg-white hover:bg-gray-50"}
+              `}
+                                        >
+                                            {page}
+                                        </button>
+                                    </span>
+                                ))}
+
+                            {/* Next */}
+                            <button
+                                disabled={currentPage === totalPages}
+                                onClick={() =>
+                                    setCurrentPage(p => Math.min(totalPages, p + 1))
+                                }
+                                className={`
+          px-3 py-2 rounded-lg border
+          ${currentPage === totalPages
+                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                        : "bg-white hover:bg-gray-50"}
+        `}
+                            >
+                                Next
+                            </button>
+
+                        </div>
+                    </div>
+                )}
+
             </div>
 
             {/* ================= MOBILE CARDS ================= */}
             <div className="md:hidden space-y-3">
-                {filteredUsers.map((u) => (
+                {paginatedUsers.map((u) => (
                     <div
                         key={u.userId}
                         className="bg-white border rounded-xl p-4 flex justify-between items-start"
@@ -249,15 +330,15 @@ export default function OwnerUsers() {
                                     <Mail size={14} /> {u.email || "—"}
                                 </div>
 
-                             <div className="flex items-center justify-start gap-3">
-                                <div className="text-sm text-gray-600 flex items-center gap-2">
-                                    <Phone size={14} /> {u.mobile}
+                                <div className="flex items-center justify-start gap-3">
+                                    <div className="text-sm text-gray-600 flex items-center gap-2">
+                                        <Phone size={14} /> {u.mobile}
+                                    </div>
+                                    <p className="text-center text-[12px]">.</p>
+                                    <p className="text-xs text-gray-500 text-600 mt-1">
+                                        {u.totalBookings} bookings
+                                    </p>
                                 </div>
-                                .
-                                <p className="text-xs text-gray-500 text-600 mt-1">
-                                    {u.totalBookings} bookings
-                                </p>
-                              </div>
                             </div>
                         </div>
 
