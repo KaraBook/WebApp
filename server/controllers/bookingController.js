@@ -6,9 +6,7 @@ import { bookingConfirmationTemplate } from "../utils/emailTemplates.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
-import pkg from "number-to-words";
 
-const { toWords } = pkg;
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -341,10 +339,6 @@ export const getBookingInvoice = async (req, res) => {
     const grandTotal = Number(booking.grandTotal ?? subtotal + taxAmount);
     const perNight = Math.floor(subtotal / booking.totalNights);
 
-    const amountInWords =
-      toWords(grandTotal)
-        .replace(/\b\w/g, (l) => l.toUpperCase()) + " Only";
-
     /* ---------- INVOICE DATA ---------- */
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
@@ -366,7 +360,6 @@ export const getBookingInvoice = async (req, res) => {
       totalAmount: subtotal,
       taxAmount,
       grandTotal,
-      amountInWords,
 
       orderId: booking.orderId,
       bookingDate: booking.createdAt,
