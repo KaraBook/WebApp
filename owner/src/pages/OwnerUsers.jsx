@@ -292,13 +292,13 @@ export default function OwnerUsers() {
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => openUser(u)}>
+                                <DropdownMenuItem onClick={() => openUser(u)} className="mb-2 mt-1">
                                     <Eye size={14} className="mr-2" /> View
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => copy(u.email)}>
+                                <DropdownMenuItem onClick={() => copy(u.email)} className="mb-2">
                                     <Copy size={14} className="mr-2" /> Copy Email
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => copy(u.mobile)}>
+                                <DropdownMenuItem onClick={() => copy(u.mobile)} className="mb-2">
                                     <Copy size={14} className="mr-2" /> Copy Mobile
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
