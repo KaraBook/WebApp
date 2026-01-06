@@ -104,14 +104,14 @@ export default function OwnerUsers() {
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="w-44">
-            <DropdownMenuItem onClick={() => setRoleFilter("all")}>
+          <DropdownMenuContent className="w-80 py-2 md:w-44">
+            <DropdownMenuItem onClick={() => setRoleFilter("all")} className="mb-1">
               All Users
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setRoleFilter("traveller")}>
+            <DropdownMenuItem onClick={() => setRoleFilter("traveller")} className="mb-1">
               Traveller
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setRoleFilter("owner")}>
+            <DropdownMenuItem onClick={() => setRoleFilter("owner")} className="mb-1">
               Resort Owner
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -136,7 +136,7 @@ export default function OwnerUsers() {
           <tbody>
             {filteredUsers.map((u, i) => (
               <tr key={u.userId} className="border-t">
-                <td className="px-4 py-4">{i + 1}</td>
+                <td className="px-4 py-4 text-center">{i + 1}</td>
 
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-3">
