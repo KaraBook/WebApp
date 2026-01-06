@@ -5,145 +5,188 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
   if (!invoice) return null;
 
   const user = invoice.user || {};
-  const breakdown = Array.isArray(invoice.priceBreakdown)
-    ? invoice.priceBreakdown
-    : [];
-
-  const rawSubtotal = Number(invoice.totalAmount || 0);
-  const tax = Math.round(rawSubtotal * 0.1);
-  const grandTotal = rawSubtotal + tax;
+  const nights = invoice.nights || 0;
+  const rate = nights ? invoice.totalAmount / nights : 0;
 
   return (
     <div
       ref={ref}
-      className="
-        bg-white border rounded-xl
-        p-4 sm:p-6 md:p-8
-        w-full max-w-3xl mx-auto
-        text-[13px] sm:text-sm
-        text-gray-800
-      "
-      style={{ fontFamily: "sans-serif" }}
+      className="bg-white max-w-4xl mx-auto border rounded-lg px-8 py-10 text-sm text-gray-800"
+      style={{ fontFamily: "Inter, sans-serif" }}
     >
       {/* ================= HEADER ================= */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+      <div className="flex justify-between items-start">
+        <div className="flex gap-3">
+          <div className="h-10 w-10 bg-emerald-600 rounded-md flex items-center justify-center text-white font-bold">
+            🧾
+          </div>
+          <div>
+            <h1 className="font-semibold text-base">
+              {invoice.propertyName}
+            </h1>
+            <p className="text-xs text-gray-500 leading-relaxed max-w-xs">
+              {invoice.propertyAddress || "—"}
+            </p>
+          </div>
+        </div>
+
+        <h2 className="text-lg font-bold tracking-wide">
+          TAX INVOICE
+        </h2>
+      </div>
+
+      <hr className="my-6" />
+
+      {/* ================= BILL TO + META ================= */}
+      <div className="flex justify-between">
         <div>
-          <h1 className="text-lg sm:text-xl font-semibold">
-            {invoice.propertyName || "Villa Gulposh"}
-          </h1>
-          <p className="text-gray-500 text-xs sm:text-sm">
-            {invoice.propertyCity || ""} {invoice.propertyState || ""}
-          </p>
+          <p className="text-xs text-gray-500 mb-1">BILL TO</p>
+          <p className="font-medium">{user.name}</p>
+          <p className="text-xs">{user.mobile}</p>
+          <p className="text-xs">{user.email}</p>
         </div>
 
-        <div className="sm:text-right">
-          <h2 className="text-xl sm:text-2xl font-bold">Invoice</h2>
-          <p className="text-xs sm:text-sm text-gray-500">
-            Invoice No: {invoice.invoiceNumber || "-"}
-          </p>
-        </div>
-      </div>
-
-      {/* ================= BOOKING INFO ================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border rounded-lg p-4 mb-5">
-        <div className="space-y-1">
-          <p>
-            <strong>Check-in:</strong>{" "}
-            {invoice.checkIn
-              ? format(new Date(invoice.checkIn), "dd MMM yyyy")
-              : "-"}
-          </p>
-          <p>
-            <strong>Check-out:</strong>{" "}
-            {invoice.checkOut
-              ? format(new Date(invoice.checkOut), "dd MMM yyyy")
-              : "-"}
-          </p>
-          <p><strong>Nights:</strong> {invoice.nights ?? "-"}</p>
-          <p>
-            <strong>Guests:</strong>{" "}
-            {typeof invoice.guests === "number"
-              ? invoice.guests
-              : (invoice.guests?.adults || 0) +
-                (invoice.guests?.children || 0)}
-          </p>
-
-          {typeof invoice.guests === "object" && (
-            <div className="mt-2 text-xs text-gray-600 space-y-0.5">
-              <p>• Adults: <strong>{invoice.guests.adults}</strong></p>
-              <p>• Children: <strong>{invoice.guests.children}</strong></p>
-              <p>• Infants: <strong>{invoice.guests.infants}</strong></p>
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-1">
-          <p>
-            <strong>Booking Date:</strong>{" "}
-            {invoice.bookingDate
-              ? format(new Date(invoice.bookingDate), "dd MMM yyyy")
-              : "-"}
-          </p>
-          <p><strong>Payment Status:</strong> {invoice.paymentStatus || "-"}</p>
-          <p>
-            <strong>Total:</strong>{" "}
-            ₹{rawSubtotal.toLocaleString("en-IN")}
-          </p>
+        <div className="text-xs space-y-1">
+          <div className="flex gap-3">
+            <span className="text-gray-500 w-24">Invoice No:</span>
+            <span className="font-medium">{invoice.invoiceNumber}</span>
+          </div>
+          <div className="flex gap-3">
+            <span className="text-gray-500 w-24">Invoice Date:</span>
+            <span>{format(new Date(invoice.invoiceDate), "dd MMM yyyy")}</span>
+          </div>
+          <div className="flex gap-3">
+            <span className="text-gray-500 w-24">Booking Date:</span>
+            <span>{format(new Date(invoice.bookingDate), "dd MMM yyyy")}</span>
+          </div>
+          <div className="flex gap-3">
+            <span className="text-gray-500 w-24">Order ID:</span>
+            <span className="break-all">{invoice.orderId}</span>
+          </div>
         </div>
       </div>
 
-      {/* ================= GUEST INFO ================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border rounded-lg p-4 mb-5">
+      {/* ================= BOOKING DETAILS BOX ================= */}
+      <div className="mt-6 border rounded-lg p-4 grid grid-cols-4 gap-4 text-xs">
         <div>
-          <h3 className="font-semibold mb-1">Guest Info</h3>
-          <p>{user.name || "-"}</p>
-          <p>{user.mobile || "-"}</p>
-          <p className="break-all">{user.email || "-"}</p>
+          <p className="text-gray-500 mb-1">Check-in</p>
+          <p className="font-medium">
+            {format(new Date(invoice.checkIn), "dd MMM yyyy")}
+          </p>
+          <p className="text-gray-400">2:00 PM</p>
         </div>
-
         <div>
-          <h3 className="font-semibold mb-1">Room & Service</h3>
-          <p className="text-gray-600">
-            Accommodation and service charges as applicable.
+          <p className="text-gray-500 mb-1">Check-out</p>
+          <p className="font-medium">
+            {format(new Date(invoice.checkOut), "dd MMM yyyy")}
+          </p>
+          <p className="text-gray-400">11:00 AM</p>
+        </div>
+        <div>
+          <p className="text-gray-500 mb-1">Duration</p>
+          <p className="font-medium">{nights} Nights</p>
+        </div>
+        <div>
+          <p className="text-gray-500 mb-1">Guests</p>
+          <p className="font-medium">
+            {invoice.guests.adults + invoice.guests.children} Guests
+          </p>
+          <p className="text-gray-400">
+            {invoice.guests.adults} Adults
           </p>
         </div>
       </div>
 
-      {/* ================= PRICE TABLE ================= */}
-      <div className="overflow-x-auto mb-5">
-        <table className="min-w-[480px] w-full border-t text-sm">
-          <thead>
-            <tr className="border-b font-semibold text-gray-700">
-              <th className="text-left py-2">Description</th>
-              <th className="text-right py-2">Rate</th>
-              <th className="text-right py-2">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {breakdown.map((item, i) => (
-              <tr key={i} className="border-b last:border-0">
-                <td className="py-2">{item.description || "-"}</td>
-                <td className="py-2 text-right">{item.rate || "-"}</td>
-                <td className="py-2 text-right">{item.total || "-"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* ================= TABLE ================= */}
+      <table className="w-full mt-8 text-xs border-t">
+        <thead>
+          <tr className="border-b text-left">
+            <th className="py-2">S.No</th>
+            <th>Description</th>
+            <th className="text-right">Qty</th>
+            <th className="text-right">Rate</th>
+            <th className="text-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="border-b">
+            <td className="py-3">1</td>
+            <td>
+              <p className="font-medium">
+                Room / Accommodation Charges
+              </p>
+              <p className="text-gray-500">
+                Tent at {invoice.propertyName}
+              </p>
+            </td>
+            <td className="text-right">{nights} Nights</td>
+            <td className="text-right">
+              ₹{rate.toFixed(2)}
+            </td>
+            <td className="text-right">
+              ₹{invoice.totalAmount.toLocaleString("en-IN")}
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       {/* ================= TOTALS ================= */}
-      <div className="text-right space-y-1">
-        <p><strong>Sub Total:</strong> ₹{rawSubtotal.toLocaleString("en-IN")}</p>
-        <p><strong>Tax (10%):</strong> ₹{tax.toLocaleString("en-IN")}</p>
-        <p className="text-base sm:text-lg font-semibold mt-1">
-          Grand Total: ₹{grandTotal.toLocaleString("en-IN")}
-        </p>
+      <div className="flex justify-end mt-6">
+        <div className="w-72 text-xs space-y-2">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Sub Total</span>
+            <span>₹{invoice.totalAmount.toLocaleString("en-IN")}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Tax (0%)</span>
+            <span>₹0.00</span>
+          </div>
+          <div className="flex justify-between font-semibold text-sm border-t pt-2">
+            <span>Grand Total</span>
+            <span>₹{invoice.totalAmount.toLocaleString("en-IN")}</span>
+          </div>
+        </div>
       </div>
 
-      {/* ================= FOOTER ================= */}
-      <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
-        Thank you for choosing {invoice.propertyName || "our property"}!
+      {/* ================= AMOUNT IN WORDS ================= */}
+      <p className="mt-6 text-xs">
+        <span className="text-gray-500">Amount in Words:</span>{" "}
+        <strong>{invoice.amountInWords}</strong>
+      </p>
+
+      <hr className="my-6" />
+
+      {/* ================= PAYMENT + SIGN ================= */}
+      <div className="flex justify-between text-xs">
+        <div className="space-y-1">
+          <p className="text-gray-500">PAYMENT INFORMATION</p>
+          <p>Status: <strong>{invoice.paymentStatus}</strong></p>
+          <p>Method: {invoice.paymentMethod}</p>
+          <p>Transaction ID: {invoice.transactionId}</p>
+        </div>
+
+        <div className="text-right">
+          <div className="border-t w-40 ml-auto mt-8 pt-1">
+            Authorized Signatory
+          </div>
+          <p className="text-gray-500 mt-1">
+            {invoice.propertyName}
+          </p>
+        </div>
       </div>
+
+      <hr className="my-6" />
+
+      {/* ================= TERMS ================= */}
+      <div className="text-xs text-gray-500 space-y-1">
+        <p>• This is a computer-generated invoice and does not require a physical signature.</p>
+        <p>• Check-in and check-out times are subject to property policies.</p>
+        <p>• Please retain this invoice for your records.</p>
+      </div>
+
+      <p className="text-center text-xs text-gray-500 mt-6">
+        Thank you for your stay at {invoice.propertyName}!
+      </p>
     </div>
   );
 });
