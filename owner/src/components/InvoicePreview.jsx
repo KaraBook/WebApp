@@ -132,7 +132,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
                 Room / Accommodation Charges
               </p>
               <p className="text-gray-500">
-                Tent at {invoice.propertyName}
+                {invoice.propertyType} at {invoice.propertyName}
               </p>
             </td>
             <td className="text-right">{nights} Nights</td>

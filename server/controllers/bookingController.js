@@ -142,13 +142,13 @@ export const createOrder = async (req, res) => {
       checkOut,
       guests: { adults, children, infants },
       meals: meals
-    ? {
-        includeMeals: true,
-        veg: meals.veg,
-        nonVeg: meals.nonVeg,
-        combo: meals.combo,
-      }
-    : { includeMeals: false },
+        ? {
+          includeMeals: true,
+          veg: meals.veg,
+          nonVeg: meals.nonVeg,
+          combo: meals.combo,
+        }
+        : { includeMeals: false },
       totalNights,
       totalAmount: baseTotal,
       taxAmount,
@@ -360,28 +360,40 @@ export const getBookingInvoice = async (req, res) => {
 
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
+
       propertyName: booking.propertyId.propertyName,
-      propertyAddress: booking.propertyId.address,
-      propertyCity: booking.propertyId.city,
-      propertyState: booking.propertyId.state,
+      propertyType: booking.propertyId.propertyType || "Accommodation",
+
+      propertyAddress: [
+        booking.propertyId.address,
+        booking.propertyId.city,
+        booking.propertyId.state,
+      ]
+        .filter(Boolean)
+        .join(", "),
+
       checkIn: booking.checkIn,
       checkOut: booking.checkOut,
       nights: booking.totalNights,
       guests: booking.guests,
+
       totalAmount: subtotal,
-      meals: booking.meals || { includeMeals: false },
       taxAmount,
       grandTotal,
-      paymentStatus: booking.paymentStatus,
+
+      orderId: booking.orderId,
       bookingDate: booking.createdAt,
+      paymentStatus: booking.paymentStatus,
+
       user: {
         name: `${booking.userId.firstName} ${booking.userId.lastName}`,
         mobile: booking.userId.mobile,
         email: booking.userId.email,
       },
+
       priceBreakdown: [
         {
-          description: "Room Charges",
+          description: `${booking.propertyId.propertyType || "Accommodation"} Charges`,
           rate: `₹${perNight.toLocaleString()} × ${booking.totalNights} Nights`,
           total: `₹${subtotal.toLocaleString()}`,
         },
