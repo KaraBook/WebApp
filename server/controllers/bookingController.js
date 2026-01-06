@@ -6,7 +6,9 @@ import { bookingConfirmationTemplate } from "../utils/emailTemplates.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
-import { toWords } from "number-to-words";
+import numberToWords from "number-to-words";
+
+const { toWords } = numberToWords;
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -329,10 +331,6 @@ export const getBookingInvoice = async (req, res) => {
         "propertyName propertyType address city state ownerUserId resortOwner pricingPerNightWeekdays pricingPerNightWeekend"
       );
 
-    const amountInWords =
-      toWords(grandTotal)
-        .replace(/\b\w/g, (l) => l.toUpperCase()) + " Only";
-
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
@@ -358,9 +356,13 @@ export const getBookingInvoice = async (req, res) => {
       booking.propertyId.pricingPerNightWeekend || weekdayPrice
     );
 
-    const subtotal = Number(booking.totalAmount);              // room-only
+    const subtotal = Number(booking.totalAmount);             
     const taxAmount = Number(booking.taxAmount ?? Math.round(subtotal * 0.10));
     const grandTotal = Number(booking.grandTotal ?? subtotal + taxAmount);
+
+    const amountInWords =
+      toWords(grandTotal)
+        .replace(/\b\w/g, (l) => l.toUpperCase()) + " Only";
     const perNight = Math.floor(subtotal / booking.totalNights);
 
     const invoiceData = {
