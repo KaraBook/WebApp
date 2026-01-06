@@ -247,21 +247,27 @@ export default function PropertyDetails() {
   };
 
   const images = [
-    property?.coverImage,
-    ...(property?.galleryPhotos || []),
-  ]
-    .filter(Boolean)
-    .filter((img) => {
-      const src =
-        typeof img === "string"
-          ? img
-          : img?.url || img?.path || "";
+  property?.coverImage,
+  ...(property?.galleryPhotos || []),
+]
+  .filter(Boolean)
+  .filter((img) => {
+    // normalize
+    if (typeof img === "string") {
+      // HARD BLOCK Aadhaar / Shop Act by content
+      return !img.toLowerCase().includes("aadhaar");
+    }
 
-      return !src.includes("/shopAct/");
-    })
-    .map((img) =>
-      typeof img === "string" ? img : img.url || img.path
-    );
+    // object-based images
+    if (img?.fieldname === "shopAct") return false;
+    if (img?.type === "shopAct") return false;
+
+    const src = img?.url || img?.path || "";
+    return !src.toLowerCase().includes("aadhaar");
+  })
+  .map((img) =>
+    typeof img === "string" ? img : img.url || img.path
+  );
 
   const renderGallery = () => {
     if (images.length === 1) {
