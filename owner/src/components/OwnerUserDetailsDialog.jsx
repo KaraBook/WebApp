@@ -52,8 +52,6 @@ export default function OwnerUserDetailsDialog({ open, user, onClose }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <RolePill role={user.role} />
-
             <button
               onClick={onClose}
               className="p-1 rounded-md text-red-500 hover:bg-red-50"
@@ -157,25 +155,4 @@ function InfoRow({ icon: Icon, value }) {
   );
 }
 
-function RolePill({ role }) {
-  const map = {
-    admin: "border-purple-400 text-purple-600 bg-purple-50",
-    traveller: "border-neutral-400 text-neutral-600 bg-neutral-100",
-    resortOwner: "border-blue-400 text-blue-600 bg-blue-50",
-    manager: "border-amber-400 text-amber-600 bg-amber-50",
-  };
 
-  return (
-    <span
-      className={`
-        inline-flex items-center
-        px-3 py-[2px]
-        text-xs font-medium
-        rounded-full border capitalize
-        ${map[role] || "border-neutral-300 text-neutral-600"}
-      `}
-    >
-      {role === "traveller" ? "Guest" : role}
-    </span>
-  );
-}

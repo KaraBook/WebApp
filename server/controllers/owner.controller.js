@@ -823,7 +823,7 @@ export const getOwnerBookedUsers = async (req, res) => {
       propertyId: { $in: propertyIds },
       paymentStatus: { $in: ["paid", "initiated"] },
     })
-      .populate("userId", "firstName lastName email mobile")
+      .populate("userId", "firstName lastName email mobile city state role createdAt")
       .populate("propertyId", "propertyName")
       .lean();
 
@@ -837,12 +837,16 @@ export const getOwnerBookedUsers = async (req, res) => {
       if (!usersMap[uid]) {
         usersMap[uid] = {
           userId: b.userId._id,
-          name: `${b.userId.firstName || ""} ${b.userId.lastName || ""}`.trim(),
+          firstName: b.userId.firstName,
+          lastName: b.userId.lastName,
           email: b.userId.email,
           mobile: b.userId.mobile,
+          city: b.userId.city,
+          state: b.userId.state,
+          role: b.userId.role,
+          createdAt: b.userId.createdAt,
           totalBookings: 0,
           lastBookingDate: b.createdAt,
-          properties: new Set(),
         };
       }
 
