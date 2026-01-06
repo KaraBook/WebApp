@@ -246,7 +246,16 @@ export default function PropertyDetails() {
     });
   };
 
-  const images = [property?.coverImage, ...(property?.galleryPhotos || [])].filter(Boolean);
+  const images = [
+  property?.coverImage,
+  ...(property?.galleryPhotos || []),
+]
+  .filter(Boolean)
+  .filter(img =>
+    !img.toLowerCase().includes("shop") &&
+    !img.toLowerCase().includes("act") &&
+    !img.toLowerCase().includes("document")
+  );
 
   const renderGallery = () => {
     if (images.length === 1) {
