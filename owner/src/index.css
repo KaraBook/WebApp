@@ -129,17 +129,19 @@ color: #000!important;
   color: #9aa0a6 !important;
 }
 
-/* subtle visual separation without breaking grid */
 .rdrDayDisabled::after {
   content: "";
   position: absolute;
-  inset: 6px;
+  inset: 3px;
   border-radius: 8px;
   background: #e5e5e5;
   z-index: -1;
 }
 
-/* Optional: soften disabled text */
+.rdrDayDisabled{
+  background: #fff !important;
+}
+
 .rdrDayDisabled .rdrDayNumber span {
   color: #202020 !important;
 }
