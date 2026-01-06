@@ -148,7 +148,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
 
       {/* ================= TOTALS ================= */}
       <div className="flex justify-end mt-6">
-        <div className="w-72 text-xs space-y-2">
+        <div className="w-72 text-s space-y-2">
           <div className="flex justify-between">
             <span className="text-gray-500">Sub Total</span>
             <span>₹{invoice.totalAmount.toLocaleString("en-IN")}</span>

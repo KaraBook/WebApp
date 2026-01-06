@@ -6,6 +6,7 @@ import { bookingConfirmationTemplate } from "../utils/emailTemplates.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
+import { toWords } from "number-to-words";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -325,8 +326,12 @@ export const getBookingInvoice = async (req, res) => {
       .populate("userId", "firstName lastName email mobile")
       .populate(
         "propertyId",
-        "propertyName address city state ownerUserId resortOwner pricingPerNightWeekdays pricingPerNightWeekend"
+        "propertyName propertyType address city state ownerUserId resortOwner pricingPerNightWeekdays pricingPerNightWeekend"
       );
+
+    const amountInWords =
+      toWords(grandTotal)
+        .replace(/\b\w/g, (l) => l.toUpperCase()) + " Only";
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
@@ -380,6 +385,8 @@ export const getBookingInvoice = async (req, res) => {
       totalAmount: subtotal,
       taxAmount,
       grandTotal,
+
+      amountInWords,
 
       orderId: booking.orderId,
       bookingDate: booking.createdAt,
