@@ -247,15 +247,21 @@ export default function PropertyDetails() {
   };
 
   const images = [
-  property?.coverImage,
-  ...(property?.galleryPhotos || []),
-]
-  .filter(Boolean)
-  .filter(img =>
-    !img.toLowerCase().includes("shop") &&
-    !img.toLowerCase().includes("act") &&
-    !img.toLowerCase().includes("document")
-  );
+    property?.coverImage,
+    ...(property?.galleryPhotos || []),
+  ]
+    .filter(Boolean)
+    .filter((img) => {
+      const src =
+        typeof img === "string"
+          ? img
+          : img?.url || img?.path || "";
+
+      return !src.includes("/shopAct/");
+    })
+    .map((img) =>
+      typeof img === "string" ? img : img.url || img.path
+    );
 
   const renderGallery = () => {
     if (images.length === 1) {
