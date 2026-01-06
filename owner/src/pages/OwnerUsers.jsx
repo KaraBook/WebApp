@@ -249,13 +249,15 @@ export default function OwnerUsers() {
                                     <Mail size={14} /> {u.email || "—"}
                                 </div>
 
+                             <div className="flex items-center justify-start gap-3">
                                 <div className="text-sm text-gray-600 flex items-center gap-2">
                                     <Phone size={14} /> {u.mobile}
                                 </div>
-
-                                <p className="text-xs text-gray-500 mt-1">
+                                .
+                                <p className="text-xs text-gray-500 text-600 mt-1">
                                     {u.totalBookings} bookings
                                 </p>
+                              </div>
                             </div>
                         </div>
 
