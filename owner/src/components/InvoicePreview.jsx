@@ -23,11 +23,11 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       {/* ================= HEADER ================= */}
       <div className="flex justify-between items-start">
         <div className="flex gap-3">
-          <div className="h-10 w-10 bg-emerald-600 rounded-md flex items-center justify-center text-white font-bold">
-            🧾
+          <div className=" h-10 w-10 rounded-md bg-primary flex items-center justify-center text-white font-semibold uppercase">
+            {invoice.propertyName?.charAt(0) || "P"}
           </div>
           <div>
-            <h1 className="font-semibold text-base">
+            <h1 className="font-semibold text-[20px]">
               {invoice.propertyName}
             </h1>
             <p className="text-xs text-gray-500 leading-relaxed max-w-xs">
@@ -52,22 +52,22 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
           <p className="text-s">{user.email}</p>
         </div>
 
-        <div className="text-xs space-y-1">
+        <div className="text-xs space-y-2">
           <div className="flex gap-3">
-            <span className="text-gray-500 w-24">Invoice No:</span>
-            <span className="font-medium">{invoice.invoiceNumber}</span>
+            <span className="text-gray-500 text-s w-24">Invoice No:</span>
+            <span className="font-[600]">{invoice.invoiceNumber}</span>
           </div>
           <div className="flex gap-3">
-            <span className="text-gray-500 w-24">Invoice Date:</span>
-            <span>{safeFormat(invoice.invoiceDate)}</span>
+            <span className="text-gray-500 text-s w-24">Invoice Date:</span>
+            <span className="font-[600]">{safeFormat(invoice.invoiceDate)}</span>
           </div>
           <div className="flex gap-3">
-            <span className="text-gray-500 w-24">Booking Date:</span>
-            <span>{safeFormat(invoice.bookingDate)}</span>
+            <span className="text-gray-500 text-s w-24">Booking Date:</span>
+            <span className="font-[600]">{safeFormat(invoice.bookingDate)}</span>
           </div>
           <div className="flex gap-3">
-            <span className="text-gray-500 w-24">Order ID:</span>
-            <span className="break-all">{invoice.orderId}</span>
+            <span className="text-gray-500 text-s w-24">Order ID:</span>
+            <span className="break-all font-[600]">{invoice.orderId}</span>
           </div>
         </div>
       </div>
