@@ -151,11 +151,13 @@
   animation: float 4s ease-in-out infinite;
 }
 
-
-
 .carousel-track {
   animation: scroll-left 25s linear infinite;
 }
+
+.rdrCalendarWrapper {
+    transform: none;
+  }
 
 @keyframes scroll-left {
   from {
@@ -176,3 +178,9 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+
+@media screen and (max-width:578px){
+  .rdrCalendarWrapper {
+    transform: scale(0.98);
+  }
+}

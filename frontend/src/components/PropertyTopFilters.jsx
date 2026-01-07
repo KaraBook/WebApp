@@ -1,30 +1,33 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  Check,
-  ChevronDown,
-  SlidersHorizontal,
-} from "lucide-react";
-
+import { Check, ChevronDown, SlidersHorizontal } from "lucide-react";
 
 export default function PropertyTopFilters({ total, value, onChange }) {
   return (
-    <div className="w-full bg-white rounded-2xl border border-[#E5EAF1] px-6 py-4 mb-6">
-      <div className="flex items-center justify-between gap-4">
+    <div className="w-full bg-white rounded-2xl border border-[#E5EAF1] px-4 md:px-6 py-4 mb-6">
+      
+      {/* MAIN CONTAINER */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-        {/* LEFT */}
-        <div className="flex items-center gap-4">
+        {/* LEFT GROUP */}
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+
+          {/* Filters label */}
           <div className="flex items-center gap-2 text-sm text-[#64748B]">
             <SlidersHorizontal className="w-4 h-4" />
             <span>Filters:</span>
           </div>
 
+          {/* Type */}
           <FilterDropdown
+            full
             label={value.type}
             options={["All Types", "villa", "tent", "cottage", "hotel"]}
             onSelect={(v) => onChange({ ...value, type: v })}
           />
 
+          {/* Price */}
           <FilterDropdown
+            full
             label={value.price}
             options={[
               "All Prices",
@@ -36,23 +39,28 @@ export default function PropertyTopFilters({ total, value, onChange }) {
           />
         </div>
 
-        {/* RIGHT */}
-        <FilterDropdown
-          align="right"
-          icon
-          label={value.sort}
-          options={[
-            "Recommended",
-            "Price: Low to High",
-            "Price: High to Low",
-            "Highest Rated",
-          ]}
-          onSelect={(v) => onChange({ ...value, sort: v })}
-        />
+        {/* RIGHT (moves below on mobile automatically) */}
+        <div className="md:ml-auto">
+          <FilterDropdown
+            full
+            align="right"
+            icon
+            label={value.sort}
+            options={[
+              "Recommended",
+              "Price: Low to High",
+              "Price: High to Low",
+              "Highest Rated",
+            ]}
+            onSelect={(v) => onChange({ ...value, sort: v })}
+          />
+        </div>
+
       </div>
     </div>
   );
 }
+
 
 
 function FilterDropdown({
@@ -61,48 +69,51 @@ function FilterDropdown({
   onSelect,
   align = "left",
   icon = false,
+  full = false,
 }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // 👇 CLOSE ON OUTSIDE CLICK
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div ref={dropdownRef} className="relative">
+    <div
+      ref={dropdownRef}
+      className={`relative ${full ? "w-full md:w-auto" : ""}`}
+    >
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="
-          flex items-center gap-2
-          px-4 py-[9px]
+        className={`
+          flex items-center justify-between gap-2
+          px-4 py-[10px]
           rounded-lg
           border border-[#E5EAF1]
           bg-white
           text-sm text-[#0F172A]
           hover:bg-[#F8FAFC]
           transition
-        "
+          ${full ? "w-full md:w-auto" : ""}
+        `}
       >
-        {icon && (
-          <SlidersHorizontal className="w-4 h-4 text-[#64748B]" />
-        )}
-        {label}
+        <div className="flex items-center gap-2">
+          {icon && <SlidersHorizontal className="w-4 h-4 text-[#64748B]" />}
+          <span>{label}</span>
+        </div>
         <ChevronDown className="w-4 h-4 text-[#64748B]" />
       </button>
 
       {open && (
         <div
           className={`
-            absolute z-50 mt-2 min-w-[220px]
+            absolute z-50 mt-2 w-full md:min-w-[220px]
             bg-white
             border border-[#E5EAF1]
             rounded-xl

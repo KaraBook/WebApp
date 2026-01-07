@@ -93,8 +93,8 @@ export default function Properties() {
   return (
     <div className="max-w-full mx-auto">
       {/* Banner */}
-      <div className="relative w-full p-[20px] bg-[#E6F4F1]">
-        <div className="flex items-center flex-col pt-[80px] pb-[140px]">
+      <div className="relative w-full p-[10px] md:p-[20px] bg-[#E6F4F1]">
+        <div className="flex items-center flex-col pt-[40px] gap-[10px] md:pt-[80px] pb-[40px] md:pb-[140px]">
           <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full">
             <Star className="h-4 w-4 text-accent fill-yellow-400" />
             <span className="text-sm font-medium text-primary">
@@ -102,7 +102,7 @@ export default function Properties() {
             </span>
           </div>
 
-          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-center">
+          <h1 className="font-display text-[42px] md:text-6xl lg:text-7xl font-bold leading-tight text-center">
             <span className="block text-[#1F2A2E]">Discover Your</span>
             <span className="block pb-[18px] bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent">
               Perfect Gateway
@@ -111,14 +111,14 @@ export default function Properties() {
         </div>
 
         {/* Floating images */}
-        <img src="/banimg1.jpg" className="w-[160px] rounded-[12px] absolute top-[10%] left-[18%]" />
-        <img src="/banimg1.jpg" className="w-[200px] rounded-[12px] absolute top-[48%] left-[10%]" />
-        <img src="/banimg1.jpg" className="w-[200px] rounded-[12px] absolute top-[10%] right-[18%]" />
-        <img src="/banimg1.jpg" className="w-[160px] rounded-[12px] absolute top-[54%] right-[10%]" />
+        <img src="/banimg1.jpg" className="hidden md:block w-[160px] rounded-[12px] absolute top-[10%] left-[18%]" />
+        <img src="/banimg1.jpg" className="hidden md:block w-[200px] rounded-[12px] absolute top-[48%] left-[10%]" />
+        <img src="/banimg1.jpg" className="hidden md:block w-[200px] rounded-[12px] absolute top-[10%] right-[16%]" />
+        <img src="/banimg1.jpg" className="hidden md:block w-[160px] rounded-[12px] absolute top-[54%] right-[10%]" />
       </div>
 
       {/* Sticky Filters */}
-      <div className="sticky top-[70px] z-[50]">
+      <div className="md:sticky md:top-[70px] top-0 z-[50]">
         <div className="max-w-6xl mx-auto px-4 -mt-[50px]">
           <PropertyFilters
             onFilter={fetchProperties}
