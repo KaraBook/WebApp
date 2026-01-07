@@ -52,6 +52,16 @@ export default function ViewInvoice() {
       const element = invoiceRef.current;
       if (!element) return;
 
+      const root = element.querySelector(".invoice-root");
+
+      const prevMargin = root.style.margin;
+      const prevPaddingTop = root.style.paddingTop;
+      const prevBoxShadow = root.style.boxShadow;
+
+      root.style.margin = "0";
+      root.style.paddingTop = "0";
+      root.style.boxShadow = "none";
+
       const prevWidth = element.style.width;
       const prevMaxWidth = element.style.maxWidth;
 
@@ -67,6 +77,10 @@ export default function ViewInvoice() {
         windowWidth: 794,
         letterRendering: true,
       });
+
+      root.style.margin = prevMargin;
+      root.style.paddingTop = prevPaddingTop;
+      root.style.boxShadow = prevBoxShadow;
 
       element.style.width = prevWidth;
       element.style.maxWidth = prevMaxWidth;
