@@ -508,7 +508,7 @@ export default function OfflineBooking() {
   // ---------- RENDER ----------
 
   return (
-    <div className="bg-[#f5f5f7] min-h-[100dvh] flex flex-col md:px-8 md:py-6 px-2 py-4">
+    <div className="bg-[#f5f5f7] min-h-[100dvh] md:px-8 md:py-6 px-2 py-4">
       <div className="max-w-6xl p-2 mx-auto">
         <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3 mb-2">Create Offline Booking</h1>
 
@@ -517,7 +517,6 @@ export default function OfflineBooking() {
             <div className="w-6 h-6 animate-spin rounded-full border-2 border-gray-300 border-t-transparent"></div>
           </div>
         ) : (
-          <div className="flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* LEFT: Traveller */}
             <Card>
@@ -878,7 +877,6 @@ export default function OfflineBooking() {
                 </Button>
               </CardContent>
             </Card>
-          </div>
           </div>
         )}
 
