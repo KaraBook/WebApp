@@ -79,7 +79,11 @@ export default function ViewInvoice() {
       const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
       if (imgHeight <= pageHeight) {
-        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imgHeight);
+        const yOffset =
+          imgHeight < pageHeight ? (pageHeight - imgHeight) / 2 : 0;
+
+        pdf.addImage(imgData, "JPEG", 0, yOffset, pageWidth, imgHeight);
+
       } else {
         let heightLeft = imgHeight;
         let position = 0;
