@@ -102,6 +102,18 @@ const SummaryApi = {
         url: `${BASE_URL}/api/owner/booked-users`,
         method: "GET",
     },
+    updateOwnerProfile: {
+        url: `${BASE_URL}/api/auth/owner/profile`,
+        method: "PUT",
+    },
+    uploadOwnerAvatar: {
+        url: `${BASE_URL}/api/auth/owner/avatar`,
+        method: "POST",
+    },
+    removeOwnerAvatar: {
+        url: `${BASE_URL}/api/auth/owner/avatar`,
+        method: "DELETE",
+    },
 
 
 };

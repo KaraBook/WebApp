@@ -1,21 +1,34 @@
-import { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useEffect, useRef, useState } from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 
 export default function MyProfile() {
+  const fileRef = useRef(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [states] = useState(getIndianStates());
   const [cities, setCities] = useState([]);
-
   const [selectedStateCode, setSelectedStateCode] = useState("");
 
   const [user, setUser] = useState({
@@ -31,9 +44,7 @@ export default function MyProfile() {
     avatarUrl: "",
   });
 
-  /* ---------------------------------------------------
-     LOAD PROFILE
-  ---------------------------------------------------- */
+  /* ---------------- LOAD PROFILE ---------------- */
   useEffect(() => {
     (async () => {
       try {
@@ -43,10 +54,11 @@ export default function MyProfile() {
         if (u) {
           setUser({
             ...u,
-            dateOfBirth: u.dateOfBirth ? u.dateOfBirth.substring(0, 10) : "",
+            dateOfBirth: u.dateOfBirth
+              ? u.dateOfBirth.substring(0, 10)
+              : "",
           });
 
-          // Auto populate states + cities
           const st = states.find((s) => s.name === u.state);
           if (st) {
             setSelectedStateCode(st.isoCode);
@@ -61,15 +73,13 @@ export default function MyProfile() {
     })();
   }, []);
 
-  /* ---------------------------------------------------
-     HANDLE STATE CHANGE
-  ---------------------------------------------------- */
+  /* ---------------- STATE CHANGE ---------------- */
   const handleStateChange = (code) => {
     setSelectedStateCode(code);
     const st = states.find((s) => s.isoCode === code);
 
-    setUser((prev) => ({
-      ...prev,
+    setUser((p) => ({
+      ...p,
       state: st?.name || "",
       city: "",
     }));
@@ -77,26 +87,71 @@ export default function MyProfile() {
     setCities(getCitiesByState(code));
   };
 
-  /* ---------------------------------------------------
-     SAVE PROFILE
-  ---------------------------------------------------- */
+  /* ---------------- SAVE PROFILE ---------------- */
   const handleSave = async () => {
     setSaving(true);
+    setErrors({});
 
     try {
-      const res = await api.put("/api/owner/update-profile", user);
-      toast.success("Profile updated");
+      const res = await api.put(
+        SummaryApi.updateOwnerProfile.url,
+        user
+      );
+
+      toast.success("Profile updated successfully");
 
       setUser({
         ...res.data.user,
-        dateOfBirth: res.data.user.dateOfBirth?.substring(0, 10),
+        dateOfBirth: res.data.user.dateOfBirth
+          ? res.data.user.dateOfBirth.substring(0, 10)
+          : "",
       });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update profile");
+      if (err.response?.data?.errors) {
+        setErrors(err.response.data.errors);
+        toast.error("Please fix highlighted fields");
+      } else {
+        toast.error(
+          err.response?.data?.message || "Update failed"
+        );
+      }
     } finally {
       setSaving(false);
     }
   };
+
+  /* ---------------- AVATAR UPLOAD ---------------- */
+  const handleAvatarUpload = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await api.post(
+        SummaryApi.uploadOwnerAvatar.url,
+        formData
+      );
+      setUser((p) => ({ ...p, avatarUrl: res.data.avatarUrl }));
+      toast.success("Avatar updated");
+    } catch {
+      toast.error("Failed to upload avatar");
+    }
+  };
+
+  /* ---------------- AVATAR REMOVE ---------------- */
+  const handleAvatarRemove = async () => {
+    try {
+      await api.delete(SummaryApi.removeOwnerAvatar.url);
+      setUser((p) => ({ ...p, avatarUrl: "" }));
+      toast.success("Avatar removed");
+    } catch {
+      toast.error("Failed to remove avatar");
+    }
+  };
+
+  /* ---------------- INITIALS ---------------- */
+  const initials = `${user.firstName?.[0] || ""}${
+    user.lastName?.[0] || ""
+  }`.toUpperCase();
 
   if (loading) {
     return (
@@ -106,102 +161,138 @@ export default function MyProfile() {
     );
   }
 
-  /* ---------------------------------------------------
-     UI
-  ---------------------------------------------------- */
+  /* ---------------- UI ---------------- */
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3 mb-4 mt-2">My Profile</h1>
+      <h1 className="text-[26px] font-bold mb-4">My Profile</h1>
 
-      <Card className="shadow-sm border-gray-200">
+      <Card>
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
 
+        <CardContent className="space-y-6">
           {/* Avatar */}
           <div className="flex items-center gap-6">
-            <img
-              src={user.avatarUrl || "/default-avatar.png"}
-              className="w-20 h-20 rounded-full object-cover border"
-            />
-            <Button variant="outline">Change Avatar</Button>
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                className="w-20 h-20 rounded-full object-cover border"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-xl font-semibold">
+                {initials || "U"}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => fileRef.current.click()}
+              >
+                Change Avatar
+              </Button>
+
+              {user.avatarUrl && (
+                <Button
+                  variant="destructive"
+                  onClick={handleAvatarRemove}
+                >
+                  Remove
+                </Button>
+              )}
+
+              <input
+                ref={fileRef}
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) =>
+                  e.target.files?.[0] &&
+                  handleAvatarUpload(e.target.files[0])
+                }
+              />
+            </div>
           </div>
 
           {/* Names */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>First Name</Label>
-              <Input
-                value={user.firstName}
-                onChange={(e) => setUser({ ...user, firstName: e.target.value })}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label>Last Name</Label>
-              <Input
-                value={user.lastName}
-                onChange={(e) => setUser({ ...user, lastName: e.target.value })}
-                className="mt-1"
-              />
-            </div>
-          </div>
-
-          {/* Email / Mobile */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>Email</Label>
-              <Input
-                value={user.email}
-                onChange={(e) => setUser({ ...user, email: e.target.value })}
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label>Mobile Number</Label>
-              <Input value={user.mobile} disabled className="mt-1 bg-gray-100" />
-            </div>
-          </div>
-
-          {/* DOB / Pin */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>Date of Birth</Label>
-              <Input
-                type="date"
-                value={user.dateOfBirth}
-                onChange={(e) => setUser({ ...user, dateOfBirth: e.target.value })}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label>Pin Code</Label>
-              <Input
-                maxLength={6}
-                value={user.pinCode}
-                onChange={(e) => setUser({ ...user, pinCode: e.target.value.replace(/\D/g, "") })}
-                className="mt-1"
-              />
-            </div>
-          </div>
-
-          {/* Address */}
-          <div>
-            <Label>Address</Label>
-            <Input
-              value={user.address}
-              onChange={(e) => setUser({ ...user, address: e.target.value })}
-              className="mt-1"
+          <div className="grid md:grid-cols-2 gap-4">
+            <Field
+              label="First Name"
+              value={user.firstName}
+              error={errors.firstName}
+              onChange={(v) =>
+                setUser({ ...user, firstName: v })
+              }
+            />
+            <Field
+              label="Last Name"
+              value={user.lastName}
+              error={errors.lastName}
+              onChange={(v) =>
+                setUser({ ...user, lastName: v })
+              }
             />
           </div>
 
-          {/* State + City */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Email / Mobile */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <Field
+              label="Email"
+              value={user.email}
+              error={errors.email}
+              onChange={(v) => setUser({ ...user, email: v })}
+            />
+            <div>
+              <Label>Mobile</Label>
+              <Input
+                value={user.mobile}
+                disabled
+                className="mt-1 bg-gray-100"
+              />
+            </div>
+          </div>
+
+          {/* DOB / PIN */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <Field
+              type="date"
+              label="Date of Birth"
+              value={user.dateOfBirth}
+              error={errors.dateOfBirth}
+              onChange={(v) =>
+                setUser({ ...user, dateOfBirth: v })
+              }
+            />
+            <Field
+              label="Pin Code"
+              value={user.pinCode}
+              error={errors.pinCode}
+              onChange={(v) =>
+                setUser({
+                  ...user,
+                  pinCode: v.replace(/\D/g, ""),
+                })
+              }
+            />
+          </div>
+
+          {/* Address */}
+          <Field
+            label="Address"
+            value={user.address}
+            error={errors.address}
+            onChange={(v) => setUser({ ...user, address: v })}
+          />
+
+          {/* State / City */}
+          <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label>State</Label>
-              <Select value={selectedStateCode} onValueChange={handleStateChange}>
+              <Select
+                value={selectedStateCode}
+                onValueChange={handleStateChange}
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select State" />
                 </SelectTrigger>
@@ -213,13 +304,20 @@ export default function MyProfile() {
                   ))}
                 </SelectContent>
               </Select>
+              {errors.state && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.state}
+                </p>
+              )}
             </div>
 
             <div>
               <Label>City</Label>
               <Select
                 value={user.city}
-                onValueChange={(v) => setUser({ ...user, city: v })}
+                onValueChange={(v) =>
+                  setUser({ ...user, city: v })
+                }
                 disabled={!cities.length}
               >
                 <SelectTrigger className="mt-1">
@@ -233,10 +331,15 @@ export default function MyProfile() {
                   ))}
                 </SelectContent>
               </Select>
+              {errors.city && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.city}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Save Button */}
+          {/* Save */}
           <div className="pt-4">
             <Button
               className="bg-primary text-white px-6"
@@ -246,9 +349,26 @@ export default function MyProfile() {
               {saving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
-
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+/* ---------------- FIELD COMPONENT ---------------- */
+function Field({ label, value, onChange, error, type = "text" }) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      <Input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`mt-1 ${error ? "border-red-500" : ""}`}
+      />
+      {error && (
+        <p className="text-xs text-red-500 mt-1">{error}</p>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { normalizeMobile } from "../utils/phone.js";
 import Razorpay from "razorpay";
 import { getEffectiveOwnerId } from "../utils/getEffectiveOwner.js";
 
+
 const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
 const razorpay = new Razorpay({

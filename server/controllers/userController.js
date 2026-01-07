@@ -370,6 +370,98 @@ export const resortOwnerLogin = async (req, res) => {
 };
 
 
+export const updateOwnerProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!["resortOwner", "manager", "admin"].includes(user.role)) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    const {
+      firstName,
+      lastName,
+      email,
+      dateOfBirth,
+      address,
+      city,
+      state,
+      pinCode,
+    } = req.body;
+
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.name = `${firstName} ${lastName}`.trim();
+    user.email = email?.toLowerCase();
+    user.dateOfBirth = dateOfBirth || null;
+    user.address = address;
+    user.city = city;
+    user.state = state;
+    user.pinCode = pinCode;
+
+    await user.validate();
+    await user.save();
+
+    return res.json({
+      message: "Profile updated successfully",
+      user: publicUser(user),
+    });
+
+  } catch (err) {
+    console.error("Owner profile update error:", err);
+
+    if (err.name === "ValidationError") {
+      const errors = {};
+      for (const field in err.errors) {
+        errors[field] = err.errors[field].message;
+      }
+      return res.status(400).json({ errors });
+    }
+
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern || {})[0];
+      return res.status(409).json({
+        errors: { [field]: `${field} already exists` },
+      });
+    }
+
+    return res.status(500).json({
+      message: "Failed to update profile",
+    });
+  }
+};
+
+
+export const uploadOwnerAvatar = async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  if (!req.file?.path) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  const BASE_URL = process.env.BACKEND_BASE_URL || "";
+  user.avatarUrl = `${BASE_URL}/${req.file.path.replace(/\\/g, "/")}`;
+  await user.save();
+
+  res.json({ avatarUrl: user.avatarUrl });
+};
+
+
+export const removeOwnerAvatar = async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  user.avatarUrl = "";
+  await user.save();
+
+  res.json({ avatarUrl: "" });
+};
+
+
 
 export const checkResortOwnerNumber = async (req, res) => {
   try {
