@@ -678,8 +678,8 @@ export default function OfflineBooking() {
 
           {/* RIGHT: Booking */}
           <Card>
-            <CardHeader className="p-4 md:p-6">
-              <CardTitle className="p-4 md:p-6">Booking Details</CardTitle>
+            <CardHeader>
+              <CardTitle>Booking Details</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-3">
