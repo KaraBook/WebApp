@@ -508,7 +508,7 @@ export default function OfflineBooking() {
   // ---------- RENDER ----------
 
   return (
-    <div className="bg-[#f5f5f7] min-h-screen md:px-8 md:py-6 px-2 py-4">
+    <div className="bg-[#f5f5f7] min-h-[100dvh] md:px-8 md:py-6 px-2 py-4">
       <div className="max-w-6xl p-2 mx-auto">
         <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3 mb-2">Create Offline Booking</h1>
 
