@@ -92,17 +92,20 @@ export default function ViewInvoice() {
       const pageHeight = 297;
       const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
+      const TOP_MARGIN_MM = 15;
+
       if (imgHeight <= pageHeight) {
-        const yOffset =
-          imgHeight < pageHeight ? (pageHeight - imgHeight) / 2 : 0;
-
-        const TOP_MARGIN_MM = 15;
-
-        pdf.addImage(imgData, "JPEG", 0, TOP_MARGIN_MM, pageWidth, imgHeight);
-
+        pdf.addImage(
+          imgData,
+          "JPEG",
+          0,
+          TOP_MARGIN_MM,
+          pageWidth,
+          imgHeight
+        );
       } else {
         let heightLeft = imgHeight;
-        let position = 0;
+        let position = TOP_MARGIN_MM;
 
         pdf.addImage(imgData, "JPEG", 0, position, pageWidth, imgHeight);
         heightLeft -= pageHeight;
