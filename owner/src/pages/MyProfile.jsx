@@ -93,9 +93,17 @@ export default function MyProfile() {
     setErrors({});
 
     try {
+      const payload = {
+        ...user,
+        dateOfBirth: user.dateOfBirth
+          ? new Date(user.dateOfBirth).toISOString().split("T")[0]
+          : null,
+        pinCode: user.pinCode || null,
+      };
+
       const res = await api.put(
         SummaryApi.updateOwnerProfile.url,
-        user
+        payload
       );
 
       toast.success("Profile updated successfully");
@@ -111,9 +119,7 @@ export default function MyProfile() {
         setErrors(err.response.data.errors);
         toast.error("Please fix highlighted fields");
       } else {
-        toast.error(
-          err.response?.data?.message || "Update failed"
-        );
+        toast.error(err.response?.data?.message || "Update failed");
       }
     } finally {
       setSaving(false);
@@ -149,9 +155,8 @@ export default function MyProfile() {
   };
 
   /* ---------------- INITIALS ---------------- */
-  const initials = `${user.firstName?.[0] || ""}${
-    user.lastName?.[0] || ""
-  }`.toUpperCase();
+  const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""
+    }`.toUpperCase();
 
   if (loading) {
     return (
