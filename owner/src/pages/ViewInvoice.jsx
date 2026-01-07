@@ -40,90 +40,72 @@ export default function ViewInvoice() {
 
 
   const downloadPDF = async () => {
-    try {
-      toast.info("Generating invoice…");
+  try {
+    toast.info("Generating invoice…");
 
-      if (document.fonts?.ready) {
-        await document.fonts.ready;
-      }
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
+    }
 
-      await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, 200));
 
-      const element = invoiceRef.current;
-      if (!element) return;
+    const element = invoiceRef.current;
+    if (!element) return;
 
-      const root = element.querySelector(".invoice-root");
+    const prevWidth = element.style.width;
+    const prevMaxWidth = element.style.maxWidth;
 
-      const prevMargin = root.style.margin;
-      const prevPaddingTop = root.style.paddingTop;
-      const prevBoxShadow = root.style.boxShadow;
+    // Force A4 width
+    element.style.width = "794px";
+    element.style.maxWidth = "794px";
 
-      root.style.margin = "0";
-      root.style.paddingTop = "0";
-      root.style.boxShadow = "none";
+    const canvas = await html2canvas(element, {
+      scale: 3,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: 794,
+    });
 
-      const prevWidth = element.style.width;
-      const prevMaxWidth = element.style.maxWidth;
+    // Restore styles
+    element.style.width = prevWidth;
+    element.style.maxWidth = prevMaxWidth;
 
-      element.style.width = "794px";
-      element.style.maxWidth = "794px";
+    const imgData = canvas.toDataURL("image/jpeg", 1.0);
+    const pdf = new jsPDF("p", "mm", "a4");
 
-      const canvas = await html2canvas(element, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: -window.scrollY,
-        windowWidth: 794,
-        letterRendering: true,
-      });
+    const pageWidth = 210;
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
-      root.style.margin = prevMargin;
-      root.style.paddingTop = prevPaddingTop;
-      root.style.boxShadow = prevBoxShadow;
+    const TOP_MARGIN_MM = 15;
 
-      element.style.width = prevWidth;
-      element.style.maxWidth = prevMaxWidth;
+    if (imgHeight <= pageHeight) {
+      pdf.addImage(imgData, "JPEG", 0, TOP_MARGIN_MM, pageWidth, imgHeight);
+    } else {
+      let heightLeft = imgHeight;
+      let position = TOP_MARGIN_MM;
 
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
-      const pdf = new jsPDF("p", "mm", "a4");
+      pdf.addImage(imgData, "JPEG", 0, position, pageWidth, imgHeight);
+      heightLeft -= pageHeight;
 
-      const pageWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * pageWidth) / canvas.width;
-
-      const TOP_MARGIN_MM = 15;
-
-      if (imgHeight <= pageHeight) {
-        pdf.addImage(
-          imgData,
-          "JPEG",
-          0,
-          TOP_MARGIN_MM,
-          pageWidth,
-          imgHeight
-        );
-      } else {
-        let heightLeft = imgHeight;
-        let position = TOP_MARGIN_MM;
-
+      while (heightLeft > 0) {
+        pdf.addPage();
+        position -= pageHeight;
         pdf.addImage(imgData, "JPEG", 0, position, pageWidth, imgHeight);
         heightLeft -= pageHeight;
-
-        while (heightLeft > 0) {
-          pdf.addPage();
-          position -= pageHeight;
-          pdf.addImage(imgData, "JPEG", 0, position, pageWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
       }
-
-      pdf.save(`Invoice_${id}.pdf`);
-      toast.success("Invoice downloaded!");
-    } catch (err) {
-      toast.error("Failed to download invoice");
     }
-  };
+
+    pdf.save(`Invoice_${id}.pdf`);
+    toast.success("Invoice downloaded!");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to download invoice");
+  }
+};
+
 
   if (loading) {
     return (
