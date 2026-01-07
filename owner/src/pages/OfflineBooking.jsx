@@ -508,387 +508,391 @@ export default function OfflineBooking() {
   // ---------- RENDER ----------
 
   return (
-    <div className="bg-[#f5f5f7] h-auto md:px-8 md:py-6 px-2 py-4">
-    <div className="max-w-6xl p-2 mx-auto">
-      <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3 mb-2">Create Offline Booking</h1>
+    <div className="bg-[#f5f5f7] min-h-screen md:px-8 md:py-6 px-2 py-4">
+      <div className="max-w-6xl p-2 mx-auto">
+        <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3 mb-2">Create Offline Booking</h1>
 
-      {!propertyId ? (
-        <div className="flex items-center justify-center py-10">
-          <div className="w-6 h-6 animate-spin rounded-full border-2 border-gray-300 border-t-transparent"></div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* LEFT: Traveller */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Traveller Details</CardTitle>
-            </CardHeader>
+        {!propertyId ? (
+          <div className="flex items-center justify-center py-10">
+            <div className="w-6 h-6 animate-spin rounded-full border-2 border-gray-300 border-t-transparent"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* LEFT: Traveller */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Traveller Details</CardTitle>
+              </CardHeader>
 
-            <CardContent className="space-y-3">
-              {/* Mobile */}
-              <div className="flex items-end gap-2">
-                <div className="flex-1">
-                  <Label>Mobile</Label>
-                  <Input
-                    value={traveller.mobile}
-                    onChange={(e) =>
-                      handleChange("mobile", e.target.value.replace(/\D/g, ""))
-                    }
-                    maxLength={10}
-                    placeholder="10-digit number"
-                    className="mt-1"
-                  />
+              <CardContent className="space-y-3">
+                {/* Mobile */}
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <Label>Mobile</Label>
+                    <Input
+                      value={traveller.mobile}
+                      onChange={(e) =>
+                        handleChange("mobile", e.target.value.replace(/\D/g, ""))
+                      }
+                      maxLength={10}
+                      placeholder="10-digit number"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={verifyMobile}
+                    disabled={checking || traveller.mobile.length !== 10}
+                    className="bg-primary text-white"
+                  >
+                    {checking ? "Checking..." : "Verify"}
+                  </Button>
+                </div>
+
+                {/* Show form only after mobile verified */}
+                {allowForm && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>First Name</Label>
+                        <Input
+                          value={traveller.firstName}
+                          onChange={(e) =>
+                            handleChange("firstName", e.target.value)
+                          }
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>Last Name</Label>
+                        <Input
+                          value={traveller.lastName}
+                          onChange={(e) =>
+                            handleChange("lastName", e.target.value)
+                          }
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label>Email</Label>
+                      <Input
+                        value={traveller.email}
+                        onChange={(e) =>
+                          handleChange("email", e.target.value)
+                        }
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>Date of Birth</Label>
+                        <Input
+                          type="date"
+                          value={traveller.dateOfBirth}
+                          onChange={(e) =>
+                            handleChange("dateOfBirth", e.target.value)
+                          }
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>Pin Code</Label>
+                        <Input
+                          value={traveller.pinCode}
+                          onChange={(e) =>
+                            handleChange(
+                              "pinCode",
+                              e.target.value.replace(/\D/g, "")
+                            )
+                          }
+                          maxLength={6}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label>Address</Label>
+                      <Input
+                        value={traveller.address}
+                        onChange={(e) =>
+                          handleChange("address", e.target.value)
+                        }
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label>State</Label>
+                        <Select
+                          value={selectedStateCode}
+                          onValueChange={handleStateChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select State" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {states.map((s) => (
+                              <SelectItem key={s.isoCode} value={s.isoCode}>
+                                {s.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label>City</Label>
+                        <Select
+                          value={traveller.city}
+                          onValueChange={(v) => handleChange("city", v)}
+                          disabled={!cities.length}
+                        >
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={
+                                cities.length
+                                  ? "Select City"
+                                  : "Select State first"
+                              }
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {cities.map((c) => (
+                              <SelectItem key={c.name} value={c.name}>
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* RIGHT: Booking */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Booking Details</CardTitle>
+              </CardHeader>
+
+              <CardContent className="space-y-3">
+                {/* Dates */}
+                <div className="relative">
+                  <Label>Dates</Label>
+                  <div
+                    className="border rounded-lg p-2 cursor-pointer mt-1 date-input"
+                    onClick={() => setShowCalendar(true)}
+                  >
+                    {format(dateRange[0].startDate, "dd MMM")} –{" "}
+                    {format(dateRange[0].endDate, "dd MMM")}
+                  </div>
+
+                  {showCalendar && (
+                    <div
+                      ref={calendarRef}
+                      className="
+      mt-2 bg-white border border-gray-200 rounded-2xl p-3
+      max-h-[70vh] overflow-y-auto
+      md:absolute md:shadow-xl md:z-50
+    "
+                    >
+                      <DateRange
+                        ranges={dateRange}
+                        onChange={handleDateSelection}
+                        minDate={new Date()}
+                        disabledDates={disabledDays}
+                        moveRangeOnFirstSelection={false}
+                        showSelectionPreview={false}
+                        showDateDisplay={false}
+                        months={1}
+                        direction="horizontal"
+                        rangeColors={["#0097A7"]}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Guests */}
+                <div className="relative" ref={guestRef}>
+                  <Label>Guests</Label>
+
+                  {/* Collapsed Box */}
+                  <div
+                    className="border rounded-lg p-2 cursor-pointer mt-1 bg-white"
+                    onClick={() => setShowGuestDropdown(!showGuestDropdown)}
+                  >
+                    {guestCount.adults +
+                      guestCount.children +
+                      guestCount.infants}{" "}
+                    guests
+                  </div>
+
+                  {/* Dropdown */}
+                  {showGuestDropdown && (
+                    <div className="absolute w-full bg-white shadow-xl border rounded-xl mt-2 z-50 p-4 space-y-4">
+                      {/* Adults */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Adults</p>
+                          <p className="text-xs text-gray-500">Age 13+</p>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              setGuestCount((g) => ({
+                                ...g,
+                                adults: Math.max(1, g.adults - 1),
+                              }))
+                            }
+                          >
+                            -
+                          </Button>
+
+                          <span className="w-6 text-center">
+                            {guestCount.adults}
+                          </span>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              setGuestCount((g) => ({
+                                ...g,
+                                adults: g.adults + 1,
+                              }))
+                            }
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Children */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Children</p>
+                          <p className="text-xs text-gray-500">Age 2–12</p>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              setGuestCount((g) => ({
+                                ...g,
+                                children: Math.max(0, g.children - 1),
+                              }))
+                            }
+                          >
+                            -
+                          </Button>
+
+                          <span className="w-6 text-center">
+                            {guestCount.children}
+                          </span>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              setGuestCount((g) => ({
+                                ...g,
+                                children: g.children + 1,
+                              }))
+                            }
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Infants */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Infants</p>
+                          <p className="text-xs text-gray-500">Under 2</p>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              setGuestCount((g) => ({
+                                ...g,
+                                infants: Math.max(0, g.infants - 1),
+                              }))
+                            }
+                          >
+                            -
+                          </Button>
+
+                          <span className="w-6 text-center">
+                            {guestCount.infants}
+                          </span>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              setGuestCount((g) => ({
+                                ...g,
+                                infants: g.infants + 1,
+                              }))
+                            }
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Total */}
+                <div>
+                  <Label>Total Price</Label>
+                  <div className="border rounded-lg p-2 mt-1 bg-gray-50">
+                    ₹{calculateTotal().toLocaleString()}
+                  </div>
                 </div>
 
                 <Button
-                  onClick={verifyMobile}
-                  disabled={checking || traveller.mobile.length !== 10}
-                  className="bg-primary text-white"
+                  className="w-full bg-primary text-white py-3"
+                  disabled={loading}
+                  onClick={handleBooking}
                 >
-                  {checking ? "Checking..." : "Verify"}
+                  {loading ? "Creating..." : "Proceed to Payment"}
                 </Button>
-              </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
-              {/* Show form only after mobile verified */}
-              {allowForm && (
-                <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>First Name</Label>
-                      <Input
-                        value={traveller.firstName}
-                        onChange={(e) =>
-                          handleChange("firstName", e.target.value)
-                        }
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label>Last Name</Label>
-                      <Input
-                        value={traveller.lastName}
-                        onChange={(e) =>
-                          handleChange("lastName", e.target.value)
-                        }
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label>Email</Label>
-                    <Input
-                      value={traveller.email}
-                      onChange={(e) =>
-                        handleChange("email", e.target.value)
-                      }
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>Date of Birth</Label>
-                      <Input
-                        type="date"
-                        value={traveller.dateOfBirth}
-                        onChange={(e) =>
-                          handleChange("dateOfBirth", e.target.value)
-                        }
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label>Pin Code</Label>
-                      <Input
-                        value={traveller.pinCode}
-                        onChange={(e) =>
-                          handleChange(
-                            "pinCode",
-                            e.target.value.replace(/\D/g, "")
-                          )
-                        }
-                        maxLength={6}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label>Address</Label>
-                    <Input
-                      value={traveller.address}
-                      onChange={(e) =>
-                        handleChange("address", e.target.value)
-                      }
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>State</Label>
-                      <Select
-                        value={selectedStateCode}
-                        onValueChange={handleStateChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select State" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {states.map((s) => (
-                            <SelectItem key={s.isoCode} value={s.isoCode}>
-                              {s.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label>City</Label>
-                      <Select
-                        value={traveller.city}
-                        onValueChange={(v) => handleChange("city", v)}
-                        disabled={!cities.length}
-                      >
-                        <SelectTrigger>
-                          <SelectValue
-                            placeholder={
-                              cities.length
-                                ? "Select City"
-                                : "Select State first"
-                            }
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {cities.map((c) => (
-                            <SelectItem key={c.name} value={c.name}>
-                              {c.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* RIGHT: Booking */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Booking Details</CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-3">
-              {/* Dates */}
-              <div className="relative">
-                <Label>Dates</Label>
-                <div
-                  className="border rounded-lg p-2 cursor-pointer mt-1 date-input"
-                  onClick={() => setShowCalendar(true)}
-                >
-                  {format(dateRange[0].startDate, "dd MMM")} –{" "}
-                  {format(dateRange[0].endDate, "dd MMM")}
-                </div>
-
-                {showCalendar && (
-                  <div
-                    ref={calendarRef}
-                    className="absolute mt-2 bg-white shadow-xl border border-gray-200 rounded-2xl z-50 p-3"
-                  >
-                    <DateRange
-                      ranges={dateRange}
-                      onChange={handleDateSelection}
-                      minDate={new Date()}
-                      disabledDates={disabledDays}
-                      moveRangeOnFirstSelection={false}
-                      showSelectionPreview={false}
-                      showDateDisplay={false}
-                      months={1}
-                      direction="horizontal"
-                      rangeColors={["#0097A7"]}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Guests */}
-              <div className="relative" ref={guestRef}>
-                <Label>Guests</Label>
-
-                {/* Collapsed Box */}
-                <div
-                  className="border rounded-lg p-2 cursor-pointer mt-1 bg-white"
-                  onClick={() => setShowGuestDropdown(!showGuestDropdown)}
-                >
-                  {guestCount.adults +
-                    guestCount.children +
-                    guestCount.infants}{" "}
-                  guests
-                </div>
-
-                {/* Dropdown */}
-                {showGuestDropdown && (
-                  <div className="absolute w-full bg-white shadow-xl border rounded-xl mt-2 z-50 p-4 space-y-4">
-                    {/* Adults */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Adults</p>
-                        <p className="text-xs text-gray-500">Age 13+</p>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            setGuestCount((g) => ({
-                              ...g,
-                              adults: Math.max(1, g.adults - 1),
-                            }))
-                          }
-                        >
-                          -
-                        </Button>
-
-                        <span className="w-6 text-center">
-                          {guestCount.adults}
-                        </span>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            setGuestCount((g) => ({
-                              ...g,
-                              adults: g.adults + 1,
-                            }))
-                          }
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Children */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Children</p>
-                        <p className="text-xs text-gray-500">Age 2–12</p>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            setGuestCount((g) => ({
-                              ...g,
-                              children: Math.max(0, g.children - 1),
-                            }))
-                          }
-                        >
-                          -
-                        </Button>
-
-                        <span className="w-6 text-center">
-                          {guestCount.children}
-                        </span>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            setGuestCount((g) => ({
-                              ...g,
-                              children: g.children + 1,
-                            }))
-                          }
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Infants */}
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Infants</p>
-                        <p className="text-xs text-gray-500">Under 2</p>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            setGuestCount((g) => ({
-                              ...g,
-                              infants: Math.max(0, g.infants - 1),
-                            }))
-                          }
-                        >
-                          -
-                        </Button>
-
-                        <span className="w-6 text-center">
-                          {guestCount.infants}
-                        </span>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            setGuestCount((g) => ({
-                              ...g,
-                              infants: g.infants + 1,
-                            }))
-                          }
-                        >
-                          +
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Total */}
-              <div>
-                <Label>Total Price</Label>
-                <div className="border rounded-lg p-2 mt-1 bg-gray-50">
-                  ₹{calculateTotal().toLocaleString()}
-                </div>
-              </div>
-
-              <Button
-                className="w-full bg-primary text-white py-3"
-                disabled={loading}
-                onClick={handleBooking}
-              >
-                {loading ? "Creating..." : "Proceed to Payment"}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Popup */}
-      <Dialog open={showPopup} onOpenChange={setShowPopup}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{popupTitle}</DialogTitle>
-            <DialogDescription>{popupMsg}</DialogDescription>
-          </DialogHeader>
-          <Button onClick={() => setShowPopup(false)} className="mt-4">
-            Close
-          </Button>
-        </DialogContent>
-      </Dialog>
-    </div>
+        {/* Popup */}
+        <Dialog open={showPopup} onOpenChange={setShowPopup}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{popupTitle}</DialogTitle>
+              <DialogDescription>{popupMsg}</DialogDescription>
+            </DialogHeader>
+            <Button onClick={() => setShowPopup(false)} className="mt-4">
+              Close
+            </Button>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }
