@@ -102,14 +102,15 @@ export default function ViewInvoice() {
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-[70vh] text-gray-600">
         <Loader2 className="animate-spin h-10 w-10" />
       </div>
     );
+  }
 
-  if (!invoice)
+  if (!invoice) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] text-gray-500">
         <p className="text-lg">Invoice not found</p>
@@ -121,13 +122,12 @@ export default function ViewInvoice() {
         </button>
       </div>
     );
-
+  }
 
   return (
     <div className="bg-[#f5f5f7] min-h-screen px-4 md:px-6 py-10">
       <div className="max-w-3xl mx-auto">
 
-        {/* TOP BAR */}
         <div className="flex justify-between items-center mb-6">
           <button
             onClick={() => navigate(-1)}
@@ -146,11 +146,7 @@ export default function ViewInvoice() {
           </button>
         </div>
 
-        {/* INVOICE CARD */}
-        <div
-          ref={ref}
-          className="invoice-pdf bg-white max-w-4xl mx-auto border rounded-lg px-4 sm:px-8 py-6 sm:py-10 text-sm text-gray-800"
-        >
+        <div className="bg-white shadow-lg rounded-xl max-w-3xl p-2 border border-gray-100">
           <div ref={invoiceRef}>
             <InvoicePreview invoice={invoice} />
           </div>
