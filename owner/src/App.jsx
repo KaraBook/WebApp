@@ -51,11 +51,10 @@ function AutoPropertyRedirect() {
 
 function MainContainer() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
-      {/* This becomes the remaining height */}
-      <main className="flex-1 p-0 pb-16 md:pb-0">
+      <main className="p-0 pb-16 md:pb-0">
         <Outlet />
       </main>
 
@@ -63,7 +62,6 @@ function MainContainer() {
     </div>
   );
 }
-
 
 
 export default function App() {
