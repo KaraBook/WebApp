@@ -108,7 +108,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
 
       {/* ================= TABLE ================= */}
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] mt-8 text-xs border-t">
+        <table className="w-full min-w-[640px] md:min-w-full mt-8 text-xs border-t">
           <thead>
             <tr className="border-b text-left text-[14px]">
               <th className="py-4">S.No</th>
