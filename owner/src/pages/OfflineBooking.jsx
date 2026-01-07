@@ -698,7 +698,7 @@ export default function OfflineBooking() {
                     <div
                       ref={calendarRef}
                       className="
-      mt-2 bg-white border border-gray-200 rounded-2xl p-3
+      mt-2 bg-white border border-gray-200 rounded-2xl p-0
       max-h-[70vh] overflow-y-auto
       md:absolute md:shadow-xl md:z-50
     "
