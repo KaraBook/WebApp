@@ -166,7 +166,7 @@ export default function ViewInvoice() {
           </button>
         </div>
 
-        <div className="bg-white shadow-lg rounded-xl max-w-3xl p-2 border border-gray-100">
+        <div className="invoice-root bg-white max-w-4xl mx-auto border rounded-lg px-4 sm:px-8 py-6 sm:py-10 text-sm text-gray-800">
           <div ref={invoiceRef}>
             <InvoicePreview invoice={invoice} />
           </div>
