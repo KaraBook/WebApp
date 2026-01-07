@@ -508,7 +508,7 @@ export default function OfflineBooking() {
   // ---------- RENDER ----------
 
   return (
-    <div className="bg-[#f5f5f7] min-h-screen px-8 py-6">
+    <div className="bg-[#f5f5f7] min-h-screen md:px-8 md:py-6 px-2 py-4">
     <div className="max-w-6xl p-2 mx-auto">
       <h1 className="text-[26px] font-bold text-gray-900 flex items-center gap-3 mb-2">Create Offline Booking</h1>
 
@@ -678,8 +678,8 @@ export default function OfflineBooking() {
 
           {/* RIGHT: Booking */}
           <Card>
-            <CardHeader>
-              <CardTitle>Booking Details</CardTitle>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="p-4 md:p-6">Booking Details</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-3">
