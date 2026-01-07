@@ -20,15 +20,10 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       className="bg-white max-w-4xl mx-auto border rounded-lg px-4 sm:px-8 py-6 sm:py-10 text-sm text-gray-800"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
+      {/* ================= HEADER ================= */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
         <div className="flex gap-3">
-          <div
-            className="h-10 w-10 rounded-md bg-primary flex items-center justify-center text-white font-semibold uppercase"
-            style={{
-              fontSize: "20px",
-              lineHeight: "40px",
-            }}
-          >
+          <div className="h-10 w-10 text-[20px] rounded-md bg-primary grid place-items-center text-white font-semibold uppercase leading-none">
             {invoice.propertyName?.charAt(0) || "P"}
           </div>
           <div>
