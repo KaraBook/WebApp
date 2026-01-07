@@ -23,7 +23,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       {/* ================= HEADER ================= */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
         <div className="flex gap-3">
-          <div className="h-10 w-10 text-[20px] rounded-md bg-primary flex items-center justify-center text-white font-semibold uppercase">
+          <div className="h-10 w-10 text-[20px] rounded-md bg-primary grid place-items-center text-white font-semibold uppercase leading-none">
             {invoice.propertyName?.charAt(0) || "P"}
           </div>
           <div>

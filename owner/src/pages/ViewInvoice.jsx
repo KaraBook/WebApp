@@ -43,29 +43,56 @@ export default function ViewInvoice() {
     try {
       toast.info("Generating invoice…");
 
-      await new Promise((r) => setTimeout(r, 300)); 
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+
+      await new Promise((r) => setTimeout(r, 200));
 
       const element = invoiceRef.current;
-      const canvas = await html2canvas(element, { scale: 2 });
+      if (!element) return;
+
+      const prevWidth = element.style.width;
+      const prevMaxWidth = element.style.maxWidth;
+
+      element.style.width = "794px";
+      element.style.maxWidth = "794px";
+
+      const canvas = await html2canvas(element, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        windowWidth: 794,
+        letterRendering: true,
+      });
+
+      element.style.width = prevWidth;
+      element.style.maxWidth = prevMaxWidth;
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
       const pdf = new jsPDF("p", "mm", "a4");
 
-      const imgWidth = 210;
+      const pageWidth = 210;
       const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
-      let heightLeft = imgHeight;
-      let position = 0;
+      if (imgHeight <= pageHeight) {
+        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, imgHeight);
+      } else {
+        let heightLeft = imgHeight;
+        let position = 0;
 
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        pdf.addPage();
-        position = heightLeft - imgHeight;
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", 0, position, pageWidth, imgHeight);
         heightLeft -= pageHeight;
+
+        while (heightLeft > 0) {
+          pdf.addPage();
+          position -= pageHeight;
+          pdf.addImage(imgData, "JPEG", 0, position, pageWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
       }
 
       pdf.save(`Invoice_${id}.pdf`);
@@ -120,7 +147,10 @@ export default function ViewInvoice() {
         </div>
 
         {/* INVOICE CARD */}
-        <div className="bg-white shadow-lg rounded-xl max-w-3xl p-2 border border-gray-100">
+        <div
+          ref={ref}
+          className="invoice-pdf bg-white max-w-4xl mx-auto border rounded-lg px-4 sm:px-8 py-6 sm:py-10 text-sm text-gray-800"
+        >
           <div ref={invoiceRef}>
             <InvoicePreview invoice={invoice} />
           </div>
