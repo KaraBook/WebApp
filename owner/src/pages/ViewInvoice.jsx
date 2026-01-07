@@ -52,6 +52,7 @@ export default function ViewInvoice() {
       const element = invoiceRef.current;
       if (!element) return;
 
+      // 🔥 REMOVE visual offsets BEFORE capture
       const root = element.querySelector(".invoice-root");
 
       const prevMargin = root.style.margin;
@@ -61,6 +62,7 @@ export default function ViewInvoice() {
       root.style.margin = "0";
       root.style.paddingTop = "0";
       root.style.boxShadow = "none";
+
 
       const prevWidth = element.style.width;
       const prevMaxWidth = element.style.maxWidth;
