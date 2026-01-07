@@ -339,7 +339,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
                     <Calendar className="w-4 h-4 text-gray-500" />
                 </div>
                 {showCalendar && (
-                    <div className="absolute rounded-[12px] top-[71px] -left-[10%] md:left-0 bg-white p-1 md:p-3 shadow-2xl border border-gray-100 pl-[35px] md:pl-[42px] z-[999999]">
+                    <div className="absolute rounded-[12px] top-[71px] -left-[1%] md:left-0 bg-white p-1 md:p-3 shadow-2xl border border-gray-100 pl-[35px] md:pl-[42px] z-[999999]">
                         <DateRange
                             ranges={dateRange}
                             onChange={(item) => setDateRange([item.selection])}
