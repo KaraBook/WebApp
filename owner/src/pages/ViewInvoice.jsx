@@ -96,7 +96,9 @@ export default function ViewInvoice() {
         const yOffset =
           imgHeight < pageHeight ? (pageHeight - imgHeight) / 2 : 0;
 
-        pdf.addImage(imgData, "JPEG", 0, yOffset, pageWidth, imgHeight);
+        const TOP_MARGIN_MM = 15;
+
+        pdf.addImage(imgData, "JPEG", 0, TOP_MARGIN_MM, pageWidth, imgHeight);
 
       } else {
         let heightLeft = imgHeight;
