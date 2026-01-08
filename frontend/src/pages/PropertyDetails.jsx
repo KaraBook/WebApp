@@ -332,7 +332,7 @@ export default function PropertyDetails() {
           Back
         </button>
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex md:flex-row flex-col items-start gap-[1rem] md:items-center justify-between mb-4">
           <div>
             <h1 className="text-3xl font-bold text-black font-sans">
               {property.propertyName}
@@ -341,7 +341,7 @@ export default function PropertyDetails() {
             <div className="flex items-center gap-2 text-[15px] text-gray-800 mt-1">
 
               <span className="flex items-center gap-1 font-medium">
-                <Star className="w-4 h-4 text-black fill-yellow-400" />
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                 {property.averageRating ? property.averageRating.toFixed(1) : "0.0"}
               </span>
 
@@ -468,7 +468,7 @@ export default function PropertyDetails() {
             <h2 className="text-xl font-semibold flex items-center gap-2 mb-2">
               About this property
             </h2>
-            <p className="text-gray-700 leading-relaxed mb-6">{property.description}</p>
+            <p className="text-gray-700 leading-relaxed md:text-[16px] text-[14px] mb-6">{property.description}</p>
 
             <div className="border-t pt-6 mt-6">
               <h2 className="text-xl font-semibold flex items-center gap-2 mb-3">
@@ -491,8 +491,8 @@ export default function PropertyDetails() {
 
                   return (
                     <div key={value} className="flex items-center gap-2 text-gray-800 bg-gray-100 px-3 py-3 rounded-lg">
-                      <Icon className="w-5 h-5 text-primary" />
-                      <span>{amenity.label}</span>
+                      <Icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                      <span className="text-[14px] md:text-[16px]">{amenity.label}</span>
                     </div>
                   );
                 })}

@@ -151,9 +151,26 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-[12px] p-6">
+      <DialogContent className="sm:max-w-md rounded-[12px] w-[95%] p-4 md:p-6">
+        {/* CUSTOM CLOSE BUTTON */}
+  <button
+    onClick={() => onOpenChange(false)}
+    className="
+      absolute top-2 right-2
+      z-10
+      rounded-[10px]
+      p-1
+      px-[10px]
+      bg-gray-100 hover:bg-gray-200
+      text-gray-700
+      transition
+    "
+    aria-label="Close"
+  >
+    ✕
+  </button>
         <DialogHeader>
-          <DialogTitle className="text-[22px] font-semibold tracking-tight">
+          <DialogTitle className="text-[22px] pt-6 md:pt-0 font-semibold tracking-tight">
             Continue with mobile number
           </DialogTitle>
 

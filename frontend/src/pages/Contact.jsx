@@ -7,27 +7,27 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-[#f2f2f0]">
 
-      <section className="py-16 text-center">
-        <h1 className="text-4xl md:text-4xl font-semibold tracking-wide text-[#233b19] uppercase">
+      <section className="py-6 md:py-16 text-center">
+        <h1 className="md:text-4xl text-2xl md:text-4xl font-semibold tracking-wide text-[#233b19] uppercase">
           Contact Us
         </h1>
 
-        <div className="w-24 h-[3px] bg-[#2aa5a0] mx-auto mt-4"></div>
+        <div className="w-24 h-[3px] bg-[#2aa5a0] mx-auto mt-2 md:mt-4"></div>
 
-        <p className="text-gray-600 text-base mt-4">
+        <p className="text-gray-600 text-[15px]  md:text-base mt-4">
           We’re here to help. Let’s make your stay unforgettable.
         </p>
       </section>
 
-      <section className="max-w-7xl mx-auto px-6 pb-20 grid md:grid-cols-2 gap-12">
+      <section className="max-w-7xl mx-auto px-4 md:px-6 pb-20 grid md:grid-cols-2 gap-12">
 
-        <div className="p-10 bg-white shadow-xl border border-gray-200 rounded-none">
+        <div className="p-4 md:p-10 bg-white shadow-xl border border-gray-200 rounded-[12px]">
 
-          <h2 className="text-2xl font-semibold text-gray-900 mb-6 tracking-wide">
+          <h2 className="text-2xl font-semibold text-gray-900 pb-4 md:mb-6 tracking-wide">
             Get in Touch
           </h2>
 
-          <p className="text-gray-600 mb-8 leading-relaxed">
+          <p className="text-gray-600 text-[14px] mb-8 leading-relaxed">
             Whether you have questions about bookings, payments, or want to list your resort — we’re here to help.
           </p>
 
@@ -59,37 +59,37 @@ export default function Contact() {
         </div>
 
         {/* RIGHT CARD — CONTACT FORM */}
-        <div className="p-10 bg-white shadow-xl border border-gray-200 rounded-none">
+        <div className="p-4 md:p-10 bg-white shadow-xl border border-gray-200 rounded-[12px]">
 
           <h2 className="text-2xl font-semibold text-gray-900 mb-6 tracking-wide">
             Send Us a Message
           </h2>
 
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             
             <Input
               placeholder="Your Name"
-              className="rounded-none h-12 text-sm tracking-wide border-gray-300 focus:border-[#0e8892] focus:ring-0"
+              className="rounded-[10px] h-12 text-sm tracking-wide border-gray-300 focus:border-[#0e8892] focus:ring-0"
             />
 
             <Input
               placeholder="Your Email"
               type="email"
-              className="rounded-none h-12 text-sm tracking-wide border-gray-300 focus:border-[#0e8892] focus:ring-0"
+              className="rounded-[10px] h-12 text-sm tracking-wide border-gray-300 focus:border-[#0e8892] focus:ring-0"
             />
 
             <Input
               placeholder="Phone Number"
               type="text"
-              className="rounded-none h-12 text-sm tracking-wide border-gray-300 focus:border-[#0e8892] focus:ring-0"
+              className="rounded-[10px] h-12 text-sm tracking-wide border-gray-300 focus:border-[#0e8892] focus:ring-0"
             />
 
             <Textarea
               placeholder="Your Message..."
-              className="rounded-none h-32 text-sm tracking-wide border-gray-300 focus:border-[#0e8892] focus:ring-0"
+              className="rounded-[10px] h-32 text-sm tracking-wide border-gray-300 focus:border-[#0e8892] focus:ring-0"
             />
 
-            <Button className="w-full rounded-none h-12 tracking-[2px] text-sm uppercase bg-[#0e8892] hover:bg-[#0b6f75]">
+            <Button className="w-full rounded-[10px] h-12 tracking-[2px] text-sm uppercase bg-[#0e8892] hover:bg-[#0b6f75]">
               Send Message
             </Button>
 
@@ -98,7 +98,7 @@ export default function Contact() {
       </section>
 
       {/* MAP SECTION */}
-      <section className="w-full h-[380px] border-t border-gray-300 shadow-inner">
+      <section className="w-full h-[280px] md:h-[380px] border-t border-gray-300 shadow-inner">
         <iframe
           title="Google Map"
           className="w-full h-full"

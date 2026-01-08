@@ -184,3 +184,70 @@
     transform: scale(0.98);
   }
 }
+
+/* ================= MOBILE PROPERTY GALLERY ================= */
+
+.mobile-property-gallery {
+  height: 260px;
+}
+
+/* ---------- Arrows ---------- */
+.mobile-property-gallery .swiper-button-prev,
+.mobile-property-gallery .swiper-button-next {
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.mobile-property-gallery .swiper-button-prev::after,
+.mobile-property-gallery .swiper-button-next::after {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Arrow positioning (EXACT) */
+.mobile-property-gallery .swiper-button-prev {
+  left: 14px;
+}
+.mobile-property-gallery .swiper-button-next {
+  right: 14px;
+}
+
+/* ---------- Pagination ---------- */
+.mobile-property-gallery .swiper-pagination {
+  bottom: 12px !important;
+}
+
+.mobile-property-gallery .swiper-pagination-bullet {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 1;
+  margin: 0 4px !important;
+  border-radius: 999px;
+  transition: all 0.3s ease;
+}
+
+.mobile-property-gallery .swiper-pagination-bullet-active {
+  width: 20px;
+  background: #ffffff;
+}
+.swiper-navigation-icon{
+  color: #000;
+}
+.swiper-button-next svg{
+  width : 8px;
+}
+.swiper-button-prev svg{
+  width : 8px;
+}
+
+.lucide-x{
+  display: none;
+}
+.swiper-pagination-bullet-active{
+  background: #038ba0 !important;
+}
