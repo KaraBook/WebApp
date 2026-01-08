@@ -153,17 +153,30 @@ export default function Properties() {
         </button>
 
         {/* 👇 INLINE FILTERS (EXPAND BELOW) */}
-        {showMobileFilters && (
-          <div className="mt-12 bg-white rounded-2xl shadow-sm p-0">
-            <PropertyFilters
-              onFilter={(filters) => {
-                fetchProperties(filters);
-                setShowMobileFilters(false);
-              }}
-              defaultValues={defaultValues}
-            />
+        <div
+          className={`
+    transition-all duration-300 ease-out
+    ${showMobileFilters
+              ? "max-h-[1200px] opacity-100 translate-y-0 mt-3"
+              : "max-h-0 opacity-0 -translate-y-2 mt-0"
+            }
+  `}
+        >
+          {/* 👇 THIS is the overflow controller */}
+          <div className="overflow-hidden pt-10 bg-white rounded-2xl ">
+            {/* 👇 REAL CONTENT — NO CLIPPING */}
+            <div className="bg-white rounded-2xl shadow-sm">
+              <PropertyFilters
+                onFilter={(filters) => {
+                  fetchProperties(filters);
+                  setShowMobileFilters(false);
+                }}
+                defaultValues={defaultValues}
+              />
+            </div>
           </div>
-        )}
+        </div>
+
       </div>
 
       {/* Sticky Filters (Desktop only) */}
