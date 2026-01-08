@@ -120,7 +120,7 @@ export default function Properties() {
 
 
       {/* Mobile Search Trigger + Inline Filters */}
-      <div className="md:hidden px-2 -mt-[40px] z-30 relative">
+      <div className="md:hidden px-2 -mt-[35px] z-30 relative">
         <button
           onClick={() => setShowMobileFilters((p) => !p)}
           className="w-full bg-white rounded-2xl shadow-sm border border-[#E5EAF1] px-4 py-4 flex items-center justify-between"
