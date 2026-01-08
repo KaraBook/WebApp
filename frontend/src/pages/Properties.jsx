@@ -6,12 +6,13 @@ import PropertyCard from "../components/PropertyCard";
 import PropertyFilters from "../components/PropertyFilters";
 import { useSearchParams } from "react-router-dom";
 import PropertyTopFilters from "@/components/PropertyTopFilters";
-import { Star } from "lucide-react";
+import { Star, SlidersHorizontal } from "lucide-react";
 
 export default function Properties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
 
   const [topFilters, setTopFilters] = useState({
@@ -94,7 +95,7 @@ export default function Properties() {
     <div className="max-w-full mx-auto">
       {/* Banner */}
       <div className="relative w-full p-[10px] md:p-[20px] bg-[#E6F4F1]">
-        <div className="flex items-center flex-col pt-[40px] gap-[10px] md:pt-[80px] pb-[40px] md:pb-[140px]">
+        <div className="flex items-center flex-col pt-[20px] gap-[10px] md:pt-[80px] pb-[20px] md:pb-[140px]">
           <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full">
             <Star className="h-4 w-4 text-accent fill-yellow-400" />
             <span className="text-sm font-medium text-primary">
@@ -117,8 +118,56 @@ export default function Properties() {
         <img src="/banimg1.jpg" className="hidden md:block w-[160px] rounded-[12px] absolute top-[54%] right-[10%]" />
       </div>
 
-      {/* Sticky Filters */}
-      <div className="md:sticky md:top-[70px] top-0 z-[50]">
+
+      {/* Mobile Search Trigger + Inline Filters */}
+      <div className="md:hidden px-2 -mt-[40px] z-30 relative">
+        <button
+          onClick={() => setShowMobileFilters((p) => !p)}
+          className="w-full bg-white rounded-2xl shadow-sm border border-[#E5EAF1] px-4 py-4 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#EAF4F2] flex items-center justify-center">
+              <svg
+                className="w-5 h-5 text-primary"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
+
+            <div className="text-left">
+              <p className="text-sm font-semibold text-[#1F2A2E]">Where to?</p>
+              <p className="text-xs text-[#64748B]">
+                Add dates · Add guests
+              </p>
+            </div>
+          </div>
+
+          <div className="w-9 h-9 rounded-full bg-[#F4F1EB] flex items-center justify-center">
+            <SlidersHorizontal className="w-4 h-4 text-[#1F2A2E]" />
+          </div>
+        </button>
+
+        {/* 👇 INLINE FILTERS (EXPAND BELOW) */}
+        {showMobileFilters && (
+          <div className="mt-12 bg-white rounded-2xl shadow-sm p-0">
+            <PropertyFilters
+              onFilter={(filters) => {
+                fetchProperties(filters);
+                setShowMobileFilters(false);
+              }}
+              defaultValues={defaultValues}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Sticky Filters (Desktop only) */}
+      <div className="hidden md:block md:sticky md:top-[70px] z-[50]">
         <div className="max-w-6xl mx-auto px-4 -mt-[50px]">
           <PropertyFilters
             onFilter={fetchProperties}

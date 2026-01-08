@@ -473,7 +473,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
             {/* Search Button */}
             <button
                 onClick={applyFilters}
-                className="bg-primary rounded-[8px] text-white px-8 py-2 mt-6 font-semibold transition-all duration-300 shadow-md"
+                className="bg-primary w-full md:w-auto rounded-[8px] text-white px-8 py-2 mt-3 md:mt-6 font-semibold transition-all duration-300 shadow-md"
             >
                 Search
             </button>
