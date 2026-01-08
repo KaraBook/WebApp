@@ -109,7 +109,7 @@ export default function Home() {
           transition={{ delay: 0.3, duration: 0.6 }}
           className="absolute -bottom-[200px] md:-bottom-[50px] w-full flex justify-center px-4 z-10"
         >
-          <div className="hidden md:block absolute -bottom-[50px] w-full px-4 z-10">
+          <div className="hidden md:block absolute -bottom-[20px] w-full px-4 z-10">
             <div className="max-w-6xl mx-auto">
               <PropertyFilters onFilter={handleFilter} />
             </div>
