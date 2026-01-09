@@ -9,16 +9,16 @@ export default function Footer() {
         <div className="absolute -bottom-32 -right-32 w-64 h-64 md:w-96 md:h-96 bg-white/10 rounded-full" />
 
         <div className="relative z-10 max-w-5xl mx-auto px-6 py-10 text-center text-white">
-          <h2 className="text-2xl md:text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[#fff] mt-2">
             Own a Property? List It With Us
           </h2>
 
-          <p className="text-[14px] md:text-lg text-white/90 max-w-2xl mx-auto mb-8">
-            Join thousands of property owners and start earning from your
+          <p className="text-sm md:text-base text-white text-center mt-4 ">
+            Join thousands of property owners and start earning from your<br></br>
             vacation property. Easy setup, instant visibility, secure payments.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col mt-4 sm:flex-row items-center justify-center gap-4">
             {/* Primary Button */}
             <button className="bg-white text-primary font-medium px-8 py-2 md:py-3 rounded-[10px] md:rounded-[12px] flex items-center gap-2 hover:bg-gray-100 transition">
               List Your Property
@@ -37,7 +37,7 @@ export default function Footer() {
 
       {/* ================= MAIN FOOTER ================= */}
       <div className="w-full bg-[#1f242e] ">
-        <div className="max-w-7xl mx-auto px-6 py-4 md:py-12">
+        <div className="max-w-full mx-auto px-6 py-4 md:py-12">
 
           {/* MAIN GRID */}
           <div className="flex flex-wrap gap-8 md:gap-5">

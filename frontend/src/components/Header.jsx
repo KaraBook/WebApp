@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
 import { ChevronRight, CalendarCheck, Heart, User as UserIcon, Star,
-  LifeBuoy, LogOut, Menu, X} from "lucide-react";
+  LifeBuoy, LogOut, Menu, X, Home, Search, Settings} from "lucide-react";
 
 export default function Header({ onLoginClick }) {
   const { user, clearAuth } = useAuthStore();
@@ -75,28 +75,92 @@ export default function Header({ onLoginClick }) {
             onClick={() => setMobileOpen(!mobileOpen)}
             className="p-1 text-white rounded-md bg-primary"
           >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileOpen ? <span className="px-[6px]">X</span> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </div>
 
-      {mobileOpen && (
-        <div className="md:hidden bg-white border-t shadow-sm animate-slideDown">
-          <div className="flex flex-col gap-4 px-4 py-4">
+      {/* ================= MOBILE SIDE DRAWER ================= */}
+<div
+  className={`
+    fixed inset-0 z-[999999]
+    md:hidden
+    transition-opacity duration-300
+    ${mobileOpen ? "opacity-100 visible" : "opacity-0 invisible"}
+  `}
+>
+  {/* BACKDROP */}
+  <div
+    onClick={() => setMobileOpen(false)}
+    className="absolute inset-0 bg-black/40"
+  />
 
-            <Link to="/properties" onClick={() => setMobileOpen(false)}>
-              Explore
-            </Link>
-            <Link to="/top-places" onClick={() => setMobileOpen(false)}>
-              Top Places
-            </Link>
-            <Link to="/contact" onClick={() => setMobileOpen(false)}>
-              Contact
-            </Link>
-
-          </div>
+  {/* DRAWER */}
+  <div
+    className={`
+      absolute left-0 top-0 h-full w-[280px]
+      bg-white shadow-2xl
+      transition-transform duration-300 ease-out
+      ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+    `}
+  >
+    {/* HEADER */}
+    <div className="flex items-center justify-between px-4 py-4 border-b">
+      <div className="flex items-center gap-2">
+        <div className="h-9 w-9 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+          K
         </div>
+        <div>
+          <p className="text-sm font-semibold">KaraBook</p>
+          <p className="text-xs text-gray-500">
+            {user ? user.name : "Guest User"}
+          </p>
+        </div>
+      </div>
+
+      <button onClick={() => setMobileOpen(false)}>
+        <X className="h-5 w-5 text-gray-600" />
+      </button>
+    </div>
+
+    {/* MENU */}
+    <div className="px-3 py-4 space-y-1">
+      <MobileItem icon={<Home />} label="Home" to="/" setMobileOpen={setMobileOpen} />
+      <MobileItem icon={<Search />} label="Explore" to="/properties" setMobileOpen={setMobileOpen} />
+      <MobileItem icon={<Heart />} label="Favorites" to="/account/wishlist" setMobileOpen={setMobileOpen} />
+      <MobileItem icon={<UserIcon />} label="Profile" to="/account/profile" setMobileOpen={setMobileOpen} />
+      <MobileItem icon={<Settings />} label="Settings" to="/account/settings" setMobileOpen={setMobileOpen} />
+      <MobileItem icon={<LifeBuoy />} label="Help & Support" to="/account/support" setMobileOpen={setMobileOpen} />
+    </div>
+
+    {/* FOOTER */}
+    <div className="absolute bottom-0 w-full border-t px-4 py-4">
+      {user ? (
+        <button
+          onClick={() => {
+            clearAuth();
+            setMobileOpen(false);
+          }}
+          className="flex items-center gap-3 text-red-600 font-medium"
+        >
+          <LogOut className="h-5 w-5" />
+          Log out
+        </button>
+      ) : (
+        <Button
+          onClick={() => {
+            setMobileOpen(false);
+            onLoginClick();
+          }}
+          className="w-full rounded-[8px]"
+        >
+          Sign In
+        </Button>
       )}
+    </div>
+  </div>
+</div>
+
     </header>
   );
 }
@@ -215,3 +279,22 @@ style.innerHTML = `
 .animate-slideDown { animation: slideDown 0.25s ease-out; }
 `;
 document.head.appendChild(style);
+
+
+
+function MobileItem({ icon, label, to, setMobileOpen }) {
+  return (
+    <Link
+      to={to}
+      onClick={() => setMobileOpen(false)}
+      className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-gray-100 transition"
+    >
+      <div className="h-8 w-8 p-2 rounded-full bg-gray-100 flex items-center justify-center text-gray-700">
+        {icon}
+      </div>
+      <span className="text-[15px] font-medium text-gray-800">
+        {label}
+      </span>
+    </Link>
+  );
+}

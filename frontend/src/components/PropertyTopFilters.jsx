@@ -3,21 +3,17 @@ import { Check, ChevronDown, SlidersHorizontal } from "lucide-react";
 
 export default function PropertyTopFilters({ total, value, onChange }) {
   return (
-    <div className="w-full bg-white rounded-2xl border border-[#E5EAF1] px-4 md:px-6 py-4 mb-6">
+    <div className="w-full hidden md:block bg-white rounded-2xl border border-[#E5EAF1] px-4 md:px-6 py-4 mb-6">
       
-      {/* MAIN CONTAINER */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-        {/* LEFT GROUP */}
         <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
 
-          {/* Filters label */}
           <div className="flex items-center gap-2 text-sm text-[#64748B]">
             <SlidersHorizontal className="w-4 h-4" />
             <span>Filters:</span>
           </div>
 
-          {/* Type */}
           <FilterDropdown
             full
             label={value.type}
@@ -25,7 +21,6 @@ export default function PropertyTopFilters({ total, value, onChange }) {
             onSelect={(v) => onChange({ ...value, type: v })}
           />
 
-          {/* Price */}
           <FilterDropdown
             full
             label={value.price}
@@ -39,7 +34,6 @@ export default function PropertyTopFilters({ total, value, onChange }) {
           />
         </div>
 
-        {/* RIGHT (moves below on mobile automatically) */}
         <div className="md:ml-auto">
           <FilterDropdown
             full

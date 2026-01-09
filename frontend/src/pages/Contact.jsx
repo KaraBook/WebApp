@@ -7,12 +7,10 @@ export default function Contact() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-[#f2f2f0]">
 
-      <section className="py-6 md:py-16 text-center">
-        <h1 className="md:text-4xl text-2xl md:text-4xl font-semibold tracking-wide text-[#233b19] uppercase">
+      <section className="py-6 md:py-10 text-center">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-[#0F172A] mt-2">
           Contact Us
         </h1>
-
-        <div className="w-24 h-[3px] bg-[#2aa5a0] mx-auto mt-2 md:mt-4"></div>
 
         <p className="text-gray-600 text-[15px]  md:text-base mt-4">
           We’re here to help. Let’s make your stay unforgettable.

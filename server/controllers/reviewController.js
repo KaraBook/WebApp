@@ -45,11 +45,21 @@ export const addReview = async (req, res) => {
       comment,
     });
 
-    const allReviews = await Review.find({ propertyId });
-    const avgRating =
-      allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+    const stats = await Review.aggregate([
+      { $match: { propertyId: new mongoose.Types.ObjectId(propertyId) } },
+      {
+        $group: {
+          _id: "$propertyId",
+          avgRating: { $avg: "$rating" },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
 
-    await Property.findByIdAndUpdate(propertyId, { averageRating: avgRating });
+    await Property.findByIdAndUpdate(propertyId, {
+      averageRating: stats[0]?.avgRating || 0,
+      reviewCount: stats[0]?.count || 0,
+    });
 
     res.status(201).json({ success: true, data: review });
 
@@ -101,13 +111,21 @@ export const deleteReview = async (req, res) => {
 
     const propertyId = review.propertyId;
     await Review.deleteOne({ _id: reviewId });
-    const allReviews = await Review.find({ propertyId });
-    const avgRating =
-      allReviews.length > 0
-        ? allReviews.reduce((s, r) => s + r.rating, 0) / allReviews.length
-        : 0;
+    const stats = await Review.aggregate([
+      { $match: { propertyId: new mongoose.Types.ObjectId(propertyId) } },
+      {
+        $group: {
+          _id: "$propertyId",
+          avgRating: { $avg: "$rating" },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
 
-    await Property.findByIdAndUpdate(propertyId, { averageRating: avgRating });
+    await Property.findByIdAndUpdate(propertyId, {
+      averageRating: stats[0]?.avgRating || 0,
+      reviewCount: stats[0]?.count || 0,
+    });
 
     res.json({ success: true, message: "Review removed" });
   } catch (err) {

@@ -29,6 +29,18 @@ const amenitiesMap = amenitiesCategories
     return acc;
   }, {});
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return isDesktop;
+}
+
 
 export default function PropertyDetails() {
   const { id } = useParams();
@@ -37,6 +49,7 @@ export default function PropertyDetails() {
   const { wishlist, setWishlist, user, showAuthModal, accessToken } = useAuthStore();
   const navigate = useNavigate();
   const [reviews, setReviews] = useState([]);
+  const isDesktop = useIsDesktop();
   const [newReview, setNewReview] = useState({
     rating: 0,
     comment: "",
@@ -247,27 +260,27 @@ export default function PropertyDetails() {
   };
 
   const images = [
-  property?.coverImage,
-  ...(property?.galleryPhotos || []),
-]
-  .filter(Boolean)
-  .filter((img) => {
-    // normalize
-    if (typeof img === "string") {
-      // HARD BLOCK Aadhaar / Shop Act by content
-      return !img.toLowerCase().includes("aadhaar");
-    }
+    property?.coverImage,
+    ...(property?.galleryPhotos || []),
+  ]
+    .filter(Boolean)
+    .filter((img) => {
+      // normalize
+      if (typeof img === "string") {
+        // HARD BLOCK Aadhaar / Shop Act by content
+        return !img.toLowerCase().includes("aadhaar");
+      }
 
-    // object-based images
-    if (img?.fieldname === "shopAct") return false;
-    if (img?.type === "shopAct") return false;
+      // object-based images
+      if (img?.fieldname === "shopAct") return false;
+      if (img?.type === "shopAct") return false;
 
-    const src = img?.url || img?.path || "";
-    return !src.toLowerCase().includes("aadhaar");
-  })
-  .map((img) =>
-    typeof img === "string" ? img : img.url || img.path
-  );
+      const src = img?.url || img?.path || "";
+      return !src.toLowerCase().includes("aadhaar");
+    })
+    .map((img) =>
+      typeof img === "string" ? img : img.url || img.path
+    );
 
   const renderGallery = () => {
     if (images.length === 1) {
@@ -649,9 +662,10 @@ export default function PropertyDetails() {
 
                 <div
                   onClick={() => {
-                    setShowCalendar(true);
+                    setShowCalendar((prev) => !prev);
                     setShowGuestDropdown(false);
                   }}
+
                   className="grid grid-cols-2 rounded-[12px] border border-gray-300 overflow-hidden cursor-pointer"
                 >
                   <div className="border-r p-3 bg-white hover:bg-gray-50">
@@ -672,13 +686,13 @@ export default function PropertyDetails() {
                 {showCalendar && (
                   <div
                     className="
-      absolute mt-3 bg-white border shadow-2xl rounded-[12px]
+      absolute mt-3 -left-[10%] md:-left-[95%] bg-white border shadow-2xl rounded-[12px]
       z-[999] p-4 w-[680px] max-w-[90vw] pl-[42px] right-0
     "
                   >
                     <DateRange
                       ranges={dateRange}
-                      months={2}
+                      months={isDesktop ? 2 : 1}
                       direction="horizontal"
                       showDateDisplay={false}
                       moveRangeOnFirstSelection={false}

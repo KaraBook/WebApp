@@ -2,12 +2,24 @@ import { useState, useEffect, useRef } from "react";
 import { DateRange } from "react-date-range";
 import Select from "react-select";
 import { format } from "date-fns";
-import { Calendar } from "lucide-react";
+import { Calendar, CalendarRange, Map, MapPin, Navigation, Users, Search } from "lucide-react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import SummaryApi from "@/common/SummaryApi";
 import Axios from "@/utils/Axios";
 import { STATE_CODE_TO_NAME } from "@/utils/stateMap";
+
+
+function FilterLabel({ icon: Icon, text }) {
+    return (
+        <label className="flex items-center gap-1.5 mb-2 text-[12px] font-semibold uppercase text-gray-800 ml-1">
+            <Icon className="w-3.5 h-3.5 text-primary" />
+            {text}
+        </label>
+    );
+}
+
+
 
 export default function PropertyFilters({ onFilter, defaultValues = {}, enableStickyGlass = false, }) {
     const [locationTree, setLocationTree] = useState([]);
@@ -236,23 +248,22 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
 
 
     return (
-<div
-  ref={filterRef}
-  className={`
+        <div
+            ref={filterRef}
+            className={`
     w-full p-[25px] flex flex-wrap items-center justify-between gap-3
     relative -mt-10 z-[20] overflow-visible
     transition-all duration-300
 
-    ${
-      enableStickyGlass && isSticky
-        ? "glass-filter"
-        : "bg-white shadow-xl border border-gray-100 rounded-[15px]"
-    }
+    ${enableStickyGlass && isSticky
+                    ? "glass-filter"
+                    : "bg-white shadow-xl border border-gray-100 rounded-[15px]"
+                }
   `}
->
+        >
             {/* State */}
             <div className="flex-1 min-w-[150px] z-10">
-                <label className="text-[14px] text-black uppercase ml-1">State</label>
+                <FilterLabel icon={Map} text="State" />
                 <Select
                     options={states}
                     placeholder="Select state"
@@ -279,7 +290,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
 
             {/* City */}
             <div className="flex-1 min-w-[150px]">
-                <label className="text-[14px] text-black uppercase ml-1">City</label>
+                <FilterLabel icon={MapPin} text="City" />
                 <Select
                     options={cities}
                     placeholder="Select city"
@@ -307,7 +318,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
 
             {/* Area */}
             <div className="flex-1 min-w-[150px]">
-                <label className="text-[14px] text-black uppercase ml-1">Area</label>
+                <FilterLabel icon={Navigation} text="Area" />
                 <Select
                     options={areas}
                     placeholder="Select area"
@@ -325,7 +336,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
 
             {/* Date Range */}
             <div className="flex-1 min-w-[200px] relative" ref={calendarRef}>
-                <label className="text-[14px] text-black uppercase ml-1">Check-in - Check-out</label>
+                <FilterLabel icon={CalendarRange} text="Check-in · Check-out" />
                 <div
                     className="flex items-center justify-between border bg-[#ededed] rounded-[8px] border-gray-200 hover:border-primary px-4 py-2 mt-1 cursor-pointer transition-all duration-200"
                     onClick={() => setShowCalendar(!showCalendar)}
@@ -339,7 +350,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
                     <Calendar className="w-4 h-4 text-gray-500" />
                 </div>
                 {showCalendar && (
-                    <div className="absolute rounded-[12px] top-[71px] -left-[12%] md:left-0 bg-white p-1 md:p-3 shadow-2xl border border-gray-100 pl-[35px] md:pl-[42px] z-[999999]">
+                    <div className="absolute rounded-[12px] top-[71px] -left-[7.5%] md:left-0 bg-white p-1 md:p-3 shadow-2xl border border-gray-100 pl-[35px] md:pl-[42px] z-[999999]">
                         <DateRange
                             ranges={dateRange}
                             onChange={(item) => setDateRange([item.selection])}
@@ -410,7 +421,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
 
             {/* Guests */}
             <div className="flex-1 min-w-[180px] relative" ref={guestRef}>
-                <label className="text-[14px] text-black uppercase ml-1">Travellers</label>
+                <FilterLabel icon={Users} text="Travellers" />
 
                 <div
                     onClick={() => setShowGuestBox(!showGuestBox)}
@@ -473,8 +484,19 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
             {/* Search Button */}
             <button
                 onClick={applyFilters}
-                className="bg-primary w-full md:w-auto rounded-[8px] text-white px-8 py-2 mt-3 md:mt-6 font-semibold transition-all duration-300 shadow-md"
+                className="
+    bg-primary w-full md:w-auto
+    rounded-[8px]
+    text-white
+    px-6 py-2
+    mt-3 md:mt-6
+    font-semibold
+    transition-all duration-300
+    shadow-md
+    flex items-center justify-center gap-2
+  "
             >
+                <Search className="w-4 h-4" />
                 Search
             </button>
         </div>

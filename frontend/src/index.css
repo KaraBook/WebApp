@@ -251,3 +251,8 @@
 .swiper-pagination-bullet-active{
   background: #038ba0 !important;
 }
+
+.ply{
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 36px;
+}

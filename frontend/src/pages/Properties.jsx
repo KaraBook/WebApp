@@ -7,12 +7,14 @@ import PropertyFilters from "../components/PropertyFilters";
 import { useSearchParams } from "react-router-dom";
 import PropertyTopFilters from "@/components/PropertyTopFilters";
 import { Star, SlidersHorizontal } from "lucide-react";
+import PropertyFilterPopup from "@/components/PropertyFilterPopup";
 
 export default function Properties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
 
 
   const [topFilters, setTopFilters] = useState({
@@ -49,6 +51,16 @@ export default function Properties() {
     const city = searchParams.get("city");
     if (state) filters.state = state;
     if (city) filters.city = city;
+
+    const propertyType = searchParams.get("propertyType");
+    const minPrice = searchParams.get("minPrice");
+    const maxPrice = searchParams.get("maxPrice");
+    const sort = searchParams.get("sort");
+
+    if (propertyType) filters.propertyType = propertyType;
+    if (minPrice) filters.minPrice = Number(minPrice);
+    if (maxPrice) filters.maxPrice = Number(maxPrice);
+    if (sort) filters.sort = sort;
 
     const guestsParam = searchParams.get("guests");
     if (guestsParam) {
@@ -98,14 +110,14 @@ export default function Properties() {
         <div className="flex items-center flex-col pt-[20px] gap-[10px] md:pt-[80px] pb-[20px] md:pb-[140px]">
           <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full">
             <Star className="h-4 w-4 text-accent fill-yellow-400" />
-            <span className="text-sm font-medium text-primary">
+            <span className=" text-[11px] md:text-xs uppercase tracking-widest text-primary font-semibold">
               Curated stays across top destinations
             </span>
           </div>
 
-          <h1 className="font-display text-[42px] md:text-6xl lg:text-7xl font-bold leading-tight text-center">
-            <span className="block text-[#1F2A2E]">Discover Your</span>
-            <span className="block pb-[18px] bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent">
+          <h1 className="font-display text-4xl md:text-5xl text-center font-extrabold leading-tight">
+            <span className="block text-[#1F2A2E] mb-1">Discover Your</span>
+            <span className="block bg-gradient-to-b from-primary text-center to-[#9AA06B] bg-clip-text text-transparent pb-6 md:pb-2">
               Perfect Gateway
             </span>
           </h1>
@@ -121,38 +133,44 @@ export default function Properties() {
 
       {/* Mobile Search Trigger + Inline Filters */}
       <div className="md:hidden px-2 -mt-[35px] z-30 relative">
-        <button
-          onClick={() => setShowMobileFilters((p) => !p)}
-          className="w-full bg-white rounded-2xl shadow-sm border border-[#E5EAF1] px-4 py-4 flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#EAF4F2] flex items-center justify-center">
-              <svg
-                className="w-5 h-5 text-primary"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowMobileFilters((p) => !p)}
+            className="w-full bg-white rounded-2xl shadow-sm border border-[#E5EAF1] px-4 py-2 flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#EAF4F2] flex items-center justify-center">
+                <svg
+                  className="w-5 h-5 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </div>
+
+              <div className="text-left">
+                <p className="text-sm font-semibold text-[#1F2A2E]">Where to?</p>
+                <p className="text-xs text-[#64748B]">
+                  Add dates · Add guests
+                </p>
+              </div>
+            </div>
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowFilterPopup(true);
+              }}
+              className="w-12 h-12 -mr-2 shadow-sm border border-[#E5EAF1] rounded-[10px] bg-[#fff] flex items-center justify-center">
+              <SlidersHorizontal className="w-5 h-5 text-[#1F2A2E]" />
             </div>
 
-            <div className="text-left">
-              <p className="text-sm font-semibold text-[#1F2A2E]">Where to?</p>
-              <p className="text-xs text-[#64748B]">
-                Add dates · Add guests
-              </p>
-            </div>
-          </div>
+          </button>
+        </div>
 
-          <div className="w-9 h-9 rounded-full bg-[#F4F1EB] flex items-center justify-center">
-            <SlidersHorizontal className="w-4 h-4 text-[#1F2A2E]" />
-          </div>
-        </button>
-
-        {/* 👇 INLINE FILTERS (EXPAND BELOW) */}
         <div
           className={`
     transition-all duration-300 ease-out
@@ -163,7 +181,7 @@ export default function Properties() {
   `}
         >
           {/* 👇 THIS is the overflow controller */}
-          <div className="overflow-hidden pt-10 bg-white rounded-2xl ">
+          <div className="pt-10 bg-white rounded-2xl ">
             {/* 👇 REAL CONTENT — NO CLIPPING */}
             <div className="bg-white rounded-2xl shadow-sm">
               <PropertyFilters
@@ -213,6 +231,37 @@ export default function Properties() {
           </div>
         )}
       </div>
+
+
+      <PropertyFilterPopup
+        open={showFilterPopup}
+        onClose={() => setShowFilterPopup(false)}
+        onApply={(filters) => {
+          const apiFilters = {};
+
+          if (filters.propertyType && filters.propertyType !== "all") {
+            apiFilters.propertyType = filters.propertyType;
+          }
+
+          if (filters.price) {
+            apiFilters.minPrice = filters.price[0];
+            apiFilters.maxPrice = filters.price[1];
+          }
+
+          if (filters.recommendation === "topRated") {
+            apiFilters.sort = "rating_desc";
+          }
+          if (filters.recommendation === "trending") {
+            apiFilters.sort = "popular";
+          }
+          if (filters.recommendation === "new") {
+            apiFilters.sort = "latest";
+          }
+          fetchProperties(apiFilters);
+          setShowFilterPopup(false);
+        }}
+      />
+
 
     </div>
   );

@@ -16,6 +16,11 @@ import CarouselCard from "@/components/CarouselCard";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import { SlidersHorizontal } from "lucide-react";
 import { Fragment } from "react";
+import TopDestinations from "@/components/TopDestinations";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import PropertyFilterPopup from "@/components/PropertyFilterPopup";
+
+
 
 
 const fadeUp = {
@@ -49,6 +54,9 @@ export default function Home() {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [swiperInstance, setSwiperInstance] = useState(null);
+  const [showFilterPopup, setShowFilterPopup] = useState(false);
+
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -80,7 +88,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen relative">
 
-      <section className="relative w-full h-[60vh] md:h-[85vh] flex flex-col md:flex-row md:items-center pt-[15vh]">
+      <section className="relative w-full h-[68vh] md:h-[85vh] flex flex-col md:flex-row md:items-center pt-[15vh]">
         <img
           src="/bannerImg1.webp"
           alt="Banner"
@@ -94,12 +102,16 @@ export default function Home() {
           animate="visible"
           className="relative z-10 text-center text-white px-4 mx-auto"
         >
-          <h1 className="text-3xl md:text-5xl tracking-[2px] uppercase font-[600] mb-3">
+          <h1 className="ply text-3xl md:text-5xl leading-[45px] tracking-[2px] uppercase font-[600] mb-3">
             Discover Stays That Feel Like Home
           </h1>
           <p className="text-sm md:text-lg text-gray-200 max-w-xl mx-auto">
             Find beautiful resorts, villas, and getaways across India — book your next escape effortlessly.
           </p>
+          <Button className="bg-yellow-600 text-white text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold">
+            Explore Destination
+          </Button>
+
         </motion.div>
 
         {/* FILTERS */}
@@ -117,10 +129,8 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ================= MOBILE SEARCH TRIGGER + INLINE FILTERS ================= */}
       <div className="md:hidden px-2 -mt-[35px] z-30 relative">
 
-        {/* WHERE TO BUTTON */}
         <button
           onClick={() => setShowMobileFilters((p) => !p)}
           className="w-full bg-white rounded-2xl shadow-sm border border-[#E5EAF1]
@@ -150,12 +160,16 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="w-9 h-9 rounded-full bg-[#F4F1EB] flex items-center justify-center">
-            <SlidersHorizontal className="w-4 h-4 text-[#1F2A2E]" />
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowFilterPopup(true);
+            }}
+            className="w-12 h-12 -mr-2 shadow-sm border border-[#E5EAF1] rounded-[10px] bg-[#fff] flex items-center justify-center">
+            <SlidersHorizontal className="w-5 h-5 text-[#1F2A2E]" />
           </div>
         </button>
 
-        {/* INLINE FILTERS (EXPAND BELOW) */}
         <div
           className={`
       transition-all duration-300 ease-out
@@ -165,11 +179,11 @@ export default function Home() {
             }
     `}
         >
-          <div className="overflow-hidden pt-10 bg-white rounded-2xl">
+          <div className="pt-10 bg-white rounded-2xl">
             <div className="bg-white rounded-2xl shadow-sm">
               <PropertyFilters
                 onFilter={(filters) => {
-                  handleFilter(filters);   // 🔥 NAVIGATES TO /properties
+                  handleFilter(filters);
                   setShowMobileFilters(false);
                 }}
               />
@@ -185,69 +199,131 @@ export default function Home() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="max-w-7xl w-full mx-auto mt-[50px] md:mt-[130px] flex flex-wrap justify-between items-center"
+        className="max-w-7xl mx-auto px-4 mt-[50px] md:mt-[140px]"
       >
-        <motion.div variants={fadeUp} className="flex flex-col items-center md:items-start gap-4">
-          <span className="text-sm font-medium text-primary">
-            Curated stays across top destinations
-          </span>
-          <h1 className="font-display text-4xl lg:text-5xl font-bold">
-            <span className="block text-[#1F2A2E] text-center md:text-left">Find Your</span>
-            <span className="block bg-gradient-to-b from-primary text-center md:text-left to-[#9AA06B] bg-clip-text text-transparent">
-              Perfect Stay
-            </span>
-          </h1>
-          <p className="text-gray-600 max-w-sm text-center text-[14px] md:text-[16px] md:text-left">
-            Experience the best of Maharashtra, from city life to coastal and hill escapes.
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center jusstify-between">
 
-          <Button
-            onClick={() => navigate("/properties")}
-            className=" relative w-fit overflow-hidden rounded-[10px] bg-primary text-white px-6 py-5 font-medium group">
-            <span className="relative z-10 flex items-center gap-2">
-              Explore Beautiful Stays
-              <span className="transition-transform duration-300 group-hover:translate-x-1">
-                →
+          <motion.div
+            variants={fadeUp}
+            className="flex flex-col items-center lg:items-start text-center lg:text-left gap-2 md:gap-5"
+          >
+            <span className="text-xs uppercase tracking-widest text-primary font-semibold">
+              Curated stays across top destinations
+            </span>
+
+            <h2 className="font-display text-4xl md:text-5xl font-extrabold leading-tight">
+              <span className="block text-[#1F2A2E]">Find Your</span>
+              <span className="block bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent pb-2">
+                Perfect Stay
               </span>
-            </span>
-            <span
-              className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-          </Button>
-        </motion.div>
+            </h2>
 
-        {/* AUTO CAROUSEL */}
-        <motion.div
-          variants={fadeUp}
-          className="
-    relative
-    w-full lg:w-[55%]
-    mt-6 lg:mt-4
-  "
-        >
-          {/* LEFT GRADIENT — DESKTOP ONLY */}
-          <div className="hidden lg:block absolute left-0 top-0 h-full w-16 z-20 bg-gradient-to-r from-white to-transparent" />
+            <p className="text-gray-600 max-w-md text-[15px] md:text-[16px]">
+              From peaceful hill retreats to luxurious pool villas and coastal escapes —
+              discover stays that match your travel mood.
+            </p>
 
-          <div className="overflow-hidden">
-            <div
-              className="
-        carousel-track
-        flex gap-4
-        animate-scroll
-        md:animate-scroll-slow
-      "
+            <Button
+              onClick={() => navigate("/properties")}
+              className="relative overflow-hidden rounded-[10px] bg-primary text-white px-7 py-5 font-semibold group"
             >
-              {[...Array(2)].flatMap((_, idx) => (
-                <Fragment key={idx}>
-                  <CarouselCard title="Villas" subtitle="Experience Luxury" img="/banimg1.jpg" />
-                  <CarouselCard title="Tents" subtitle="Close to Nature" img="/bannerimg.webp" />
-                  <CarouselCard title="Hotels" subtitle="Comfort & Convenience" img="/bannerImg1.webp" />
-                </Fragment>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+              <span className="relative z-10 flex items-center gap-2">
+                Explore Beautiful Stays
+                <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+            </Button>
+          </motion.div>
 
+          <div className="block md:hidden relative mt-6">
+            <button
+              id="exp-prev"
+              className="
+      absolute left-[-14px] top-1/2 -translate-y-1/2 z-20
+      h-9 w-9 rounded-full bg-white shadow-md
+      flex items-center justify-center
+    "
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-700" />
+            </button>
+
+            <button
+              id="exp-next"
+              className="
+      absolute right-[-14px] top-1/2 -translate-y-1/2 z-20
+      h-9 w-9 rounded-full bg-white shadow-md
+      flex items-center justify-center
+    "
+            >
+              <ChevronRight className="w-5 h-5 text-gray-700" />
+            </button>
+
+            <Swiper
+              modules={[Navigation]}
+              slidesPerView={1.2}
+              spaceBetween={14}
+              navigation={{
+                prevEl: "#exp-prev",
+                nextEl: "#exp-next",
+              }}
+              className="px-2"
+            >
+              <SwiperSlide>
+                <ExperienceCard
+                  title="Luxury Villas"
+                  subtitle="Private · Premium · Scenic"
+                  img="/banimg1.jpg"
+                />
+              </SwiperSlide>
+
+              <SwiperSlide>
+                <ExperienceCard
+                  title="Nature Tents"
+                  subtitle="Calm · Green · Peaceful"
+                  img="/bannerimg.webp"
+                />
+              </SwiperSlide>
+
+              <SwiperSlide>
+                <ExperienceCard
+                  title="Hill Retreats"
+                  subtitle="Cool · Quiet · Views"
+                  img="/banimg1.jpg"
+                />
+              </SwiperSlide>
+            </Swiper>
+          </div>
+
+          <motion.div
+            variants={fadeUp}
+            className="
+    hidden md:flex
+    gap-6
+    md:max-w-[640px]
+    ml-auto
+  "
+          >
+            <ExperienceCard
+              title="Luxury Villas"
+              subtitle="Private · Premium · Scenic"
+              img="/banimg1.jpg"
+            />
+            <ExperienceCard
+              title="Nature Tents"
+              subtitle="Calm · Green · Peaceful"
+              img="/bannerimg.webp"
+            />
+            <ExperienceCard
+              title="Hill Retreats"
+              subtitle="Cool · Quiet · Views"
+              img="/banimg1.jpg"
+            />
+          </motion.div>
+
+
+        </div>
       </motion.section>
+
 
       <motion.section
         variants={fadeUp}
@@ -263,68 +339,154 @@ export default function Home() {
         <WhyChooseUs />
       </div>
 
-      <motion.section
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        className="w-full mt-[0px] md:mt-[50px] py-16 bg-white overflow-hidden"
-      >
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-2 md:items-center mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold">Popular Stays</h2>
-            <Button
-              onClick={() => navigate("/properties")}
-              className=" relative overflow-hidden rounded-[10px] bg-primary text-white px-6 py-5 font-medium group">
-              <span className="relative z-10 flex items-center gap-2">
-                View All Properties
-                <span className="transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </span>
-              <span
-                className="absolute inset-0 bg-gradient-to-r from-primary via-white/30 to-primary translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            </Button>
 
+      <section className="w-full bg-white py-8 mt-2 md:mt-0 md:py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col justify-center items-center md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10">
+            <div>
+              <p className="text-xs tracking-widest uppercase text-primary text-center md:text-left font-[700]">
+                Handpicked for you
+              </p>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-[#0F172A] text-center md:text-left mt-2">
+                Featured Properties
+              </h2>
+              <p className="text-sm md:text-base text-slate-600 mt-2 max-w-xl text-center md:text-left">
+                Explore our most loved stays, chosen for comfort, location, and experience.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => navigate("/properties")}
+                className="h-11 rounded-[10px] px-8 bg-primary text-white font-semibold hover:opacity-90"
+              >
+                View All →
+              </Button>
+            </div>
           </div>
 
+          {/* SWIPER */}
           <Swiper
-            modules={[Navigation, Autoplay, FreeMode]}
-            onBeforeInit={(swiper) => {
-              swiper.params.navigation.prevEl = prevRef.current;
-              swiper.params.navigation.nextEl = nextRef.current;
+            modules={[Navigation, Autoplay]}
+            spaceBetween={18}
+            slidesPerView={1.15}
+            loop={properties.length > 4}
+            autoplay={{ delay: 3200, disableOnInteraction: false }}
+            onSwiper={setSwiperInstance}
+            breakpoints={{
+              480: { slidesPerView: 1.25 },
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 4 },
             }}
-            loop
-            autoplay={{ delay: 1, disableOnInteraction: false }}
-            speed={5000}
-            freeMode
-            slidesPerView="auto"
-            spaceBetween={16}
+            className="featuredPropsSwiper"
           >
-            {properties.map((property, i) => (
-              <SwiperSlide key={i} style={{ width: "250px", height: "100%" }} className="flex">
-                <motion.div
-                  variants={cardFade}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  whileHover={{ scale: 1.03 }}
-                  className="md:h-[470px] h-[420px] w-full pt-[20px] md:pt-[40px] pb-[30px] md:pb-[70px] flex"
-                >
+            <div className="flex items-center justify-end p-4 gap-3">
+              <button
+                onClick={() => swiperInstance?.slidePrev()}
+                className="hidden md:flex h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
+              >
+                ‹
+              </button>
+              <button
+                onClick={() => swiperInstance?.slideNext()}
+                className="hidden md:flex h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
+              >
+                ›
+              </button>
+            </div>
+            {properties.map((property) => (
+              <SwiperSlide key={property._id} className="!h-auto">
+                <div className="h-full">
                   <PropertyCard property={property} />
-                </motion.div>
+                </div>
               </SwiperSlide>
             ))}
           </Swiper>
 
-          {/* ARROWS */}
-          <div className="hidden md:flex justify-end gap-3 mt-6">
-            <button ref={prevRef} className="w-10 h-10 bg-gray-100">←</button>
-            <button ref={nextRef} className="w-10 h-10 bg-gray-100">→</button>
-          </div>
         </div>
-      </motion.section>
+      </section>
 
+      <section className="w-full bg-[#faf7f4] py-8 md:py-10">
+        <TopDestinations />
+      </section>
+
+
+
+      <PropertyFilterPopup
+        open={showFilterPopup}
+        onClose={() => setShowFilterPopup(false)}
+        onApply={(filters) => {
+          const params = new URLSearchParams();
+
+          if (filters.propertyType && filters.propertyType !== "all") {
+            params.set("propertyType", filters.propertyType);
+          }
+
+          if (filters.price) {
+            params.set("minPrice", filters.price[0]);
+            params.set("maxPrice", filters.price[1]);
+          }
+
+          if (filters.recommendation === "topRated") {
+            params.set("sort", "rating_desc");
+          }
+          if (filters.recommendation === "trending") {
+            params.set("sort", "popular");
+          }
+          if (filters.recommendation === "new") {
+            params.set("sort", "latest");
+          }
+
+          navigate(`/properties?${params.toString()}`);
+
+          setShowFilterPopup(false);
+        }}
+      />
     </div>
+  );
+}
+
+
+function ExperienceCard({ title, subtitle, img }) {
+  return (
+    <motion.div
+      whileHover={{ y: -6 }}
+      transition={{ type: "spring", stiffness: 220, damping: 20 }}
+      className="
+        relative
+        min-w-[180px] md:min-w-[200px]
+        h-[280px]
+        rounded-[22px]
+        overflow-hidden
+        shadow-none
+        md:shadow-[0_12px_35px_rgba(0,0,0,0.18)]
+        cursor-pointer
+        group
+        flex-shrink-0
+      "
+    >
+      <img
+        src={img}
+        alt={title}
+        className="
+          absolute inset-0
+          w-full h-full
+          object-cover
+          transition-transform duration-700
+          group-hover:scale-110
+        "
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+
+      <div className="absolute bottom-5 left-5 right-5 text-white">
+        <h3 className="text-[15px] font-semibold leading-tight">
+          {title}
+        </h3>
+        <p className="text-xs text-white/80 mt-1">
+          {subtitle}
+        </p>
+      </div>
+    </motion.div>
   );
 }

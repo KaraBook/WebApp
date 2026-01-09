@@ -41,14 +41,14 @@ export default function WhyChooseUs() {
       <div className="max-w-7xl mx-auto px-4">
 
         {/* HEADER */}
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="text-sm font-medium tracking-widest text-primary uppercase mb-2">
+        <div className="text-center max-w-2xl mx-auto mb-8 md:mb-14">
+          <p className="text-xs tracking-widest uppercase text-primary font-[700]">
             Why Choose Us
           </p>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0F172A] mb-4">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-[#0F172A] mt-2">
             Travel with Confidence
           </h2>
-          <p className="text-gray-600 md:text-[16px] text-[14px]">
+          <p className="text-sm md:text-base text-center text-slate-600 mt-2">
             We make your travel experience seamless, secure, and memorable.
           </p>
         </div>
@@ -102,29 +102,45 @@ export default function WhyChooseUs() {
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
                 viewport={{ once: true }}
+
+                whileHover={{ y: -6 }}
                 className="
-                  bg-white
-                  rounded-2xl
-                  border border-[#E5EAF1]
-                  p-6
-                  shadow-sm
-                  hover:shadow-md
-                  transition
-                "
+    group
+    bg-white
+    rounded-2xl
+    border border-[#E5EAF1]
+    p-6
+
+    transition-shadow duration-150 ease-out
+    hover:shadow-[0_14px_30px_rgba(3,139,160,0.18)]
+  "
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                  <Icon className="w-6 h-6 text-primary" />
+                {/* ICON */}
+                <div
+                  className="
+      w-12 h-12 rounded-xl
+      bg-primary/10
+      flex items-center justify-center
+      mb-5
+
+      transition-colors duration-150 ease-out
+      group-hover:bg-primary
+    "
+                >
+                  <Icon className="w-6 h-6 text-primary transition-colors duration-150 group-hover:text-white" />
                 </div>
 
                 <h3 className="text-lg font-semibold text-[#0F172A] mb-2">
                   {item.title}
                 </h3>
+
                 <p className="text-sm text-gray-600 leading-relaxed">
                   {item.desc}
                 </p>
               </motion.div>
+
             );
           })}
         </div>

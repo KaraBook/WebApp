@@ -1,6 +1,6 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, MapPin, Home } from "lucide-react";
+import { Heart, MapPin, Home, Star } from "lucide-react";
 import { useAuthStore } from "../store/auth";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
@@ -72,7 +72,7 @@ export default function PropertyCard({ property }) {
           onClick={toggleWishlist}
           className="
             absolute top-3 right-3
-            bg-white/90 backdrop-blur
+            bg-white backdrop-blur
             rounded-full p-2
             shadow-sm
             hover:shadow-md
@@ -81,8 +81,8 @@ export default function PropertyCard({ property }) {
         >
           <Heart
             className={`w-4 h-4 ${inWishlist
-                ? "text-red-500 fill-red-500"
-                : "text-gray-600"
+              ? "text-red-500 fill-red-500"
+              : "text-gray-600"
               }`}
           />
         </button>
@@ -91,7 +91,7 @@ export default function PropertyCard({ property }) {
         <div
           className="
             absolute top-3 left-3
-            bg-white/90 backdrop-blur
+            bg-white backdrop-blur
             text-xs font-medium
             px-3 py-1
             rounded-full
@@ -114,18 +114,18 @@ export default function PropertyCard({ property }) {
           </Link>
 
           {/* Rating */}
-          <div className="flex items-center text-yellow-400 text-sm">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i}>
-                {i < Math.round(property.averageRating || 0) ? "★" : "☆"}
-              </span>
-            ))}
-            <span className="text-gray-500 text-xs ml-1">
-              {property.averageRating
-                ? property.averageRating.toFixed(1)
-                : "0.0"}
+          <div className="flex items-center gap-1 text-sm text-gray-800 shrink-0">
+            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+
+            <span className="font-medium">
+              {property.averageRating ? property.averageRating.toFixed(1) : "0.0"}
+            </span>
+
+            <span className="text-gray-500">
+              ({property.reviewCount || 0})
             </span>
           </div>
+
         </div>
 
         <div className="flex items-center text-sm text-gray-500 mt-1">
