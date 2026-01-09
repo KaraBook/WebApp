@@ -220,7 +220,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
             paddingLeft: "8px",
             height: "40px",
             cursor: "pointer",
-            backgroundColor: "#ededed",
+            backgroundColor: "#ffffff",
             borderRadius: "8px",
         }),
         menuList: (provided) => ({
@@ -338,7 +338,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
             <div className="flex-1 min-w-[200px] relative" ref={calendarRef}>
                 <FilterLabel icon={CalendarRange} text="Check-in · Check-out" />
                 <div
-                    className="flex items-center justify-between border bg-[#ededed] rounded-[8px] border-gray-200 hover:border-primary px-4 py-2 mt-1 cursor-pointer transition-all duration-200"
+                    className="flex items-center justify-between border bg-[#fff] rounded-[8px] border-gray-200 hover:border-primary px-4 py-2 mt-1 cursor-pointer transition-all duration-200"
                     onClick={() => setShowCalendar(!showCalendar)}
                 >
                     <span className="text-gray-700 text-sm font-medium">
@@ -350,7 +350,21 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
                     <Calendar className="w-4 h-4 text-gray-500" />
                 </div>
                 {showCalendar && (
-                    <div className="absolute rounded-[12px] top-[71px] -left-[7.5%] md:left-0 bg-white p-1 md:p-3 shadow-2xl border border-gray-100 pl-[35px] md:pl-[42px] z-[999999]">
+                    <div
+  className="
+    absolute top-[71px]
+    left-1/2 -translate-x-1/2
+    md:left-0 md:translate-x-0
+    bg-white
+    rounded-[12px]
+    p-1 md:p-3
+    shadow-2xl
+    border border-gray-100
+    pl-[35px] md:pl-[42px]
+    z-[999999]
+  "
+>
+
                         <DateRange
                             ranges={dateRange}
                             onChange={(item) => setDateRange([item.selection])}
@@ -425,7 +439,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
 
                 <div
                     onClick={() => setShowGuestBox(!showGuestBox)}
-                    className="border rounded-[8px] bg-[#ededed] text-sm border-gray-200 hover:border-primary px-4 py-2 mt-1 cursor-pointer flex items-center justify-between"
+                    className="border rounded-[8px] bg-[#fff] text-sm border-gray-200 hover:border-primary px-4 py-2 mt-1 cursor-pointer flex items-center justify-between"
                 >
                     <span>{guests.adults + guests.children} guests</span>
                 </div>

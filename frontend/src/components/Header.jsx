@@ -98,7 +98,7 @@ export default function Header({ onLoginClick }) {
   {/* DRAWER */}
   <div
     className={`
-      absolute left-0 top-0 h-full w-[280px]
+      absolute left-0 top-0 h-full w-[220px]
       bg-white shadow-2xl
       transition-transform duration-300 ease-out
       ${mobileOpen ? "translate-x-0" : "-translate-x-full"}

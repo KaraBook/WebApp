@@ -19,6 +19,8 @@ import { Fragment } from "react";
 import TopDestinations from "@/components/TopDestinations";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyFilterPopup from "@/components/PropertyFilterPopup";
+import WelcomeSection from "@/components/WelcomeSection";
+import ExperiencesSection from "@/components/FacilitiesExperience";
 
 
 
@@ -90,7 +92,7 @@ export default function Home() {
 
       <section className="relative w-full h-[68vh] md:h-[85vh] flex flex-col md:flex-row md:items-center pt-[15vh]">
         <img
-          src="/bannerImg1.webp"
+          src="/bannermg2.webp"
           alt="Banner"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -103,13 +105,13 @@ export default function Home() {
           className="relative z-10 text-center text-white px-4 mx-auto"
         >
           <h1 className="ply text-3xl md:text-5xl leading-[45px] tracking-[2px] uppercase font-[600] mb-3">
-            Discover Stays That Feel Like Home
+            Your Perfect Gateway Just A Click Away
           </h1>
           <p className="text-sm md:text-lg text-gray-200 max-w-xl mx-auto">
-            Find beautiful resorts, villas, and getaways across India — book your next escape effortlessly.
+            Discover verified villas, farmhouses, and resorts across Maharashtra.
           </p>
-          <Button className="bg-yellow-600 text-white text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold">
-            Explore Destination
+          <Button className="bg-[#FBB017] text-white text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold">
+            Find Your Stay
           </Button>
 
         </motion.div>
@@ -406,8 +408,17 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="w-full bg-[#faf7f4] py-8 md:py-10">
+
+      <div>
+        <WelcomeSection />
+      </div>
+
+      <section className="w-full bg-[#faf7f4] py-8 md:py-10 mt-20 md:mt-28">
         <TopDestinations />
+      </section>
+
+      <section>
+        <ExperiencesSection />
       </section>
 
 

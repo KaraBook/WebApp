@@ -41,7 +41,7 @@ export default function PropertyFilterPopup({ open, onClose, onApply }) {
     return (
         <div className="fixed inset-0 z-[9999999] flex justify-start bg-black/40">
             {/* PANEL */}
-            <div className="w-[360px] max-w-full h-full bg-white shadow-xl flex flex-col">
+            <div className="w-[285px] max-w-full h-full bg-white shadow-xl flex flex-col">
 
                 {/* HEADER */}
                 <div className="flex items-center justify-between px-5 py-4 border-b">
