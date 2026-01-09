@@ -132,7 +132,13 @@ export default function Properties() {
 
 
       {/* Mobile Search Trigger + Inline Filters */}
-      <div className="md:hidden px-2 -mt-[35px] z-30 relative">
+      <div
+  className={`
+    md:hidden px-2 -mt-[35px] relative
+    ${showMobileFilters || showFilterPopup ? "z-40" : "z-9"}
+  `}
+>
+
         <div className="flex gap-2">
           <button
             onClick={() => setShowMobileFilters((p) => !p)}
