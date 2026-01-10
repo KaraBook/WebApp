@@ -158,7 +158,7 @@ export default function Header({ onLoginClick }) {
                   clearAuth();
                   setMobileOpen(false);
                 }}
-                className="flex items-center gap-3 text-red-600 font-medium"
+                className="flex items-center gap-3 py-5 text-[16px] text-red-600 font-medium"
               >
                 <LogOut className="h-5 w-5" />
                 Log out
@@ -169,7 +169,7 @@ export default function Header({ onLoginClick }) {
                   setMobileOpen(false);
                   onLoginClick();
                 }}
-                className="w-full rounded-[8px]"
+                className="w-full rounded-[8px] py-5 text-[16px]"
               >
                 Sign In
               </Button>

@@ -152,7 +152,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md w-[95%] p-0 rounded-[12px] border-none overflow-hidden">
+      <DialogContent className="sm:max-w-md w-[95%] z-[9999999] p-0 rounded-[12px] border-none overflow-hidden">
         {/* CLOSE */}
         <button
           onClick={() => onOpenChange(false)}
