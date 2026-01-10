@@ -14,7 +14,7 @@ import "swiper/css/navigation";
 import "swiper/css/free-mode";
 import CarouselCard from "@/components/CarouselCard";
 import WhyChooseUs from "@/components/WhyChooseUs";
-import { SlidersHorizontal } from "lucide-react";
+import { Dot, SlidersHorizontal } from "lucide-react";
 import { Fragment } from "react";
 import TopDestinations from "@/components/TopDestinations";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -90,13 +90,13 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen relative">
 
-      <section className="relative w-full h-[68vh] md:h-[85vh] flex flex-col md:flex-row md:items-center pt-[15vh]">
+      <section className="relative w-full h-[70vh] md:h-[85vh] flex flex-col md:flex-row md:items-center pt-[15vh]">
         <img
-          src="/bannermg2.webp"
+          src="/bannerImg3.jpg"
           alt="Banner"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-black/40" />
 
         <motion.div
           variants={fadeUp}
@@ -104,13 +104,16 @@ export default function Home() {
           animate="visible"
           className="relative z-10 text-center text-white px-4 mx-auto"
         >
-          <h1 className="ply text-3xl md:text-5xl leading-[45px] tracking-[2px] uppercase font-[600] mb-3">
-            Your Perfect Gateway Just A Click Away
+          <span className="w-fit text-xs uppercase tracking-[1px] items-center mx-auto -mt-8 md:-mt-28 flex bg-white/20 px-2 md:px-4 rounded-full">
+          <Dot className="w-6 md:w-10 h-10  text-yellow-500"/>Discover Maharashtra's Hidden Gems
+          </span>
+          <h1 className="ply md:text-6xl leading-[45px] mt-4 md:leading-[60px] tracking-[2px]  font-[600] mb-3">
+            Your Perfect Gateway <br></br>Just A Click Away
           </h1>
           <p className="text-sm md:text-lg text-gray-200 max-w-xl mx-auto">
             Discover verified villas, farmhouses, and resorts across Maharashtra.
           </p>
-          <Button className="bg-[#FBB017] text-white text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold">
+          <Button className="bg-[#FBB017] text-black text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold">
             Find Your Stay
           </Button>
 
@@ -136,7 +139,7 @@ export default function Home() {
         <button
           onClick={() => setShowMobileFilters((p) => !p)}
           className="w-full bg-white rounded-2xl shadow-sm border border-[#E5EAF1]
-               px-4 py-4 flex items-center justify-between"
+               px-4 py-2 flex items-center justify-between"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#EAF4F2] flex items-center justify-center">

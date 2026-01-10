@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/auth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
-import { ChevronRight, CalendarCheck, Heart, User as UserIcon, Star,
-  LifeBuoy, LogOut, Menu, X, Home, Search, Settings} from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+  ChevronRight, CalendarCheck, Heart, User as UserIcon, Star,
+  LifeBuoy, LogOut, Menu, X, Home, Search, Settings
+} from "lucide-react";
 
 export default function Header({ onLoginClick }) {
   const { user, clearAuth } = useAuthStore();
@@ -39,7 +41,22 @@ export default function Header({ onLoginClick }) {
           {user ? (
             <AccountDropdown user={user} clearAuth={clearAuth} />
           ) : (
-            <Button onClick={onLoginClick} className="text-sm rounded-[8px] tracking-[3px]">
+            <Button
+              onClick={onLoginClick}
+              className="
+    text-sm
+    rounded-[10px]
+    tracking-[3px]
+    transition-all
+    duration-300
+    ease-out
+    transform
+    hover:-translate-y-[2px]
+    hover:shadow-[0_10px_24px_rgba(0,0,0,0.10)]
+    active:translate-y-0
+    active:shadow-md
+  "
+            >
               SIGN IN <ChevronRight className="w-4 h-4" />
             </Button>
           )}
@@ -81,85 +98,85 @@ export default function Header({ onLoginClick }) {
       </div>
 
       {/* ================= MOBILE SIDE DRAWER ================= */}
-<div
-  className={`
+      <div
+        className={`
     fixed inset-0 z-[999999]
     md:hidden
     transition-opacity duration-300
     ${mobileOpen ? "opacity-100 visible" : "opacity-0 invisible"}
   `}
->
-  {/* BACKDROP */}
-  <div
-    onClick={() => setMobileOpen(false)}
-    className="absolute inset-0 bg-black/40"
-  />
+      >
+        {/* BACKDROP */}
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="absolute inset-0 bg-black/40"
+        />
 
-  {/* DRAWER */}
-  <div
-    className={`
+        {/* DRAWER */}
+        <div
+          className={`
       absolute left-0 top-0 h-full w-[220px]
       bg-white shadow-2xl
       transition-transform duration-300 ease-out
       ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
     `}
-  >
-    {/* HEADER */}
-    <div className="flex items-center justify-between px-4 py-4 border-b">
-      <div className="flex items-center gap-2">
-        <div className="h-9 w-9 rounded-full bg-primary text-white flex items-center justify-center font-bold">
-          K
-        </div>
-        <div>
-          <p className="text-sm font-semibold">KaraBook</p>
-          <p className="text-xs text-gray-500">
-            {user ? user.name : "Guest User"}
-          </p>
+        >
+          {/* HEADER */}
+          <div className="flex items-center justify-between px-4 py-4 border-b">
+            <div className="flex items-center gap-2">
+              <div className="h-9 w-9 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                K
+              </div>
+              <div>
+                <p className="text-sm font-semibold">KaraBook</p>
+                <p className="text-xs text-gray-500">
+                  {user ? user.name : "Guest User"}
+                </p>
+              </div>
+            </div>
+
+            <button onClick={() => setMobileOpen(false)}>
+              <X className="h-5 w-5 text-gray-600" />
+            </button>
+          </div>
+
+          {/* MENU */}
+          <div className="px-3 py-4 space-y-1">
+            <MobileItem icon={<Home />} label="Home" to="/" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<Search />} label="Explore" to="/properties" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<Heart />} label="Favorites" to="/account/wishlist" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<UserIcon />} label="Profile" to="/account/profile" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<Settings />} label="Settings" to="/account/settings" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<LifeBuoy />} label="Help & Support" to="/account/support" setMobileOpen={setMobileOpen} />
+          </div>
+
+          {/* FOOTER */}
+          <div className="absolute bottom-0 w-full border-t px-4 py-4">
+            {user ? (
+              <button
+                onClick={() => {
+                  clearAuth();
+                  setMobileOpen(false);
+                }}
+                className="flex items-center gap-3 text-red-600 font-medium"
+              >
+                <LogOut className="h-5 w-5" />
+                Log out
+              </button>
+            ) : (
+              <Button
+                onClick={() => {
+                  setMobileOpen(false);
+                  onLoginClick();
+                }}
+                className="w-full rounded-[8px]"
+              >
+                Sign In
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-
-      <button onClick={() => setMobileOpen(false)}>
-        <X className="h-5 w-5 text-gray-600" />
-      </button>
-    </div>
-
-    {/* MENU */}
-    <div className="px-3 py-4 space-y-1">
-      <MobileItem icon={<Home />} label="Home" to="/" setMobileOpen={setMobileOpen} />
-      <MobileItem icon={<Search />} label="Explore" to="/properties" setMobileOpen={setMobileOpen} />
-      <MobileItem icon={<Heart />} label="Favorites" to="/account/wishlist" setMobileOpen={setMobileOpen} />
-      <MobileItem icon={<UserIcon />} label="Profile" to="/account/profile" setMobileOpen={setMobileOpen} />
-      <MobileItem icon={<Settings />} label="Settings" to="/account/settings" setMobileOpen={setMobileOpen} />
-      <MobileItem icon={<LifeBuoy />} label="Help & Support" to="/account/support" setMobileOpen={setMobileOpen} />
-    </div>
-
-    {/* FOOTER */}
-    <div className="absolute bottom-0 w-full border-t px-4 py-4">
-      {user ? (
-        <button
-          onClick={() => {
-            clearAuth();
-            setMobileOpen(false);
-          }}
-          className="flex items-center gap-3 text-red-600 font-medium"
-        >
-          <LogOut className="h-5 w-5" />
-          Log out
-        </button>
-      ) : (
-        <Button
-          onClick={() => {
-            setMobileOpen(false);
-            onLoginClick();
-          }}
-          className="w-full rounded-[8px]"
-        >
-          Sign In
-        </Button>
-      )}
-    </div>
-  </div>
-</div>
 
     </header>
   );

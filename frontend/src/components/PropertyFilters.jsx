@@ -302,7 +302,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
                     menuPosition="fixed"
                     menuPlacement="bottom"
                     menuShouldScrollIntoView={false}
-                    className="mt-1 text-sm"
+                    className="mt-1 text-sm hover:border-primary"
                     classNamePrefix="react-select"
                     theme={(theme) => ({
                         ...theme,

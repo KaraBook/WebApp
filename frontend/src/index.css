@@ -5,6 +5,11 @@
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/poppins/700.css";
+
 
 
 @layer base {
@@ -252,7 +257,11 @@
   background: #038ba0 !important;
 }
 
-.ply{
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 36px;
+.ply {
+  font-family: 'Poppins', sans-serif;
+  font-size: 38px;
+}
+
+.react-select__control:hover{
+  border-color: #038ba0 !important;
 }
