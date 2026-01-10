@@ -204,7 +204,7 @@ export default function Home() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="max-w-7xl mx-auto px-4 mt-[50px] md:mt-[140px]"
+        className="max-w-7xl mx-auto px-4 z-[9999999] mt-[50px] md:mt-[140px]"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center jusstify-between">
 
