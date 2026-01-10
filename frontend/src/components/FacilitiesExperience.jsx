@@ -3,26 +3,26 @@ export default function ExperiencesSection() {
     <section className="relative w-full overflow-hidden mt-12 md:mt-20">
       {/* BACKGROUND IMAGE */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center max-h-[65vh]"
         style={{
           backgroundImage: "url('/experiencebg.webp')",
         }}
       />
 
       {/* OVERLAY */}
-      <div className="absolute inset-0 bg-black/55" />
+      <div className="absolute inset-0 bg-black/60 max-h-[65vh]" />
 
       {/* CONTENT */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 md:py-12 text-center text-white">
 
         {/* LABEL */}
-        <p className="text-xs tracking-[3px] uppercase text-[#494949] font-semibold mb-3">
+        <p className="text-xs tracking-[3px] uppercase text-yellow-500 font-semibold mb-3">
           Our Facilities & Experiences
         </p>
 
         {/* HEADING */}
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#212121] leading-tight">
-          Stay For The Comfort, Love The Experiences
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white/80 leading-tight">
+          Stay For The Comfort, <br></br>Love The Experiences
         </h2>
 
         {/* SUBTEXT */}
