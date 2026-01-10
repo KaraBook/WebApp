@@ -21,8 +21,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyFilterPopup from "@/components/PropertyFilterPopup";
 import WelcomeSection from "@/components/WelcomeSection";
 import ExperiencesSection from "@/components/FacilitiesExperience";
-
-
+import WhyListWithUs from "@/components/WhyListWithUs";
 
 
 const fadeUp = {
@@ -424,6 +423,9 @@ export default function Home() {
         <ExperiencesSection />
       </section>
 
+      <section>
+        <WhyListWithUs />
+      </section>
 
 
       <PropertyFilterPopup
