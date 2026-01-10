@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   ChevronRight, CalendarCheck, Heart, User as UserIcon, Star,
-  LifeBuoy, LogOut, Menu, X, Home, Search, Settings
+  LifeBuoy, LogOut, Menu, X, Home, Search, Settings, LucideMenu
 } from "lucide-react";
 
 export default function Header({ onLoginClick }) {
@@ -90,9 +90,9 @@ export default function Header({ onLoginClick }) {
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-1 text-white rounded-md bg-primary"
+            className="p-1 text-black hover:bg-gray-100 rounded-md"
           >
-            {mobileOpen ? <span className="px-[6px]">X</span> : <Menu className="h-6 w-6" />}
+            {mobileOpen ? <span className="px-[6px]">X</span> : <LucideMenu className="h-6 w-6" />}
           </button>
         </div>
       </div>
@@ -115,7 +115,7 @@ export default function Header({ onLoginClick }) {
         {/* DRAWER */}
         <div
           className={`
-      absolute left-0 top-0 h-full w-[220px]
+      absolute left-0 top-0 h-full w-[75vw]
       bg-white shadow-2xl
       transition-transform duration-300 ease-out
       ${mobileOpen ? "translate-x-0" : "-translate-x-full"}

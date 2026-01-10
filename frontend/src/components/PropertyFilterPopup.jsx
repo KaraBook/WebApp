@@ -39,9 +39,13 @@ export default function PropertyFilterPopup({ open, onClose, onApply }) {
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999999] flex justify-start bg-black/40">
+        <div className="fixed inset-0 z-[9999999] flex justify-start bg-black/40"
+          onClick={onClose}
+        >
             {/* PANEL */}
-            <div className="w-[285px] max-w-full h-full bg-white shadow-xl flex flex-col">
+            <div className="w-[80vw] max-w-full h-full bg-white shadow-xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+            >
 
                 {/* HEADER */}
                 <div className="flex items-center justify-between px-5 py-4 border-b">
