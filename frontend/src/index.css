@@ -22,6 +22,8 @@
     --popover-foreground: 240 10% 3.9%;
     --primary: 188 96% 32%;
     --primary-foreground: 0 0% 100%;
+    --primary-from: 187 78% 46%; 
+    --primary-to: 196 84% 35%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
@@ -69,6 +71,15 @@
 }
 
 
+@layer utilities {
+  .bg-primary-gradient {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--primary-from)) 0%,
+      hsl(var(--primary-to)) 100%
+    );
+  }
+}
 
 
 @layer base {
