@@ -273,7 +273,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           </p>
 
           <p className=" border-t text-[12px] text-center text-gray-500 pt-2">
-            By continuing, you agree to our <a href="/terms" className="text-primary">Terms of Service</a> and <a href="/privacy" className="text-primary">Privacy Policy</a>.
+            By continuing, you agree to our <a href="/terms-and-conditions" className="text-primary">Terms & Conditions</a> and <a href="/privacy-policy" className="text-primary">Privacy Policy</a>.
           </p>
         </div>
 

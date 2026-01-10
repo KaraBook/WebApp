@@ -37,7 +37,7 @@ export default function Footer() {
 
       {/* ================= MAIN FOOTER ================= */}
       <div className="w-full bg-[#1f242e] ">
-        <div className="max-w-full mx-auto px-6 py-4 md:py-12">
+        <div className="max-w-full mx-auto px-6 py-4 md:py-6">
 
           {/* MAIN GRID */}
           <div className="flex flex-wrap gap-8 md:gap-5">
@@ -55,10 +55,10 @@ export default function Footer() {
               <h3 className="text-base font-semibold text-gray-300 mb-3 tracking-wide">
                 Explore
               </h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>Top Places</li>
-                <li>Properties</li>
-                <li>Contact</li>
+              <ul className="space-y-2 text-sm text-gray-400 flex flex-col gap-1">
+                <a href="/top-places"><li>Top Places</li></a>
+                <a href="/properties"><li>Properties</li></a>
+                <a href="/contact"><li>Contact</li></a>
               </ul>
             </div>
 
@@ -67,9 +67,9 @@ export default function Footer() {
               <h3 className="text-base font-semibold text-gray-300 mb-3 tracking-wide">
                 For Owners
               </h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>Owner Login</li>
-                <li>List Your Property</li>
+              <ul className="space-y-2 text-sm text-gray-400 flex flex-col gap-1">
+                <a href="/owner-login"><li>Owner Login</li></a>
+                <a href="/list-property"><li>List Your Property</li></a>
               </ul>
             </div>
 
@@ -78,10 +78,10 @@ export default function Footer() {
               <h3 className="text-base font-semibold text-gray-300 mb-3 tracking-wide">
                 Connect
               </h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>Instagram</li>
-                <li>Facebook</li>
-                <li>Twitter</li>
+              <ul className="space-y-2 text-sm text-gray-400 flex flex-col gap-1">
+                <a href="/instagram"><li>Instagram</li></a>
+                <a href="/facebook"><li>Facebook</li></a>
+                <a href="/twitter"><li>Twitter</li></a>
               </ul>
             </div>
 
@@ -90,10 +90,10 @@ export default function Footer() {
               <h3 className="text-base font-semibold text-gray-300 mb-3 tracking-wide">
                 Quick Links
               </h3>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>Privacy Policy</li>
-                <li>Terms and Conditions</li>
-                <li>FAQs</li>
+              <ul className="space-y-2 text-sm text-gray-400 flex flex-col gap-1">
+                <a href="/privacy-policy"><li>Privacy Policy</li></a>
+                <a href="/terms-and-conditions"><li>Terms and Conditions</li></a>
+                <a href="/faqs"><li>FAQs</li></a>
               </ul>
             </div>
           </div>
@@ -102,15 +102,10 @@ export default function Footer() {
           <div className="border-t border-gray-200 mt-6 md:mt-10 pt-4 md:pt-6"></div>
 
           {/* Bottom Section */}
-          <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-300">
+          <div className="flex flex-col sm:flex-row justify-center items-center text-sm text-gray-300">
             <p className="text-center">
-              © {new Date().getFullYear()} KaraBook. All rights reserved.
+              © {new Date().getFullYear()} KaraBook, All rights reserved. Powered by Felicity Studio.
             </p>
-
-            <div className="flex space-x-6 mt-2 md:mt-3 sm:mt-0">
-              <a href="#" className="hover:text-primary">Privacy Policy</a>
-              <a href="#" className="hover:text-primary">Terms of Service</a>
-            </div>
           </div>
 
         </div>
