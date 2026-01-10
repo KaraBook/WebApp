@@ -230,7 +230,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
             onChange={(e) =>
               setOtp(e.target.value.replace(/\D/g, ""))
             }
-            className="rounded-[12px] text-center tracking-[6px]"
+            className="rounded-[10px] text-center tracking-[6px]"
           />
         </div>
 
@@ -248,7 +248,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         </div>
 
         <Button
-          className="w-full py-3 rounded-[12px] bg-primary text-white"
+          className="w-full py-5 rounded-[10px] bg-primary text-white"
           disabled={otp.length !== 6 || verifying}
           onClick={() => verifyOtp(otp)}
         >
