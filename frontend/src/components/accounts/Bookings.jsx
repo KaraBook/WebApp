@@ -277,7 +277,7 @@ export default function Bookings() {
 
         {ratingBooking && (
           <Dialog open={true} onOpenChange={() => setRatingBooking(null)}>
-            <DialogContent className="max-w-md p-6 rounded-none mt-[2rem]">
+            <DialogContent className="max-w-md p-6 z-[9999999] rounded-none mt-[2rem]">
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold">Rate this Resort</DialogTitle>
               </DialogHeader>
