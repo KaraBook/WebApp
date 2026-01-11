@@ -134,7 +134,7 @@ export default function Bookings() {
                       key={b._id}
                       className="hover:bg-gray-50 border-b border-gray-200"
                     >
-                      <td className="px-4 py-3 font-medium text-[#233b19]">
+                      <td className="px-4 py-3 font-medium uppercase text-[#233b19]">
                         #{b._id.slice(-5)}
                       </td>
 
