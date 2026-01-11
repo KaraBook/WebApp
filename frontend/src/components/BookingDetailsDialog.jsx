@@ -151,10 +151,10 @@ export default function BookingDetailsDialog({
 
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[14px] font-semibold text-gray-900 leading-tight">
+              <p className="text-[16px] font-semibold text-gray-900 leading-tight">
                 {userName}
               </p>
-              <p className="text-[12px] text-gray-500 mt-0.5">{email}</p>
+              <p className="text-[14px] text-gray-500 mt-0.5">{email}</p>
             </div>
 
             <Badge tone={getStatusTone(status)}>{String(status).toUpperCase()}</Badge>
@@ -168,8 +168,8 @@ export default function BookingDetailsDialog({
             <div className="flex items-start gap-2">
               <Home className="w-4 h-4 text-gray-400 mt-0.5" />
               <div>
-                <p className="text-[12px] text-gray-500">Property</p>
-                <p className="text-[13px] font-medium text-gray-900 mt-0.5">
+                <p className="text-[14px] text-gray-500">Property</p>
+                <p className="text-[16px] font-medium text-gray-900 mt-0.5">
                   {propertyName}
                 </p>
               </div>
@@ -179,39 +179,39 @@ export default function BookingDetailsDialog({
           {/* Dates + Nights + Guests (2x2) */}
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl border border-gray-200 bg-white p-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center bg-neutral-50 gap-2">
                 <CalendarDays className="w-4 h-4 text-gray-400" />
-                <p className="text-[12px] text-gray-500">Check-in</p>
+                <p className="text-[14px] text-gray-500">Check-in</p>
               </div>
-              <p className="text-[13px] font-medium text-gray-900 mt-1">
+              <p className="text-[16px] font-medium text-gray-900 mt-1">
                 {checkIn ? format(new Date(checkIn), "dd MMM, yyyy") : "—"}
               </p>
             </div>
 
             <div className="rounded-xl border border-gray-200 bg-white p-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center bg-neutral-50 gap-2">
                 <CalendarDays className="w-4 h-4 text-gray-400" />
-                <p className="text-[12px] text-gray-500">Check-out</p>
+                <p className="text-[14px] text-gray-500">Check-out</p>
               </div>
-              <p className="text-[13px] font-medium text-gray-900 mt-1">
+              <p className="text-[16px] font-medium text-gray-900 mt-1">
                 {checkOut ? format(new Date(checkOut), "dd MMM, yyyy") : "—"}
               </p>
             </div>
 
             <div className="rounded-xl border border-gray-200 bg-white p-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center bg-neutral-50 gap-2">
                 <Moon className="w-4 h-4 text-gray-400" />
-                <p className="text-[12px] text-gray-500">Nights</p>
+                <p className="text-[14px] text-gray-500">Nights</p>
               </div>
-              <p className="text-[13px] font-medium text-gray-900 mt-1">{nights}</p>
+              <p className="text-[16px] font-medium text-gray-900 mt-1">{nights}</p>
             </div>
 
             <div className="rounded-xl border border-gray-200 bg-white p-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center bg-neutral-50 gap-2">
                 <Users className="w-4 h-4 text-gray-400" />
-                <p className="text-[12px] text-gray-500">Guests</p>
+                <p className="text-[14px] text-gray-500">Guests</p>
               </div>
-              <p className="text-[13px] font-medium text-gray-900 mt-1">
+              <p className="text-[16px] font-medium text-gray-900 mt-1">
                 {guestsText(booking?.guests)}
               </p>
             </div>

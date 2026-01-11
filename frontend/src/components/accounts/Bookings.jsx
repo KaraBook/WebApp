@@ -81,10 +81,10 @@ export default function Bookings() {
   return (
     <div className="w-full px-2 md:px-4 min-h-[calc(100vh-160px)]">
       {/* TITLE */}
-      <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Bookings</h1>
+      <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19] mb-6">My Bookings</h1>
 
       {/* TABLE WRAPPER */}
-      <div className="border border-gray-200 bg-white rounded-[12px]">
+      <div className="border border-gray-200 bg-white shadow-lg rounded-[12px]">
 
         {/* TABLE SCROLL AREA */}
         <div className="relative overflow-hidden rounded-[12px]">
