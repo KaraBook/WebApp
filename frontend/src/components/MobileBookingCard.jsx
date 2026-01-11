@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import RateBookingDialog from "./RateBookingDialog";
 
 export default function MobileBookingCard({
   booking,
@@ -84,7 +85,7 @@ export default function MobileBookingCard({
 
               <DropdownMenuItem
                 className="py-3 gap-3"
-                onClick={() => onRate?.(booking)}
+                onClick={() => onRate(booking)}
               >
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 Rate this Resort

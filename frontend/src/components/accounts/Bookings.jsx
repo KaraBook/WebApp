@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import BookingDetailsDialog from "../BookingDetailsDialog";
 import MobileBookingCard from "../MobileBookingCard";
+import RateBookingDialog from "../RateBookingDialog";
 
 
 export default function Bookings() {
@@ -294,66 +295,12 @@ export default function Bookings() {
           }}
         />
 
-        {ratingBooking && (
-          <Dialog open={true} onOpenChange={() => setRatingBooking(null)}>
-            <DialogContent className="max-w-md p-6 z-[9999999] rounded-none mt-[2rem]">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-semibold">Rate this Resort</DialogTitle>
-              </DialogHeader>
+        <RateBookingDialog
+          open={!!ratingBooking}
+          booking={ratingBooking}
+          onClose={() => setRatingBooking(null)}
+        />
 
-              <div className="mt-4 space-y-4">
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-6 h-6 cursor-pointer ${star <= (ratingBooking.rating || 0)
-                        ? "text-black fill-black"
-                        : "text-gray-400"
-                        }`}
-                      onClick={() =>
-                        setRatingBooking((rb) => ({ ...rb, rating: star }))
-                      }
-                    />
-                  ))}
-                </div>
-
-                <textarea
-                  className="w-full border p-3"
-                  rows="3"
-                  placeholder="Write your review..."
-                  onChange={(e) =>
-                    setRatingBooking((rb) => ({ ...rb, comment: e.target.value }))
-                  }
-                />
-
-                <button
-                  className="w-full bg-primary text-white py-3 rounded-[12px]"
-                  onClick={async () => {
-                    try {
-                      await Axios.post(
-                        SummaryApi.addReview.url,
-                        {
-                          propertyId: ratingBooking.property?._id,
-                          bookingId: ratingBooking._id,
-                          rating: ratingBooking.rating,
-                          comment: ratingBooking.comment,
-                        },
-                        { headers: { Authorization: `Bearer ${accessToken}` } }
-                      );
-
-                      toast.success("Review submitted!");
-                      setRatingBooking(null);
-                    } catch (err) {
-                      toast.error(err.response?.data?.message || "Failed to submit review");
-                    }
-                  }}
-                >
-                  Submit Review
-                </button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
 
 
         {/* PAGINATION */}
