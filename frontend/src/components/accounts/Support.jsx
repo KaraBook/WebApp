@@ -66,7 +66,7 @@ export default function Support() {
         Support & Help
       </h1>
       <Tabs defaultValue="contact" className="w-full">
-        <TabsList className="grid grid-cols-2 w-full max-w-sm mb-8 rounded-[8px] ">
+        <TabsList className="grid grid-cols-2 w-full bg-[#efefef] max-w-sm mb-8 rounded-[8px] ">
           <TabsTrigger value="contact" className="rounded-[8px]">
             <Mail className="w-4 h-4 mr-2" /> Contact Form
           </TabsTrigger>
