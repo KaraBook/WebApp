@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import { Phone, MoreVertical, Download, FileDown, Eye, Star } from "lucide-react";
+import { Phone, MoreVertical, Download, FileDown, Eye, Star, PhoneCall } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -269,12 +269,17 @@ export default function Bookings() {
                                 window.open(`tel:${b.property?.contactNumber}`)
                               }
                             >
-                              Call Resort
+                              <div className="flex items-center gap-2">
+                                <PhoneCall size={16} /> Call Resort
+                              </div>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem className="text-red-600">
-                              Cancel Booking
-                            </DropdownMenuItem>
+                              <div className="flex items-center gap-2">
+                                <XCircle size={16} />
+                                Cancel Booking
+                              </div>
+                              </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
