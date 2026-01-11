@@ -48,8 +48,8 @@ export default function Ratings() {
     );
 
   return (
-    <div className="max-w-6xl px-4 py-0">
-      <h1 className="text-2xl uppercase tracking-[1px] font-[500] mb-6 text-[#233b19]">
+    <div className="max-w-6xl px-0 md:px-4 py-0">
+      <h1 className="text-2xl uppercase tracking-[1px] font-[600] mb-6 text-[#233b19]">
         My Ratings & Reviews
       </h1>
 

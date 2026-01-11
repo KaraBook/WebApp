@@ -96,7 +96,7 @@ export default function Profile() {
   return (
     <div className="max-w-5xl md:px-4 px-0 py-2 space-y-8">
 
-      <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19] mb-4 md:mb-6">My Profile</h1>
+      <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19] mb-2 md:mb-6">My Profile</h1>
 
       <div
         className="
