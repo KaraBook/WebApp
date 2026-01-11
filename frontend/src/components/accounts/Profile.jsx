@@ -96,13 +96,13 @@ export default function Profile() {
   return (
     <div className="max-w-5xl md:px-4 px-0 py-2 space-y-8">
 
-      <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19] mb-6">My Profile</h1>
+      <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19] mb-4 md:mb-6">My Profile</h1>
 
       <div
         className="
     border shadow-sm rounded-[12px] bg-white p-6
     flex flex-col md:flex-row
-    items-center md:items-start
+    items-start md:items-start
     gap-6
   "
       >
@@ -165,7 +165,7 @@ export default function Profile() {
             {profile.email}
           </p>
 
-          <div className="flex justify-center md:justify-start gap-6 mt-4">
+          <div className="flex justify-start md:justify-start gap-6 mt-4">
             <Stat value={bookingCount} label="Bookings" />
             <Stat value={wishlistCount} label="Wishlist" />
             <Stat value={memberSince} label="Since" />
@@ -175,7 +175,7 @@ export default function Profile() {
         {/* ACTIONS */}
         <div
           className="
-      flex flex-col md:flex-row
+      flex md:flex-row
       gap-3
       w-full md:w-auto
     "
