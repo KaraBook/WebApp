@@ -240,7 +240,7 @@ export default function Bookings() {
                               }}
                             >
                               <div className="flex items-center gap-2">
-                                ⭐ Rate this Resort
+                                <Star size={16} className="text-yellow-500" /> Rate this Resort
                               </div>
                             </DropdownMenuItem>
                             <DropdownMenuItem
