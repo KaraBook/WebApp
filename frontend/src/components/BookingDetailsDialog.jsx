@@ -143,7 +143,7 @@ export default function BookingDetailsDialog({
         <div className="relative px-4 pt-4 pb-3 border-b">
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute right-3 top-3 text-gray-400 hover:text-gray-700"
+            className="absolute right-3 top-3 text-black hover:text-red-700"
             aria-label="Close"
           >
             ✕
