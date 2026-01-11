@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import BookingDetailsDialog from "../BookingDetailsDialog";
 
 
 export default function Bookings() {
@@ -266,182 +267,13 @@ export default function Bookings() {
 
 
         {/* BOOKING DETAILS POPUP */}
-        {selectedBooking && (
-          <Dialog open={true} onOpenChange={() => setSelectedBooking(null)} >
-            <DialogContent
-              className="
-    max-w-3xl
-    w-full
-    max-h-[85vh]
-    overflow-y-auto
-    p-6
-    mt-6
-    rounded-md
-  "
-            >
-
-              <DialogHeader>
-                <DialogTitle className="text-xl font-semibold">Booking Details</DialogTitle>
-              </DialogHeader>
-
-              {/* PROPERTY DETAILS */}
-              <div className="flex gap-4 items-center border-b pb-4 mb-4">
-                <img
-                  src={selectedBooking.property?.coverImage}
-                  className="w-20 h-20 object-cover rounded"
-                />
-                <div>
-                  <p className="font-semibold text-lg">{selectedBooking.property?.propertyName}</p>
-                  <p className="text-gray-600 text-sm">
-                    {selectedBooking.property?.city}, {selectedBooking.property?.state}
-                  </p>
-                </div>
-              </div>
-
-
-              {/* Travellers Details */}
-              <div className="-mt-[15px]">
-                <div className="bg-white border rounded-md p-4">
-                  <h4 className="font-semibold text-gray-800 mb-2">Traveller Details</h4>
-
-                  <div className="text-sm space-y-1 flex items-center gap-4 ">
-                    <p>Name: {fullName(selectedBooking.user)}</p>|
-                    <p>Phone: {selectedBooking.user?.mobile}</p>|
-                    <p>Email: {selectedBooking.user?.email}</p>
-                  </div>
-                </div>
-              </div>
-
-
-              {/* ROW 1 — STAY DETAILS + PRICE BREAKDOWN */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 -mt-[8px]">
-
-                {/* LEFT SIDE — STAY DETAILS */}
-                <div className="md:col-span-2 bg-gray-50 p-4 rounded-md border">
-                  <h4 className="font-semibold mb-2">Stay Details</h4>
-
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase">Check-in</p>
-                      <p className="text-base font-medium mt-1">
-                        {format(new Date(selectedBooking.checkIn), "dd MMM yyyy")}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase">Check-out</p>
-                      <p className="text-base font-medium mt-1">
-                        {format(new Date(selectedBooking.checkOut), "dd MMM yyyy")}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase">Nights</p>
-                      <p className="text-base mt-1 font-semibold text-[#233b19]">
-                        {selectedBooking.totalNights}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase">Payment</p>
-                      <span
-                        className={`inline-block mt-1 px-2 py-1 text-xs font-semibold rounded
-              ${selectedBooking.paymentStatus === "paid"
-                            ? "bg-green-100 text-green-700"
-                            : selectedBooking.paymentStatus === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
-                          }
-            `}
-                      >
-                        {selectedBooking.paymentStatus.toUpperCase()}
-                      </span>
-                    </div>
-
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase">Booking Date</p>
-                      <p className="text-base font-medium mt-1">
-                        {format(new Date(selectedBooking.createdAt), "dd MMM yyyy")}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-gray-500 text-xs uppercase">SubTotal</p>
-                      <p className="text-base font-semibold mt-1">
-                        ₹{selectedBooking.totalAmount.toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className="col-span-3">
-                      {/* HEADERS */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <p className="text-gray-500 text-xs uppercase">Guests</p>
-                        <p className="text-gray-500 text-xs uppercase">Meals Included</p>
-                      </div>
-
-                      {/* VALUES */}
-                      <div className="grid grid-cols-2 gap-4 mt-1 text-[13px] font-medium">
-                        {/* Guests */}
-                        <div>
-                          Adults: {selectedBooking.guests.adults} | Children:{" "}
-                          {selectedBooking.guests.children}
-                        </div>
-
-                        {/* Meals */}
-                        <div>
-                          {selectedBooking.meals ? (
-                            <>
-                              Veg: {selectedBooking.meals.veg || 0} | Non-Veg:{" "}
-                              {selectedBooking.meals.nonVeg || 0} | Combo:{" "}
-                              {selectedBooking.meals.combo || 0}
-                            </>
-                          ) : (
-                            <span className="text-gray-400">Not selected</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-                {/* RIGHT SIDE — PRICE BREAKDOWN */}
-                <div className="bg-white border rounded-md p-4 h-fit shadow-sm">
-                  <h4 className="font-semibold mb-2">Price Breakdown</h4>
-
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">
-                      ₹{selectedBooking.totalAmount.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between text-sm mt-2">
-                    <span className="text-gray-600">Tax (10%)</span>
-                    <span className="font-medium">
-                      ₹{Math.round(selectedBooking.totalAmount * 0.10).toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="border-t my-3"></div>
-
-                  <div className="flex justify-between text-base font-semibold text-[#233b19]">
-                    <span>Total</span>
-                    <span>
-                      ₹{(
-                        selectedBooking.totalAmount +
-                        Math.round(selectedBooking.totalAmount * 0.10)
-                      ).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-
+        <BookingDetailsDialog
+          open={!!selectedBooking}
+          booking={selectedBooking}
+          onOpenChange={(o) => {
+            if (!o) setSelectedBooking(null);
+          }}
+        />
 
         {ratingBooking && (
           <Dialog open={true} onOpenChange={() => setRatingBooking(null)}>
