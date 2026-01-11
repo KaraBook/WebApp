@@ -24,6 +24,7 @@ import {
     getIndianStates,
     getCitiesByState,
 } from "@/utils/locationUtils";
+import { DialogClose } from "@/components/ui/dialog";
 
 
 export default function EditProfileDialog({ open, onClose, profile, onUpdated }) {
