@@ -143,7 +143,7 @@ export default function BookingDetailsDialog({
         <div className="relative px-4 pt-4 pb-3 border-b">
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute right-3 mr-[25px] top-3 text-gray-400 hover:text-gray-700"
+            className="absolute right-3 top-3 text-gray-400 hover:text-gray-700"
             aria-label="Close"
           >
             ✕
@@ -157,7 +157,7 @@ export default function BookingDetailsDialog({
               <p className="text-[12px] text-gray-500 mt-0.5">{email}</p>
             </div>
 
-            <Badge tone={getStatusTone(status)}>{String(status).toUpperCase()}</Badge>
+            <Badge className="mr-[25px]" tone={getStatusTone(status)}>{String(status).toUpperCase()}</Badge>
           </div>
         </div>
 
