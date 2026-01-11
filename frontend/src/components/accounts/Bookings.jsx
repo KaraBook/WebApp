@@ -232,7 +232,7 @@ export default function Bookings() {
                         {format(new Date(b.createdAt), "dd MMM yyyy")}
                       </td>
 
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger>
                             <MoreVertical className="h-5 w-5 text-gray-700 hover:text-black cursor-pointer" />
