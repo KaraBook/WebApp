@@ -277,17 +277,6 @@ export default function Bookings() {
 
         {ratingBooking && (
           <Dialog open={true} onOpenChange={() => setRatingBooking(null)}>
-            <button
-              onClick={() => setRatingBooking(null)}
-              className="
-        absolute top-3 right-3
-        text-gray-400 hover:text-gray-700
-        transition
-      "
-              aria-label="Close"
-            >
-              ✕
-            </button>
             <DialogContent className="max-w-md p-6 z-[9999999] rounded-none mt-[2rem]">
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold">Rate this Resort</DialogTitle>

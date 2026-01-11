@@ -198,7 +198,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
     return (
         <Dialog open={open} onOpenChange={onClose} className="mt-[32px]">
-            <DialogContent className="max-w-xl mt-[32px]">
+            <DialogContent className="max-w-xl mt-[32px] z-[9999999]">
                 <DialogHeader>
                     <DialogTitle>Edit Profile</DialogTitle>
                 </DialogHeader>
