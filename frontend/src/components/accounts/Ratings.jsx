@@ -92,7 +92,7 @@ export default function Ratings() {
                       key={i}
                       className={`w-4 h-4 ${
                         i < r.rating
-                          ? "text-black fill-black"
+                          ? "text-yellow-500 fill-yellow-500"
                           : "text-gray-300"
                       }`}
                     />
