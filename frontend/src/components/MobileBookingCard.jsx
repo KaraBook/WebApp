@@ -138,6 +138,12 @@ export default function MobileBookingCard({
           guests
         </div>
       </div>
+
+      <RateBookingDialog
+        open={!!booking.isRating}
+        booking={booking.isRating}
+        onClose={() => onRate(null)}
+        />
     </div>
   );
 }
