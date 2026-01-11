@@ -93,6 +93,7 @@ export default function Bookings() {
             key={b._id}
             booking={b}
             onView={(booking) => setSelectedBooking(booking)}
+            onRate={(booking) => setRatingBooking(booking)}
           />
         ))}
 
@@ -323,18 +324,18 @@ export default function Bookings() {
 
 
       {/* BOOKING DETAILS */}
-<BookingDetailsDialog
-  open={!!selectedBooking}
-  booking={selectedBooking}
-  onOpenChange={(o) => !o && setSelectedBooking(null)}
-/>
+      <BookingDetailsDialog
+        open={!!selectedBooking}
+        booking={selectedBooking}
+        onOpenChange={(o) => !o && setSelectedBooking(null)}
+      />
 
-{/* RATE BOOKING */}
-<RateBookingDialog
-  open={!!ratingBooking}
-  booking={ratingBooking}
-  onClose={() => setRatingBooking(null)}
-/>
+      {/* RATE BOOKING */}
+      <RateBookingDialog
+        open={!!ratingBooking}
+        booking={ratingBooking}
+        onClose={() => setRatingBooking(null)}
+      />
 
     </div>
   );
