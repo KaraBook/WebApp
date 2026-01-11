@@ -188,122 +188,119 @@ export default function OwnerLogin() {
 
 
   return (
-    <div className="min-h-screen w-full bg-[#f6f7fb] flex items-center justify-center px-4">
-      {/* required for Firebase reCAPTCHA */}
-      <div id="recaptcha-container" />
+  <div className="min-h-screen w-full bg-[#f6f7fb] flex items-center justify-center px-4">
+    <div id="recaptcha-container" />
 
-      <Card className="w-full max-w-xl rounded-2xl shadow-sm border bg-white">
-        <CardHeader className="pt-8 pb-4 flex flex-col items-center text-center">
-          {/* Replace with your logo */}
-          <img
-            src="/KarabookLogo.png"
-            alt="KaraBook"
-            className="h-10 w-auto mb-3"
-          />
-          <CardTitle className="text-2xl font-semibold">
-            Resort Owner Login
-          </CardTitle>
-          <CardDescription className="mt-1">
-            Sign in securely using your registered mobile number
-          </CardDescription>
-        </CardHeader>
+    <div className="w-full max-w-md bg-white rounded-xl shadow-md overflow-hidden">
 
-        <CardContent className="px-8 pb-8">
-          {phase === "mobile" ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Mobile Number</Label>
+      {/* HEADER */}
+      <div className="bg-gradient-to-b from-[#18b6c8] to-[#0f8ea8] px-6 py-10 text-center">
+        <img
+          src="/KarabookLogo.png"
+          alt="KaraBook"
+          className="h-10 mx-auto mb-4"
+        />
 
-                <div className="flex gap-2">
-                  <div className="w-[70px] flex items-center justify-center rounded-md border bg-muted/40 text-sm">
-                    +91
-                  </div>
+        <h2 className="text-xl font-semibold text-white">
+          Welcome Back
+        </h2>
+        <p className="text-sm text-white/90 mt-1">
+          Sign in to manage your property, bookings & availability
+        </p>
+      </div>
 
-                  <Input
-                    value={mobile10}
-                    onChange={(e) => setMobile(e.target.value)}
-                    inputMode="numeric"
-                    placeholder="Enter mobile number"
-                    className="h-11"
-                    maxLength={10}
-                  />
+      {/* CONTENT */}
+      <div className="px-6 py-6">
+        {phase === "mobile" ? (
+          <div className="space-y-5">
+            <div>
+              <Label className="text-sm">Registered Mobile Number</Label>
+
+              <div className="flex gap-2 mt-2">
+                <div className="w-[70px] flex items-center justify-center rounded-lg border bg-gray-50 text-sm">
+                  IN +91
                 </div>
-              </div>
 
-              <Button
-                onClick={startOtpFlow}
-                disabled={loading || mobile10.length !== 10}
-                className="w-full h-11 rounded-md"
-              >
-                {loading ? "Sending..." : "Send OTP"}
-              </Button>
-
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                Protected by Google reCAPTCHA
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="text-sm text-muted-foreground text-center">
-                OTP sent to <span className="font-medium text-foreground">{fullPhone}</span>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Enter OTP</Label>
                 <Input
-                  ref={otpInputRef}
-                  value={otp}
-                  onChange={(e) => onOtpChange(e.target.value)}
+                  value={mobile10}
+                  onChange={(e) => setMobile(e.target.value)}
                   inputMode="numeric"
-                  placeholder="••••••"
-                  className="h-11 text-center tracking-[0.35em] font-semibold"
-                  maxLength={OTP_LEN}
-                  disabled={verifying}
+                  placeholder="Enter registered number"
+                  maxLength={10}
+                  className="h-11 rounded-lg"
                 />
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <button
-                    type="button"
-                    onClick={changeNumber}
-                    className="underline underline-offset-4 hover:text-foreground"
-                    disabled={loading || verifying}
-                  >
-                    Change number
-                  </button>
-
-                  <span>
-                    {secondsLeft > 0 ? (
-                      <>Resend in <span className="font-medium">{formatTimer(secondsLeft)}</span></>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={resendOtp}
-                        className="underline underline-offset-4 hover:text-foreground"
-                        disabled={loading}
-                      >
-                        Resend OTP
-                      </button>
-                    )}
-                  </span>
-                </div>
               </div>
 
-              {/* This button exists (like many pro websites) but OTP also auto-verifies */}
-              <Button
-                onClick={() => verifyOtp(otp)}
-                disabled={otp.length !== OTP_LEN || verifying}
-                className="w-full h-11 rounded-md"
-              >
-                {verifying ? "Verifying..." : "Verify and continue"}
-              </Button>
-
-              <p className="text-xs text-muted-foreground text-center">
-                OTP will verify automatically once completed
+              <p className="text-xs text-gray-500 mt-2">
+                Secure login using OTP to access your owner dashboard
               </p>
             </div>
-          )}
-        </CardContent>
 
-      </Card>
+            <Button
+              onClick={startOtpFlow}
+              disabled={loading || mobile10.length !== 10}
+              className="w-full h-11 rounded-lg bg-[#7ec9d3] hover:bg-[#6abdc7] text-white"
+            >
+              {loading ? "Sending OTP..." : "Continue →"}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <p className="text-sm text-center text-gray-600">
+              Enter the OTP sent to your registered mobile number
+            </p>
+
+            <div>
+              <Label>One-Time Password (OTP)</Label>
+              <Input
+                ref={otpInputRef}
+                value={otp}
+                onChange={(e) => onOtpChange(e.target.value)}
+                inputMode="numeric"
+                maxLength={OTP_LEN}
+                placeholder="••••••"
+                className="h-11 text-center tracking-[0.4em] font-semibold rounded-lg"
+                disabled={verifying}
+              />
+            </div>
+
+            <div className="flex justify-between text-xs text-gray-500">
+              <button
+                onClick={changeNumber}
+                className="underline"
+                disabled={loading || verifying}
+              >
+                Change number
+              </button>
+
+              {secondsLeft > 0 ? (
+                <span>Resend in {formatTimer(secondsLeft)}</span>
+              ) : (
+                <button
+                  onClick={resendOtp}
+                  className="underline"
+                >
+                  Resend OTP
+                </button>
+              )}
+            </div>
+
+            <Button
+              onClick={() => verifyOtp(otp)}
+              disabled={otp.length !== OTP_LEN || verifying}
+              className="w-full h-11 rounded-lg bg-[#7ec9d3] hover:bg-[#6abdc7]"
+            >
+              {verifying ? "Verifying..." : "Verify & Enter Dashboard"}
+            </Button>
+          </div>
+        )}
+
+        {/* OWNER CONTEXT FOOTER */}
+        <p className="text-[11px] text-center text-gray-500 mt-6">
+          Manage your property calendar, bookings, guests and earnings securely
+        </p>
+      </div>
     </div>
-  );
+  </div>
+);
 }
