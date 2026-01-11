@@ -112,7 +112,9 @@ export default function Home() {
           <p className="text-sm md:text-lg text-gray-200 max-w-xl mx-auto">
             Discover verified villas, farmhouses, and resorts across Maharashtra.
           </p>
-          <Button className="bg-[#FBB017] text-black text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold">
+          <Button 
+            onClick={() => navigate("/properties")}
+            className="bg-[#FBB017] text-black text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold">
             Find Your Stay
           </Button>
 
@@ -203,7 +205,7 @@ export default function Home() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="max-w-7xl mx-auto px-4 z-[999999] mt-[50px] md:mt-[140px]"
+        className="max-w-7xl mx-auto px-4 z-[999999] md:z-[9] mt-[50px] md:mt-[140px]"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center jusstify-between">
 

@@ -34,7 +34,6 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
 
     const guestRef = useRef(null);
     const calendarRef = useRef(null);
-
     const filterRef = useRef(null);
     const [isSticky, setIsSticky] = useState(false);
     const STICKY_TOP = 70;
