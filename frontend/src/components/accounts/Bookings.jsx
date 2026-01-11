@@ -286,22 +286,6 @@ export default function Bookings() {
         </div>
 
 
-        {/* BOOKING DETAILS POPUP */}
-        <BookingDetailsDialog
-          open={!!selectedBooking}
-          booking={selectedBooking}
-          onOpenChange={(o) => {
-            if (!o) setSelectedBooking(null);
-          }}
-        />
-
-        <RateBookingDialog
-          open={!!ratingBooking}
-          booking={ratingBooking}
-          onClose={() => setRatingBooking(null)}
-        />
-
-
 
         {/* PAGINATION */}
         {totalPages > 1 && (
@@ -336,6 +320,22 @@ export default function Bookings() {
 
         )}
       </div>
+
+
+      {/* BOOKING DETAILS */}
+<BookingDetailsDialog
+  open={!!selectedBooking}
+  booking={selectedBooking}
+  onOpenChange={(o) => !o && setSelectedBooking(null)}
+/>
+
+{/* RATE BOOKING */}
+<RateBookingDialog
+  open={!!ratingBooking}
+  booking={ratingBooking}
+  onClose={() => setRatingBooking(null)}
+/>
+
     </div>
   );
 }
