@@ -113,9 +113,30 @@ export default function BookingDetailsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="
-          w-[95vw] max-w-md p-0 overflow-hidden
-          rounded-[14px]
-        "
+           fixed
+    inset-y-0
+    right-0
+    z-50
+    h-full
+    w-[420px]
+    max-w-[90vw]
+    p-0
+    pb-4
+    rounded-none
+    border-l
+    bg-white
+    shadow-xl
+
+    !translate-x-0
+    !translate-y-0
+    !left-auto
+    !top-0
+
+    data-[state=open]:animate-in
+    data-[state=open]:slide-in-from-right
+    data-[state=closed]:animate-out
+    data-[state=closed]:slide-out-to-right
+    duration-300"
       >
         {/* HEADER */}
         <div className="relative px-4 pt-4 pb-3 border-b">
