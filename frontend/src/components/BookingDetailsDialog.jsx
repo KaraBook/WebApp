@@ -110,7 +110,7 @@ export default function BookingDetailsDialog({
   const orderId = booking?.orderId || booking?.razorpayOrderId || "—";
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} className="z-[9999999]">
       <DialogContent
         className="
            fixed
@@ -143,7 +143,7 @@ export default function BookingDetailsDialog({
         <div className="relative px-4 pt-4 pb-3 border-b">
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute right-3 top-3 text-gray-400 hover:text-gray-700"
+            className="absolute right-3 mr-[25px] top-3 text-gray-400 hover:text-gray-700"
             aria-label="Close"
           >
             ✕
