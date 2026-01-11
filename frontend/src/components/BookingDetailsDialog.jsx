@@ -22,7 +22,7 @@ const Badge = ({ children, tone = "green" }) => {
       : "bg-red-100 text-red-700 border-red-200";
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full border ${styles}`}>
+    <span className={`inline-flex mr-[25px] items-center px-2.5 py-1 text-xs font-semibold rounded-full border ${styles}`}>
       {children}
     </span>
   );
@@ -157,7 +157,7 @@ export default function BookingDetailsDialog({
               <p className="text-[12px] text-gray-500 mt-0.5">{email}</p>
             </div>
 
-            <Badge className="mr-[25px]" tone={getStatusTone(status)}>{String(status).toUpperCase()}</Badge>
+            <Badge tone={getStatusTone(status)}>{String(status).toUpperCase()}</Badge>
           </div>
         </div>
 
