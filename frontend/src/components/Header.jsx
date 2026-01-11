@@ -249,7 +249,7 @@ function AccountDropdownPanel({ user, clearAuth }) {
   return (
     <DropdownMenuContent
       align="end"
-      className="w-60 p-0 shadow-2xl rounded-[10px] border border-gray-100 overflow-hidden"
+      className="w-60 p-0 shadow-2xl rounded-[10px] z-[9999999] border border-gray-100 overflow-hidden"
     >
       <div className="px-4 py-3 mt-2 border-b">
         <p className="text-[15px] font-semibold truncate">{user?.name}</p>
