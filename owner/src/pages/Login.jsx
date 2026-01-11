@@ -259,7 +259,7 @@ export default function OwnerLogin() {
                 inputMode="numeric"
                 maxLength={OTP_LEN}
                 placeholder="••••••"
-                className="h-11 text-center tracking-[0.4em] font-semibold rounded-lg"
+                className="h-11 text-center tracking-[0.4em] font-semibold rounded-lg mt-2"
                 disabled={verifying}
               />
             </div>
