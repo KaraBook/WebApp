@@ -51,7 +51,7 @@ export default function RateBookingDialog({ open, booking, onClose }) {
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-black"
         >
-          <X className="w-5 h-5" />
+          X
         </button>
 
         <DialogHeader>
