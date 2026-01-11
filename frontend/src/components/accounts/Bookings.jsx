@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import BookingDetailsDialog from "../BookingDetailsDialog";
+import MobileBookingCard from "../MobileBookingCard";
 
 
 export default function Bookings() {
@@ -83,8 +84,26 @@ export default function Bookings() {
       {/* TITLE */}
       <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19] mb-6">My Bookings</h1>
 
+
+      {/* MOBILE CARDS */}
+      <div className="md:hidden space-y-4">
+        {paginatedBookings.map((b) => (
+          <MobileBookingCard
+            key={b._id}
+            booking={b}
+            onView={(booking) => setSelectedBooking(booking)}
+          />
+        ))}
+
+        {bookings.length === 0 && (
+          <p className="text-center text-gray-500 py-10">
+            No bookings found
+          </p>
+        )}
+      </div>
+
       {/* TABLE WRAPPER */}
-      <div className="border border-gray-200 bg-white shadow-lg rounded-[12px]">
+      <div className="hidden md:block border border-gray-200 bg-white shadow-lg rounded-[12px]">
 
         {/* TABLE SCROLL AREA */}
         <div className="relative overflow-hidden rounded-[12px]">
