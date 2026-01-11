@@ -265,13 +265,6 @@ export default function OwnerLogin() {
             </div>
 
             <div className="flex justify-between text-xs text-gray-500">
-              <button
-                onClick={changeNumber}
-                className="underline"
-                disabled={loading || verifying}
-              >
-                Change number
-              </button>
 
               {secondsLeft > 0 ? (
                 <span>Resend in {formatTimer(secondsLeft)}</span>
