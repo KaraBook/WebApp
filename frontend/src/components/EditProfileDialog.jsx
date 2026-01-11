@@ -198,7 +198,24 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
     return (
         <Dialog open={open} onOpenChange={onClose} className="mt-[32px]">
-            <DialogContent className="max-w-xl mt-[32px] z-[9999999]">
+            <DialogContent className="md:max-w-xl max-h-[75vh] overflow-y-auto max-w-[95vw] mt-[32px] z-[9999999]">
+                <DialogClose asChild>
+                    <button
+                        className="
+        absolute
+        right-4
+        top-4
+        rounded-sm
+        opacity-70
+        transition-opacity
+        hover:opacity-100
+        focus:outline-none
+      "
+                    >
+                        X
+                        <span className="sr-only">Close</span>
+                    </button>
+                </DialogClose>
                 <DialogHeader>
                     <DialogTitle>Edit Profile</DialogTitle>
                 </DialogHeader>
@@ -334,7 +351,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                                 <SelectValue placeholder="Select city" />
                             </SelectTrigger>
 
-                            <SelectContent>
+                            <SelectContent className="z-[99999999]">
                                 {cities.map((city) => (
                                     <SelectItem key={city.name} value={city.name}>
                                         {city.name}
