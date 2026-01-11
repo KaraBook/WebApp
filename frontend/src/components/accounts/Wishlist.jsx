@@ -57,8 +57,8 @@ export default function Wishlist() {
     );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-0">
-      <h1 className="text-2xl uppercase tracking-[1px] font-[500] text-gray-900 mb-6">My Wishlist</h1>
+    <div className="max-w-7xl mx-auto px-0 md:px-4 py-0">
+      <h1 className="text-2xl uppercase tracking-[1px] font-[600] text-gray-900 mb-6">My Wishlist</h1>
 
       {/* GRID: 3 CARDS PER ROW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

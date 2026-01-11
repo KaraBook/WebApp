@@ -94,21 +94,36 @@ export default function Profile() {
 
 
   return (
-    <div className="max-w-5xl px-2 py-2 space-y-8">
+    <div className="max-w-5xl md:px-4 px-0 py-2 space-y-8">
 
-      <h1 className="text-2xl font-[500] uppercase tracking-[1px] text-[#233b19] mb-6">My Profile</h1>
+      <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19] mb-6">My Profile</h1>
 
-      <div className="border shadow-sm rounded-[12px] bg-white p-6 flex items-center gap-6">
-
+      <div
+        className="
+    border shadow-sm rounded-[12px] bg-white p-6
+    flex flex-col md:flex-row
+    items-center md:items-start
+    gap-6
+  "
+      >
+        {/* AVATAR */}
         <div className="relative group">
           {avatarPreview ? (
             <img
               src={avatarPreview}
-              className="w-[180px] h-[150px] rounded-[12px] object-cover border shadow-sm"
+              className="w-[140px] h-[140px] md:w-[180px] md:h-[150px]
+        rounded-[12px] object-cover border shadow-sm"
             />
           ) : (
-            <div className="w-[180px] h-[150px] rounded-[12px] border shadow-sm bg-gray-100 
-      flex items-center justify-center text-5xl font-semibold text-[#233b19]">
+            <div
+              className="
+          w-[140px] h-[140px]
+          md:w-[180px] md:h-[150px]
+          rounded-[12px] border shadow-sm bg-gray-100
+          flex items-center justify-center
+          text-5xl font-semibold text-[#233b19]
+        "
+            >
               {profile?.name?.charAt(0)?.toUpperCase()}
             </div>
           )}
@@ -141,22 +156,37 @@ export default function Profile() {
           />
         </div>
 
+        {/* INFO */}
+        <div className="flex-1 rounded-[12px] text-center md:text-left">
+          <h2 className="text-xl font-semibold text-gray-900">
+            {profile.name}
+          </h2>
+          <p className="text-gray-500 text-sm mt-1">
+            {profile.email}
+          </p>
 
-        <div className="flex-1 rounded-[12px]">
-          <h2 className="text-xl font-semibold text-gray-900">{profile.name}</h2>
-          <p className="text-gray-500 text-sm mt-1">{profile.email}</p>
-
-          <div className="flex gap-6 mt-4">
+          <div className="flex justify-center md:justify-start gap-6 mt-4">
             <Stat value={bookingCount} label="Bookings" />
             <Stat value={wishlistCount} label="Wishlist" />
             <Stat value={memberSince} label="Since" />
           </div>
         </div>
 
-        <div className="flex gap-3">
+        {/* ACTIONS */}
+        <div
+          className="
+      flex flex-col md:flex-row
+      gap-3
+      w-full md:w-auto
+    "
+        >
           <Button
             onClick={() => setEditOpen(true)}
-            className="rounded-[8px] bg-primary text-white hover:bg-primary"
+            className="
+        rounded-[8px]
+        bg-primary text-white hover:bg-primary
+        w-full md:w-auto
+      "
           >
             Edit Profile
           </Button>
@@ -164,12 +194,18 @@ export default function Profile() {
           <Button
             onClick={clearAuth}
             variant="outline"
-            className="rounded-[8px] border-gray-300 text-gray-800 hover:bg-gray-50 flex items-center gap-2"
+            className="
+        rounded-[8px]
+        border-gray-300 text-gray-800 hover:bg-gray-50
+        flex items-center justify-center gap-2
+        w-full md:w-auto
+      "
           >
             <LogOut size={16} /> Logout
           </Button>
         </div>
       </div>
+
 
       <div className="border rounded-[8px] shadow-sm bg-white p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
 
