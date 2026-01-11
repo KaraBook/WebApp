@@ -116,7 +116,7 @@ export default function BookingDetailsDialog({
            fixed
     inset-y-0
     right-0
-    z-50
+    z-[9999999]
     h-full
     w-[420px]
     max-w-[90vw]
@@ -126,6 +126,7 @@ export default function BookingDetailsDialog({
     border-l
     bg-white
     shadow-xl
+    overflow-y-auto
 
     !translate-x-0
     !translate-y-0
