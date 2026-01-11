@@ -33,7 +33,7 @@ export default function AccountLayout() {
       <div className="flex flex-1">
         <Sidebar className="sticky top-0 h-screen" />
 
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto bg-white">
+        <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6 overflow-y-auto bg-white">
           <Outlet />
         </main>
       </div>

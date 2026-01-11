@@ -7,6 +7,7 @@ import AppRoutes from "@/routes";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "sonner";
 import { useLocation } from "react-router-dom";
+import MobileAccountBottomNav from "./components/accounts/MobileAccountBottomNav";
 
 export default function App() {
   const { init, loginModalOpen, showAuthModal, hideAuthModal } = useAuthStore();
@@ -57,6 +58,8 @@ useEffect(() => {
       </main>
 
       {!shouldHideFooter && <Footer />}
+
+      <MobileAccountBottomNav />
 
       <PhoneLoginModal 
         open={loginModalOpen}
