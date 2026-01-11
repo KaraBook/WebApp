@@ -197,7 +197,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
 
     return (
-        <Dialog open={open} onOpenChange={onClose} className="mt-[32px]">
+        <Dialog open={open} onOpenChange={onClose} modal={false}>
             <DialogContent className="max-w-xl mt-[32px] z-[9999999]">
                 <DialogHeader>
                     <DialogTitle>Edit Profile</DialogTitle>
@@ -310,7 +310,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                                 <SelectValue placeholder="Select state" />
                             </SelectTrigger>
 
-                            <SelectContent>
+                            <SelectContent position="popper">
                                 {states.map((state) => (
                                     <SelectItem key={state.isoCode} value={state.isoCode}>
                                         {state.name}
