@@ -60,7 +60,7 @@ export default function Dashboard() {
 
   /* ---------------- UI ---------------- */
   return (
-    <div className="p-6 bg-[#f7f8fa] min-h-screen">
+    <div className="p-4 min-h-screen">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">
