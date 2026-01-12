@@ -55,25 +55,13 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
     >
       <DialogContent
         className="
-          fixed
-          inset-y-0
-          right-0
-          z-[9999999]
-          h-full
-          w-[420px]
-          max-w-[90vw]
-          p-0
-          pb-4
-          rounded-none
-          border-l
-          bg-white
-          shadow-xl
-          overflow-y-auto
+          fixed inset-y-0 right-0 z-[9999999]
+          h-full w-[420px] max-w-[90vw]
+          p-0 pb-4 rounded-none border-l
+          bg-white shadow-xl overflow-y-auto
 
-          !translate-x-0
-          !translate-y-0
-          !left-auto
-          !top-0
+          !translate-x-0 !translate-y-0
+          !left-auto !top-0
 
           data-[state=open]:animate-in
           data-[state=open]:slide-in-from-right
@@ -82,14 +70,14 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
           duration-300
         "
       >
-        {/* ================= HEADER ================= */}
+        {/* HEADER */}
         <DialogHeader className="px-6 py-5 border-b relative">
           <DialogTitle className="text-[17px] font-semibold">
             {userId?.firstName} {userId?.lastName}
           </DialogTitle>
 
           <p className="text-sm text-muted-foreground">
-            {userId?.email}
+            {userId?.email || "—"}
           </p>
 
           <span
@@ -103,7 +91,6 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
             {paymentStatus}
           </span>
 
-          {/* CLOSE */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-1 rounded-md text-red-500 hover:bg-red-50"
@@ -112,9 +99,8 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
           </button>
         </DialogHeader>
 
-        {/* ================= BODY ================= */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5 text-sm">
-
+        {/* BODY */}
+        <div className="flex-1 px-6 py-6 space-y-5 text-sm">
           {/* PROPERTY */}
           <div className="rounded-xl border bg-white px-4 py-3 flex items-center gap-3">
             <Home size={16} className="text-muted-foreground" />
@@ -126,7 +112,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
             </div>
           </div>
 
-          {/* CHECK-IN / CHECK-OUT */}
+          {/* DATES */}
           <div className="grid grid-cols-2 gap-4">
             <InfoCard
               icon={<Calendar size={16} />}
@@ -140,7 +126,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
             />
           </div>
 
-          {/* NIGHTS / GUESTS */}
+          {/* META */}
           <div className="grid grid-cols-2 gap-4">
             <InfoCard
               icon={<Moon size={16} />}
@@ -159,10 +145,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
           {/* CONTACT */}
           <Section title="Contact Information">
             <Row icon={<Mail size={14} />} text={userId?.email} />
-            <Row
-              icon={<Phone size={14} />}
-              text={contactNumber || userId?.mobile}
-            />
+            <Row icon={<Phone size={14} />} text={contactNumber || userId?.mobile} />
           </Section>
 
           <Separator />
@@ -175,20 +158,9 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
               </span>
             </KeyValue>
 
-            <KeyValue
-              label="Payment Method"
-              value={paymentMethod}
-            />
-
-            <KeyValue
-              label="Amount"
-              value={`₹${totalAmount?.toLocaleString("en-IN")}`}
-            />
-
-            <KeyValue
-              label="Tax"
-              value={`₹${taxAmount?.toLocaleString("en-IN")}`}
-            />
+            <KeyValue label="Payment Method" value={paymentMethod} />
+            <KeyValue label="Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
+            <KeyValue label="Tax" value={`₹${taxAmount?.toLocaleString("en-IN")}`} />
 
             <div className="bg-muted/40 rounded-lg px-3 py-2">
               <KeyValue
@@ -198,11 +170,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
               />
             </div>
 
-            <KeyValue
-              label="Order ID"
-              value={orderId}
-              mono
-            />
+            <KeyValue label="Order ID" value={orderId} mono />
           </Section>
 
           <Row
@@ -216,7 +184,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
   );
 }
 
-/* ================= SMALL COMPONENTS (SAME AS ADMIN) ================= */
+/* ===== EXACT SHARED UI BLOCKS ===== */
 
 function InfoCard({ icon, label, value }) {
   return (
@@ -225,9 +193,7 @@ function InfoCard({ icon, label, value }) {
         {icon}
         {label}
       </div>
-      <div className="mt-1 font-medium text-gray-900">
-        {value}
-      </div>
+      <div className="mt-1 font-medium text-gray-900">{value}</div>
     </div>
   );
 }
@@ -259,11 +225,7 @@ function KeyValue({ label, value, bold, mono, children }) {
     <div className="flex justify-between items-center">
       <span className="text-muted-foreground text-sm">{label}</span>
       {children || (
-        <span
-          className={`text-sm ${
-            bold ? "font-semibold" : "font-medium"
-          } ${mono ? "font-mono text-xs" : ""}`}
-        >
+        <span className={`text-sm ${bold ? "font-semibold" : "font-medium"} ${mono ? "font-mono text-xs" : ""}`}>
           {value}
         </span>
       )}
