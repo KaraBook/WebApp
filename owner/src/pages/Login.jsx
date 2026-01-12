@@ -251,7 +251,7 @@ export default function OwnerLogin() {
             </p>
 
             <div>
-              <Label>One-Time Password (OTP)</Label>
+              <Label className="mb-2">One-Time Password (OTP)</Label>
               <Input
                 ref={otpInputRef}
                 value={otp}
@@ -259,7 +259,7 @@ export default function OwnerLogin() {
                 inputMode="numeric"
                 maxLength={OTP_LEN}
                 placeholder="••••••"
-                className="h-11 text-center tracking-[0.4em] font-semibold rounded-lg mt-2"
+                className="h-11 text-center tracking-[0.4em] font-semibold rounded-lg"
                 disabled={verifying}
               />
             </div>

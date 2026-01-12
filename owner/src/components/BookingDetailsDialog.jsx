@@ -1,8 +1,19 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Home, Calendar, Moon, Users, Mail, Phone, Clock} from "lucide-react";
-
-
+import {
+  Home,
+  Calendar,
+  Moon,
+  Users,
+  Mail,
+  Phone,
+  Clock,
+} from "lucide-react";
 
 export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
   if (!booking) return null;
@@ -38,88 +49,72 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="
-    fixed
-    inset-y-0
-    right-0
-    z-50
-    h-full
-    w-[420px]
-    max-w-[90vw]
-    p-0
-    rounded-none
-    border-l
-    bg-white
-    shadow-xl
-
-    !translate-x-0
-    !translate-y-0
-    !left-auto
-    !top-0
-
-    data-[state=open]:animate-in
-    data-[state=open]:slide-in-from-right
-    data-[state=closed]:animate-out
-    data-[state=closed]:slide-out-to-right
-    duration-300
-  "
+          fixed inset-y-0 right-0 z-50 h-full w-[420px] max-w-[95vw]
+          p-0 rounded-none border-l bg-white shadow-xl
+          data-[state=open]:slide-in-from-right
+          data-[state=closed]:slide-out-to-right
+        "
       >
-
-
         {/* ================= HEADER ================= */}
         <DialogHeader className="px-6 py-5 border-b">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col ">
-              <DialogTitle className="text-[18px] font-semibold leading-tight">
-                {userId?.firstName} {userId?.lastName}
-              </DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1">
-                {userId?.email}
-              </p>
-              <span
-              className={`px-3 w-fit text-start py-1 rounded-full text-xs font-medium capitalize
-                ${paymentStatus === "paid"
+          <DialogTitle className="text-[17px] font-semibold">
+            {userId?.firstName} {userId?.lastName}
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            {userId?.email}
+          </p>
+
+          <span
+            className={`mt-2 w-fit px-3 py-1 rounded-full text-xs font-medium capitalize
+              ${
+                paymentStatus === "paid"
                   ? "bg-emerald-100 text-emerald-700"
-                  : paymentStatus === "confirmed"
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-            >
-              {paymentStatus}
-            </span>
-            </div>
-          </div>
+                  : "bg-gray-100 text-gray-600"
+              }`}
+          >
+            {paymentStatus}
+          </span>
         </DialogHeader>
 
         {/* ================= BODY ================= */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6 text-sm">
+        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5 text-sm">
 
-          {/* DATES */}
-            <Section title="Stay Details" >
-              <div className="grid grid-cols-2 gap-4">
-              <InfoCard
-                icon={<Calendar size={18} />}
-                label="Check-in"
-                value={formatDate(checkIn)}
-              />
-              <InfoCard
-                icon={<Calendar size={18} />}
-                label="Check-out"
-                value={formatDate(checkOut)}
-              />
-              </div>
-            </Section>
+          {/* PROPERTY */}
+          <div className="rounded-xl border bg-white px-4 py-3 flex items-center gap-3">
+            <Home size={16} className="text-muted-foreground" />
+            <div>
+              <p className="text-xs text-muted-foreground">Property</p>
+              <p className="font-medium text-gray-900">
+                {propertyId?.propertyName}
+              </p>
+            </div>
+          </div>
 
-          {/* META */}
+          {/* CHECK-IN / CHECK-OUT */}
           <div className="grid grid-cols-2 gap-4">
             <InfoCard
-              icon={<Moon size={18} />}
+              icon={<Calendar size={16} />}
+              label="Check-in"
+              value={formatDate(checkIn)}
+            />
+            <InfoCard
+              icon={<Calendar size={16} />}
+              label="Check-out"
+              value={formatDate(checkOut)}
+            />
+          </div>
+
+          {/* NIGHTS / GUESTS */}
+          <div className="grid grid-cols-2 gap-4">
+            <InfoCard
+              icon={<Moon size={16} />}
               label="Nights"
               value={totalNights}
             />
             <InfoCard
-              icon={<Users size={18} />}
+              icon={<Users size={16} />}
               label="Guests"
-              value={`${adults} Adult${adults !== 1 ? "s" : ""}, ${children} Child${children !== 1 ? "ren" : ""}`}
+              value={`${adults} Adults, ${children} Children`}
             />
           </div>
 
@@ -127,45 +122,72 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
 
           {/* CONTACT */}
           <Section title="Contact Information">
-            <Row icon={<Mail size={16} />} text={userId?.email} />
-            <Row icon={<Phone size={16} />} text={contactNumber || userId?.mobile} />
+            <Row icon={<Mail size={14} />} text={userId?.email} />
             <Row
-              icon={<Clock size={16} />}
-              text={`Booking created on ${formatDate(createdAt)}`}
-              muted
+              icon={<Phone size={14} />}
+              text={contactNumber || userId?.mobile}
             />
           </Section>
 
           <Separator />
 
           {/* PAYMENT */}
-          <Section title="Payment Details">
-            <KeyValue label="Room Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
-            <KeyValue label="Tax" value={`₹${taxAmount?.toLocaleString("en-IN")}`} />
+          <Section title="Payment Information">
+            <KeyValue label="Payment Status">
+              <span className="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
+                Paid
+              </span>
+            </KeyValue>
+
             <KeyValue
-              label="Grand Total"
-              value={`₹${grandTotal?.toLocaleString("en-IN")}`}
-              bold
+              label="Payment Method"
+              value={paymentMethod}
             />
-            <KeyValue label="Payment Method" value={paymentMethod} />
-            <KeyValue label="Order ID" value={orderId} mono />
+            <KeyValue
+              label="Amount"
+              value={`₹${totalAmount?.toLocaleString("en-IN")}`}
+            />
+            <KeyValue
+              label="Tax"
+              value={`₹${taxAmount?.toLocaleString("en-IN")}`}
+            />
+
+            <div className="bg-muted/40 rounded-lg px-3 py-2">
+              <KeyValue
+                label="Grand Total"
+                value={`₹${grandTotal?.toLocaleString("en-IN")}`}
+                bold
+              />
+            </div>
+
+            <KeyValue
+              label="Order ID"
+              value={orderId}
+              mono
+            />
           </Section>
+
+          <Row
+            icon={<Clock size={14} />}
+            text={`Booking created on ${formatDate(createdAt)}`}
+            muted
+          />
         </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-/* ================= SMALL UI BUILDING BLOCKS ================= */
+/* ================= SMALL COMPONENTS ================= */
 
 function InfoCard({ icon, label, value }) {
   return (
-    <div className="rounded-xl bg-muted/40 p-4">
-      <div className="flex items-center gap-2 text-muted-foreground text-xs">
+    <div className="rounded-xl border bg-white px-4 py-3">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
         {icon}
-        <span>{label}</span>
+        {label}
       </div>
-      <div className="mt-1 font-medium text-[15px] text-gray-900">
+      <div className="mt-1 font-medium text-gray-900">
         {value}
       </div>
     </div>
@@ -178,7 +200,7 @@ function Section({ title, children }) {
       <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-3">
         {title}
       </h4>
-      <div className="space-y-3">{children}</div>
+      <div className="space-y-2">{children}</div>
     </div>
   );
 }
@@ -194,16 +216,19 @@ function Row({ icon, text, muted }) {
   );
 }
 
-function KeyValue({ label, value, bold, mono }) {
+function KeyValue({ label, value, bold, mono, children }) {
   return (
-    <div className="flex justify-between gap-4">
+    <div className="flex justify-between items-center">
       <span className="text-muted-foreground text-sm">{label}</span>
-      <span
-        className={`text-sm text-right ${bold ? "font-semibold" : "font-medium"
+      {children || (
+        <span
+          className={`text-sm ${
+            bold ? "font-semibold" : "font-medium"
           } ${mono ? "font-mono text-xs" : ""}`}
-      >
-        {value}
-      </span>
+        >
+          {value}
+        </span>
+      )}
     </div>
   );
 }
