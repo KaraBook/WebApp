@@ -102,7 +102,7 @@ export default function InvoicePage() {
       </div>
 
       {/* INVOICE */}
-      <div ref={invoiceRef} className="max-w-4xl bg-white border rounded-xl p-8">
+      <div ref={invoiceRef} className="max-w-[50rem] bg-white border rounded-xl p-8">
         {/* HEADER */}
         <div className="flex justify-between pb-4 border-b">
           <div className="flex gap-3">
