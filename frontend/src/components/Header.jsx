@@ -6,7 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   ChevronRight, CalendarCheck, Heart, User as UserIcon, Star,
-  LifeBuoy, LogOut, Menu, X, Home, Search, Settings, LucideMenu, MessageCircleQuestionMark
+  LifeBuoy, LogOut, Menu, X, Home, Search, Settings, LucideMenu, MessageCircleQuestionMark,
+  LayoutDashboard
 } from "lucide-react";
 
 export default function Header({ onLoginClick }) {
@@ -213,6 +214,13 @@ function AccountDropdown({ user, clearAuth }) {
 function AccountDropdownPanel({ user, clearAuth }) {
 
   const items = [
+    {
+      label: "Dashboard",
+      icon: <LayoutDashboard className="h-4 w-4" />,
+      to: "/account/dashboard",
+      bg: "bg-[#D7F9F2]",
+      iconColor: "text-[#00A685]"
+    },
     {
       label: "My Bookings",
       icon: <CalendarCheck className="h-4 w-4" />,
