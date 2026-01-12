@@ -65,12 +65,12 @@ export default function Dashboard() {
   /* ---------------- DERIVED STATS ---------------- */
   const totalBookings = bookings.length;
 
-  const confirmed = bookings.filter(b => b.status === "confirmed").length;
-  const pending = bookings.filter(b => b.status === "pending").length;
+  const confirmed = bookings.filter(b => b.status === "paid").length;
+  const pending = bookings.filter(b => b.status === "initiated").length;
   const cancelled = bookings.filter(b => b.status === "cancelled").length;
 
   const totalSpent = bookings
-    .filter(b => b.status === "confirmed")
+    .filter(b => b.status === "paid")
     .reduce((sum, b) => sum + (b.amount || 0), 0);
 
   const uniqueVisited = new Set(
