@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   ChevronRight, CalendarCheck, Heart, User as UserIcon, Star,
-  LifeBuoy, LogOut, Menu, X, Home, Search, Settings, LucideMenu
+  LifeBuoy, LogOut, Menu, X, Home, Search, Settings, LucideMenu, MessageCircleQuestionMark
 } from "lucide-react";
 
 export default function Header({ onLoginClick }) {
@@ -151,7 +151,7 @@ export default function Header({ onLoginClick }) {
             <MobileItem icon={<UserIcon />} label="Profile" to="/account/profile" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<Settings />} label="Settings" to="/account/settings" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<LifeBuoy />} label="Contact" to="/contact" setMobileOpen={setMobileOpen} />
-            <MobileItem icon={<LucideMenu />} label="FAQs" to="/faq" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<MessageCircleQuestionMark />} label="FAQs" to="/faq" setMobileOpen={setMobileOpen} />
           </div>
 
           {/* FOOTER */}
