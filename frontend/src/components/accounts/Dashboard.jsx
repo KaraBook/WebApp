@@ -63,12 +63,10 @@ export default function Dashboard() {
     }, []);
 
     /* ---------------- DERIVED STATS ---------------- */
-    /* ---------------- DERIVED STATS ---------------- */
-
     const totalBookings = bookings.length;
 
     const confirmed = bookings.filter(
-        b => b.status === "confirmed" && b.paymentStatus === "paid"
+        b => b.status === "confirmed" && b.paymentId
     ).length;
 
     const pending = bookings.filter(
@@ -80,8 +78,8 @@ export default function Dashboard() {
     ).length;
 
     const totalSpent = bookings
-        .filter(b => b.status === "confirmed" && b.paymentStatus === "paid")
-        .reduce((sum, b) => sum + (b.amount || 0), 0);
+        .filter(b => b.status === "confirmed" && b.paymentId)
+        .reduce((sum, b) => sum + Number(b.amount || 0), 0);
 
     const uniqueVisited = new Set(
         bookings.map(b => b.propertyId?._id || b.propertyId)
@@ -283,23 +281,23 @@ function StatCard({ title, value, subtitle, icon, dark }) {
 }
 
 function StatusChip({ status }) {
-  const normalized =
-    status === "initiated" ? "pending" : status;
+    const normalized =
+        status === "initiated" ? "pending" : status;
 
-  const map = {
-    pending: "bg-orange-100 text-orange-600 border-orange-300",
-    confirmed: "bg-green-100 text-green-600 border-green-300",
-    cancelled: "bg-red-100 text-red-600 border-red-300",
-  };
+    const map = {
+        pending: "bg-orange-100 text-orange-600 border-orange-300",
+        confirmed: "bg-green-100 text-green-600 border-green-300",
+        cancelled: "bg-red-100 text-red-600 border-red-300",
+    };
 
-  return (
-    <span
-      className={cn(
-        "px-3 py-1 rounded-full text-xs font-medium border capitalize",
-        map[normalized]
-      )}
-    >
-      {normalized}
-    </span>
-  );
+    return (
+        <span
+            className={cn(
+                "px-3 py-1 rounded-full text-xs font-medium border capitalize",
+                map[normalized]
+            )}
+        >
+            {normalized}
+        </span>
+    );
 }
