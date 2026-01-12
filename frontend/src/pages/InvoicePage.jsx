@@ -76,13 +76,37 @@ export default function InvoicePage() {
       ? `${numberToWords(grandTotal)} Rupees Only`
       : "—";
 
-  const downloadPDF = async () => {
-    const canvas = await html2canvas(invoiceRef.current, { scale: 2 });
-    const img = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-    pdf.addImage(img, "PNG", 0, 0, 210, (canvas.height * 210) / canvas.width);
-    pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
-  };
+ const downloadPDF = async () => {
+  const element = invoiceRef.current;
+  if (!element) return;
+
+  // 1️⃣ Force desktop layout
+  element.classList.add("pdf-desktop");
+
+  // 2️⃣ Wait for reflow
+  await new Promise((r) => setTimeout(r, 200));
+
+  // 3️⃣ Capture canvas
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+  });
+
+  // 4️⃣ Restore responsive layout
+  element.classList.remove("pdf-desktop");
+
+  // 5️⃣ Create PDF
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF("p", "mm", "a4");
+
+  const pdfWidth = 210;
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
+};
+
 
   return (
     <div className="min-h-screen px-0 md:px-4 py-6">
@@ -158,44 +182,44 @@ export default function InvoicePage() {
 
         {/* TABLE */}
         {/* TABLE */}
-<div className="mt-6 overflow-x-auto">
-  <table className="min-w-[600px] w-full text-sm border-t">
-    <thead>
-      <tr className="border-b whitespace-nowrap">
-        <th className="py-2 text-left">S.No</th>
-        <th className="text-left">Description</th>
-        <th className="text-right">Nights</th>
-        <th className="text-right">Rate</th>
-        <th className="text-right">Amount</th>
-      </tr>
-    </thead>
+        <div className="mt-6 overflow-x-auto">
+          <table className="min-w-[600px] w-full text-sm border-t">
+            <thead>
+              <tr className="border-b whitespace-nowrap">
+                <th className="py-2 text-left">S.No</th>
+                <th className="text-left">Description</th>
+                <th className="text-right">Nights</th>
+                <th className="text-right">Rate</th>
+                <th className="text-right">Amount</th>
+              </tr>
+            </thead>
 
-    <tbody>
-      <tr className="border-b">
-        <td className="py-3">1</td>
+            <tbody>
+              <tr className="border-b">
+                <td className="py-3">1</td>
 
-        <td className="py-2">
-          <p className="font-medium">
-            Room / Accommodation Charges
-          </p>
-          <p className="text-xs text-muted-foreground">
-            villa at {invoice.propertyName}
-          </p>
-        </td>
+                <td className="py-2">
+                  <p className="font-medium">
+                    Room / Accommodation Charges
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    villa at {invoice.propertyName}
+                  </p>
+                </td>
 
-        <td className="text-right">{invoice.nights}</td>
+                <td className="text-right">{invoice.nights}</td>
 
-        <td className="text-right">
-          ₹{(subtotal / invoice.nights).toLocaleString("en-IN")}
-        </td>
+                <td className="text-right">
+                  ₹{(subtotal / invoice.nights).toLocaleString("en-IN")}
+                </td>
 
-        <td className="text-right">
-          ₹{subtotal.toLocaleString("en-IN")}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+                <td className="text-right">
+                  ₹{subtotal.toLocaleString("en-IN")}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         {/* TOTALS */}
         <div className="flex justify-end mt-4 text-sm">
