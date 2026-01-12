@@ -39,7 +39,7 @@ export default function InvoicePage() {
   const grandTotal = Number(invoice.grandTotal || subtotal + tax);
 
   return (
-    <div className="min-h-screen bg-white px-4 py-6">
+    <div className="min-h-screen px-4 py-6">
       {/* ACTIONS */}
       <div className="max-w-4xl flex justify-between mb-4">
         <Link
