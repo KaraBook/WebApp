@@ -82,7 +82,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
         "
       >
         {/* ================= HEADER ================= */}
-        <DialogHeader className="px-6 py-5 border-b relative">
+        <DialogHeader className="px-4 py-5 border-b relative">
           <DialogTitle className="text-[17px] font-semibold">
             {userName || "Guest"}
           </DialogTitle>
@@ -110,7 +110,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
         </DialogHeader>
 
         {/* ================= BODY ================= */}
-        <div className="px-6 py-6 space-y-5 text-sm">
+        <div className="px-4 py-4 space-y-5 text-sm">
 
           {/* PROPERTY */}
           <div className="rounded-xl border bg-white px-4 py-3 flex items-center gap-3">
