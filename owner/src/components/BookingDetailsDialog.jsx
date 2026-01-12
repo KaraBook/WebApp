@@ -226,7 +226,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
 
 function InfoCard({ icon, label, value }) {
   return (
-    <div className="rounded-xl border bg-white px-4 py-3">
+    <div className="rounded-xl border bg-gray-50 px-4 py-3">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         {icon}
         {label}
