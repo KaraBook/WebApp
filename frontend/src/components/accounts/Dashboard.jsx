@@ -63,7 +63,7 @@ export default function Dashboard() {
     <div className="px-4 min-h-screen">
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19]">
           Dashboard Overview
         </h1>
 
