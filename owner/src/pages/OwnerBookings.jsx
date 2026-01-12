@@ -490,8 +490,8 @@ export default function OwnerBookings() {
 
       <BookingDetailsDialog
         open={viewBooking.open}
-        onOpenChange={(o) => !o && closeBookingDialog()}
         booking={viewBooking.booking}
+        onClose={closeBookingDialog}
       />
 
     </>
