@@ -40,7 +40,7 @@ export default function WelcomeSection() {
           </h2>
 
           {/* Description */}
-          <p className="text-gray-600 text-[15px] md:text-[16px] leading-relaxed max-w-xl text-center md:text-left">
+          <p className="text-gray-600 text-[14px] md:text-[16px] leading-relaxed max-w-xl text-center md:text-left">
             Your perfect getaway is closer than you think. At Karabook, we connect
             travelers with handpicked stays across{" "}
             <span className="font-semibold text-gray-800">
@@ -49,7 +49,7 @@ export default function WelcomeSection() {
             and more.
           </p>
 
-          <p className="text-gray-600 text-[15px] md:text-[16px] leading-relaxed max-w-xl text-center md:text-left">
+          <p className="text-gray-600 text-[14px] md:text-[16px] leading-relaxed max-w-xl text-center md:text-left">
             Whether it’s a family holiday, a weekend retreat, or a special celebration,
             booking with us is{" "}
             <span className="font-semibold text-gray-800">

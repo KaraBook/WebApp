@@ -49,6 +49,7 @@ const cardFade = {
   },
 };
 
+
 export default function Home() {
   const [properties, setProperties] = useState([]);
   const navigate = useNavigate();
@@ -57,6 +58,10 @@ export default function Home() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [swiperInstance, setSwiperInstance] = useState(null);
   const [showFilterPopup, setShowFilterPopup] = useState(false);
+
+  const goToPropertyType = (type) => {
+    navigate(`/properties?propertyType=${type}`);
+  };
 
 
   useEffect(() => {
@@ -104,7 +109,7 @@ export default function Home() {
           className="relative z-10 text-center text-white px-4 mx-auto"
         >
           <span className="w-fit text-xs uppercase tracking-[1px] items-center mx-auto -mt-8 md:-mt-28 flex bg-white/20 px-2 md:px-4 rounded-full">
-          <Dot className="w-6 md:w-10 h-10  text-yellow-500"/>Discover Maharashtra's Hidden Gems
+            <Dot className="w-6 md:w-10 h-10  text-yellow-500" />Discover Maharashtra's Hidden Gems
           </span>
           <h1 className="ply md:text-6xl leading-[45px] mt-4 md:leading-[60px] tracking-[2px]  font-[600] mb-3">
             Your Perfect Gateway <br></br>Just A Click Away
@@ -112,9 +117,9 @@ export default function Home() {
           <p className="text-sm md:text-lg text-gray-200 max-w-xl mx-auto">
             Discover verified villas, farmhouses, and resorts across Maharashtra.
           </p>
-          <Button 
+          <Button
             onClick={() => navigate("/properties")}
-            className="bg-[#FBB017] text-black text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold">
+            className="bg-[#FBB017] text-black text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold hover:text-white">
             Find Your Stay
           </Button>
 
@@ -217,14 +222,14 @@ export default function Home() {
               Curated stays across top destinations
             </span>
 
-            <h2 className="font-display text-4xl md:text-5xl font-extrabold leading-tight">
+            <h2 className="font-display text-[30px] md:text-5xl font-extrabold leading-tight">
               <span className="block text-[#1F2A2E]">Find Your</span>
               <span className="block bg-gradient-to-b from-primary to-[#9AA06B] bg-clip-text text-transparent pb-2">
                 Perfect Stay
               </span>
             </h2>
 
-            <p className="text-gray-600 max-w-md text-[15px] md:text-[16px]">
+            <p className="text-gray-600 max-w-md text-[14px] md:text-[16px]">
               From peaceful hill retreats to luxurious pool villas and coastal escapes —
               discover stays that match your travel mood.
             </p>
@@ -279,6 +284,7 @@ export default function Home() {
                   title="Luxury Villas"
                   subtitle="Private · Premium · Scenic"
                   img="/banimg1.jpg"
+                  onClick={() => goToPropertyType("villa")}
                 />
               </SwiperSlide>
 
@@ -287,6 +293,7 @@ export default function Home() {
                   title="Nature Tents"
                   subtitle="Calm · Green · Peaceful"
                   img="/bannerimg.webp"
+                  onClick={() => goToPropertyType("tent")}
                 />
               </SwiperSlide>
 
@@ -295,6 +302,7 @@ export default function Home() {
                   title="Hill Retreats"
                   subtitle="Cool · Quiet · Views"
                   img="/banimg1.jpg"
+                  onClick={() => goToPropertyType("hill")}
                 />
               </SwiperSlide>
             </Swiper>
@@ -313,16 +321,21 @@ export default function Home() {
               title="Luxury Villas"
               subtitle="Private · Premium · Scenic"
               img="/banimg1.jpg"
+              onClick={() => goToPropertyType("villa")}
             />
+
             <ExperienceCard
               title="Nature Tents"
               subtitle="Calm · Green · Peaceful"
               img="/bannerimg.webp"
+              onClick={() => goToPropertyType("tent")}
             />
+
             <ExperienceCard
               title="Hill Retreats"
               subtitle="Cool · Quiet · Views"
               img="/banimg1.jpg"
+              onClick={() => goToPropertyType("hill")}
             />
           </motion.div>
 
@@ -364,7 +377,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => navigate("/properties")}
-                className="h-11 rounded-[10px] px-8 bg-primary text-white font-semibold hover:opacity-90"
+                className="h-11 rounded-[10px] px-8 text-[14px] bg-primary text-white font-semibold hover:opacity-90"
               >
                 View All →
               </Button>
@@ -465,19 +478,18 @@ export default function Home() {
 }
 
 
-function ExperienceCard({ title, subtitle, img }) {
+function ExperienceCard({ title, subtitle, img, onClick }) {
   return (
     <motion.div
       whileHover={{ y: -6 }}
       transition={{ type: "spring", stiffness: 220, damping: 20 }}
+      onClick={onClick}
       className="
         relative
         min-w-[180px] md:min-w-[200px]
         h-[280px]
         rounded-[22px]
         overflow-hidden
-        shadow-none
-        md:shadow-[0_12px_35px_rgba(0,0,0,0.18)]
         cursor-pointer
         group
         flex-shrink-0
@@ -486,24 +498,14 @@ function ExperienceCard({ title, subtitle, img }) {
       <img
         src={img}
         alt={title}
-        className="
-          absolute inset-0
-          w-full h-full
-          object-cover
-          transition-transform duration-700
-          group-hover:scale-110
-        "
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
 
       <div className="absolute bottom-5 left-5 right-5 text-white">
-        <h3 className="text-[15px] font-semibold leading-tight">
-          {title}
-        </h3>
-        <p className="text-xs text-white/80 mt-1">
-          {subtitle}
-        </p>
+        <h3 className="text-[16px] font-semibold leading-tight">{title}</h3>
+        <p className="text-xs text-white/80 mt-1">{subtitle}</p>
       </div>
     </motion.div>
   );

@@ -29,11 +29,14 @@ export default function Header({ onLoginClick }) {
           <Link to="/properties" className="tracking-[2px] uppercase md:text-[14px] font-medium">
             Explore
           </Link>
-          <Link to="/top-places" className="tracking-[2px] uppercase md:text-[14px] font-medium">
-            Top Places
+          <Link to="/about-us" className="tracking-[2px] uppercase md:text-[14px] font-medium">
+            About Us
           </Link>
           <Link to="/contact" className="tracking-[2px] uppercase md:text-[14px] font-medium">
             Contact
+          </Link>
+          <Link to="/faq" className="tracking-[2px] uppercase md:text-[14px] font-medium">
+            FAQs
           </Link>
         </div>
 
@@ -147,7 +150,7 @@ export default function Header({ onLoginClick }) {
             <MobileItem icon={<Heart />} label="Favorites" to="/account/wishlist" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<UserIcon />} label="Profile" to="/account/profile" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<Settings />} label="Settings" to="/account/settings" setMobileOpen={setMobileOpen} />
-            <MobileItem icon={<LifeBuoy />} label="Help & Support" to="/account/support" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<LifeBuoy />} label="Contact" to="/contact" setMobileOpen={setMobileOpen} />
           </div>
 
           {/* FOOTER */}

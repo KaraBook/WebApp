@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 import { useLocation } from "react-router-dom";
 import MobileAccountBottomNav from "./components/accounts/MobileAccountBottomNav";
 
+
 export default function App() {
   const { init, loginModalOpen, showAuthModal, hideAuthModal } = useAuthStore();
   const location = useLocation();

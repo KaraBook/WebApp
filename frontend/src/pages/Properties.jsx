@@ -9,6 +9,14 @@ import PropertyTopFilters from "@/components/PropertyTopFilters";
 import { Star, SlidersHorizontal } from "lucide-react";
 import PropertyFilterPopup from "@/components/PropertyFilterPopup";
 
+const PROPERTY_TYPE_LABELS = {
+  villa: "Villa",
+  tent: "Tent",
+  cottage: "Cottage",
+  hotel: "Hotel",
+};
+
+
 export default function Properties() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,9 +24,12 @@ export default function Properties() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showFilterPopup, setShowFilterPopup] = useState(false);
 
+  const propertyTypeFromUrl = searchParams.get("propertyType");
 
   const [topFilters, setTopFilters] = useState({
-    type: "All Types",
+    type: propertyTypeFromUrl
+      ? PROPERTY_TYPE_LABELS[propertyTypeFromUrl] || "All Types"
+      : "All Types",
     price: "All Prices",
     sort: "Recommended",
   });
@@ -133,11 +144,11 @@ export default function Properties() {
 
       {/* Mobile Search Trigger + Inline Filters */}
       <div
-  className={`
+        className={`
     md:hidden px-2 -mt-[35px] relative
     ${showMobileFilters || showFilterPopup ? "z-40" : "z-9"}
   `}
->
+      >
 
         <div className="flex gap-2">
           <button
@@ -220,8 +231,21 @@ export default function Properties() {
         <PropertyTopFilters
           total={properties.length}
           value={topFilters}
-          onChange={setTopFilters}
+          onChange={(newFilters) => {
+            setTopFilters(newFilters);
+
+            const params = new URLSearchParams(searchParams);
+
+            if (newFilters.type && newFilters.type !== "All Types") {
+              params.set("propertyType", newFilters.type);
+            } else {
+              params.delete("propertyType");
+            }
+
+            navigate(`/properties?${params.toString()}`);
+          }}
         />
+
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-10 h-10 border-4 border-gray-300 border-t-[#efcc61] rounded-full animate-spin"></div>
