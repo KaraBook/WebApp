@@ -83,11 +83,11 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
       >
         {/* ================= HEADER ================= */}
         <DialogHeader className="px-4 py-5 border-b relative">
-          <DialogTitle className="text-[17px] font-semibold">
+          <DialogTitle className="text-[17px] text-left font-semibold">
             {userName || "Guest"}
           </DialogTitle>
 
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-left text-muted-foreground">
             {userEmail}
           </p>
 
