@@ -90,10 +90,9 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
 
           <span
             className={`mt-2 w-fit px-3 py-1 rounded-full text-xs font-medium capitalize
-              ${
-                paymentStatus === "paid"
-                  ? "bg-emerald-100 text-emerald-700"
-                  : "bg-gray-100 text-gray-600"
+              ${paymentStatus === "paid"
+                ? "bg-emerald-100 text-emerald-700"
+                : "bg-gray-100 text-gray-600"
               }`}
           >
             {paymentStatus}
@@ -161,26 +160,53 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
 
           {/* PAYMENT */}
           <Section title="Payment Information">
-            <KeyValue label="Payment Status">
+            {/* Payment Status */}
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Payment Status</span>
               <span className="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
                 Paid
               </span>
-            </KeyValue>
-
-            <KeyValue label="Payment Method" value={paymentMethod} />
-            <KeyValue label="Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
-            <KeyValue label="Tax" value={`₹${taxAmount?.toLocaleString("en-IN")}`} />
-
-            <div className="bg-muted/40 rounded-lg px-3 py-2">
-              <KeyValue
-                label="Grand Total"
-                value={`₹${grandTotal?.toLocaleString("en-IN")}`}
-                bold
-              />
             </div>
 
-            <KeyValue label="Order ID" value={orderId} mono />
+            {/* Method */}
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Payment Method</span>
+              <span className="font-medium">{paymentMethod}</span>
+            </div>
+
+            {/* Amount */}
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Amount</span>
+              <span className="font-medium">
+                ₹{totalAmount?.toLocaleString("en-IN")}
+              </span>
+            </div>
+
+            {/* Tax */}
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Tax</span>
+              <span className="font-medium">
+                ₹{taxAmount?.toLocaleString("en-IN")}
+              </span>
+            </div>
+
+            {/* GRAND TOTAL (highlight row) */}
+            <div className="flex justify-between items-center text-sm bg-muted/40 rounded-lg px-3 py-2">
+              <span className="text-muted-foreground">Grand Total</span>
+              <span className="font-semibold text-gray-900">
+                ₹{grandTotal?.toLocaleString("en-IN")}
+              </span>
+            </div>
+
+            {/* Order ID */}
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Order ID</span>
+              <span className="font-mono text-xs">
+                {orderId}
+              </span>
+            </div>
           </Section>
+
 
           <Row
             icon={<Clock size={14} />}
@@ -237,9 +263,8 @@ function KeyValue({ label, value, bold, mono, children }) {
       <span className="text-muted-foreground text-sm">{label}</span>
       {children || (
         <span
-          className={`text-sm ${
-            bold ? "font-semibold" : "font-medium"
-          } ${mono ? "font-mono text-xs" : ""}`}
+          className={`text-sm ${bold ? "font-semibold" : "font-medium"
+            } ${mono ? "font-mono text-xs" : ""}`}
         >
           {value}
         </span>
