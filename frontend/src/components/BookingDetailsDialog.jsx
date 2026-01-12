@@ -149,7 +149,7 @@ export default function BookingDetailsDialog({
             ✕
           </button>
 
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-start gap-4">
             <div>
               <p className="text-[16px] font-semibold text-gray-900 leading-tight">
                 {userName}
