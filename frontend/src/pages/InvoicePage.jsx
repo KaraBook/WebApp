@@ -51,7 +51,7 @@ export default function InvoicePage() {
 
         <Button
           onClick={downloadPDF}
-          className="bg-teal-600 hover:bg-teal-700 text-sm px-4"
+          className="bg-primary hover:bg-primary text-sm px-4"
         >
           <FileDown size={16} className="mr-2" />
           Download Invoice
@@ -66,7 +66,7 @@ export default function InvoicePage() {
         {/* HEADER */}
         <div className="flex justify-between items-start pb-4 border-b">
           <div className="flex gap-3">
-            <div className="w-10 h-10 bg-teal-600 text-white rounded-md flex items-center justify-center font-bold">
+            <div className="w-10 h-10 bg-primary text-white rounded-md flex items-center justify-center font-bold">
               {invoice.propertyName?.[0]}
             </div>
             <div>
