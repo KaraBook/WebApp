@@ -160,7 +160,7 @@ export default function InvoicePage() {
         <table className="w-full mt-6 text-sm border-t">
           <thead>
             <tr className="border-b">
-              <th>S.No</th>
+              <th className="py-2">S.No</th>
               <th>Description</th>
               <th className="text-right">Nights</th>
               <th className="text-right">Rate</th>
@@ -170,7 +170,7 @@ export default function InvoicePage() {
           <tbody>
             <tr className="border-b">
               <td>1</td>
-              <td>
+              <td class="py-2">
                 <p className="font-medium">Room / Accommodation Charges</p>
                 <p className="text-xs text-muted-foreground">
                   villa at {invoice.propertyName}
