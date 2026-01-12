@@ -10,10 +10,12 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Dashboard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
+  { to: "/account/dashboard", label: "Dashboard", icon: Dashboard },
   { to: "/account/bookings", label: "My Bookings", icon: CalendarCheck },
   { to: "/account/wishlist", label: "Wishlist", icon: Heart },
   { to: "/account/profile", label: "My Profile", icon: UserIcon },
