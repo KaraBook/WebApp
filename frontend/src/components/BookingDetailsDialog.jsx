@@ -22,7 +22,7 @@ const Badge = ({ children, tone = "green" }) => {
       : "bg-red-100 text-red-700 border-red-200";
 
   return (
-    <span className={`inline-flex mr-[25px] items-center px-2.5 py-1 text-xs font-semibold rounded-full border ${styles}`}>
+    <span className={`inline-flex md:mr-[25px] items-center px-2.5 py-1 text-xs font-semibold rounded-full border ${styles}`}>
       {children}
     </span>
   );
@@ -149,7 +149,7 @@ export default function BookingDetailsDialog({
             ✕
           </button>
 
-          <div className="flex items-start justify-start gap-4">
+          <div className="flex items-start md:justify-between justify-start gap-4">
             <div>
               <p className="text-[16px] font-semibold text-gray-900 leading-tight">
                 {userName}
