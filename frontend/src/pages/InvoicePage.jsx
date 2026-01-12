@@ -76,47 +76,47 @@ export default function InvoicePage() {
       ? `${numberToWords(grandTotal)} Rupees Only`
       : "—";
 
- const downloadPDF = async () => {
-  const original = invoiceRef.current;
-  if (!original) return;
+  const downloadPDF = async () => {
+    const original = invoiceRef.current;
+    if (!original) return;
 
-  // 1️⃣ Clone node
-  const clone = original.cloneNode(true);
+    // 1️⃣ Clone node
+    const clone = original.cloneNode(true);
 
-  // 2️⃣ Force desktop layout
-  clone.classList.add("pdf-desktop");
+    // 2️⃣ Force desktop layout
+    clone.classList.add("pdf-desktop");
 
-  // 3️⃣ Position clone off-screen
-  clone.style.position = "fixed";
-  clone.style.top = "0";
-  clone.style.left = "-9999px";
-  clone.style.background = "#fff";
+    // 3️⃣ Position clone off-screen
+    clone.style.position = "fixed";
+    clone.style.top = "0";
+    clone.style.left = "-9999px";
+    clone.style.background = "#fff";
 
-  document.body.appendChild(clone);
+    document.body.appendChild(clone);
 
-  // 4️⃣ Wait for styles to apply
-  await new Promise((r) => setTimeout(r, 200));
+    // 4️⃣ Wait for styles to apply
+    await new Promise((r) => setTimeout(r, 200));
 
-  // 5️⃣ Capture clone
-  const canvas = await html2canvas(clone, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#ffffff",
-  });
+    // 5️⃣ Capture clone
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
 
-  // 6️⃣ Remove clone
-  document.body.removeChild(clone);
+    // 6️⃣ Remove clone
+    document.body.removeChild(clone);
 
-  // 7️⃣ Generate PDF
-  const imgData = canvas.toDataURL("image/png");
-  const pdf = new jsPDF("p", "mm", "a4");
+    // 7️⃣ Generate PDF
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
 
-  const pdfWidth = 210;
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pdfWidth = 210;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-  pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
-};
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
+  };
 
 
 
@@ -197,12 +197,12 @@ export default function InvoicePage() {
         <div className="mt-6 overflow-x-auto">
           <table className="min-w-[600px] w-full text-sm border-t">
             <thead>
-              <tr className="border-b whitespace-nowrap">
-                <th className="py-2 text-left">S.No</th>
-                <th className="text-left">Description</th>
-                <th className="text-right">Nights</th>
-                <th className="text-right">Rate</th>
-                <th className="text-right">Amount</th>
+              <tr className="border-b">
+                <th className="py-3 text-left align-middle">S.No</th>
+                <th className="py-3 text-left align-middle">Description</th>
+                <th className="py-3 text-right align-middle">Nights</th>
+                <th className="py-3 text-right align-middle">Rate</th>
+                <th className="py-3 text-right align-middle">Amount</th>
               </tr>
             </thead>
 
