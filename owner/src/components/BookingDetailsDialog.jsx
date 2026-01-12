@@ -34,10 +34,20 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
     paymentMethod,
     orderId,
     contactNumber,
+    contactEmail,
   } = booking;
 
   const adults = guests?.adults || 0;
   const children = guests?.children || 0;
+
+  const userName = `${userId?.firstName || ""} ${userId?.lastName || ""}`.trim();
+
+  // ✅ FIXED EMAIL LOGIC
+  const userEmail =
+    userId?.email || contactEmail || booking?.email || "—";
+
+  const userPhone =
+    contactNumber || userId?.mobile || "—";
 
   const formatDate = (d) =>
     new Date(d).toLocaleDateString("en-GB", {
@@ -49,9 +59,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
   return (
     <Dialog
       open={open}
-      onOpenChange={(isOpen) => {
-        if (!isOpen) onClose();
-      }}
+      onOpenChange={(v) => !v && onClose()}
     >
       <DialogContent
         className="
@@ -70,14 +78,14 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
           duration-300
         "
       >
-        {/* HEADER */}
+        {/* ================= HEADER ================= */}
         <DialogHeader className="px-6 py-5 border-b relative">
           <DialogTitle className="text-[17px] font-semibold">
-            {userId?.firstName} {userId?.lastName}
+            {userName || "Guest"}
           </DialogTitle>
 
           <p className="text-sm text-muted-foreground">
-            {userId?.email || "—"}
+            {userEmail}
           </p>
 
           <span
@@ -99,20 +107,21 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
           </button>
         </DialogHeader>
 
-        {/* BODY */}
-        <div className="flex-1 px-6 py-6 space-y-5 text-sm">
+        {/* ================= BODY ================= */}
+        <div className="px-6 py-6 space-y-5 text-sm">
+
           {/* PROPERTY */}
           <div className="rounded-xl border bg-white px-4 py-3 flex items-center gap-3">
             <Home size={16} className="text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Property</p>
               <p className="font-medium text-gray-900">
-                {propertyId?.propertyName}
+                {propertyId?.propertyName || "—"}
               </p>
             </div>
           </div>
 
-          {/* DATES */}
+          {/* CHECK-IN / CHECK-OUT */}
           <div className="grid grid-cols-2 gap-4">
             <InfoCard
               icon={<Calendar size={16} />}
@@ -126,7 +135,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
             />
           </div>
 
-          {/* META */}
+          {/* NIGHTS / GUESTS */}
           <div className="grid grid-cols-2 gap-4">
             <InfoCard
               icon={<Moon size={16} />}
@@ -144,8 +153,8 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
 
           {/* CONTACT */}
           <Section title="Contact Information">
-            <Row icon={<Mail size={14} />} text={userId?.email} />
-            <Row icon={<Phone size={14} />} text={contactNumber || userId?.mobile} />
+            <Row icon={<Mail size={14} />} text={userEmail} />
+            <Row icon={<Phone size={14} />} text={userPhone} />
           </Section>
 
           <Separator />
@@ -184,7 +193,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
   );
 }
 
-/* ===== EXACT SHARED UI BLOCKS ===== */
+/* ================= SHARED UI BLOCKS ================= */
 
 function InfoCard({ icon, label, value }) {
   return (
@@ -193,7 +202,9 @@ function InfoCard({ icon, label, value }) {
         {icon}
         {label}
       </div>
-      <div className="mt-1 font-medium text-gray-900">{value}</div>
+      <div className="mt-1 font-medium text-gray-900">
+        {value}
+      </div>
     </div>
   );
 }
@@ -225,7 +236,11 @@ function KeyValue({ label, value, bold, mono, children }) {
     <div className="flex justify-between items-center">
       <span className="text-muted-foreground text-sm">{label}</span>
       {children || (
-        <span className={`text-sm ${bold ? "font-semibold" : "font-medium"} ${mono ? "font-mono text-xs" : ""}`}>
+        <span
+          className={`text-sm ${
+            bold ? "font-semibold" : "font-medium"
+          } ${mono ? "font-mono text-xs" : ""}`}
+        >
           {value}
         </span>
       )}
