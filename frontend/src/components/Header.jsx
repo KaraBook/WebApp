@@ -151,6 +151,7 @@ export default function Header({ onLoginClick }) {
             <MobileItem icon={<UserIcon />} label="Profile" to="/account/profile" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<Settings />} label="Settings" to="/account/settings" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<LifeBuoy />} label="Contact" to="/contact" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<LucideMenu />} label="FAQs" to="/faq" setMobileOpen={setMobileOpen} />
           </div>
 
           {/* FOOTER */}

@@ -12,7 +12,7 @@ export default function Contact() {
           Contact Us
         </h1>
 
-        <p className="text-gray-600 text-[15px]  md:text-base mt-4">
+        <p className="text-gray-600 text-[15px] px-2 md:text-base mt-4">
           We’re here to help. Let’s make your stay unforgettable.
         </p>
       </section>
