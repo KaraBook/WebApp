@@ -77,26 +77,37 @@ export default function InvoicePage() {
       : "—";
 
  const downloadPDF = async () => {
-  const element = invoiceRef.current;
-  if (!element) return;
+  const original = invoiceRef.current;
+  if (!original) return;
 
-  // 1️⃣ Force desktop layout
-  element.classList.add("pdf-desktop");
+  // 1️⃣ Clone node
+  const clone = original.cloneNode(true);
 
-  // 2️⃣ Wait for reflow
+  // 2️⃣ Force desktop layout
+  clone.classList.add("pdf-desktop");
+
+  // 3️⃣ Position clone off-screen
+  clone.style.position = "fixed";
+  clone.style.top = "0";
+  clone.style.left = "-9999px";
+  clone.style.background = "#fff";
+
+  document.body.appendChild(clone);
+
+  // 4️⃣ Wait for styles to apply
   await new Promise((r) => setTimeout(r, 200));
 
-  // 3️⃣ Capture canvas
-  const canvas = await html2canvas(element, {
+  // 5️⃣ Capture clone
+  const canvas = await html2canvas(clone, {
     scale: 2,
     useCORS: true,
     backgroundColor: "#ffffff",
   });
 
-  // 4️⃣ Restore responsive layout
-  element.classList.remove("pdf-desktop");
+  // 6️⃣ Remove clone
+  document.body.removeChild(clone);
 
-  // 5️⃣ Create PDF
+  // 7️⃣ Generate PDF
   const imgData = canvas.toDataURL("image/png");
   const pdf = new jsPDF("p", "mm", "a4");
 
@@ -106,6 +117,7 @@ export default function InvoicePage() {
   pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
   pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
 };
+
 
 
   return (

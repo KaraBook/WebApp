@@ -276,8 +276,17 @@
 .react-select__control:hover{
   border-color: #038ba0 !important;
 }
-/* Force desktop width ONLY for PDF capture */
+/* put this in global.css */
 .pdf-desktop {
-  width: 800px !important;   /* desktop invoice width */
-  max-width: 800px !important;
+  width: 794px !important; /* A4 width at 96dpi */
+  max-width: 794px !important;
 }
+
+.pdf-desktop .overflow-x-auto {
+  overflow: visible !important;
+}
+
+.pdf-desktop table {
+  min-width: 100% !important;
+}
+
