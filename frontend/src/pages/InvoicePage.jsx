@@ -39,9 +39,9 @@ export default function InvoicePage() {
   const grandTotal = Number(invoice.grandTotal || subtotal + tax);
 
   return (
-    <div className="min-h-screen bg-[#f6f7f9] px-4 py-6">
+    <div className="min-h-screen bg-white px-4 py-6">
       {/* ACTIONS */}
-      <div className="max-w-4xl mx-auto flex justify-between mb-4">
+      <div className="max-w-4xl flex justify-between mb-4">
         <Link
           to="/account/bookings"
           className="flex items-center gap-2 bg-white border px-4 py-2 rounded-md text-sm"
@@ -61,7 +61,7 @@ export default function InvoicePage() {
       {/* INVOICE */}
       <div
         ref={invoiceRef}
-        className="max-w-4xl mx-auto bg-white border rounded-xl p-8"
+        className="max-w-4xl bg-white border rounded-xl p-8"
       >
         {/* HEADER */}
         <div className="flex justify-between items-start pb-4 border-b">
