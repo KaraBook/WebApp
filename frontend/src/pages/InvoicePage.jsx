@@ -85,7 +85,7 @@ export default function InvoicePage() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-6">
+    <div className="min-h-screen px-0 md:px-4 py-6">
       {/* ACTION BAR */}
       <div className="max-w-[50rem] flex justify-between mb-4">
         <Link
@@ -102,7 +102,7 @@ export default function InvoicePage() {
       </div>
 
       {/* INVOICE */}
-      <div ref={invoiceRef} className="max-w-[50rem] bg-white border rounded-xl p-8">
+      <div ref={invoiceRef} className="max-w-[50rem] bg-white border rounded-xl p-4 md:p-8">
         {/* HEADER */}
         <div className="flex justify-between pb-4 border-b">
           <div className="flex gap-3">
