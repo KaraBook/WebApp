@@ -17,7 +17,7 @@ import TermsAndConditions from "@/pages/TermsAndConditions";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import PaymentPolicy from "@/pages/PaymentPolicy";
 import FAQ from "@/pages/FAQ";
-import AccountDashboard from "@/components/accounts/Dashboard";
+import Dashboard from "@/components/accounts/Dashboard";
 
 export default function AppRoutes() {
   return (
@@ -36,7 +36,7 @@ export default function AppRoutes() {
       {/* Dashboard-only area */}
       <Route element={<ProtectedRoute />}>
         <Route path="/account" element={<AccountLayout />}>
-          <Route index element={<AccountDashboard />} />
+          <Route index element={<Dashboard />} />
           <Route path="bookings" element={<Bookings />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="profile" element={<Profile />} />
