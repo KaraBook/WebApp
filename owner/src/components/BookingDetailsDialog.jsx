@@ -13,9 +13,10 @@ import {
   Mail,
   Phone,
   Clock,
+  X,
 } from "lucide-react";
 
-export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
+export default function BookingDetailsDialog({ open, booking, onClose }) {
   if (!booking) return null;
 
   const {
@@ -46,40 +47,47 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
     });
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
+    >
       <DialogContent
         className="
           fixed
-    inset-y-0
-    right-0
-    z-[9999999]
-    h-full
-    w-[420px]
-    max-w-[90vw]
-    p-0
-    pb-4
-    rounded-none
-    border-l
-    bg-white
-    shadow-xl
-    overflow-y-auto
+          inset-y-0
+          right-0
+          z-[9999999]
+          h-full
+          w-[420px]
+          max-w-[90vw]
+          p-0
+          pb-4
+          rounded-none
+          border-l
+          bg-white
+          shadow-xl
+          overflow-y-auto
 
-    !translate-x-0
-    !translate-y-0
-    !left-auto
-    !top-0
+          !translate-x-0
+          !translate-y-0
+          !left-auto
+          !top-0
 
-    data-[state=open]:animate-in
-    data-[state=open]:slide-in-from-right
-    data-[state=closed]:animate-out
-    data-[state=closed]:slide-out-to-right
-    duration-300"
+          data-[state=open]:animate-in
+          data-[state=open]:slide-in-from-right
+          data-[state=closed]:animate-out
+          data-[state=closed]:slide-out-to-right
+          duration-300
+        "
       >
         {/* ================= HEADER ================= */}
-        <DialogHeader className="px-6 py-5 border-b">
+        <DialogHeader className="px-6 py-5 border-b relative">
           <DialogTitle className="text-[17px] font-semibold">
             {userId?.firstName} {userId?.lastName}
           </DialogTitle>
+
           <p className="text-sm text-muted-foreground">
             {userId?.email}
           </p>
@@ -94,6 +102,14 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
           >
             {paymentStatus}
           </span>
+
+          {/* CLOSE */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1 rounded-md text-red-500 hover:bg-red-50"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </DialogHeader>
 
         {/* ================= BODY ================= */}
@@ -163,10 +179,12 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
               label="Payment Method"
               value={paymentMethod}
             />
+
             <KeyValue
               label="Amount"
               value={`₹${totalAmount?.toLocaleString("en-IN")}`}
             />
+
             <KeyValue
               label="Tax"
               value={`₹${taxAmount?.toLocaleString("en-IN")}`}
@@ -198,7 +216,7 @@ export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
   );
 }
 
-/* ================= SMALL COMPONENTS ================= */
+/* ================= SMALL COMPONENTS (SAME AS ADMIN) ================= */
 
 function InfoCard({ icon, label, value }) {
   return (
