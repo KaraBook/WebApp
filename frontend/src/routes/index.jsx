@@ -36,7 +36,7 @@ export default function AppRoutes() {
       {/* Dashboard-only area */}
       <Route element={<ProtectedRoute />}>
         <Route path="/account" element={<AccountLayout />}>
-          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="bookings" element={<Bookings />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="profile" element={<Profile />} />
