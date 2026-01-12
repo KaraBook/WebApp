@@ -15,6 +15,7 @@ export default function App() {
   const location = useLocation();
 
    const hideFooterRoutes = [
+    "/account/dashboard",
     "/account/bookings",
     "/account/wishlist",
     "/account/profile",
