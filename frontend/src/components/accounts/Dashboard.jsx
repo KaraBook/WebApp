@@ -283,20 +283,23 @@ function StatCard({ title, value, subtitle, icon, dark }) {
 }
 
 function StatusChip({ status }) {
-    const map = {
-        pending: "bg-orange-100 text-orange-600 border-orange-300",
-        confirmed: "bg-green-100 text-green-600 border-green-300",
-        cancelled: "bg-red-100 text-red-600 border-red-300",
-    };
+  const normalized =
+    status === "initiated" ? "pending" : status;
 
-    return (
-        <span
-            className={cn(
-                "px-3 py-1 rounded-full text-xs font-medium border capitalize",
-                map[status]
-            )}
-        >
-            {status}
-        </span>
-    );
+  const map = {
+    pending: "bg-orange-100 text-orange-600 border-orange-300",
+    confirmed: "bg-green-100 text-green-600 border-green-300",
+    cancelled: "bg-red-100 text-red-600 border-red-300",
+  };
+
+  return (
+    <span
+      className={cn(
+        "px-3 py-1 rounded-full text-xs font-medium border capitalize",
+        map[normalized]
+      )}
+    >
+      {normalized}
+    </span>
+  );
 }
