@@ -87,7 +87,7 @@ export default function InvoicePage() {
   return (
     <div className="min-h-screen px-4 py-6">
       {/* ACTION BAR */}
-      <div className="max-w-4xl flex justify-between mb-4">
+      <div className="max-w-[50rem] flex justify-between mb-4">
         <Link
           to="/account/bookings"
           className="flex items-center gap-2 bg-white border px-4 py-2 rounded-md text-sm"
