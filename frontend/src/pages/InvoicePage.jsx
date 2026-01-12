@@ -104,7 +104,7 @@ export default function InvoicePage() {
       {/* INVOICE */}
       <div ref={invoiceRef} className="max-w-[50rem] bg-white border rounded-xl p-4 md:p-8">
         {/* HEADER */}
-        <div className="flex justify-between pb-4 border-b">
+        <div className="flex justify-between pb-0 md:pb-4 border-b">
           <div className="flex gap-3">
             <div className="w-10 h-10 bg-primary text-white rounded-md flex items-center justify-center font-bold">
               {invoice.propertyName?.[0]}
@@ -157,35 +157,45 @@ export default function InvoicePage() {
         </div>
 
         {/* TABLE */}
-        <table className="w-full mt-6 text-sm border-t">
-          <thead>
-            <tr className="border-b">
-              <th className="py-2">S.No</th>
-              <th>Description</th>
-              <th className="text-right">Nights</th>
-              <th className="text-right">Rate</th>
-              <th className="text-right">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b">
-              <td>1</td>
-              <td class="py-2">
-                <p className="font-medium">Room / Accommodation Charges</p>
-                <p className="text-xs text-muted-foreground">
-                  villa at {invoice.propertyName}
-                </p>
-              </td>
-              <td className="text-right">{invoice.nights}</td>
-              <td className="text-right">
-                ₹{(subtotal / invoice.nights).toLocaleString("en-IN")}
-              </td>
-              <td className="text-right">
-                ₹{subtotal.toLocaleString("en-IN")}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {/* TABLE */}
+<div className="mt-6 overflow-x-auto">
+  <table className="min-w-[600px] w-full text-sm border-t">
+    <thead>
+      <tr className="border-b whitespace-nowrap">
+        <th className="py-2 text-left">S.No</th>
+        <th className="text-left">Description</th>
+        <th className="text-right">Nights</th>
+        <th className="text-right">Rate</th>
+        <th className="text-right">Amount</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr className="border-b">
+        <td className="py-3">1</td>
+
+        <td className="py-2">
+          <p className="font-medium">
+            Room / Accommodation Charges
+          </p>
+          <p className="text-xs text-muted-foreground">
+            villa at {invoice.propertyName}
+          </p>
+        </td>
+
+        <td className="text-right">{invoice.nights}</td>
+
+        <td className="text-right">
+          ₹{(subtotal / invoice.nights).toLocaleString("en-IN")}
+        </td>
+
+        <td className="text-right">
+          ₹{subtotal.toLocaleString("en-IN")}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
         {/* TOTALS */}
         <div className="flex justify-end mt-4 text-sm">
@@ -207,7 +217,7 @@ export default function InvoicePage() {
         </div>
 
         {/* PAYMENT INFO */}
-        <div className="mt-6 pt-4 border-t grid sm:grid-cols-2 text-sm">
+        <div className="mt-6 pt-4 grid sm:grid-cols-2 text-sm">
           <div>
             <p className="uppercase text-xs font-semibold mb-2">
               Payment Information
