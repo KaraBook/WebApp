@@ -8,12 +8,23 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { format } from "date-fns";
 import { useAuthStore } from "@/store/auth";
+import { toWords } from "number-to-words";
+
 
 export default function InvoicePage() {
   const { id } = useParams();
   const [invoice, setInvoice] = useState(null);
   const invoiceRef = useRef(null);
   const { accessToken } = useAuthStore();
+  const adults = Number(invoice.guests?.adults || 0);
+  const children = Number(invoice.guests?.children || 0);
+  const totalGuests = adults + children;
+
+  const amountInWords =
+    grandTotal > 0
+      ? `${toWords(grandTotal).replace(/\b\w/g, c => c.toUpperCase())} Rupees Only`
+      : "—";
+
 
   useEffect(() => {
     (async () => {
@@ -116,7 +127,11 @@ export default function InvoicePage() {
             <BD label="Check-in" value="27 Nov 2025" sub="2:00 PM" />
             <BD label="Check-out" value="30 Nov 2025" sub="11:00 AM" />
             <BD label="Duration" value={`${invoice.nights} Nights`} />
-            <BD label="Guests" value="NaN Guests" sub="Adults, Children" />
+            <BD
+              label="Guests"
+              value={`${totalGuests} Guests`}
+              sub="Adults, Children"
+            />
           </div>
         </div>
 
@@ -166,18 +181,35 @@ export default function InvoicePage() {
           </div>
         </div>
 
+
+        {/* AMOUNT IN WORDS */}
+        <div className="mt-6 text-sm">
+          <p className="text-muted-foreground mb-2">
+            Amount in Words:
+          </p>
+          <div className="border-b pb-3">
+            {amountInWords}
+          </div>
+        </div>
+
         {/* PAYMENT INFO */}
         <div className="mt-6 pt-4 border-t grid grid-cols-1 sm:grid-cols-2 text-sm">
           <div>
             <p className="uppercase text-xs font-semibold mb-2">
               Payment Information
             </p>
-            <p>Status: paid</p>
+            <p>
+              Status:{" "}
+              <span className="font-semibold capitalize">
+                {invoice.paymentStatus}
+              </span>
+            </p>
             <p>Method:</p>
             <p>Transaction ID:</p>
           </div>
 
           <div className="text-right self-end">
+            <div className="border-t w-40 ml-auto mb-1" />
             <p className="text-xs">Authorized Signatory</p>
             <p className="text-sm font-medium">
               {invoice.propertyName}
