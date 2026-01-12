@@ -249,7 +249,7 @@ function StatCard({ title, value, subtitle, icon, dark }) {
     <div
       className={cn(
         "rounded-xl border p-5 flex justify-between items-start",
-        dark ? "bg-black text-white border-black" : "bg-white"
+        dark ? "bg-primary text-white border-none" : "bg-white"
       )}
     >
       <div>
