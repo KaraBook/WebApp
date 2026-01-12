@@ -162,7 +162,7 @@ export default function OwnerBookings() {
       );
     return (
       <span className={`${base} bg-red-50 border-red-200 text-red-700`}>
-        Failed
+        Initiated
       </span>
     );
   };
