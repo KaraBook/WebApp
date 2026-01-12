@@ -66,11 +66,13 @@ export default function Dashboard() {
     const totalBookings = bookings.length;
 
     const confirmed = bookings.filter(
-        b => b.status === "confirmed" && b.paymentId
+        b =>
+            ["paid", "confirmed", "completed"].includes(b.status) ||
+            !!b.paymentId
     ).length;
 
     const pending = bookings.filter(
-        b => b.status === "initiated" || b.status === "pending"
+        b => ["initiated", "pending"].includes(b.status)
     ).length;
 
     const cancelled = bookings.filter(
@@ -78,7 +80,11 @@ export default function Dashboard() {
     ).length;
 
     const totalSpent = bookings
-        .filter(b => b.status === "confirmed" && b.paymentId)
+        .filter(
+            b =>
+                ["paid", "confirmed", "completed"].includes(b.status) ||
+                !!b.paymentId
+        )
         .reduce((sum, b) => sum + Number(b.amount || 0), 0);
 
     const uniqueVisited = new Set(
