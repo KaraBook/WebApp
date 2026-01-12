@@ -70,6 +70,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
 
           !translate-x-0 !translate-y-0
           !left-auto !top-0
+          [&>button]:hidden
 
           data-[state=open]:animate-in
           data-[state=open]:slide-in-from-right
