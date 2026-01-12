@@ -59,7 +59,9 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
   return (
     <Dialog
       open={open}
-      onOpenChange={(v) => !v && onClose()}
+      onOpenChange={(v) => {
+        if (!v) onClose();
+      }}
     >
       <DialogContent
         className="
