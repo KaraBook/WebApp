@@ -22,7 +22,7 @@ const Badge = ({ children, tone = "green" }) => {
       : "bg-red-100 text-red-700 border-red-200";
 
   return (
-    <span className={`inline-flex md:mr-[25px] items-center px-2.5 py-1 text-xs font-semibold rounded-full border ${styles}`}>
+    <span className={`inline-flex md:mr-[25px] hidden md:block items-center px-2.5 py-1 text-xs font-semibold rounded-full border ${styles}`}>
       {children}
     </span>
   );
