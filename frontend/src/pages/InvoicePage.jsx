@@ -8,23 +8,48 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { format } from "date-fns";
 import { useAuthStore } from "@/store/auth";
-import { toWords } from "number-to-words";
 
+/* -------------------------------------------
+   Amount to Words (safe, no dependency)
+------------------------------------------- */
+const numberToWords = (num) => {
+  const a = [
+    "", "One", "Two", "Three", "Four", "Five", "Six",
+    "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve",
+    "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+    "Seventeen", "Eighteen", "Nineteen",
+  ];
+  const b = [
+    "", "", "Twenty", "Thirty", "Forty",
+    "Fifty", "Sixty", "Seventy", "Eighty", "Ninety",
+  ];
+
+  if (num === 0) return "Zero";
+
+  if (num < 20) return a[num];
+  if (num < 100)
+    return b[Math.floor(num / 10)] + (num % 10 ? " " + a[num % 10] : "");
+  if (num < 1000)
+    return (
+      a[Math.floor(num / 100)] +
+      " Hundred" +
+      (num % 100 ? " " + numberToWords(num % 100) : "")
+    );
+  if (num < 100000)
+    return (
+      numberToWords(Math.floor(num / 1000)) +
+      " Thousand" +
+      (num % 1000 ? " " + numberToWords(num % 1000) : "")
+    );
+
+  return "";
+};
 
 export default function InvoicePage() {
   const { id } = useParams();
   const [invoice, setInvoice] = useState(null);
   const invoiceRef = useRef(null);
   const { accessToken } = useAuthStore();
-  const adults = Number(invoice.guests?.adults || 0);
-  const children = Number(invoice.guests?.children || 0);
-  const totalGuests = adults + children;
-
-  const amountInWords =
-    grandTotal > 0
-      ? `${toWords(grandTotal).replace(/\b\w/g, c => c.toUpperCase())} Rupees Only`
-      : "—";
-
 
   useEffect(() => {
     (async () => {
@@ -35,6 +60,22 @@ export default function InvoicePage() {
     })();
   }, [id]);
 
+  if (!invoice) return null;
+
+  /* ----------------- SAFE DERIVED VALUES ----------------- */
+  const adults = Number(invoice.guests?.adults || 0);
+  const children = Number(invoice.guests?.children || 0);
+  const totalGuests = adults + children;
+
+  const subtotal = Number(invoice.totalAmount || 0);
+  const tax = Number(invoice.taxAmount || 0);
+  const grandTotal = Number(invoice.grandTotal || subtotal + tax);
+
+  const amountInWords =
+    grandTotal > 0
+      ? `${numberToWords(grandTotal)} Rupees Only`
+      : "—";
+
   const downloadPDF = async () => {
     const canvas = await html2canvas(invoiceRef.current, { scale: 2 });
     const img = canvas.toDataURL("image/png");
@@ -43,15 +84,9 @@ export default function InvoicePage() {
     pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
   };
 
-  if (!invoice) return null;
-
-  const subtotal = Number(invoice.totalAmount || 0);
-  const tax = Number(invoice.taxAmount || 0);
-  const grandTotal = Number(invoice.grandTotal || subtotal + tax);
-
   return (
     <div className="min-h-screen px-4 py-6">
-      {/* ACTIONS */}
+      {/* ACTION BAR */}
       <div className="max-w-4xl flex justify-between mb-4">
         <Link
           to="/account/bookings"
@@ -60,47 +95,34 @@ export default function InvoicePage() {
           <ArrowLeft size={16} /> Back
         </Link>
 
-        <Button
-          onClick={downloadPDF}
-          className="bg-primary hover:bg-primary text-sm px-4"
-        >
+        <Button onClick={downloadPDF} className="bg-primary text-sm px-4">
           <FileDown size={16} className="mr-2" />
           Download Invoice
         </Button>
       </div>
 
       {/* INVOICE */}
-      <div
-        ref={invoiceRef}
-        className="max-w-4xl bg-white border rounded-xl p-8"
-      >
+      <div ref={invoiceRef} className="max-w-4xl bg-white border rounded-xl p-8">
         {/* HEADER */}
-        <div className="flex justify-between items-start pb-4 border-b">
+        <div className="flex justify-between pb-4 border-b">
           <div className="flex gap-3">
             <div className="w-10 h-10 bg-primary text-white rounded-md flex items-center justify-center font-bold">
               {invoice.propertyName?.[0]}
             </div>
             <div>
-              <p className="font-semibold text-[16px]">
-                {invoice.propertyName}
-              </p>
+              <p className="font-semibold">{invoice.propertyName}</p>
               <p className="text-xs text-muted-foreground">
                 {invoice.propertyCity}, {invoice.propertyState}
               </p>
             </div>
           </div>
-
-          <p className="font-semibold text-sm tracking-wide">
-            TAX INVOICE
-          </p>
+          <p className="font-semibold text-sm tracking-wide">TAX INVOICE</p>
         </div>
 
         {/* BILL TO */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-6 text-sm">
+        <div className="grid sm:grid-cols-2 gap-8 mt-6 text-sm">
           <div>
-            <p className="uppercase text-xs text-muted-foreground mb-2">
-              Bill To
-            </p>
+            <p className="uppercase text-xs text-muted-foreground mb-2">Bill To</p>
             <p className="font-medium">{invoice.user?.name}</p>
             <p>{invoice.user?.mobile}</p>
             <p>{invoice.user?.email}</p>
@@ -122,7 +144,6 @@ export default function InvoicePage() {
           <p className="uppercase text-xs font-semibold text-muted-foreground mb-3">
             Booking Details
           </p>
-
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
             <BD label="Check-in" value="27 Nov 2025" sub="2:00 PM" />
             <BD label="Check-out" value="30 Nov 2025" sub="11:00 AM" />
@@ -139,8 +160,8 @@ export default function InvoicePage() {
         <table className="w-full mt-6 text-sm border-t">
           <thead>
             <tr className="border-b">
-              <th className="py-2 text-left">S.No</th>
-              <th className="text-left">Description</th>
+              <th>S.No</th>
+              <th>Description</th>
               <th className="text-right">Nights</th>
               <th className="text-right">Rate</th>
               <th className="text-right">Amount</th>
@@ -148,11 +169,9 @@ export default function InvoicePage() {
           </thead>
           <tbody>
             <tr className="border-b">
-              <td className="py-3">1</td>
+              <td>1</td>
               <td>
-                <p className="font-medium">
-                  Room / Accommodation Charges
-                </p>
+                <p className="font-medium">Room / Accommodation Charges</p>
                 <p className="text-xs text-muted-foreground">
                   villa at {invoice.propertyName}
                 </p>
@@ -181,19 +200,14 @@ export default function InvoicePage() {
           </div>
         </div>
 
-
         {/* AMOUNT IN WORDS */}
         <div className="mt-6 text-sm">
-          <p className="text-muted-foreground mb-2">
-            Amount in Words:
-          </p>
-          <div className="border-b pb-3">
-            {amountInWords}
-          </div>
+          <p className="text-muted-foreground mb-2">Amount in Words:</p>
+          <div className="border-b pb-3">{amountInWords}</div>
         </div>
 
         {/* PAYMENT INFO */}
-        <div className="mt-6 pt-4 border-t grid grid-cols-1 sm:grid-cols-2 text-sm">
+        <div className="mt-6 pt-4 border-t grid sm:grid-cols-2 text-sm">
           <div>
             <p className="uppercase text-xs font-semibold mb-2">
               Payment Information
@@ -208,12 +222,11 @@ export default function InvoicePage() {
             <p>Transaction ID:</p>
           </div>
 
+          {/* SIGNATURE */}
           <div className="text-right self-end">
             <div className="border-t w-40 ml-auto mb-1" />
             <p className="text-xs">Authorized Signatory</p>
-            <p className="text-sm font-medium">
-              {invoice.propertyName}
-            </p>
+            <p className="text-sm font-medium">{invoice.propertyName}</p>
           </div>
         </div>
 
@@ -232,7 +245,7 @@ export default function InvoicePage() {
   );
 }
 
-/* ===== Helpers ===== */
+/* ---------- HELPERS ---------- */
 
 function KV({ label, value, mono, bold }) {
   return (
