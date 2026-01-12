@@ -17,95 +17,77 @@ export default function InvoicePage() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const res = await Axios.get(
-          SummaryApi.getInvoice.url(id),
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Cache-Control": "no-cache",
-            },
-          }
-        );
-        if (res.data.success) setInvoice(res.data.data);
-      } catch (err) {
-        console.error("Invoice fetch error:", err);
-      }
+      const res = await Axios.get(SummaryApi.getInvoice.url(id), {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (res.data.success) setInvoice(res.data.data);
     })();
   }, [id]);
 
   const downloadPDF = async () => {
-    if (!invoiceRef.current) return;
     const canvas = await html2canvas(invoiceRef.current, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-
+    const img = canvas.toDataURL("image/png");
     const pdf = new jsPDF("p", "mm", "a4");
-    const width = 210;
-    const height = (canvas.height * width) / canvas.width;
-
-    pdf.addImage(imgData, "PNG", 0, 0, width, height);
+    pdf.addImage(img, "PNG", 0, 0, 210, (canvas.height * 210) / canvas.width);
     pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
   };
 
-  if (!invoice) {
-    return <p className="text-center py-20 text-gray-500">Loading...</p>;
-  }
+  if (!invoice) return null;
 
   const subtotal = Number(invoice.totalAmount || 0);
   const tax = Number(invoice.taxAmount || 0);
   const grandTotal = Number(invoice.grandTotal || subtotal + tax);
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-4">
-      {/* HEADER ACTIONS */}
-      <div className="max-w-4xl mx-auto flex justify-between items-center mb-4">
+    <div className="min-h-screen bg-[#f6f7f9] px-4 py-6">
+      {/* ACTIONS */}
+      <div className="max-w-4xl mx-auto flex justify-between mb-4">
         <Link
           to="/account/bookings"
-          className="flex items-center gap-2 text-sm bg-white border px-4 py-2 rounded-lg"
+          className="flex items-center gap-2 bg-white border px-4 py-2 rounded-md text-sm"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back
+          <ArrowLeft size={16} /> Back
         </Link>
 
         <Button
           onClick={downloadPDF}
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700"
+          className="bg-teal-600 hover:bg-teal-700 text-sm px-4"
         >
-          <FileDown className="w-4 h-4" />
+          <FileDown size={16} className="mr-2" />
           Download Invoice
         </Button>
       </div>
 
-      {/* INVOICE CARD */}
+      {/* INVOICE */}
       <div
         ref={invoiceRef}
-        className="max-w-4xl mx-auto bg-white border rounded-xl p-6 sm:p-8"
+        className="max-w-4xl mx-auto bg-white border rounded-xl p-8"
       >
         {/* HEADER */}
-        <div className="flex justify-between items-start border-b pb-4">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-md bg-teal-600 text-white flex items-center justify-center font-bold">
+        <div className="flex justify-between items-start pb-4 border-b">
+          <div className="flex gap-3">
+            <div className="w-10 h-10 bg-teal-600 text-white rounded-md flex items-center justify-center font-bold">
               {invoice.propertyName?.[0]}
             </div>
             <div>
-              <h2 className="font-semibold text-lg">
+              <p className="font-semibold text-[16px]">
                 {invoice.propertyName}
-              </h2>
-              <p className="text-sm text-muted-foreground">
+              </p>
+              <p className="text-xs text-muted-foreground">
                 {invoice.propertyCity}, {invoice.propertyState}
               </p>
             </div>
           </div>
 
-          <div className="text-right">
-            <h3 className="text-lg font-semibold">TAX INVOICE</h3>
-          </div>
+          <p className="font-semibold text-sm tracking-wide">
+            TAX INVOICE
+          </p>
         </div>
 
-        {/* BILL TO + META */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-          <div className="text-sm">
-            <p className="text-muted-foreground text-xs uppercase mb-1">
+        {/* BILL TO */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-6 text-sm">
+          <div>
+            <p className="uppercase text-xs text-muted-foreground mb-2">
               Bill To
             </p>
             <p className="font-medium">{invoice.user?.name}</p>
@@ -113,99 +95,99 @@ export default function InvoicePage() {
             <p>{invoice.user?.email}</p>
           </div>
 
-          <div className="text-sm space-y-1">
-            <Meta label="Invoice No" value={invoice.invoiceNumber} />
-            <Meta label="Invoice Date" value="—" />
-            <Meta
+          <div className="space-y-1">
+            <KV label="Invoice No" value={invoice.invoiceNumber} />
+            <KV label="Invoice Date" value="—" />
+            <KV
               label="Booking Date"
               value={format(new Date(invoice.bookingDate), "dd MMM yyyy")}
             />
-            <Meta label="Order ID" value={invoice.orderId} mono />
+            <KV label="Order ID" value={invoice.orderId} mono />
           </div>
         </div>
 
         {/* BOOKING DETAILS */}
-        <div className="border rounded-xl p-4 mt-6">
-          <p className="text-xs font-semibold uppercase mb-3 text-muted-foreground">
+        <div className="mt-6 bg-gray-50 border rounded-lg p-4">
+          <p className="uppercase text-xs font-semibold text-muted-foreground mb-3">
             Booking Details
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-            <Detail
-              label="Check-in"
-              value={format(new Date(invoice.checkIn), "dd MMM yyyy")}
-              sub={invoice.checkInTime}
-            />
-            <Detail
-              label="Check-out"
-              value={format(new Date(invoice.checkOut), "dd MMM yyyy")}
-              sub={invoice.checkOutTime}
-            />
-            <Detail label="Duration" value={`${invoice.nights} Nights`} />
-            <Detail
-              label="Guests"
-              value={`${invoice.guests?.adults || 0 + invoice.guests?.children || 0}`}
-              sub="Adults, Children"
-            />
+            <BD label="Check-in" value="27 Nov 2025" sub="2:00 PM" />
+            <BD label="Check-out" value="30 Nov 2025" sub="11:00 AM" />
+            <BD label="Duration" value={`${invoice.nights} Nights`} />
+            <BD label="Guests" value="NaN Guests" sub="Adults, Children" />
           </div>
         </div>
 
         {/* TABLE */}
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full text-sm border-t">
-            <thead>
-              <tr className="border-b text-left">
-                <th className="py-3">S.No</th>
-                <th>Description</th>
-                <th className="text-right">Nights</th>
-                <th className="text-right">Rate</th>
-                <th className="text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b">
-                <td className="py-3">1</td>
-                <td>
-                  <p className="font-medium">
-                    Room / Accommodation Charges
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    villa at {invoice.propertyName}
-                  </p>
-                </td>
-                <td className="text-right">{invoice.nights}</td>
-                <td className="text-right">
-                  ₹{(subtotal / invoice.nights).toLocaleString("en-IN")}
-                </td>
-                <td className="text-right">
-                  ₹{subtotal.toLocaleString("en-IN")}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table className="w-full mt-6 text-sm border-t">
+          <thead>
+            <tr className="border-b">
+              <th className="py-2 text-left">S.No</th>
+              <th className="text-left">Description</th>
+              <th className="text-right">Nights</th>
+              <th className="text-right">Rate</th>
+              <th className="text-right">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b">
+              <td className="py-3">1</td>
+              <td>
+                <p className="font-medium">
+                  Room / Accommodation Charges
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  villa at {invoice.propertyName}
+                </p>
+              </td>
+              <td className="text-right">{invoice.nights}</td>
+              <td className="text-right">
+                ₹{(subtotal / invoice.nights).toLocaleString("en-IN")}
+              </td>
+              <td className="text-right">
+                ₹{subtotal.toLocaleString("en-IN")}
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
         {/* TOTALS */}
-        <div className="flex justify-end mt-6">
-          <div className="w-full sm:w-1/2 space-y-2 text-sm">
-            <Row label="Sub Total" value={subtotal} />
-            <Row label="Tax (0%)" value={tax} />
-            <Row label="Grand Total" value={grandTotal} bold />
+        <div className="flex justify-end mt-4 text-sm">
+          <div className="w-1/2 space-y-2">
+            <KV label="Sub Total" value={`₹${subtotal.toLocaleString("en-IN")}`} />
+            <KV label="Tax (0%)" value={`₹${tax.toLocaleString("en-IN")}`} />
+            <KV
+              label="Grand Total"
+              value={`₹${grandTotal.toLocaleString("en-IN")}`}
+              bold
+            />
           </div>
         </div>
 
         {/* PAYMENT INFO */}
-        <div className="mt-6 border-t pt-4 text-sm">
-          <p className="font-semibold uppercase text-xs mb-2">
-            Payment Information
-          </p>
-          <p>Status: {invoice.paymentStatus}</p>
-          <p>Method: {invoice.paymentMethod || "—"}</p>
+        <div className="mt-6 pt-4 border-t grid grid-cols-1 sm:grid-cols-2 text-sm">
+          <div>
+            <p className="uppercase text-xs font-semibold mb-2">
+              Payment Information
+            </p>
+            <p>Status: paid</p>
+            <p>Method:</p>
+            <p>Transaction ID:</p>
+          </div>
+
+          <div className="text-right self-end">
+            <p className="text-xs">Authorized Signatory</p>
+            <p className="text-sm font-medium">
+              {invoice.propertyName}
+            </p>
+          </div>
         </div>
 
         {/* FOOTER */}
         <div className="mt-6 text-xs text-muted-foreground space-y-1">
-          <p>• This is a computer-generated invoice.</p>
+          <p>• This is a computer-generated invoice and does not require a physical signature.</p>
           <p>• Check-in and check-out times are subject to property policies.</p>
           <p>• Please retain this invoice for your records.</p>
         </div>
@@ -218,32 +200,25 @@ export default function InvoicePage() {
   );
 }
 
-/* ---------- SMALL COMPONENTS ---------- */
+/* ===== Helpers ===== */
 
-function Meta({ label, value, mono }) {
+function KV({ label, value, mono, bold }) {
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}:</span>
-      <span className={mono ? "font-mono text-xs" : ""}>{value}</span>
+      <span className={`${mono ? "font-mono text-xs" : ""} ${bold ? "font-semibold" : ""}`}>
+        {value}
+      </span>
     </div>
   );
 }
 
-function Detail({ label, value, sub }) {
+function BD({ label, value, sub }) {
   return (
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="font-medium">{value}</p>
       {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
-    </div>
-  );
-}
-
-function Row({ label, value, bold }) {
-  return (
-    <div className={`flex justify-between ${bold ? "font-semibold" : ""}`}>
-      <span>{label}</span>
-      <span>₹{value.toLocaleString("en-IN")}</span>
     </div>
   );
 }
