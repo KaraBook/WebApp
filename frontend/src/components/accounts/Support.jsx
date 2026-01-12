@@ -61,7 +61,7 @@ export default function Support() {
   ];
 
   return (
-    <div className="max-w-5xl py-0 px-2">
+    <div className="max-w-5xl py-0 px-0">
       <h1 className="text-2xl uppercase tracking-[1px] font-[500] mb-6 text-[#233b19]">
         Support & Help
       </h1>
