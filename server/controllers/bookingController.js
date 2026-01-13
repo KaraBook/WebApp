@@ -333,13 +333,11 @@ export const getBookingInvoice = async (req, res) => {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
-    /* ---------- CALCULATIONS (ORDER IS IMPORTANT) ---------- */
     const subtotal = Number(booking.totalAmount);
     const taxAmount = Number(booking.taxAmount ?? Math.round(subtotal * 0.10));
     const grandTotal = Number(booking.grandTotal ?? subtotal + taxAmount);
     const perNight = Math.floor(subtotal / booking.totalNights);
 
-    /* ---------- INVOICE DATA ---------- */
     const invoiceData = {
       invoiceNumber: `INV-${booking._id.toString().slice(-6).toUpperCase()}`,
 
