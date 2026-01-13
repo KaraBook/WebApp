@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle2, Clock, XCircle, Heart, Building2, Wallet, MoreVertical} from "lucide-react";
+import { Calendar, CheckCircle2, Clock, XCircle, Heart, Building2, Wallet, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { format } from "date-fns";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
+
+
+function resolveBookingStatus(b) {
+    if (b.status === "cancelled") return "cancelled";
+
+    if (
+        b.paymentStatus === "paid" ||
+        b.status === "paid" ||
+        b.status === "confirmed" ||
+        b.paymentId
+    ) {
+        return "confirmed";
+    }
+    return "pending";
+}
 
 
 export default function Dashboard() {
@@ -47,44 +62,44 @@ export default function Dashboard() {
         fetchDashboardData();
     }, []);
 
-    /* ---------------- DERIVED STATS ---------------- */
- const isPaidBooking = (b) =>
-  b.paymentStatus === "paid" ||
-  b.status === "confirmed" ||
-  b.status === "paid" ||
-  !!b.paymentId;
+    const isPaidBooking = (b) =>
+        b.paymentStatus === "paid" ||
+        b.status === "confirmed" ||
+        b.status === "paid" ||
+        !!b.paymentId;
 
-const totalBookings = bookings.length;
+    const totalBookings = bookings.length;
 
-const confirmed = bookings.filter(isPaidBooking).length;
+    const confirmed = bookings.filter(
+        b => resolveBookingStatus(b) === "confirmed"
+    ).length;
 
-const pending = bookings.filter(
-  b => ["initiated", "pending"].includes(b.status)
-).length;
+    const pending = bookings.filter(
+        b => resolveBookingStatus(b) === "pending"
+    ).length;
 
-const cancelled = bookings.filter(
-  b => b.status === "cancelled"
-).length;
+    const cancelled = bookings.filter(
+        b => resolveBookingStatus(b) === "cancelled"
+    ).length;
 
-const totalSpent = bookings
-  .filter(isPaidBooking)
-  .reduce((sum, b) => {
-    const value =
-      b.grandTotal ??
-      b.totalAmount ??
-      b.amount ??
-      0;
-    return sum + Number(value);
-  }, 0);
+    const totalSpent = bookings
+        .filter(isPaidBooking)
+        .reduce((sum, b) => {
+            const value =
+                b.grandTotal ??
+                b.totalAmount ??
+                b.amount ??
+                0;
+            return sum + Number(value);
+        }, 0);
 
-const uniqueVisited = new Set(
-  bookings.map(b => b.propertyId?._id || b.propertyId)
-).size;
+    const uniqueVisited = new Set(
+        bookings.map(b => b.propertyId?._id || b.propertyId)
+    ).size;
 
 
     const recentBookings = bookings.slice(0, 5);
 
-    /* ---------------- ACTIONS ---------------- */
     const cancelBooking = async (id) => {
         if (!confirm("Are you sure you want to cancel this booking?")) return;
 
@@ -179,7 +194,9 @@ const uniqueVisited = new Set(
                                     <td>{format(new Date(b.checkOut), "dd MMM yyyy")}</td>
                                     <td>{b.nights}</td>
                                     <td>{b.guests?.adults + (b.guests?.children || 0)}</td>
-                                    <td><StatusChip status={b.status} /></td>
+                                    <td>
+                                        <StatusChip status={resolveBookingStatus(b)} />
+                                    </td>
                                     <td className="text-gray-500">
                                         {format(new Date(b.createdAt), "dd MMM yyyy")}
                                     </td>
@@ -289,28 +306,28 @@ function StatCard({ title, value, subtitle, icon, dark }) {
 }
 
 function StatusChip({ status }) {
-  const normalized =
-    status === "initiated" ? "pending" :
-    status === "paid" ? "confirmed" :
-    status || "pending"; // ⬅️ IMPORTANT FALLBACK
+    const normalized =
+        status === "initiated" ? "pending" :
+            status === "paid" ? "confirmed" :
+                status || "pending"; // ⬅️ IMPORTANT FALLBACK
 
-  const styles = {
-    confirmed: "border-green-300 bg-green-50 text-green-700",
-    pending: "border-orange-300 bg-orange-50 text-orange-700",
-    cancelled: "border-red-300 bg-red-50 text-red-700",
-  };
+    const styles = {
+        confirmed: "border-green-300 bg-green-50 text-green-700",
+        pending: "border-orange-300 bg-orange-50 text-orange-700",
+        cancelled: "border-red-300 bg-red-50 text-red-700",
+    };
 
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center justify-center",
-        "min-w-[88px] min-h-[26px]", // ⬅️ FIX HEIGHT COLLAPSE
-        "rounded-full border px-3 text-xs font-medium capitalize",
-        styles[normalized] || styles.pending
-      )}
-    >
-      {normalized}
-    </span>
-  );
+    return (
+        <span
+            className={cn(
+                "inline-flex items-center justify-center",
+                "min-w-[88px] min-h-[26px]", // ⬅️ FIX HEIGHT COLLAPSE
+                "rounded-full border px-3 text-xs font-medium capitalize",
+                styles[normalized] || styles.pending
+            )}
+        >
+            {normalized}
+        </span>
+    );
 }
 
