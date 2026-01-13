@@ -93,7 +93,7 @@ export default function Footer() {
               <ul className="space-y-2 text-sm text-gray-400 flex flex-col gap-1">
                 <a href="/privacy-policy"><li>Privacy Policy</li></a>
                 <a href="/terms-and-conditions"><li>Terms and Conditions</li></a>
-                <a href="/faqs"><li>FAQs</li></a>
+                <a href="/faq"><li>FAQs</li></a>
               </ul>
             </div>
           </div>
