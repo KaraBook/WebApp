@@ -69,7 +69,7 @@ export default function Footer() {
               </h3>
               <ul className="space-y-2 text-sm text-gray-400 flex flex-col gap-1">
                 <a href="/owner-login"><li>Owner Login</li></a>
-                <a href="//list-your-property"><li>List Your Property</li></a>
+                <a href="/list-your-property"><li>List Your Property</li></a>
               </ul>
             </div>
 
