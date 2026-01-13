@@ -218,8 +218,8 @@ function AccountDropdownPanel({ user, clearAuth }) {
       label: "Dashboard",
       icon: <LayoutDashboard className="h-4 w-4" />,
       to: "/account/dashboard",
-      bg: "bg-[#D7F9F2]",
-      iconColor: "text-[#00A685]"
+      bg: "bg-[#fff4cc]",
+      iconColor: "text-[#f4b000]"
     },
     {
       label: "My Bookings",
