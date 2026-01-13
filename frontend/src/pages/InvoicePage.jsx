@@ -63,9 +63,19 @@ export default function InvoicePage() {
   if (!invoice) return null;
 
   /* ----------------- SAFE DERIVED VALUES ----------------- */
-  const adults = Number(invoice.guests?.adults || 0);
-  const children = Number(invoice.guests?.children || 0);
-  const totalGuests = adults + children;
+  const guestsData = invoice.guests;
+
+  let adults = 0;
+  let children = 0;
+  let totalGuests = 0;
+
+  if (typeof guestsData === "number") {
+    totalGuests = guestsData;
+  } else if (typeof guestsData === "object" && guestsData !== null) {
+    adults = Number(guestsData.adults || 0);
+    children = Number(guestsData.children || 0);
+    totalGuests = adults + children;
+  }
 
   const subtotal = Number(invoice.totalAmount || 0);
   const tax = Number(invoice.taxAmount || 0);
@@ -187,7 +197,11 @@ export default function InvoicePage() {
             <BD
               label="Guests"
               value={`${totalGuests} Guests`}
-              sub="Adults, Children"
+              sub={
+                adults || children
+                  ? `${adults} Adults, ${children} Children`
+                  : "—"
+              }
             />
           </div>
         </div>
