@@ -276,26 +276,49 @@
 .react-select__control:hover{
   border-color: #038ba0 !important;
 }
-/* put this in global.css */
+/* ================= PDF FORCE DESKTOP ================= */
+
 .pdf-desktop {
-  width: 850px !important; /* A4 width at 96dpi */
-  max-width: 850px !important;
+  width: 794px !important;      /* A4 @ 96dpi */
+  max-width: 794px !important;
+  font-size: 14px;
 }
 
-.pdf-desktop .overflow-x-auto {
+.pdf-layout {
+  width: 100% !important;
+}
+
+/* Disable mobile grids */
+.pdf-layout .grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+
+/* Remove responsive paddings */
+.pdf-layout * {
+  line-height: 1.4 !important;
+}
+
+/* Kill overflow containers */
+.pdf-layout .overflow-x-auto {
   overflow: visible !important;
 }
 
-.pdf-desktop table {
-  min-width: 100% !important;
+/* TABLE FIX */
+.pdf-layout table {
+  width: 100% !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
 }
-.pdf-desktop table td,
-.pdf-desktop table th {
+
+.pdf-layout th,
+.pdf-layout td {
   vertical-align: middle !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding: 8px !important;
 }
 
-
-
-
+/* Description text should NOT wrap awkwardly */
+.pdf-layout td:nth-child(2) {
+  white-space: normal !important;
+  word-break: break-word !important;
+}
