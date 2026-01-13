@@ -289,4 +289,12 @@
 .pdf-desktop table {
   min-width: 100% !important;
 }
+.pdf-desktop table th,
+.pdf-desktop table td {
+  vertical-align: middle !important;
+}
+
+.pdf-desktop * {
+  line-height: 1.4 !important;
+}
 
