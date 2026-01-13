@@ -28,6 +28,17 @@ function canViewInvoice(b) {
     return resolveBookingStatus(b) === "confirmed";
 }
 
+function getNights(checkIn, checkOut) {
+  if (!checkIn || !checkOut) return "—";
+
+  const diff =
+    (new Date(checkOut) - new Date(checkIn)) /
+    (1000 * 60 * 60 * 24);
+
+  return Math.max(1, Math.round(diff));
+}
+
+
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -196,7 +207,7 @@ export default function Dashboard() {
                                     </td>
                                     <td>{format(new Date(b.checkIn), "dd MMM yyyy")}</td>
                                     <td>{format(new Date(b.checkOut), "dd MMM yyyy")}</td>
-                                    <td>{b.nights}</td>
+                                    <td>{getNights(b.checkIn, b.checkOut)}</td>
                                     <td>{b.guests?.adults + (b.guests?.children || 0)}</td>
                                     <td>
                                         <StatusChip status={resolveBookingStatus(b)} />
