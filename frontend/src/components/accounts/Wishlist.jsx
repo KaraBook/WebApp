@@ -100,7 +100,7 @@ export default function Wishlist() {
               </div>
 
               {/* Rating */}
-              <div className="flex items-center text-primary-500 mt-1 text-sm">
+              <div className="flex items-center text-yellow-500 mt-1 text-sm">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <span key={i}>
                     {i < Math.round(property.averageRating || 0) ? "★" : "☆"}
