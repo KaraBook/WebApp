@@ -158,7 +158,7 @@ export default function InvoicePage() {
             <div>
               <p className="font-semibold">{invoice.propertyName}</p>
               <p className="text-xs text-muted-foreground">
-                {invoice.propertyCity}, {invoice.propertyState}
+                {invoice.city}, {invoice.state}
               </p>
             </div>
           </div>
