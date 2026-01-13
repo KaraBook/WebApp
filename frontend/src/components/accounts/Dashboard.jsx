@@ -24,6 +24,10 @@ function resolveBookingStatus(b) {
     return "pending";
 }
 
+function canViewInvoice(b) {
+    return resolveBookingStatus(b) === "confirmed";
+}
+
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -220,11 +224,20 @@ export default function Dashboard() {
                                                     View Booking
                                                 </DropdownMenuItem>
 
-                                                <DropdownMenuItem
-                                                    onClick={() => navigate(`/account/invoice/${b._id}`)}
-                                                >
-                                                    View Invoice
-                                                </DropdownMenuItem>
+                                                {canViewInvoice(b) ? (
+                                                    <DropdownMenuItem
+                                                        onClick={() => navigate(`/account/invoice/${b._id}`)}
+                                                    >
+                                                        View Invoice
+                                                    </DropdownMenuItem>
+                                                ) : (
+                                                    <DropdownMenuItem
+                                                        disabled
+                                                        className="text-gray-400 cursor-not-allowed"
+                                                    >
+                                                        Invoice available after payment confirmation
+                                                    </DropdownMenuItem>
+                                                )}
 
                                                 {b.status === "confirmed" && (
                                                     <DropdownMenuItem
