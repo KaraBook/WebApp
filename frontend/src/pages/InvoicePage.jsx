@@ -87,45 +87,41 @@ export default function InvoicePage() {
       : "—";
 
   const downloadPDF = async () => {
-    const original = invoiceRef.current;
-    if (!original) return;
+  const original = invoiceRef.current;
+  if (!original) return;
 
-    const clone = original.cloneNode(true);
+  const clone = original.cloneNode(true);
 
-    clone.classList.add("pdf-desktop");
-    clone.querySelector(".invoice-pdf")?.classList.add("pdf-layout");
+  // 🔒 FORCE DESKTOP PDF MODE
+  clone.classList.add("pdf-desktop");
+  clone.querySelector(".invoice-pdf")?.classList.add("pdf-layout");
 
-    // 3️⃣ Position clone off-screen
-    clone.style.position = "fixed";
-    clone.style.top = "0";
-    clone.style.left = "-9999px";
-    clone.style.background = "#fff";
+  clone.style.position = "fixed";
+  clone.style.top = "0";
+  clone.style.left = "-9999px";
+  clone.style.background = "#fff";
 
-    document.body.appendChild(clone);
+  document.body.appendChild(clone);
 
-    // 4️⃣ Wait for styles to apply
-    await new Promise((r) => setTimeout(r, 200));
+  await new Promise((r) => setTimeout(r, 300));
 
-    // 5️⃣ Capture clone
-    const canvas = await html2canvas(clone, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff",
-    });
+  const canvas = await html2canvas(clone, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+  });
 
-    // 6️⃣ Remove clone
-    document.body.removeChild(clone);
+  document.body.removeChild(clone);
 
-    // 7️⃣ Generate PDF
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF("p", "mm", "a4");
 
-    const pdfWidth = 210;
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  const pdfWidth = 210;
+  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
-  };
+  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
+};
 
 
 
@@ -147,7 +143,7 @@ export default function InvoicePage() {
       </div>
 
       {/* INVOICE */}
-      <div ref={invoiceRef} className="invoice-root">
+      <div ref={invoiceRef} className="invoice-root pdf-scope">
         <div className="invoice-pdf max-w-[50rem] bg-white border rounded-xl p-8">
           {/* HEADER */}
           <div className="flex justify-between pb-2 md:pb-4 border-b">

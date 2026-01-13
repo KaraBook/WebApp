@@ -278,8 +278,10 @@
 }
 /* ================= PDF FORCE DESKTOP ================= */
 
+/* ================= PDF DESKTOP LOCK ================= */
+
 .pdf-desktop {
-  width: 794px !important;      /* A4 @ 96dpi */
+  width: 794px !important; /* A4 */
   max-width: 794px !important;
   font-size: 14px;
 }
@@ -288,23 +290,29 @@
   width: 100% !important;
 }
 
-/* Disable mobile grids */
-.pdf-layout .grid {
-  display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-}
-
-/* Remove responsive paddings */
+/* Kill mobile responsiveness */
 .pdf-layout * {
-  line-height: 1.4 !important;
+  line-height: 1.45 !important;
 }
 
-/* Kill overflow containers */
-.pdf-layout .overflow-x-auto {
-  overflow: visible !important;
+/* ================= BILL / HEADER ================= */
+
+.pdf-layout .bill-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 32px !important;
 }
 
-/* TABLE FIX */
+/* ================= BOOKING DETAILS ================= */
+
+.pdf-layout .booking-details-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+}
+
+/* ================= TABLE FIX ================= */
+
 .pdf-layout table {
   width: 100% !important;
   table-layout: fixed !important;
@@ -313,20 +321,36 @@
 
 .pdf-layout th,
 .pdf-layout td {
+  padding: 8px 10px !important;
   vertical-align: middle !important;
-  padding: 8px !important;
 }
 
-/* Description text should NOT wrap awkwardly */
+.pdf-layout colgroup col:nth-child(1) { width: 6% !important; }
+.pdf-layout colgroup col:nth-child(2) { width: 44% !important; }
+.pdf-layout colgroup col:nth-child(3) { width: 12% !important; }
+.pdf-layout colgroup col:nth-child(4) { width: 18% !important; }
+.pdf-layout colgroup col:nth-child(5) { width: 20% !important; }
+
 .pdf-layout td:nth-child(2) {
   white-space: normal !important;
   word-break: break-word !important;
 }
-.pdf-layout .booking-grid {
+
+/* ================= PAYMENT INFO ================= */
+
+.pdf-layout .payment-grid {
   display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 16px !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: end !important;
+  gap: 24px !important;
 }
+
+/* Disable overflow containers */
+.pdf-layout .overflow-x-auto {
+  overflow: visible !important;
+}
+
 .pdf-layout .bill-grid {
+  display: grid !important;
   grid-template-columns: 1fr 1fr !important;
 }
