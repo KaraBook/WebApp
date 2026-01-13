@@ -197,7 +197,7 @@ export default function InvoicePage() {
             <p className="uppercase text-xs font-semibold text-muted-foreground mb-2">
               Booking Details
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            <div className="booking-details-grid grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <BD label="Check-in" value="27 Nov 2025" sub="2:00 PM" />
               <BD label="Check-out" value="30 Nov 2025" sub="11:00 AM" />
               <BD label="Duration" value={`${invoice.nights} Nights`} />
