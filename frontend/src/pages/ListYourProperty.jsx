@@ -29,7 +29,7 @@ export default function ListYourProperty() {
 
           {/* LEFT – INFO */}
           <div className="bg-primary text-white p-8 flex flex-col justify-center">
-            <h1 className="text-3xl md:text-4xl text-center font-extrabold text-[#0F172A] mb-4">
+            <h1 className="text-3xl md:text-4xl text-left font-extrabold text-[#fff] mb-4">
               List Your Property with KaraBook
             </h1>
             <p className="text-sm opacity-90 mb-6">
@@ -38,9 +38,9 @@ export default function ListYourProperty() {
             </p>
 
             <div className="space-y-3 text-sm">
-              <p><Phone className="w-4 h-4" /> +91 9XXXXXXXXX</p>
-              <p><Inbox className="w-4 h-4" /> partners@karabook.com</p>
-              <p><Map className="w-4 h-4" /> Mon–Sat, 10:00 AM – 7:00 PM</p>
+              <p className="flex gap-2"><Phone className="w-4 h-4" /> +91 9XXXXXXXXX</p>
+              <p className="flex gap-2"><Inbox className="w-4 h-4" /> partners@karabook.com</p>
+              <p className="flex gap-2"><Map className="w-4 h-4" /> Mon–Sat, 10:00 AM – 7:00 PM</p>
             </div>
           </div>
 
