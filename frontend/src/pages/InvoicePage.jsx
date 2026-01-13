@@ -152,7 +152,15 @@ export default function InvoicePage() {
         {/* HEADER */}
         <div className="flex justify-between pb-0 md:pb-4 border-b">
           <div className="flex gap-3">
-            <div className="w-10 h-10 bg-primary text-white rounded-md flex items-center justify-center font-bold">
+            <div
+              className="w-10 h-10 bg-primary text-white rounded-md font-bold"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                lineHeight: "1",
+              }}
+            >
               {invoice.propertyName?.[0]}
             </div>
             <div>
@@ -186,8 +194,11 @@ export default function InvoicePage() {
         </div>
 
         {/* BOOKING DETAILS */}
-        <div className="mt-6 bg-gray-50 border rounded-lg p-4">
-          <p className="uppercase text-xs font-semibold text-muted-foreground mb-3">
+        <div
+          className="mt-6 bg-gray-50 border rounded-lg"
+          style={{ padding: "12px 16px" }}
+        >
+          <p className="uppercase text-xs font-semibold text-muted-foreground mb-2">
             Booking Details
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
@@ -209,14 +220,47 @@ export default function InvoicePage() {
         {/* TABLE */}
         {/* TABLE */}
         <div className="mt-6 overflow-x-auto">
-         <table className="min-w-[600px] w-full text-sm border-t align-middle">
+          <table
+            className="w-full text-sm border-t"
+            style={{
+              borderCollapse: "collapse",
+              tableLayout: "fixed",
+            }}
+          >
             <thead>
-              <tr className="border-b">
-                <th className="py-2 text-left align-middle leading-tight">S.No</th>
-                <th className="py-3 text-left align-middle">Description</th>
-                <th className="py-3 text-right align-middle">Nights</th>
-                <th className="py-3 text-right align-middle">Rate</th>
-                <th className="py-3 text-right align-middle">Amount</th>
+              <tr className="border-b" style={{ height: "56px" }}>
+                <td className="px-2">
+                  <div className="h-full flex items-center">1</div>
+                </td>
+
+                <td className="px-2">
+                  <div className="h-full flex flex-col justify-center">
+                    <p className="font-medium leading-tight">
+                      Room / Accommodation Charges
+                    </p>
+                    <p className="text-xs text-muted-foreground leading-tight">
+                      villa at {invoice.propertyName}
+                    </p>
+                  </div>
+                </td>
+
+                <td className="px-2 text-right">
+                  <div className="h-full flex items-center justify-end">
+                    {invoice.nights}
+                  </div>
+                </td>
+
+                <td className="px-2 text-right">
+                  <div className="h-full flex items-center justify-end">
+                    ₹{(subtotal / invoice.nights).toLocaleString("en-IN")}
+                  </div>
+                </td>
+
+                <td className="px-2 text-right">
+                  <div className="h-full flex items-center justify-end">
+                    ₹{subtotal.toLocaleString("en-IN")}
+                  </div>
+                </td>
               </tr>
             </thead>
 

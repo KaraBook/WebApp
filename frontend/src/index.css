@@ -289,12 +289,19 @@
 .pdf-desktop table {
   min-width: 100% !important;
 }
-.pdf-desktop table th,
-.pdf-desktop table td {
+.pdf-desktop table td,
+.pdf-desktop table th {
   vertical-align: middle !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.pdf-desktop table tr {
+  height: 56px !important;
 }
 
 .pdf-desktop * {
-  line-height: 1.4 !important;
+  line-height: 1.35 !important;
 }
+
 
