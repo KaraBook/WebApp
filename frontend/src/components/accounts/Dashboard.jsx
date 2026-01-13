@@ -129,7 +129,7 @@ export default function Dashboard() {
 
     /* ---------------- UI ---------------- */
     return (
-        <div className="px-4 min-h-screen">
+        <div className="px-0 md:px-4 min-h-screen">
             {/* HEADER */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-semibold uppercase tracking-wide text-[#233b19]">
@@ -174,7 +174,7 @@ export default function Dashboard() {
                     </Button>
                 </div>
 
-                <div className="md:hidden space-y-4 px-4 pb-4">
+                <div className="md:hidden space-y-4 px-2 pt-2 pb-4">
                     {!loading && recentBookings.length === 0 && (
                         <p className="text-center text-gray-500 py-10">
                             No bookings yet
