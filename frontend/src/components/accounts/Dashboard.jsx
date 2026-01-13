@@ -8,6 +8,7 @@ import SummaryApi from "@/common/SummaryApi";
 import { format } from "date-fns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
+import MobileBookingCard from "../MobileBookingCard";
 
 
 function resolveBookingStatus(b) {
@@ -29,13 +30,13 @@ function canViewInvoice(b) {
 }
 
 function getNights(checkIn, checkOut) {
-  if (!checkIn || !checkOut) return "—";
+    if (!checkIn || !checkOut) return "—";
 
-  const diff =
-    (new Date(checkOut) - new Date(checkIn)) /
-    (1000 * 60 * 60 * 24);
+    const diff =
+        (new Date(checkOut) - new Date(checkIn)) /
+        (1000 * 60 * 60 * 24);
 
-  return Math.max(1, Math.round(diff));
+    return Math.max(1, Math.round(diff));
 }
 
 
@@ -173,7 +174,29 @@ export default function Dashboard() {
                     </Button>
                 </div>
 
-                <div className="overflow-x-auto">
+                <div className="md:hidden space-y-4 px-4 pb-4">
+                    {!loading && recentBookings.length === 0 && (
+                        <p className="text-center text-gray-500 py-10">
+                            No bookings yet
+                        </p>
+                    )}
+
+                    {recentBookings.map((b) => (
+                        <MobileBookingCard
+                            key={b._id}
+                            booking={b}
+                            onView={(booking) => {
+                                setSelectedBooking(booking);
+                                setBookingDialogOpen(true);
+                            }}
+                            onRate={(booking) =>
+                                navigate(`/account/ratings?booking=${booking._id}`)
+                            }
+                        />
+                    ))}
+                </div>
+
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="bg-gray-50 border-b">
                             <tr className="text-left text-gray-600">
