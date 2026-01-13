@@ -142,7 +142,6 @@ export default function Bookings() {
                     "Guests",
                     "Amount",
                     "Status",
-                    "Created",
                     "Actions",
                   ].map((h) => (
                     <th
@@ -246,10 +245,6 @@ export default function Bookings() {
                         >
                           {b.paymentStatus?.toUpperCase()}
                         </div>
-                      </td>
-
-                      <td className="px-4 py-3">
-                        {format(new Date(b.createdAt), "dd MMM yyyy")}
                       </td>
 
                       <td className="px-4 py-3 text-center">
