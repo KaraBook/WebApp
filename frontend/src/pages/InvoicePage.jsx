@@ -218,7 +218,6 @@ export default function InvoicePage() {
         </div>
 
         {/* TABLE */}
-        {/* TABLE */}
         <div className="mt-6 overflow-x-auto">
           <table
             className="w-full text-sm border-t"
@@ -227,7 +226,14 @@ export default function InvoicePage() {
               tableLayout: "fixed",
             }}
           >
-            {/* ===== TABLE HEAD ===== */}
+            <colgroup>
+              <col style={{ width: "6%" }} />
+              <col style={{ width: "44%" }} />
+              <col style={{ width: "12%" }} />
+              <col style={{ width: "18%" }} />
+              <col style={{ width: "20%" }} />
+            </colgroup>
+
             <thead>
               <tr className="border-b" style={{ height: "48px" }}>
                 <th className="px-2 text-left">S.No</th>
