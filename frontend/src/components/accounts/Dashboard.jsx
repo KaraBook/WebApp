@@ -48,33 +48,39 @@ export default function Dashboard() {
     }, []);
 
     /* ---------------- DERIVED STATS ---------------- */
-    const totalBookings = bookings.length;
+ const isPaidBooking = (b) =>
+  b.paymentStatus === "paid" ||
+  b.status === "confirmed" ||
+  b.status === "paid" ||
+  !!b.paymentId;
 
-    const confirmed = bookings.filter(
-        b =>
-            ["paid", "confirmed", "completed"].includes(b.status) ||
-            !!b.paymentId
-    ).length;
+const totalBookings = bookings.length;
 
-    const pending = bookings.filter(
-        b => ["initiated", "pending"].includes(b.status)
-    ).length;
+const confirmed = bookings.filter(isPaidBooking).length;
 
-    const cancelled = bookings.filter(
-        b => b.status === "cancelled"
-    ).length;
+const pending = bookings.filter(
+  b => ["initiated", "pending"].includes(b.status)
+).length;
 
-    const totalSpent = bookings
-        .filter(
-            b =>
-                ["paid", "confirmed", "completed"].includes(b.status) ||
-                !!b.paymentId
-        )
-        .reduce((sum, b) => sum + Number(b.amount || 0), 0);
+const cancelled = bookings.filter(
+  b => b.status === "cancelled"
+).length;
 
-    const uniqueVisited = new Set(
-        bookings.map(b => b.propertyId?._id || b.propertyId)
-    ).size;
+const totalSpent = bookings
+  .filter(isPaidBooking)
+  .reduce((sum, b) => {
+    const value =
+      b.grandTotal ??
+      b.totalAmount ??
+      b.amount ??
+      0;
+    return sum + Number(value);
+  }, 0);
+
+const uniqueVisited = new Set(
+  bookings.map(b => b.propertyId?._id || b.propertyId)
+).size;
+
 
     const recentBookings = bookings.slice(0, 5);
 
