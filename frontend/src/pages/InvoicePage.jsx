@@ -209,10 +209,10 @@ export default function InvoicePage() {
         {/* TABLE */}
         {/* TABLE */}
         <div className="mt-6 overflow-x-auto">
-          <table className="min-w-[600px] w-full text-sm border-t">
+         <table className="min-w-[600px] w-full text-sm border-t align-middle">
             <thead>
               <tr className="border-b">
-                <th className="py-3 text-left align-middle">S.No</th>
+                <th className="py-2 text-left align-middle leading-tight">S.No</th>
                 <th className="py-3 text-left align-middle">Description</th>
                 <th className="py-3 text-right align-middle">Nights</th>
                 <th className="py-3 text-right align-middle">Rate</th>
