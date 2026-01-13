@@ -278,8 +278,8 @@
 }
 /* put this in global.css */
 .pdf-desktop {
-  width: 794px !important; /* A4 width at 96dpi */
-  max-width: 794px !important;
+  width: 850px !important; /* A4 width at 96dpi */
+  max-width: 850px !important;
 }
 
 .pdf-desktop .overflow-x-auto {
