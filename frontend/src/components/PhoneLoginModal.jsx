@@ -259,17 +259,8 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           )}
 
           {/* SIGN UP LINK */}
-          <p className="text-xs text-center text-gray-500 pt-0">
-            Not registered?{" "}
-            <button
-              onClick={() => {
-                onOpenChange(false);
-                navigate("/signup");
-              }}
-              className="text-primary font-medium"
-            >
-              Sign up
-            </button>
+          <p className="text-xs text-center text-gray-500 leading-relaxed px-4">
+            If you are new to KaraBook, you’ll be redirected to the sign-up page after mobile verification.
           </p>
 
           <p className=" border-t text-[12px] text-center text-gray-500 pt-2">
