@@ -229,7 +229,7 @@ export default function InvoicePage() {
           >
             {/* ===== TABLE HEAD ===== */}
             <thead>
-              <tr className="border-b">
+              <tr className="border-b" style={{ height: "48px" }}>
                 <th className="px-2 text-left">S.No</th>
                 <th className="px-2 text-left">Description</th>
                 <th className="px-2 text-right">Nights</th>
