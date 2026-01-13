@@ -45,7 +45,7 @@ export default function ListYourProperty() {
           </div>
 
           {/* RIGHT – FORM */}
-          <div className="p-8">
+          <div className="p-4 md:p-8">
             <h2 className="text-xl font-semibold mb-6">
               Property Listing Request
             </h2>
