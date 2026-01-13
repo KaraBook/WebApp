@@ -154,6 +154,7 @@ export default function Dashboard() {
                 <StatCard title="Properties Visited" value={uniqueVisited} icon={<Building2 />} />
                 <StatCard
                     title="Total Spent"
+                    className="w-[88vw]"
                     value={`₹${totalSpent.toLocaleString("en-IN")}`}
                     subtitle="Confirmed bookings"
                     icon={<Wallet />}
