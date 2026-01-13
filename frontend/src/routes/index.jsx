@@ -18,6 +18,7 @@ import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import PaymentPolicy from "@/pages/PaymentPolicy";
 import FAQ from "@/pages/FAQ";
 import Dashboard from "@/components/accounts/Dashboard";
+import ListYourProperty from "@/pages/ListYourProperty";
 
 export default function AppRoutes() {
   return (
@@ -32,6 +33,7 @@ export default function AppRoutes() {
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/payment-policy" element={<PaymentPolicy />} />
       <Route path="/faq" element={<FAQ />} />
+      <Route path="/list-your-property" element={<ListYourProperty />} />
 
       {/* Dashboard-only area */}
       <Route element={<ProtectedRoute />}>
