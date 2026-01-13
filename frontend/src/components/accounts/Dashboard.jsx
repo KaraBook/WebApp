@@ -142,14 +142,14 @@ export default function Dashboard() {
             </div>
 
             {/* STATS */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-5 mb-2 md:mb-6">
                 <StatCard title="Total Bookings" value={totalBookings} icon={<Calendar />} dark />
                 <StatCard title="Paid" value={confirmed} icon={<CheckCircle2 />} />
                 <StatCard title="Pending" value={pending} icon={<Clock />} />
                 <StatCard title="Cancelled" value={cancelled} icon={<XCircle />} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-5 mb-8">
                 <StatCard title="Wishlist Items" value={wishlistCount} icon={<Heart />} />
                 <StatCard title="Properties Visited" value={uniqueVisited} icon={<Building2 />} />
                 <StatCard
@@ -328,7 +328,7 @@ function StatCard({ title, value, subtitle, icon, dark }) {
     return (
         <div
             className={cn(
-                "rounded-xl border p-5 flex justify-between items-start",
+                "rounded-xl border p-3 md:p-5 flex justify-between items-start",
                 dark ? "bg-primary text-white border-none" : "bg-white"
             )}
         >
@@ -342,7 +342,7 @@ function StatCard({ title, value, subtitle, icon, dark }) {
 
             <div
                 className={cn(
-                    "h-10 w-10 rounded-lg flex items-center justify-center",
+                    "h-8 w-8 md:h-10 p-1 md:p-0 md:w-10 rounded-lg flex items-center justify-center",
                     dark ? "bg-white/10" : "bg-gray-100"
                 )}
             >
@@ -358,7 +358,6 @@ function StatusChip({ status }) {
     status === "paid" ? "confirmed" :
     status || "pending";
 
-  // 👇 UI LABEL (this is the key)
   const label =
     normalized === "confirmed"
       ? "Paid"
