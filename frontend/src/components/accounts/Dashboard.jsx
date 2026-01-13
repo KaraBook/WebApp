@@ -289,23 +289,29 @@ function StatCard({ title, value, subtitle, icon, dark }) {
 }
 
 function StatusChip({ status }) {
-    const normalized =
-        status === "initiated" ? "pending" : status;
+  const normalized =
+    status === "initiated" ? "pending" :
+    status === "paid" ? "confirmed" :
+    status;
 
-    const map = {
-        pending: "bg-orange-100 text-orange-600 border-orange-300",
-        confirmed: "bg-green-100 text-green-600 border-green-300",
-        cancelled: "bg-red-100 text-red-600 border-red-300",
-    };
+  const styles = {
+    confirmed:
+      "border border-green-300 bg-green-50 text-green-700",
+    pending:
+      "border border-orange-300 bg-orange-50 text-orange-700",
+    cancelled:
+      "border border-red-300 bg-red-50 text-red-700",
+  };
 
-    return (
-        <span
-            className={cn(
-                "px-3 py-1 rounded-full text-xs font-medium border capitalize",
-                map[normalized]
-            )}
-        >
-            {normalized}
-        </span>
-    );
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium capitalize whitespace-nowrap",
+        styles[normalized] || styles.pending
+      )}
+    >
+      {normalized}
+    </span>
+  );
 }
+
