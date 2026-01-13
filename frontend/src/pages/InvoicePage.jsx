@@ -150,7 +150,7 @@ export default function InvoicePage() {
       {/* INVOICE */}
       <div ref={invoiceRef} className="max-w-[50rem] bg-white border rounded-xl p-4 md:p-8">
         {/* HEADER */}
-        <div className="flex justify-between pb-0 md:pb-4 border-b">
+        <div className="flex justify-between pb-2 md:pb-4 border-b">
           <div className="flex gap-3">
             <div
               className="w-10 h-10 bg-primary text-white rounded-md font-bold"
@@ -170,7 +170,7 @@ export default function InvoicePage() {
               </p>
             </div>
           </div>
-          <p className="font-semibold text-sm tracking-wide">TAX INVOICE</p>
+          <p className="font-semibold text-sm tracking-wide">INVOICE</p>
         </div>
 
         {/* BILL TO */}
@@ -220,7 +220,7 @@ export default function InvoicePage() {
         {/* TABLE */}
         <div className="mt-6 overflow-x-auto">
           <table
-            className="w-full text-sm border-t"
+            className="w-full text-sm border-t min-w-[685px] md:min-w-full"
             style={{
               borderCollapse: "collapse",
               tableLayout: "fixed",
