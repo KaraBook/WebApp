@@ -13,6 +13,26 @@ import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
 
 
+function resolveBookingStatus(b) {
+  if (b.status === "cancelled") return "cancelled";
+
+  if (
+    b.paymentStatus === "paid" ||
+    b.status === "paid" ||
+    b.status === "confirmed" ||
+    b.paymentId
+  ) {
+    return "confirmed";
+  }
+
+  return "pending";
+}
+
+function canViewInvoice(b) {
+  return resolveBookingStatus(b) === "confirmed";
+}
+
+
 export default function Bookings() {
   const { accessToken } = useAuthStore();
   const [bookings, setBookings] = useState([]);
@@ -244,13 +264,31 @@ export default function Bookings() {
                                 <Eye size={16} /> View Booking
                               </div>
                             </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                              <Link to={`/account/invoice/${b._id}`}>
+                            {canViewInvoice(b) ? (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  window.location.href = `/account/invoice/${b._id}`;
+                                }}
+                              >
                                 <div className="flex items-center gap-2">
                                   <FileDown size={16} /> View Invoice
                                 </div>
-                              </Link>
-                            </DropdownMenuItem>
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                disabled
+                                className="text-gray-400 cursor-not-allowed"
+                                onClick={() => {
+                                  toast.error(
+                                    "Payment not completed. Invoice will be available once the booking is confirmed."
+                                  );
+                                }}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <FileDown size={16} /> Invoice not available
+                                </div>
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               onClick={() => {
                                 if (b.paymentStatus !== "paid") {
@@ -279,7 +317,7 @@ export default function Bookings() {
                                 <XCircle size={16} />
                                 Cancel Booking
                               </div>
-                              </DropdownMenuItem>
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
