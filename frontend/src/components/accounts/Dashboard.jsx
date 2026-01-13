@@ -219,7 +219,7 @@ export default function Dashboard() {
                                 <th>Guests</th>
                                 <th>Status</th>
                                 <th>Created</th>
-                                <th className="text-right px-6">Actions</th>
+                                <th className="text-right px-0">Actions</th>
                             </tr>
                         </thead>
 
