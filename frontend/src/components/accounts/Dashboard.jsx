@@ -219,7 +219,7 @@ export default function Dashboard() {
                                 <th>Guests</th>
                                 <th>Status</th>
                                 <th>Created</th>
-                                <th className="text-right px-0">Actions</th>
+                                <th className="px-0">Actions</th>
                             </tr>
                         </thead>
 
@@ -252,7 +252,7 @@ export default function Dashboard() {
                                     </td>
 
                                     {/* ACTION MENU */}
-                                    <td className="px-6 text-right">
+                                    <td className="px-0 text-center">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <button className="p-2 rounded hover:bg-gray-100">
