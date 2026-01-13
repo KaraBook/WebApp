@@ -28,7 +28,7 @@ export default function ListYourProperty() {
 
           {/* LEFT – INFO */}
           <div className="bg-primary text-white p-8 flex flex-col justify-center">
-            <h1 className="text-3xl font-bold mb-4">
+            <h1 className="text-3xl md:text-4xl text-center font-extrabold text-[#0F172A] mb-4">
               List Your Property with KaraBook
             </h1>
             <p className="text-sm opacity-90 mb-6">
