@@ -66,7 +66,7 @@ export default function MobileBookingCard({
           <span
             className={`
     text-xs font-semibold px-2 py-[2px] rounded-full capitalize
-    ${bookingStatus === "paid"
+    ${bookingStatus === "confirmed"
                 ? "bg-green-100 text-green-700"
                 : bookingStatus === "pending"
                   ? "bg-orange-100 text-orange-700"
