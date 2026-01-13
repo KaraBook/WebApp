@@ -322,3 +322,11 @@
   white-space: normal !important;
   word-break: break-word !important;
 }
+.pdf-layout .booking-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+.pdf-layout .bill-grid {
+  grid-template-columns: 1fr 1fr !important;
+}

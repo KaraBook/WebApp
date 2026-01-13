@@ -174,7 +174,7 @@ export default function InvoicePage() {
           </div>
 
           {/* BILL TO */}
-          <div className="grid sm:grid-cols-2 gap-8 mt-6 text-sm">
+          <div className="bill-grid grid sm:grid-cols-2 gap-8 mt-6 text-sm">
             <div>
               <p className="uppercase text-xs text-muted-foreground mb-2">Bill To</p>
               <p className="font-medium">{invoice.user?.name}</p>
@@ -305,7 +305,7 @@ export default function InvoicePage() {
           </div>
 
           {/* PAYMENT INFO */}
-          <div className="mt-6 pt-4 grid sm:grid-cols-2 text-sm">
+          <div className="booking-grid mt-6 pt-4 grid sm:grid-cols-2 text-sm">
             <div>
               <p className="uppercase text-xs font-semibold mb-2">
                 Payment Information
