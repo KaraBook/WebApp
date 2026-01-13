@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import {
   ChevronRight, CalendarCheck, Heart, User as UserIcon, Star,
   LifeBuoy, LogOut, Menu, X, Home, Search, Settings, LucideMenu, MessageCircleQuestionMark,
-  LayoutDashboard
+  LayoutDashboard, Users
 } from "lucide-react";
 
 export default function Header({ onLoginClick }) {
@@ -148,7 +148,7 @@ export default function Header({ onLoginClick }) {
           <div className="px-3 py-4 space-y-1">
             <MobileItem icon={<Home />} label="Home" to="/" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<Search />} label="Explore" to="/properties" setMobileOpen={setMobileOpen} />
-            <MobileItem icon={<Heart />} label="Favorites" to="/account/wishlist" setMobileOpen={setMobileOpen} />
+            <MobileItem icon={<Users />} label="About Us" to="/about-us" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<UserIcon />} label="Profile" to="/account/profile" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<Settings />} label="Settings" to="/account/settings" setMobileOpen={setMobileOpen} />
             <MobileItem icon={<LifeBuoy />} label="Contact" to="/contact" setMobileOpen={setMobileOpen} />
