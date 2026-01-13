@@ -19,6 +19,24 @@ import {
 import { Link } from "react-router-dom";
 import RateBookingDialog from "./RateBookingDialog";
 
+
+function resolveBookingStatus(b) {
+  if (b.status === "cancelled") return "cancelled";
+
+  if (
+    b.paymentStatus === "paid" ||
+    b.status === "paid" ||
+    b.status === "confirmed" ||
+    b.paymentId
+  ) {
+    return "confirmed";
+  }
+
+  return "pending";
+}
+
+
+
 export default function MobileBookingCard({
   booking,
   onView,
@@ -27,8 +45,9 @@ export default function MobileBookingCard({
   const nights = Math.max(
     1,
     (new Date(booking.checkOut) - new Date(booking.checkIn)) /
-      (1000 * 60 * 60 * 24)
+    (1000 * 60 * 60 * 24)
   );
+  const bookingStatus = resolveBookingStatus(booking);
 
   return (
     <div className="bg-white rounded-[14px] border shadow-sm p-4 flex flex-col gap-3">
@@ -44,8 +63,18 @@ export default function MobileBookingCard({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold px-2 py-[2px] rounded-full bg-green-100 text-green-700">
-            Paid
+          <span
+            className={`
+    text-xs font-semibold px-2 py-[2px] rounded-full capitalize
+    ${bookingStatus === "confirmed"
+                ? "bg-green-100 text-green-700"
+                : bookingStatus === "pending"
+                  ? "bg-orange-100 text-orange-700"
+                  : "bg-red-100 text-red-700"
+              }
+  `}
+          >
+            {bookingStatus}
           </span>
 
           {/* DROPDOWN */}
@@ -76,13 +105,22 @@ export default function MobileBookingCard({
                 View Booking
               </DropdownMenuItem>
 
-              <DropdownMenuItem asChild className="py-3 gap-3">
-                <Link to={`/account/invoice/${booking._id}`}>
+              {bookingStatus === "confirmed" ? (
+                <DropdownMenuItem asChild className="py-3 gap-3">
+                  <Link to={`/account/invoice/${booking._id}`}>
+                    <FileDown className="w-4 h-4" />
+                    View Invoice
+                  </Link>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  disabled
+                  className="py-3 gap-3 text-gray-400 cursor-not-allowed"
+                >
                   <FileDown className="w-4 h-4" />
-                  View Invoice
-                </Link>
-              </DropdownMenuItem>
-
+                  Invoice available after payment confirmation
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 className="py-3 gap-3"
                 onClick={() => onRate(booking)}
@@ -143,7 +181,7 @@ export default function MobileBookingCard({
         open={!!booking.isRating}
         booking={booking.isRating}
         onClose={() => onRate(null)}
-        />
+      />
     </div>
   );
 }
