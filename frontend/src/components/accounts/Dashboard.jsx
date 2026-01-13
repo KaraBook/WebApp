@@ -353,28 +353,35 @@ function StatCard({ title, value, subtitle, icon, dark }) {
 }
 
 function StatusChip({ status }) {
-    const normalized =
-        status === "initiated" ? "pending" :
-            status === "paid" ? "confirmed" :
-                status || "pending"; // ⬅️ IMPORTANT FALLBACK
+  const normalized =
+    status === "initiated" ? "pending" :
+    status === "paid" ? "confirmed" :
+    status || "pending";
 
-    const styles = {
-        confirmed: "border-green-300 bg-green-50 text-green-700",
-        pending: "border-orange-300 bg-orange-50 text-orange-700",
-        cancelled: "border-red-300 bg-red-50 text-red-700",
-    };
+  // 👇 UI LABEL (this is the key)
+  const label =
+    normalized === "confirmed"
+      ? "Paid"
+      : normalized === "pending"
+      ? "Pending"
+      : "Cancelled";
 
-    return (
-        <span
-            className={cn(
-                "inline-flex items-center justify-center",
-                "min-w-[88px] min-h-[26px]", // ⬅️ FIX HEIGHT COLLAPSE
-                "rounded-full border px-3 text-xs font-medium capitalize",
-                styles[normalized] || styles.pending
-            )}
-        >
-            {normalized}
-        </span>
-    );
+  const styles = {
+    confirmed: "border-green-300 bg-green-50 text-green-700",
+    pending: "border-orange-300 bg-orange-50 text-orange-700",
+    cancelled: "border-red-300 bg-red-50 text-red-700",
+  };
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center justify-center",
+        "min-w-[88px] min-h-[26px]",
+        "rounded-full border px-3 text-xs font-medium capitalize",
+        styles[normalized] || styles.pending
+      )}
+    >
+      {label}
+    </span>
+  );
 }
-
