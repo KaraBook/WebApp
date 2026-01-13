@@ -227,7 +227,19 @@ export default function InvoicePage() {
               tableLayout: "fixed",
             }}
           >
+            {/* ===== TABLE HEAD ===== */}
             <thead>
+              <tr className="border-b" style={{ height: "48px" }}>
+                <th className="px-2 text-left">S.No</th>
+                <th className="px-2 text-left">Description</th>
+                <th className="px-2 text-right">Nights</th>
+                <th className="px-2 text-right">Rate</th>
+                <th className="px-2 text-right">Amount</th>
+              </tr>
+            </thead>
+
+            {/* ===== TABLE BODY ===== */}
+            <tbody>
               <tr className="border-b" style={{ height: "56px" }}>
                 <td className="px-2">
                   <div className="h-full flex items-center">1</div>
@@ -262,33 +274,9 @@ export default function InvoicePage() {
                   </div>
                 </td>
               </tr>
-            </thead>
-
-            <tbody>
-              <tr className="border-b">
-                <td className="py-3">1</td>
-
-                <td className="py-2">
-                  <p className="font-medium">
-                    Room / Accommodation Charges
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    villa at {invoice.propertyName}
-                  </p>
-                </td>
-
-                <td className="text-right">{invoice.nights}</td>
-
-                <td className="text-right">
-                  ₹{(subtotal / invoice.nights).toLocaleString("en-IN")}
-                </td>
-
-                <td className="text-right">
-                  ₹{subtotal.toLocaleString("en-IN")}
-                </td>
-              </tr>
             </tbody>
           </table>
+
         </div>
 
         {/* TOTALS */}
