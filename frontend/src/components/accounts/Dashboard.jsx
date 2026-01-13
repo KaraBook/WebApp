@@ -292,21 +292,20 @@ function StatusChip({ status }) {
   const normalized =
     status === "initiated" ? "pending" :
     status === "paid" ? "confirmed" :
-    status;
+    status || "pending"; // ⬅️ IMPORTANT FALLBACK
 
   const styles = {
-    confirmed:
-      "border border-green-300 bg-green-50 text-green-700",
-    pending:
-      "border border-orange-300 bg-orange-50 text-orange-700",
-    cancelled:
-      "border border-red-300 bg-red-50 text-red-700",
+    confirmed: "border-green-300 bg-green-50 text-green-700",
+    pending: "border-orange-300 bg-orange-50 text-orange-700",
+    cancelled: "border-red-300 bg-red-50 text-red-700",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium capitalize whitespace-nowrap",
+        "inline-flex items-center justify-center",
+        "min-w-[88px] min-h-[26px]", // ⬅️ FIX HEIGHT COLLAPSE
+        "rounded-full border px-3 text-xs font-medium capitalize",
         styles[normalized] || styles.pending
       )}
     >
