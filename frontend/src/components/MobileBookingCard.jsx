@@ -35,6 +35,13 @@ function resolveBookingStatus(b) {
   return "pending";
 }
 
+function getStatusLabel(status) {
+  if (status === "confirmed") return "Paid";
+  if (status === "pending") return "Pending";
+  if (status === "cancelled") return "Cancelled";
+  return status;
+}
+
 
 
 export default function MobileBookingCard({
@@ -74,7 +81,7 @@ export default function MobileBookingCard({
               }
   `}
           >
-            {bookingStatus}
+            {getStatusLabel(bookingStatus)}
           </span>
 
           {/* DROPDOWN */}
