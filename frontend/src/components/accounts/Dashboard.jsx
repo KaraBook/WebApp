@@ -23,9 +23,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-/* ======================================================
-   DASHBOARD
-====================================================== */
+
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -33,8 +31,10 @@ export default function Dashboard() {
     const [bookings, setBookings] = useState([]);
     const [wishlistCount, setWishlistCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [selectedBooking, setSelectedBooking] = useState(null);
+    const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
 
-    /* ---------------- FETCH REAL DATA ---------------- */
+
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
@@ -204,7 +204,10 @@ export default function Dashboard() {
 
                                             <DropdownMenuContent align="end" className="w-48">
                                                 <DropdownMenuItem
-                                                    onClick={() => navigate(`/account/bookings/${b._id}`)}
+                                                    onClick={() => {
+                                                        setSelectedBooking(b);
+                                                        setBookingDialogOpen(true);
+                                                    }}
                                                 >
                                                     View Booking
                                                 </DropdownMenuItem>
@@ -250,13 +253,21 @@ export default function Dashboard() {
                     </table>
                 </div>
             </div>
+
+            <BookingDetailsDialog
+                open={bookingDialogOpen}
+                onOpenChange={(open) => {
+                    setBookingDialogOpen(open);
+                    if (!open) setSelectedBooking(null);
+                }}
+                booking={selectedBooking}
+            />
+
         </div>
     );
 }
 
-/* ======================================================
-   COMPONENTS
-====================================================== */
+
 
 function StatCard({ title, value, subtitle, icon, dark }) {
     return (
