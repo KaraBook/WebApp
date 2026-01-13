@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Footer() {
   return (
     <footer className="w-full mt-20">
@@ -20,17 +22,21 @@ export default function Footer() {
 
           <div className="flex flex-col mt-4 sm:flex-row items-center justify-center gap-4">
             {/* Primary Button */}
-            <button className="bg-white text-primary font-medium px-8 py-2 md:py-3 rounded-[10px] md:rounded-[12px] flex items-center gap-2 hover:bg-gray-100 transition">
+            <Link
+              to="/list-your-property"
+              className="bg-white text-primary font-medium px-8 py-2 md:py-3 rounded-[10px] md:rounded-[12px] flex items-center gap-2 hover:bg-gray-100 transition"
+            >
               List Your Property
-              <span className="transition-transform group-hover:translate-x-1">
-                →
-              </span>
-            </button>
+              <span>→</span>
+            </Link>
 
             {/* Secondary Button */}
-            <button className="bg-white/20 text-white font-medium px-8 py-2 md:py-3 rounded-[10px] md:rounded-[12px] hover:bg-white/30 transition">
+            <Link
+              to="/owner-login"
+              className="bg-white/20 text-white font-medium px-8 py-2 md:py-3 rounded-[10px] md:rounded-[12px] hover:bg-white/30 transition"
+            >
               Already a Partner? Sign In
-            </button>
+            </Link>
           </div>
         </div>
       </section>

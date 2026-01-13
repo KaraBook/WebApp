@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Phone, Inbox, Map } from "lucide-react";
 
 export default function ListYourProperty() {
   const [form, setForm] = useState({
@@ -37,9 +38,9 @@ export default function ListYourProperty() {
             </p>
 
             <div className="space-y-3 text-sm">
-              <p>📞 +91 9XXXXXXXXX</p>
-              <p>📧 partners@karabook.com</p>
-              <p>🕒 Mon–Sat, 10:00 AM – 7:00 PM</p>
+              <p><Phone className="w-4 h-4" /> +91 9XXXXXXXXX</p>
+              <p><Inbox className="w-4 h-4" /> partners@karabook.com</p>
+              <p><Map className="w-4 h-4" /> Mon–Sat, 10:00 AM – 7:00 PM</p>
             </div>
           </div>
 
