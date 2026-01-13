@@ -7,7 +7,7 @@ import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { format } from "date-fns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import BookingDetailsDialog from "@/components/accounts/BookingDetailsDialog";
+import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 
 
 export default function Dashboard() {
