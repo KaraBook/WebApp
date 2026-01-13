@@ -150,16 +150,27 @@ export default function Dashboard() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-5 mb-8">
-                <StatCard title="Wishlist Items" value={wishlistCount} icon={<Heart />} />
-                <StatCard title="Properties Visited" value={uniqueVisited} icon={<Building2 />} />
                 <StatCard
-                    title="Total Spent"
-                    className="w-[88vw]"
-                    value={`₹${totalSpent.toLocaleString("en-IN")}`}
-                    subtitle="Confirmed bookings"
-                    icon={<Wallet />}
-                    dark
+                    title="Wishlist Items"
+                    value={wishlistCount}
+                    icon={<Heart />}
                 />
+
+                <StatCard
+                    title="Properties Visited"
+                    value={uniqueVisited}
+                    icon={<Building2 />}
+                />
+
+                <div className="col-span-2 md:col-span-1">
+                    <StatCard
+                        title="Total Spent"
+                        value={`₹${totalSpent.toLocaleString("en-IN")}`}
+                        subtitle="Confirmed bookings"
+                        icon={<Wallet />}
+                        dark
+                    />
+                </div>
             </div>
 
             {/* RECENT BOOKINGS */}
@@ -354,34 +365,34 @@ function StatCard({ title, value, subtitle, icon, dark }) {
 }
 
 function StatusChip({ status }) {
-  const normalized =
-    status === "initiated" ? "pending" :
-    status === "paid" ? "confirmed" :
-    status || "pending";
+    const normalized =
+        status === "initiated" ? "pending" :
+            status === "paid" ? "confirmed" :
+                status || "pending";
 
-  const label =
-    normalized === "confirmed"
-      ? "Paid"
-      : normalized === "pending"
-      ? "Pending"
-      : "Cancelled";
+    const label =
+        normalized === "confirmed"
+            ? "Paid"
+            : normalized === "pending"
+                ? "Pending"
+                : "Cancelled";
 
-  const styles = {
-    confirmed: "border-green-300 bg-green-50 text-green-700",
-    pending: "border-orange-300 bg-orange-50 text-orange-700",
-    cancelled: "border-red-300 bg-red-50 text-red-700",
-  };
+    const styles = {
+        confirmed: "border-green-300 bg-green-50 text-green-700",
+        pending: "border-orange-300 bg-orange-50 text-orange-700",
+        cancelled: "border-red-300 bg-red-50 text-red-700",
+    };
 
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center justify-center",
-        "min-w-[88px] min-h-[26px]",
-        "rounded-full border px-3 text-xs font-medium capitalize",
-        styles[normalized] || styles.pending
-      )}
-    >
-      {label}
-    </span>
-  );
+    return (
+        <span
+            className={cn(
+                "inline-flex items-center justify-center",
+                "min-w-[88px] min-h-[26px]",
+                "rounded-full border px-3 text-xs font-medium capitalize",
+                styles[normalized] || styles.pending
+            )}
+        >
+            {label}
+        </span>
+    );
 }
