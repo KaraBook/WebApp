@@ -144,7 +144,7 @@ export default function Dashboard() {
             {/* STATS */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
                 <StatCard title="Total Bookings" value={totalBookings} icon={<Calendar />} dark />
-                <StatCard title="Confirmed" value={confirmed} icon={<CheckCircle2 />} />
+                <StatCard title="Paid" value={confirmed} icon={<CheckCircle2 />} />
                 <StatCard title="Pending" value={pending} icon={<Clock />} />
                 <StatCard title="Cancelled" value={cancelled} icon={<XCircle />} />
             </div>
