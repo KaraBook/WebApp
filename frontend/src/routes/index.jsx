@@ -19,6 +19,7 @@ import PaymentPolicy from "@/pages/PaymentPolicy";
 import FAQ from "@/pages/FAQ";
 import Dashboard from "@/components/accounts/Dashboard";
 import ListYourProperty from "@/pages/ListYourProperty";
+import AboutUs from "@/pages/AboutUs";
 
 export default function AppRoutes() {
   return (
@@ -26,6 +27,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="properties" element={<Properties />} />
+      <Route path="about-us" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/properties/:id" element={<PropertyDetails />} />
       <Route path="/checkout/:propertyId" element={<Checkout />} />
