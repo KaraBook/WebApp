@@ -96,7 +96,7 @@ export default function Header() {
       <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur border-b border-gray-200 px-4 sm:px-8 py-3 flex items-center justify-between">
 
         {/* LOGO */}
-        <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[150px]" />
+        <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[140px]" />
 
         {/* DESKTOP NAV */}
         <nav className="hidden md:flex items-center gap-6">
@@ -139,11 +139,11 @@ export default function Header() {
         </nav>
 
         {/* RIGHT SIDE */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
 
-          {/* DESKTOP PROFILE */}
+          {/* AVATAR (DESKTOP + MOBILE) */}
           <div
-            className="relative hidden md:flex items-center gap-3"
+            className="relative flex items-center"
             ref={dropdownRef}
           >
             <div
@@ -153,9 +153,10 @@ export default function Header() {
               {avatarInitial}
             </div>
 
+            {/* USER NAME → DESKTOP ONLY */}
             <span
               onClick={() => setDropdownOpen((p) => !p)}
-              className="text-gray-800 font-medium text-[14px] cursor-pointer"
+              className="hidden md:inline ml-2 text-gray-800 font-medium text-[14px] cursor-pointer"
             >
               {fullName}
             </span>
@@ -188,7 +189,7 @@ export default function Header() {
             )}
           </div>
 
-          {/* MOBILE HAMBURGER */}
+          {/* HAMBURGER */}
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="md:hidden p-2 rounded-lg hover:bg-gray-100"
@@ -208,7 +209,7 @@ export default function Header() {
           />
 
           {/* SIDEBAR */}
-          <aside className="absolute left-0 top-0 h-full w-[78%] max-w-[280px] bg-[#6b1f2c] text-white flex flex-col">
+          <aside className="absolute left-0 top-0 h-full w-[78%] max-w-[280px] bg-primary text-white flex flex-col">
             {/* HEADER */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/20">
               <span className="text-lg font-semibold">
