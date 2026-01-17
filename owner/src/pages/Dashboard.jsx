@@ -411,7 +411,14 @@ export default function Dashboard() {
                 <tbody>
                   {paginatedRows?.length ? (
                     paginatedRows.map((b) => (
-                      <tr key={b._id} className="border-b hover:bg-gray-50/60 transition">
+                      <tr
+                        key={b._id}
+                        onClick={() => {
+                          setSelectedBooking(b);
+                          setOpenBookingDialog(true);
+                        }}
+                        className="border-b hover:bg-gray-50/60 transition cursor-pointer"
+                      >
                         <td className="py-3 px-4 sm:px-6">
                           <button
                             onClick={() => {
