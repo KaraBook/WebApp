@@ -18,7 +18,6 @@ export default function Header() {
 
   const isManager = user?.role === "manager";
 
-  /* ================= FETCH PROPERTY ================= */
   useEffect(() => {
     (async () => {
       try {
@@ -32,7 +31,6 @@ export default function Header() {
     })();
   }, []);
 
-  /* ================= CLOSE PROFILE DROPDOWN ================= */
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -43,7 +41,6 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ================= USER NAME ================= */
   const fullName = isManager
     ? `${user?.firstName} (Manager)`
     : `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
@@ -58,7 +55,6 @@ export default function Header() {
 
   const avatarInitial = getInitials(fullName);
 
-  /* ================= NAV ITEMS ================= */
   const navItems = isManager
     ? [
         { label: "Dashboard", path: "/manager/dashboard" },
@@ -199,7 +195,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ================= MOBILE SIDEBAR ================= */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           {/* BACKDROP */}
@@ -213,7 +208,7 @@ export default function Header() {
             {/* HEADER */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/20">
               <span className="text-lg font-semibold">
-                {propertyId ? "Gulposh" : "Menu"}
+                {propertyId ? "Karabook" : "Menu"}
               </span>
 
               <button onClick={() => setMobileMenuOpen(false)}>
