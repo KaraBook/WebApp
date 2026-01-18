@@ -56,6 +56,7 @@ export default function OfflineBooking() {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
+  const [foodPreference, setFoodPreference] = useState("veg");
 
   const [disabledDays, setDisabledDays] = useState([]);
   const [guestCount, setGuestCount] = useState({
@@ -66,6 +67,13 @@ export default function OfflineBooking() {
   const guestRef = useRef(null);
 
   const [price, setPrice] = useState({ weekday: 0, weekend: 0 });
+
+  const [guestRules, setGuestRules] = useState({
+    maxGuests: 0,
+    baseGuests: 0,
+    extraAdultCharge: 0,
+    extraChildCharge: 0,
+  });
 
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -165,6 +173,13 @@ export default function OfflineBooking() {
           setPrice({
             weekday: Number(prop.pricingPerNightWeekdays || 0),
             weekend: Number(prop.pricingPerNightWeekend || 0),
+          });
+
+          setGuestRules({
+            maxGuests: Number(prop.maxGuests || 0),
+            baseGuests: Number(prop.baseGuests || 0),
+            extraAdultCharge: Number(prop.extraAdultCharge || 0),
+            extraChildCharge: Number(prop.extraChildCharge || 0),
           });
         }
 
@@ -352,7 +367,21 @@ export default function OfflineBooking() {
     });
   };
 
-  // ---------- BOOKING ----------
+
+  const updateGuests = (type, delta) => {
+    setGuestCount((g) => {
+      const next = { ...g, [type]: g[type] + delta };
+      if (next.adults < 1) next.adults = 1;
+      if (next.children < 0) next.children = 0;
+      const total = next.adults + next.children;
+      if (guestRules.maxGuests && total > guestRules.maxGuests) {
+        toast.error(`Maximum ${guestRules.maxGuests} guests allowed`);
+        return g;
+      }
+      return next;
+    });
+  };
+
 
   const handleBooking = async () => {
     if (!allowForm) return toast.error("Please verify mobile first");
@@ -414,6 +443,7 @@ export default function OfflineBooking() {
           adults: guestCount.adults,
           children: guestCount.children,
         },
+        foodPreference,
       });
 
       const bId = res.data.booking._id;
@@ -713,12 +743,7 @@ export default function OfflineBooking() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              setGuestCount((g) => ({
-                                ...g,
-                                adults: Math.max(1, g.adults - 1),
-                              }))
-                            }
+                            onClick={() => updateGuests("adults", -1)}
                           >
                             -
                           </Button>
@@ -730,12 +755,7 @@ export default function OfflineBooking() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              setGuestCount((g) => ({
-                                ...g,
-                                adults: g.adults + 1,
-                              }))
-                            }
+                            onClick={() => updateGuests("adults", +1)}
                           >
                             +
                           </Button>
@@ -753,12 +773,7 @@ export default function OfflineBooking() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              setGuestCount((g) => ({
-                                ...g,
-                                children: Math.max(0, g.children - 1),
-                              }))
-                            }
+                            onClick={() => updateGuests("children", -1)}
                           >
                             -
                           </Button>
@@ -770,12 +785,7 @@ export default function OfflineBooking() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() =>
-                              setGuestCount((g) => ({
-                                ...g,
-                                children: g.children + 1,
-                              }))
-                            }
+                            onClick={() => updateGuests("children", +1)}
                           >
                             +
                           </Button>
@@ -786,6 +796,24 @@ export default function OfflineBooking() {
                   )}
                 </div>
 
+                <div>
+                  <Label>Food Preference</Label>
+                  <Select value={foodPreference} onValueChange={setFoodPreference}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="veg">Vegetarian</SelectItem>
+                      <SelectItem value="non-veg">Non-Vegetarian</SelectItem>
+                      <SelectItem value="both">Veg + Non-Veg</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <p className="text-xs text-gray-500 mt-1">
+                    Menu will be finalized by the property manager after booking
+                  </p>
+                </div>
+
                 {/* Total */}
                 <div>
                   <Label>Total Price</Label>
@@ -793,6 +821,14 @@ export default function OfflineBooking() {
                     ₹{calculateTotal().toLocaleString()}
                   </div>
                 </div>
+
+                {guestRules.baseGuests > 0 && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Includes {guestRules.baseGuests} guests.
+                    Extra adult ₹{guestRules.extraAdultCharge}/night,
+                    extra child ₹{guestRules.extraChildCharge}/night.
+                  </p>
+                )}
 
                 <Button
                   className="w-full bg-primary text-white py-3"
