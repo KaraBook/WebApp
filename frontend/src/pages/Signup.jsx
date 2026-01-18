@@ -207,7 +207,7 @@ export default function Signup() {
                     <SelectTrigger className="mt-1 rounded-[10px]">
                       <SelectValue placeholder="Select State" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[999999999]">
                       {states.map((st) => (
                         <SelectItem key={st.isoCode} value={st.isoCode}>
                           {st.name}
