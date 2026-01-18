@@ -72,7 +72,6 @@ export default function OfflineBooking() {
     includeMeals: false,
     veg: 0,
     nonVeg: 0,
-    combo: 0,
   });
 
   const [guestRules, setGuestRules] = useState({
@@ -392,17 +391,13 @@ export default function OfflineBooking() {
   const updateMeals = (type, delta) => {
     setMeals((m) => {
       const next = { ...m, [type]: m[type] + delta };
-
       if (next[type] < 0) next[type] = 0;
-
-      const totalMeals = next.veg + next.nonVeg + next.combo;
+      const totalMeals = next.veg + next.nonVeg;
       const totalGuests = guestCount.adults + guestCount.children;
-
       if (totalMeals > totalGuests) {
         toast.error(`Meals cannot exceed ${totalGuests} guests`);
         return m;
       }
-
       return next;
     });
   };
@@ -868,22 +863,8 @@ export default function OfflineBooking() {
                           </div>
                         </div>
 
-                        {/* Combo */}
-                        <div className="flex items-center justify-between">
-                          <span>Combo Meal Guests</span>
-                          <div className="flex items-center gap-3">
-                            <Button size="sm" variant="outline" onClick={() => updateMeals("combo", -1)}>
-                              -
-                            </Button>
-                            <span>{meals.combo}</span>
-                            <Button size="sm" variant="outline" onClick={() => updateMeals("combo", +1)}>
-                              +
-                            </Button>
-                          </div>
-                        </div>
-
                         <p className="text-xs text-gray-500">
-                          Total meals selected: {meals.veg + meals.nonVeg + meals.combo} /{" "}
+                          Total meals selected: {meals.veg + meals.nonVeg} /{" "}
                           {guestCount.adults + guestCount.children}
                         </p>
                       </>
