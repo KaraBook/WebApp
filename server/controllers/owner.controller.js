@@ -916,3 +916,26 @@ export const getOwnerBookedUsers = async (req, res) => {
     });
   }
 };
+
+
+export const getPropertyCoverByMobile = async (req, res) => {
+  const { mobile } = req.query;
+
+  if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
+    return res.json({ coverImage: null });
+  }
+
+  const property = await Property.findOne({
+    "resortOwner.mobile": mobile,
+    isDraft: false,
+    approvalStatus: "approved",
+    isBlocked: false,
+  }).select("coverImage galleryPhotos");
+
+  return res.json({
+    coverImage:
+      property?.coverImage ||
+      property?.galleryPhotos?.[0] ||
+      null,
+  });
+};

@@ -49,6 +49,7 @@ router.post("/offline-booking/create-order", requireAuth, createRazorpayOrder);
 router.get("/booked-users", requireAuth, getOwnerBookedUsers);
 router.post("/offline-booking/verify", requireAuth, verifyRazorpayPayment);
 router.post("/manager/create", requireAuth, createManager);
+router.get("/property-cover", getPropertyCoverByMobile);
 
 
 

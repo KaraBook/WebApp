@@ -114,6 +114,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/auth/owner/avatar`,
         method: "DELETE",
     },
+    publicOwnerPropertyCover: {
+        url: `${BASE_URL}/api/public/property-cover`,
+        method: "GET",
+    },
 
 
 };
