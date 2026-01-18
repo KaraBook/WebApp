@@ -816,11 +816,13 @@ export default function OfflineBooking() {
                 </div>
 
                 <Card className="border border-gray-200">
-                  <CardHeader className="pb-0">
-                    <CardTitle className="text-base">Meals</CardTitle>
+                  <CardHeader className="pb-1 pt-3">
+                    <CardTitle className="text-base leading-tight">
+                      Meals
+                    </CardTitle>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
+                  <CardContent className="pt-1 space-y-3">
                     {/* Include Meals */}
                     <label className="flex items-center gap-2 text-sm">
                       <input
