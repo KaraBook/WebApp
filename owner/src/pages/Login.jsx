@@ -53,22 +53,22 @@ export default function OwnerLogin() {
 
 
   useEffect(() => {
-  if (mobile10.length !== 10) return;
+    if (mobile10.length !== 10) return;
 
-  (async () => {
-    try {
-      const res = await api.get(
-        SummaryApi.publicOwnerPropertyCover.url,
-        { params: { mobile: mobile10 } }
-      );
+    (async () => {
+      try {
+        const res = await api.get(
+          SummaryApi.publicOwnerPropertyCover.url,
+          { params: { mobile: mobile10 } }
+        );
 
-      if (res.data?.coverImage) {
-        setHeroImage(res.data.coverImage);
+        if (res.data?.coverImage) {
+          setHeroImage(res.data.coverImage);
+        }
+      } catch {
       }
-    } catch {
-    }
-  })();
-}, [mobile10]);
+    })();
+  }, [mobile10]);
 
 
   const backendOwnerPrecheck = async () => {
@@ -219,6 +219,9 @@ export default function OwnerLogin() {
         <img
           src={heroImage}
           alt="Karabook Property"
+          onError={(e) => {
+            e.currentTarget.src = "/login-hero.jpg";
+          }}
           className="absolute inset-0 h-full w-full object-cover"
         />
 

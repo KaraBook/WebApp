@@ -920,6 +920,7 @@ export const getOwnerBookedUsers = async (req, res) => {
 
 export const getPropertyCoverByMobile = async (req, res) => {
   const { mobile } = req.query;
+  const BASE_URL = process.env.BACKEND_BASE_URL || "";
 
   if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
     return res.json({ coverImage: null });
@@ -932,10 +933,14 @@ export const getPropertyCoverByMobile = async (req, res) => {
     isBlocked: false,
   }).select("coverImage galleryPhotos");
 
-  return res.json({
-    coverImage:
-      property?.coverImage ||
-      property?.galleryPhotos?.[0] ||
-      null,
-  });
+  let image =
+    property?.coverImage ||
+    property?.galleryPhotos?.[0] ||
+    null;
+
+  if (image && image.startsWith("/")) {
+    image = `${BASE_URL}${image}`;
+  }
+
+  return res.json({ coverImage: image });
 };
