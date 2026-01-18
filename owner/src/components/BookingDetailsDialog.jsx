@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 
-export default function BookingDetailsDialog({ open, booking, onOpenChange }) {
+export default function BookingDetailsDialog({ open, booking, onClose }) {
   if (!booking) return null;
 
   const {
@@ -59,7 +59,9 @@ export default function BookingDetailsDialog({ open, booking, onOpenChange }) {
   return (
     <Dialog
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose(); 
+      }}
     >
       <DialogContent
         className="
@@ -100,8 +102,9 @@ export default function BookingDetailsDialog({ open, booking, onOpenChange }) {
           </span>
 
           <button
-            onClick={() => onOpenChange(false)}
-            className="absolute top-4 right-4 p-1 rounded-md text-red-500 hover:bg-red-50"
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1 rounded-md
+                       text-red-500 hover:bg-red-50"
           >
             <X className="h-4 w-4" />
           </button>

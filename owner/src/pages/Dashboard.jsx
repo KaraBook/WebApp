@@ -652,8 +652,8 @@ export default function Dashboard() {
 
       <BookingDetailsDialog
         open={openBookingDialog}
-        onOpenChange={setOpenBookingDialog}
         booking={selectedBooking}
+        onClose={() => setOpenBookingDialog(false)}
       />
 
     </div>
