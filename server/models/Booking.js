@@ -10,7 +10,6 @@ const bookingSchema = new mongoose.Schema(
     guests: {
       adults: { type: Number, default: 1 },
       children: { type: Number, default: 0 },
-      infants: { type: Number, default: 0 }
     },
     totalNights: Number,
     totalAmount: Number,
@@ -20,8 +19,7 @@ const bookingSchema = new mongoose.Schema(
     meals: {
       includeMeals: { type: Boolean, default: false },
       veg: { type: Number, default: 0 },
-      nonVeg: { type: Number, default: 0 },
-      combo: { type: Number, default: 0 },
+      nonVeg: { type: Number, default: 0 }
     },
 
     contactNumber: String,

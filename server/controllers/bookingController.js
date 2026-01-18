@@ -57,7 +57,6 @@ export const createOrder = async (req, res) => {
 
     const adults = Number(guests?.adults || 0);
     const children = Number(guests?.children || 0);
-    const infants = Number(guests?.infants || 0);
 
     const totalGuests = adults + children;
 
@@ -71,8 +70,7 @@ export const createOrder = async (req, res) => {
     if (meals?.includeMeals) {
       const totalMeals =
         Number(meals.veg || 0) +
-        Number(meals.nonVeg || 0) +
-        Number(meals.combo || 0);
+        Number(meals.nonVeg || 0);
 
       if (totalMeals !== totalGuests) {
         return res.status(400).json({
@@ -141,15 +139,14 @@ export const createOrder = async (req, res) => {
       propertyId,
       checkIn,
       checkOut,
-      guests: { adults, children, infants },
+      guests: { adults, children },
       meals: meals
-        ? {
-          includeMeals: true,
-          veg: meals.veg,
-          nonVeg: meals.nonVeg,
-          combo: meals.combo,
-        }
-        : { includeMeals: false },
+  ? {
+      includeMeals: true,
+      veg: meals.veg,
+      nonVeg: meals.nonVeg,
+    }
+  : { includeMeals: false },
       totalNights,
       totalAmount: baseTotal,
       taxAmount,

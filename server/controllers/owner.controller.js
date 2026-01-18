@@ -558,7 +558,7 @@ export const createOfflineBooking = async (req, res) => {
       checkIn,
       checkOut,
       guests,
-      totalAmount
+      meals,
     } = req.body;
 
     const ownerId = await getEffectiveOwnerId(req);
@@ -583,64 +583,95 @@ export const createOfflineBooking = async (req, res) => {
     const start = new Date(checkIn);
     const end = new Date(checkOut);
 
-    const totalNights = Math.ceil(
-      (end - start) / (1000 * 60 * 60 * 24)
-    );
-
+    const totalNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     if (totalNights <= 0) {
       return res.status(400).json({ success: false, message: "Invalid date range" });
     }
 
+
     const adults = Number(guests?.adults || 0);
     const children = Number(guests?.children || 0);
-    const infants = Number(guests?.infants || 0);
-
     const totalGuests = adults + children;
 
-    if (totalGuests > property.maxGuests) {
+    if (!totalGuests || totalGuests <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one guest is required",
+      });
+    }
+
+    if (totalGuests > Number(property.maxGuests)) {
       return res.status(400).json({
         success: false,
         message: `Maximum ${property.maxGuests} guests allowed`,
       });
     }
 
-    const baseGuests = Number(property.baseGuests);
-    const basePricePerNight = Number(property.pricingPerNightWeekdays);
+    if (meals?.includeMeals) {
+      const veg = Number(meals.veg || 0);
+      const nonVeg = Number(meals.nonVeg || 0);
 
-    const baseUsedByAdults = Math.min(adults, baseGuests);
-    const remainingBaseSlots = baseGuests - baseUsedByAdults;
+      if (veg + nonVeg !== totalGuests) {
+        return res.status(400).json({
+          success: false,
+          message: "Meal count must match total guests",
+        });
+      }
+    }
 
-    const extraAdults = Math.max(0, adults - baseGuests);
-    const extraChildren = Math.max(0, children - remainingBaseSlots);
+    let totalAmount = 0;
+    let cursor = new Date(start);
 
-    const extraAdultCost =
-      extraAdults * Number(property.extraAdultCharge);
+    while (cursor < end) {
+      const day = cursor.getDay(); 
+      const isWeekend = day === 0 || day === 6;
 
-    const extraChildCost =
-      extraChildren * Number(property.extraChildCharge);
+      let nightlyBase = isWeekend
+        ? Number(property.pricingPerNightWeekend)
+        : Number(property.pricingPerNightWeekdays);
 
-    const perNightTotal =
-      basePricePerNight + extraAdultCost + extraChildCost;
+      if (!nightlyBase || nightlyBase <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Property pricing not configured",
+        });
+      }
 
-    const backendTotal = perNightTotal * totalNights;
+      const baseGuests = Number(property.baseGuests || 0);
+      const extraAdultCharge = Number(property.extraAdultCharge || 0);
+      const extraChildCharge = Number(property.extraChildCharge || 0);
 
-    if (backendTotal !== Number(totalAmount)) {
+      const baseUsedByAdults = Math.min(adults, baseGuests);
+      const remainingBaseSlots = Math.max(0, baseGuests - baseUsedByAdults);
+
+      const extraAdults = Math.max(0, adults - baseGuests);
+      const extraChildren = Math.max(0, children - remainingBaseSlots);
+
+      nightlyBase +=
+        extraAdults * extraAdultCharge +
+        extraChildren * extraChildCharge;
+
+      totalAmount += nightlyBase;
+
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Price mismatch! Please refresh and try again.",
+        message: "Invalid booking amount",
       });
     }
 
-    if (!totalAmount || Number(totalAmount) <= 0) {
-      return res.status(400).json({ success: false, message: "Invalid amount" });
+    const normalizedMobile = normalizeMobile(traveller.mobile);
+    if (!normalizedMobile || normalizedMobile.length !== 10) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid traveller mobile number",
+      });
     }
 
-    const normalized = normalizeMobile(traveller.mobile);
-    if (!normalized || normalized.length !== 10) {
-      return res.status(400).json({ success: false, message: "Invalid traveller number" });
-    }
-
-    let user = await User.findOne({ mobile: normalized });
+    let user = await User.findOne({ mobile: normalizedMobile });
 
     if (user) {
       const fields = [
@@ -655,9 +686,9 @@ export const createOfflineBooking = async (req, res) => {
       ];
 
       let updated = false;
-      fields.forEach((f) => {
-        if (!user[f] && traveller[f]) {
-          user[f] = traveller[f];
+      fields.forEach((field) => {
+        if (!user[field] && traveller[field]) {
+          user[field] = traveller[field];
           updated = true;
         }
       });
@@ -667,10 +698,10 @@ export const createOfflineBooking = async (req, res) => {
       user = await User.create({
         firstName: traveller.firstName,
         lastName: traveller.lastName,
-        name: `${traveller.firstName} ${traveller.lastName}`,
+        name: `${traveller.firstName} ${traveller.lastName}`.trim(),
         email: traveller.email,
-        mobile: normalized,
-        dateOfBirth: traveller.dateOfBirth,
+        mobile: normalizedMobile,
+        dateOfBirth: traveller.dateOfBirth ? new Date(traveller.dateOfBirth) : null,
         address: traveller.address,
         pinCode: traveller.pinCode,
         state: traveller.state,
@@ -684,20 +715,26 @@ export const createOfflineBooking = async (req, res) => {
       propertyId,
       checkIn,
       checkOut,
-      guests: {
-        adults,
-        children,
-        infants,
-      },
+      guests: { adults, children },
+      meals: meals?.includeMeals
+        ? {
+            includeMeals: true,
+            veg: meals.veg,
+            nonVeg: meals.nonVeg,
+          }
+        : { includeMeals: false },
       totalNights,
-      totalAmount: backendTotal,
+      totalAmount,
       bookedBy: ownerId,
       isOffline: true,
       paymentMethod: "razorpay",
       paymentStatus: "initiated",
     });
 
-    return res.json({ success: true, booking });
+    return res.json({
+      success: true,
+      booking,
+    });
 
   } catch (err) {
     console.error("🔥 Offline Booking Error:", err);

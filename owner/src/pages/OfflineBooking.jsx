@@ -61,7 +61,6 @@ export default function OfflineBooking() {
   const [guestCount, setGuestCount] = useState({
     adults: 1,
     children: 0,
-    infants: 0,
   });
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const guestRef = useRef(null);
@@ -126,22 +125,7 @@ export default function OfflineBooking() {
     return total;
   };
 
-  // Same logic as backend – for sanity verification before API call
-  const verifyBackendStyleTotal = () => {
-    let backendTotal = 0;
 
-    let d = new Date(formatLocalDateString(dateRange[0].startDate));
-    const end = new Date(formatLocalDateString(dateRange[0].endDate));
-
-    while (d < end) {
-      const day = d.getDay();
-      const isWeekend = day === 0 || day === 6;
-      backendTotal += isWeekend ? Number(price.weekend) : Number(price.weekday);
-      d.setDate(d.getDate() + 1);
-    }
-
-    return backendTotal;
-  };
 
   // ---------- EFFECTS ----------
 
@@ -399,18 +383,6 @@ export default function OfflineBooking() {
     const totalAmount = calculateTotal();
     if (totalAmount <= 0) return toast.error("Invalid booking amount");
 
-    // Extra safety: recalc total using backend-style logic
-    const backendStyleTotal = verifyBackendStyleTotal();
-    if (backendStyleTotal !== totalAmount) {
-      console.error("⚠️ Frontend total vs backend-style total mismatch", {
-        frontendTotal: totalAmount,
-        backendStyleTotal,
-      });
-      return toast.error(
-        "Internal price calculation mismatch. Please contact support."
-      );
-    }
-
     const checkIn = dateRange[0].startDate;
     const checkOut = dateRange[0].endDate;
 
@@ -427,7 +399,6 @@ export default function OfflineBooking() {
       nights,
       price,
       totalAmount,
-      backendStyleTotal,
     });
 
     setLoading(true);
@@ -439,13 +410,10 @@ export default function OfflineBooking() {
         propertyId,
         checkIn: checkInStr,
         checkOut: checkOutStr,
-        nights,
         guests: {
           adults: guestCount.adults,
           children: guestCount.children,
-          infants: guestCount.infants,
         },
-        totalAmount,
       });
 
       const bId = res.data.booking._id;
@@ -728,10 +696,7 @@ export default function OfflineBooking() {
                     className="border rounded-lg p-2 cursor-pointer mt-1 bg-white"
                     onClick={() => setShowGuestDropdown(!showGuestDropdown)}
                   >
-                    {guestCount.adults +
-                      guestCount.children +
-                      guestCount.infants}{" "}
-                    guests
+                    {guestCount.adults + guestCount.children} guests
                   </div>
 
                   {/* Dropdown */}
@@ -817,45 +782,6 @@ export default function OfflineBooking() {
                         </div>
                       </div>
 
-                      {/* Infants */}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">Infants</p>
-                          <p className="text-xs text-gray-500">Under 2</p>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              setGuestCount((g) => ({
-                                ...g,
-                                infants: Math.max(0, g.infants - 1),
-                              }))
-                            }
-                          >
-                            -
-                          </Button>
-
-                          <span className="w-6 text-center">
-                            {guestCount.infants}
-                          </span>
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              setGuestCount((g) => ({
-                                ...g,
-                                infants: g.infants + 1,
-                              }))
-                            }
-                          >
-                            +
-                          </Button>
-                        </div>
-                      </div>
                     </div>
                   )}
                 </div>
