@@ -131,8 +131,8 @@ export default function Signup() {
 
 
   return (
-    <div className="container mx-auto max-w-2xl p-6">
-      <Card className="shadow-lg mt-2 border border-gray-200 rounded-none">
+    <div className="container mx-auto max-w-2xl p-4 md:p-6">
+      <Card className="shadow-lg mt-2 border border-gray-200 rounded-[12px]">
         <CardHeader>
           <CardTitle>Complete your signup</CardTitle>
           <CardDescription>
@@ -149,7 +149,7 @@ export default function Signup() {
               <Label htmlFor="firstName">First name</Label>
               <Input
                 id="firstName"
-                className="mt-1 rounded-none"
+                className="mt-1 rounded-[10px]"
                 placeholder="John"
                 {...register("firstName")}
               />
@@ -162,7 +162,7 @@ export default function Signup() {
               <Label htmlFor="lastName">Last name</Label>
               <Input
                 id="lastName"
-                className="mt-1 rounded-none"
+                className="mt-1 rounded-[10px]"
                 placeholder="Doe"
                 {...register("lastName")}
               />
@@ -180,7 +180,7 @@ export default function Signup() {
             <Input
               id="email"
               type="email"
-              className="mt-1 rounded-none"
+              className="mt-1 rounded-[10px]"
               placeholder="john@example.com"
               {...register("email")}
             />
@@ -204,7 +204,7 @@ export default function Signup() {
                     onValueChange={(val) => handleStateChange(val, onChange)}
                     value={states.find((s) => s.name === value)?.isoCode || ""}
                   >
-                    <SelectTrigger className="mt-1 rounded-none">
+                    <SelectTrigger className="mt-1 rounded-[10px]">
                       <SelectValue placeholder="Select State" />
                     </SelectTrigger>
                     <SelectContent>
@@ -230,7 +230,7 @@ export default function Signup() {
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Select onValueChange={onChange} value={value || ""}>
-                    <SelectTrigger className="mt-1 rounded-none">
+                    <SelectTrigger className="mt-1 rounded-[10px]">
                       <SelectValue placeholder="Select City" />
                     </SelectTrigger>
                     <SelectContent>
@@ -254,7 +254,7 @@ export default function Signup() {
               <Input
                 id="dateOfBirth"
                 type="date"
-                className="mt-1 rounded-none"
+                className="mt-1 rounded-[10px]"
                 max={new Date().toISOString().split("T")[0]}
                 {...register("dateOfBirth")}
               />
@@ -269,7 +269,7 @@ export default function Signup() {
               <textarea
                 id="address"
                 placeholder="Full address"
-                className="mt-1 w-full h-24 border px-3 py-2 text-sm rounded-none"
+                className="mt-1 w-full h-24 border px-3 py-2 text-sm rounded-[10px]"
                 {...register("address")}
               />
               {errors.address && (
@@ -284,7 +284,7 @@ export default function Signup() {
                 id="pinCode"
                 maxLength={6}
                 placeholder="6-digit pin code"
-                className="mt-1 rounded-none"
+                className="mt-1 rounded-[10px]"
                 {...register("pinCode")}
               />
               {errors.pinCode && (
@@ -301,7 +301,7 @@ export default function Signup() {
               id="image"
               type="file"
               accept="image/*"
-              className="mt-1 rounded-none"
+              className="mt-1 rounded-[10px]"
               {...register("image")}
             />
           </div>
@@ -311,14 +311,14 @@ export default function Signup() {
         <CardFooter className="justify-end gap-2">
           <Button
             variant="ghost"
-            className="rounded-none"
+            className="rounded-[10px]"
             onClick={() => navigate("/")}
           >
             Cancel
           </Button>
 
           <Button
-            className="rounded-none"
+            className="rounded-[10px]"
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting}
           >
