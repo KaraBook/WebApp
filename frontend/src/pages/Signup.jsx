@@ -6,12 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 const nameRegex = /^[a-zA-Z][a-zA-Z\s'.-]{1,49}$/;
 
@@ -122,7 +123,13 @@ export default function Signup() {
       }
 
       setAuth({ user, accessToken, refreshToken });
+
+      toast.success("Account created successfully 🎉", {
+        description: "Welcome! You are now logged in.",
+      });
+
       navigate("/");
+
 
     } catch (err) {
       alert(err?.response?.data?.message || "Signup failed");
@@ -141,10 +148,10 @@ export default function Signup() {
         </CardHeader>
 
         <CardContent className="grid gap-4">
-          
+
           {/* NAME ROW */}
           <div className="flex justify-between flex-wrap gap-2">
-            
+
             <div className="md:w-[48%] w-full">
               <Label htmlFor="firstName">First name</Label>
               <Input
@@ -192,7 +199,7 @@ export default function Signup() {
 
           {/* STATE + CITY + DOB */}
           <div className="flex justify-between flex-wrap gap-2">
-            
+
             {/* State */}
             <div className="md:w-[48%] w-full">
               <Label htmlFor="state">State</Label>
