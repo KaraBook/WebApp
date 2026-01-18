@@ -68,6 +68,13 @@ export default function OfflineBooking() {
 
   const [price, setPrice] = useState({ weekday: 0, weekend: 0 });
 
+  const [meals, setMeals] = useState({
+    includeMeals: false,
+    veg: 0,
+    nonVeg: 0,
+    combo: 0,
+  });
+
   const [guestRules, setGuestRules] = useState({
     maxGuests: 0,
     baseGuests: 0,
@@ -106,7 +113,6 @@ export default function OfflineBooking() {
     },
   ]);
 
-  // ---------- DERIVED HELPERS ----------
 
   const getNights = () => {
     const start = normalize(dateRange[0].startDate);
@@ -383,6 +389,24 @@ export default function OfflineBooking() {
   };
 
 
+  const updateMeals = (type, delta) => {
+    setMeals((m) => {
+      const next = { ...m, [type]: m[type] + delta };
+
+      if (next[type] < 0) next[type] = 0;
+
+      const totalMeals = next.veg + next.nonVeg + next.combo;
+      const totalGuests = guestCount.adults + guestCount.children;
+
+      if (totalMeals > totalGuests) {
+        toast.error(`Meals cannot exceed ${totalGuests} guests`);
+        return m;
+      }
+
+      return next;
+    });
+  };
+
   const handleBooking = async () => {
     if (!allowForm) return toast.error("Please verify mobile first");
 
@@ -443,7 +467,7 @@ export default function OfflineBooking() {
           adults: guestCount.adults,
           children: guestCount.children,
         },
-        foodPreference,
+        meals,
       });
 
       const bId = res.data.booking._id;
@@ -796,23 +820,76 @@ export default function OfflineBooking() {
                   )}
                 </div>
 
-                <div>
-                  <Label>Food Preference</Label>
-                  <Select value={foodPreference} onValueChange={setFoodPreference}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="veg">Vegetarian</SelectItem>
-                      <SelectItem value="non-veg">Non-Vegetarian</SelectItem>
-                      <SelectItem value="both">Veg + Non-Veg</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <Card className="border border-gray-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Meals</CardTitle>
+                  </CardHeader>
 
-                  <p className="text-xs text-gray-500 mt-1">
-                    Menu will be finalized by the property manager after booking
-                  </p>
-                </div>
+                  <CardContent className="space-y-4">
+                    {/* Include Meals */}
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={meals.includeMeals}
+                        onChange={(e) =>
+                          setMeals((m) => ({ ...m, includeMeals: e.target.checked }))
+                        }
+                      />
+                      Include Meals
+                    </label>
+
+                    {meals.includeMeals && (
+                      <>
+                        {/* Veg */}
+                        <div className="flex items-center justify-between">
+                          <span>Veg Guests</span>
+                          <div className="flex items-center gap-3">
+                            <Button size="sm" variant="outline" onClick={() => updateMeals("veg", -1)}>
+                              -
+                            </Button>
+                            <span>{meals.veg}</span>
+                            <Button size="sm" variant="outline" onClick={() => updateMeals("veg", +1)}>
+                              +
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Non Veg */}
+                        <div className="flex items-center justify-between">
+                          <span>Non-Veg Guests</span>
+                          <div className="flex items-center gap-3">
+                            <Button size="sm" variant="outline" onClick={() => updateMeals("nonVeg", -1)}>
+                              -
+                            </Button>
+                            <span>{meals.nonVeg}</span>
+                            <Button size="sm" variant="outline" onClick={() => updateMeals("nonVeg", +1)}>
+                              +
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Combo */}
+                        <div className="flex items-center justify-between">
+                          <span>Combo Meal Guests</span>
+                          <div className="flex items-center gap-3">
+                            <Button size="sm" variant="outline" onClick={() => updateMeals("combo", -1)}>
+                              -
+                            </Button>
+                            <span>{meals.combo}</span>
+                            <Button size="sm" variant="outline" onClick={() => updateMeals("combo", +1)}>
+                              +
+                            </Button>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-gray-500">
+                          Total meals selected: {meals.veg + meals.nonVeg + meals.combo} /{" "}
+                          {guestCount.adults + guestCount.children}
+                        </p>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
 
                 {/* Total */}
                 <div>
