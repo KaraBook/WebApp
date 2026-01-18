@@ -816,7 +816,7 @@ export default function OfflineBooking() {
                 </div>
 
                 <Card className="border border-gray-200">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-0">
                     <CardTitle className="text-base">Meals</CardTitle>
                   </CardHeader>
 
