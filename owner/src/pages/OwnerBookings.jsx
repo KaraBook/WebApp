@@ -314,7 +314,13 @@ export default function OwnerBookings() {
                   {paginatedData.map((b) => (
                     <tr
                       key={b._id}
-                      className="border-b hover:bg-gray-50 transition"
+                      onClick={() => openBookingDialog(b)}
+                      className="
+    border-b
+    hover:bg-gray-50
+    transition
+    cursor-pointer
+  "
                     >
 
                       <td className="py-3 px-4">
@@ -367,7 +373,10 @@ export default function OwnerBookings() {
                         {formatDate(b.createdAt)}
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td
+                        className="py-3 px-4"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <DropdownMenu>
                           <DropdownMenuTrigger>
                             <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
