@@ -96,11 +96,13 @@ const userSchema = new mongoose.Schema({
   },
 
   password: {
-    type: String,
-    required: true,
-    minlength: 6,
-    select: false
-  },
+  type: String,
+  minlength: 6,
+  select: false,
+  required: function () {
+    return this.role !== "traveller";
+  }
+},
 
   ownedProperties: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }]
 

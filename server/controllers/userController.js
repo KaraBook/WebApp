@@ -174,22 +174,62 @@ export const travellerPrecheck = async (req, res) => {
 
 export const travellerSignup = async (req, res) => {
   try {
-    const mobile = normalizeMobile(req.firebaseUser?.phone_number);
-    if (!mobile || mobile.length !== 10)
-      return res.status(400).json({ message: "Invalid phone token" });
+    if (!req.firebaseUser?.phone_number) {
+      return res.status(401).json({ message: "Invalid Firebase token" });
+    }
 
-    const { firstName, lastName, email, state, city, dateOfBirth, address, pinCode } = req.body ?? {};
-    if (!firstName || !lastName || !email || !state || !city || !address || !pinCode || !dateOfBirth) {
+    const mobile = normalizeMobile(req.firebaseUser.phone_number);
+    if (!mobile || mobile.length !== 10) {
+      return res.status(400).json({ message: "Invalid phone token" });
+    }
+
+    const existingAnyRole = await User.findOne({ mobile }).select("role");
+    if (existingAnyRole && existingAnyRole.role !== "traveller") {
+      return res.status(403).json({
+        message:
+          existingAnyRole.role === "resortOwner"
+            ? "This number belongs to a Resort Owner account"
+            : "This number is not allowed for traveller signup",
+      });
+    }
+
+    const {
+      firstName,
+      lastName,
+      email,
+      state,
+      city,
+      dateOfBirth,
+      address,
+      pinCode,
+    } = req.body ?? {};
+
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !state ||
+      !city ||
+      !address ||
+      !pinCode ||
+      !dateOfBirth
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const existsMobile = await User.findOne({ mobile });
-    if (existsMobile)
-      return res.status(409).json({ message: "User already exists. Please login." });
+    if (existingAnyRole) {
+      return res.status(409).json({
+        message: "User already exists. Please login.",
+      });
+    }
 
-    const existsEmail = await User.findOne({ email: email.toLowerCase() });
-    if (existsEmail)
+    const existsEmail = await User.findOne({
+      email: email.toLowerCase(),
+    }).select("_id");
+
+    if (existsEmail) {
       return res.status(409).json({ message: "Email already in use." });
+    }
 
     const user = await User.create({
       firstName,
@@ -200,12 +240,13 @@ export const travellerSignup = async (req, res) => {
       city,
       mobile,
       role: "traveller",
-      dateOfBirth,
+      dateOfBirth: new Date(dateOfBirth),
       address,
       pinCode,
     });
 
     const { accessToken, refreshToken } = issueTokens(user);
+
     return res.status(201).json({
       message: "Signup successful",
       accessToken,
@@ -214,11 +255,21 @@ export const travellerSignup = async (req, res) => {
     });
   } catch (err) {
     console.error("Traveller signup error:", err);
+
+    if (err.name === "ValidationError") {
+      return res.status(400).json({
+        message: Object.values(err.errors)[0].message,
+      });
+    }
     if (err?.code === 11000) {
       const field = Object.keys(err?.keyPattern ?? {})[0] || "field";
       return res.status(409).json({ message: `${field} already exists` });
     }
-    return res.status(500).json({ message: "Signup failed", error: err.message });
+
+    return res.status(500).json({
+      message: "Signup failed",
+      error: err.message,
+    });
   }
 };
 

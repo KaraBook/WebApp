@@ -8,7 +8,6 @@ const AuthCtx = createContext(null);
 export function AuthProvider({ children }) {
   const location = useLocation();
 
-  // ✅ DEFINE STATE (THIS WAS MISSING)
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
 
@@ -16,9 +15,7 @@ export function AuthProvider({ children }) {
     location.pathname.startsWith("/login") ||
     location.pathname.startsWith("/manager/login");
 
-  /* -------------------- INIT AUTH -------------------- */
   useEffect(() => {
-    // Auth pages don’t need session check
     if (isAuthPage) {
       setReady(true);
       return;
