@@ -917,30 +917,3 @@ export const getOwnerBookedUsers = async (req, res) => {
   }
 };
 
-
-export const getPropertyCoverByMobile = async (req, res) => {
-  const { mobile } = req.query;
-  const BASE_URL = process.env.BACKEND_BASE_URL || "";
-
-  if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
-    return res.json({ coverImage: null });
-  }
-
-  const property = await Property.findOne({
-    "resortOwner.mobile": mobile,
-    isDraft: false,
-    approvalStatus: "approved",
-    isBlocked: false,
-  }).select("coverImage galleryPhotos");
-
-  let image =
-    property?.coverImage ||
-    property?.galleryPhotos?.[0] ||
-    null;
-
-  if (image && image.startsWith("/")) {
-    image = `${BASE_URL}${image}`;
-  }
-
-  return res.json({ coverImage: image });
-};
