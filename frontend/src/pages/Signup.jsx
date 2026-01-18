@@ -233,7 +233,7 @@ export default function Signup() {
                     <SelectTrigger className="mt-1 rounded-[10px]">
                       <SelectValue placeholder="Select City" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[999999999]">
                       {cities.map((city) => (
                         <SelectItem key={city.name} value={city.name}>
                           {city.name}
