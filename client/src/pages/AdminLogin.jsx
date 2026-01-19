@@ -43,7 +43,7 @@ export default function AdminLogin() {
             alt="BookMyStay"
             className="h-6 w-auto md:h-14"
           />
-        <p className="text-sm text-neutral-500 mt-1">Admin Portal</p>
+        <p className="text-sm text-[#0c95a2] font-[600] mt-1">Admin Portal</p>
       </div>
 
       <Card className="w-full max-w-md border border-neutral-200 bg-white shadow-lg">
@@ -67,7 +67,7 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-white border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-neutral-500"
+                className="bg-white h-10 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-neutral-500"
               />
             </div>
 
@@ -84,7 +84,7 @@ export default function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-neutral-500 pr-10"
+                  className="bg-white h-10 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-neutral-500 pr-10"
                 />
                 <button
                   type="button"
@@ -103,7 +103,7 @@ export default function AdminLogin() {
             {/* Submit */}
             <Button
               type="submit"
-              className="w-full bg-black text-white font-semibold hover:bg-neutral-800 transition"
+              className="w-full h-10 bg-[#0c95a2] text-white font-semibold hover:bg-[#0c95a2] transition"
             >
               Login
             </Button>
