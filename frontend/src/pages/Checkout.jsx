@@ -531,19 +531,6 @@ export default function Checkout() {
                                 max={totalGuests - mealCounts.veg}
                             />
 
-                            {/* Combo */}
-                            <MealCounter
-                                label="Combo Meal Guests"
-                                value={mealCounts.combo}
-                                onChange={(val) =>
-                                    setMealCounts((prev) => ({
-                                        ...prev,
-                                        combo: val,
-                                    }))
-                                }
-                                max={totalGuests - (mealCounts.veg + mealCounts.nonVeg)}
-                            />
-
                             <p className="text-xs text-gray-500">
                                 Total meals selected: {totalMealsSelected} / {totalGuests}
                             </p>
