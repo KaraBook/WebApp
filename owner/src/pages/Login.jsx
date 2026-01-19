@@ -197,7 +197,7 @@ export default function OwnerLogin() {
       "
     >
       <img
-        src="/loginhero.jpg"   
+        src="/owner/loginhero.jpg"   
         alt="Karabook Property"
         className="absolute inset-0 h-full w-full object-cover"
       />
@@ -229,12 +229,12 @@ export default function OwnerLogin() {
         <div className="px-6 pt-8 pb-6">
           <div className="flex items-center gap-3">
             <img
-              src="/KarabookLogo.png"
+              src="/owner/KarabookLogo.png"
               alt="Karabook"
               className="h-9"
             />
             <span className="text-sm font-medium text-gray-700">
-              Admin Portal
+              Owner Portal
             </span>
           </div>
 
