@@ -211,11 +211,11 @@ export default function OwnerLogin() {
           Welcome Back
         </p>
 
-        <h1 className="text-4xl font-serif mt-2">
-          Karabook
+        <h1 className="text-[48px] font-sans font-[700]">
+          KaraBook
         </h1>
 
-        <p className="mt-3 max-w-md text-sm opacity-90">
+        <p className="mt-1 max-w-md text-[18px] opacity-90">
           Manage your properties, bookings, guests and earnings with ease.
         </p>
       </div>
@@ -233,17 +233,17 @@ export default function OwnerLogin() {
               alt="Karabook"
               className="h-9"
             />
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-[16px] font-bold text-primary">
               Owner Portal
             </span>
           </div>
 
-          <h2 className="text-2xl font-semibold mt-6">
+          <h2 className="text-2xl font-bold mt-6">
             Sign in
           </h2>
 
-          <p className="text-sm text-gray-500 mt-1">
-            Use your registered mobile number to continue.
+          <p className="text-[16px] text-gray-700 mt-1">
+            Use your registered <span className="text-primary font-[600]">mobile number</span> to continue.
           </p>
         </div>
 
@@ -325,8 +325,10 @@ export default function OwnerLogin() {
             </div>
           )}
 
+
+<hr className="mt-8"/>
           {/* FOOTER */}
-          <p className="text-[11px] text-center text-gray-400 mt-8">
+          <p className="text-[11px] text-center text-gray-400 mt-6">
             © {new Date().getFullYear()} Karabook · Secure Owner Access
           </p>
         </div>
