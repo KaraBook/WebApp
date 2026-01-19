@@ -27,7 +27,6 @@ export default function Checkout() {
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
         nonVeg: 0,
-        combo: 0,
     });
 
     const normalizeRanges = (ranges) =>
@@ -57,7 +56,7 @@ export default function Checkout() {
     const totalMainGuests = guestData.adults + guestData.children;
     const totalGuests = guestData.adults + guestData.children;
     const totalMealsSelected =
-        mealCounts.veg + mealCounts.nonVeg + mealCounts.combo;
+        mealCounts.veg + mealCounts.nonVeg ;
 
     const extraAdults = Math.max(0, guestData.adults - baseGuests);
     const remainingBaseAfterAdults = Math.max(0, baseGuests - guestData.adults);
@@ -496,7 +495,7 @@ export default function Checkout() {
                             onChange={(e) => {
                                 setIncludeMeals(e.target.checked);
                                 if (!e.target.checked) {
-                                    setMealCounts({ veg: 0, nonVeg: 0, combo: 0 });
+                                    setMealCounts({ veg: 0, nonVeg: 0});
                                 }
                             }}
                         />
@@ -516,7 +515,7 @@ export default function Checkout() {
                                         veg: val,
                                     }))
                                 }
-                                max={totalGuests - (mealCounts.nonVeg + mealCounts.combo)}
+                                max={totalGuests - mealCounts.nonVeg}
                             />
 
                             {/* Non-Veg */}
@@ -529,7 +528,7 @@ export default function Checkout() {
                                         nonVeg: val,
                                     }))
                                 }
-                                max={totalGuests - (mealCounts.veg + mealCounts.combo)}
+                                max={totalGuests - mealCounts.veg}
                             />
 
                             {/* Combo */}
