@@ -56,7 +56,7 @@ export default function Checkout() {
     const totalMainGuests = guestData.adults + guestData.children;
     const totalGuests = guestData.adults + guestData.children;
     const totalMealsSelected =
-        mealCounts.veg + mealCounts.nonVeg ;
+        mealCounts.veg + mealCounts.nonVeg;
 
     const extraAdults = Math.max(0, guestData.adults - baseGuests);
     const remainingBaseAfterAdults = Math.max(0, baseGuests - guestData.adults);
@@ -150,6 +150,25 @@ export default function Checkout() {
 
     const weekday = Number(property.pricingPerNightWeekdays);
     const weekend = Number(property.pricingPerNightWeekend || weekday);
+
+    const getNightBreakdown = () => {
+        let d = new Date(startDate);
+        const end = new Date(endDate);
+        let weekdays = 0;
+        let weekends = 0;
+
+        while (d < end) {
+            const day = d.getDay();
+            if (day === 0 || day === 6) weekends++;
+            else weekdays++;
+            d.setDate(d.getDate() + 1);
+        }
+
+        return { weekdays, weekends };
+    };
+    const { weekdays, weekends } = getNightBreakdown();
+    const weekdayTotal = weekdays * weekday;
+    const weekendTotal = weekends * weekend;
 
     const calcBasePrice = () => {
         let d = new Date(startDate);
@@ -495,7 +514,7 @@ export default function Checkout() {
                             onChange={(e) => {
                                 setIncludeMeals(e.target.checked);
                                 if (!e.target.checked) {
-                                    setMealCounts({ veg: 0, nonVeg: 0});
+                                    setMealCounts({ veg: 0, nonVeg: 0 });
                                 }
                             }}
                         />
@@ -564,12 +583,13 @@ export default function Checkout() {
 
             {/* RIGHT SECTION */}
             <div>
-                <div className="border rounded-[12px] mt-[120px] p-5 shadow-sm">
-                    <div className="flex gap-3 mb-3">
+                <div className="border rounded-[12px] mt-[120px] p-5 shadow-sm space-y-4">
+
+                    {/* Property */}
+                    <div className="flex gap-3">
                         <img
                             src={property.coverImage}
-                            alt={property.propertyName}
-                            className="w-24 h-24 object-cover rounded-[8px]"
+                            className="w-24 h-24 rounded-[8px] object-cover"
                         />
                         <div>
                             <h4 className="font-semibold">{property.propertyName}</h4>
@@ -579,30 +599,88 @@ export default function Checkout() {
                         </div>
                     </div>
 
-                    <div className="border-t pt-3 mt-3 text-sm space-y-2">
-                        <div className="flex justify-between">
-                            <span>
-                                Room charges ({nights} {nights === 1 ? "night" : "nights"})
-                            </span>
-                            <span>₹{basePrice.toLocaleString()}</span>
-                        </div>
+                    <hr />
 
-                        {extraGuestPrice > 0 && (
-                            <div className="flex justify-between text-sm">
-                                <span>
-                                    Extra guests ({extraAdults} adults, {extraChildren} children)
-                                </span>
-                                <span>₹{extraGuestPrice.toLocaleString()}</span>
+                    {/* Guest Info */}
+                    <div className="text-sm space-y-1">
+                        <p>Base guests included: <b>{baseGuests}</b></p>
+                        <p>Maximum guests allowed: <b>{maxGuests}</b></p>
+                        <p>Total guests selected: <b>{totalGuests}</b></p>
+                    </div>
+
+                    <hr />
+
+                    {/* Room Charges */}
+                    <div className="text-sm space-y-2">
+                        <p className="font-medium">Room charges</p>
+
+                        {weekdays > 0 && (
+                            <div className="flex justify-between">
+                                <span>Weekdays ({weekdays} × ₹{weekday})</span>
+                                <span>₹{weekdayTotal.toLocaleString()}</span>
                             </div>
                         )}
+
+                        {weekends > 0 && (
+                            <div className="flex justify-between">
+                                <span>Weekend ({weekends} × ₹{weekend})</span>
+                                <span>₹{weekendTotal.toLocaleString()}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Extra Guests */}
+                    {(extraAdults > 0 || extraChildren > 0) && (
+                        <>
+                            <hr />
+                            <div className="text-sm space-y-2">
+                                <p className="font-medium">Extra guest charges</p>
+
+                                {extraAdults > 0 && (
+                                    <div className="flex justify-between">
+                                        <span>Adults ({extraAdults} × ₹{extraAdultCharge})</span>
+                                        <span>₹{extraAdultCost.toLocaleString()}</span>
+                                    </div>
+                                )}
+
+                                {extraChildren > 0 && (
+                                    <div className="flex justify-between">
+                                        <span>Children ({extraChildren} × ₹{extraChildCharge})</span>
+                                        <span>₹{extraChildCost.toLocaleString()}</span>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+
+                    {/* Meals */}
+                    {includeMeals && (
+                        <>
+                            <hr />
+                            <div className="text-sm">
+                                <p className="font-medium">Meals selected</p>
+                                <p>Veg: {mealCounts.veg}</p>
+                                <p>Non-veg: {mealCounts.nonVeg}</p>
+                            </div>
+                        </>
+                    )}
+
+                    <hr />
+
+                    {/* Totals */}
+                    <div className="text-sm space-y-2">
+                        <div className="flex justify-between">
+                            <span>Subtotal</span>
+                            <span>₹{subtotal.toLocaleString()}</span>
+                        </div>
 
                         <div className="flex justify-between">
                             <span>Taxes (10%)</span>
                             <span>₹{tax.toLocaleString()}</span>
                         </div>
 
-                        <div className="border-t pt-2 flex justify-between font-semibold text-base">
-                            <span>Total (INR)</span>
+                        <div className="flex justify-between font-semibold text-base border-t pt-2">
+                            <span>Total payable</span>
                             <span>₹{total.toLocaleString()}</span>
                         </div>
                     </div>
