@@ -186,9 +186,11 @@ export default function Checkout() {
     };
 
     const basePrice = calcBasePrice();
-    const extraGuestPrice =
-        extraAdults * extraAdultCharge +
-        extraChildren * extraChildCharge;
+
+    const extraAdultCost = extraAdults * extraAdultCharge;
+    const extraChildCost = extraChildren * extraChildCharge;
+
+    const extraGuestPrice = extraAdultCost + extraChildCost;
 
     const subtotal = basePrice + extraGuestPrice;
     const tax = Math.round(subtotal * 0.10);
