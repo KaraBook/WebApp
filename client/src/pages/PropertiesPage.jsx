@@ -293,12 +293,14 @@ const PropertiesPage = () => {
 
             <TableBody>
               {paginatedProperties.map((property, index) => (
-                <TableRow key={property._id}>
+                <TableRow
+                  key={property._id}
+                  className="cursor-pointer hover:bg-muted/40 transition-colors"
+                  onClickCapture={() => navigate(`/view-property/${property._id}`)}
+                >
                   <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                  <TableCell>
-                    <Link
-                      to={`/view-property/${property._id}`}
-                    >
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <Link to={`/view-property/${property._id}`} className="hover:underline">
                       {property.propertyName}
                     </Link>
                   </TableCell>
@@ -308,7 +310,7 @@ const PropertiesPage = () => {
                   <TableCell>₹{property.pricingPerNightWeekdays}</TableCell>
                   <TableCell>{renderStatusDot(property)}</TableCell>
                   <TableCell>{property.featured ? "Yes" : "No"}</TableCell>
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <Switch
                       checked={property.publishNow}
                       disabled={property.isBlocked}
@@ -321,7 +323,7 @@ const PropertiesPage = () => {
                   <TableCell className="hidden md:table-cell">
                     {formatDate(property.updatedAt)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu
                       open={openDropdownId === property._id}
                       onOpenChange={(o) => setOpenDropdownId(o ? property._id : null)}

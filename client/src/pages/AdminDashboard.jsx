@@ -22,7 +22,7 @@ const DashboardPage = () => {
   const [bookingFilter, setBookingFilter] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [openModal, setOpenModal] = useState(false);
-  const PER_PAGE = 4;
+  const PER_PAGE = 5;
   const [page, setPage] = useState(1);
 
 
@@ -111,9 +111,9 @@ const DashboardPage = () => {
         return new Date(b.checkIn) >= startOfCurrentMonth;
       });
 
-      const sortedBookings = upcomingAndCurrentBookings.sort((a, b) => {
-        return new Date(b.checkIn) - new Date(a.checkIn);
-      });
+      const sortedBookings = upcomingAndCurrentBookings
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5);
 
 
       setStats({
@@ -185,28 +185,28 @@ const DashboardPage = () => {
   );
 
   const getPageItems = (current, total) => {
-  // Matches: Previous | 1 | 2 | ... | 8 | Next (example)
-  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+    // Matches: Previous | 1 | 2 | ... | 8 | Next (example)
+    if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
 
-  const items = [];
-  const first = 1;
-  const last = total;
+    const items = [];
+    const first = 1;
+    const last = total;
 
-  const left = Math.max(current - 1, 2);
-  const right = Math.min(current + 1, total - 1);
+    const left = Math.max(current - 1, 2);
+    const right = Math.min(current + 1, total - 1);
 
-  items.push(first);
+    items.push(first);
 
-  if (left > 2) items.push("...");
+    if (left > 2) items.push("...");
 
-  for (let p = left; p <= right; p++) items.push(p);
+    for (let p = left; p <= right; p++) items.push(p);
 
-  if (right < total - 1) items.push("...");
+    if (right < total - 1) items.push("...");
 
-  items.push(last);
+    items.push(last);
 
-  return items;
-};
+    return items;
+  };
 
 
   return (
@@ -329,7 +329,7 @@ const DashboardPage = () => {
 
       {/* DESKTOP VIEW */}
       <div className="hidden md:block rounded-xl border bg-white overflow-x-auto">
-        <table className="min-w-[1100px] w-[100%] text-sm">
+        <table className="min-w-[1200px] w-[100%] text-sm">
           <thead className="bg-neutral-50 border-b">
             <tr className="text-left text-neutral-600">
               <th className="px-6 py-4 font-medium">Guest</th>
@@ -346,7 +346,14 @@ const DashboardPage = () => {
 
           <tbody className="divide-y">
             {paginatedBookings.map((b) => (
-              <tr key={b._id} className="hover:bg-neutral-50">
+              <tr
+                key={b._id}
+                className="hover:bg-neutral-50 cursor-pointer"
+                onClick={() => {
+                  setSelectedBooking(b);
+                  setOpenModal(true);
+                }}
+              >
                 {/* Guest */}
                 <td className="px-6 py-4">
                   <div className="font-medium text-neutral-900">
@@ -393,7 +400,10 @@ const DashboardPage = () => {
                 </td>
 
                 {/* Actions */}
-                <td className="px-4 py-4 text-right">
+                <td
+                  className="px-4 py-4 text-right"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <button className="text-neutral-400 hover:text-neutral-600 px-2">
