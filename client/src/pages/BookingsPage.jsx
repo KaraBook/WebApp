@@ -453,7 +453,11 @@ const BookingsPage = () => {
                                         const phone = b?.userId?.mobile || b?.contactNumber || "";
                                         const property = b?.propertyId?.propertyName || "—";
                                         return (
-                                            <TableRow key={b._id}>
+                                            <TableRow
+                                                key={b._id}
+                                                className="cursor-pointer hover:bg-muted/40 transition-colors"
+                                                onClickCapture={() => openView(b)}
+                                            >
                                                 <TableCell className="text-center">
                                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                                 </TableCell>
@@ -464,7 +468,10 @@ const BookingsPage = () => {
 
                                                         <button
                                                             type="button"
-                                                            onClick={() => openView(b)}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                openView(b);
+                                                            }}
                                                             className="font-medium text-primary cursor-pointer"
                                                         >
                                                             {shortId(b._id)}
@@ -510,7 +517,7 @@ const BookingsPage = () => {
 
                                                 <TableCell>{formatDate(b.createdAt)}</TableCell>
 
-                                                <TableCell>
+                                                <TableCell onClick={(e) => e.stopPropagation()}>
                                                     <DropdownMenu
                                                         open={openDropdownId === b._id}
                                                         onOpenChange={(o) => setOpenDropdownId(o ? b._id : null)}

@@ -254,7 +254,11 @@ const UsersPage = () => {
 
                 {!loading &&
                   paginated.map((u, index) => (
-                    <TableRow key={u._id}>
+                    <TableRow
+                      key={u._id}
+                      className="cursor-pointer hover:bg-muted/40 transition-colors"
+                      onClickCapture={() => openView(u)}
+                    >
                       <TableCell className="text-center hidden md:table-cell">
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </TableCell>
@@ -287,12 +291,10 @@ const UsersPage = () => {
                       <TableCell>{u.city || "—"}</TableCell>
                       <TableCell>{formatDate(u.createdAt)}</TableCell>
 
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu
                           open={openDropdownId === u._id}
-                          onOpenChange={(o) =>
-                            setOpenDropdownId(o ? u._id : null)
-                          }
+                          onOpenChange={(o) => setOpenDropdownId(o ? u._id : null)}
                         >
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
