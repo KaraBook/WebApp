@@ -283,7 +283,7 @@ export default function OwnerLogin() {
           ) : (
             <div className="space-y-5">
 
-              <p className="text-sm text-center text-gray-600">
+              <p className="text-sm text-left text-gray-600">
                 Enter the OTP sent to your mobile number
               </p>
 
@@ -296,7 +296,7 @@ export default function OwnerLogin() {
                   inputMode="numeric"
                   maxLength={OTP_LEN}
                   placeholder="••••••"
-                  className="h-11 text-center tracking-[0.35em] font-semibold rounded-lg"
+                  className="h-11 text-center tracking-[0.35em] mt-1 font-semibold rounded-lg"
                   disabled={verifying}
                 />
               </div>
