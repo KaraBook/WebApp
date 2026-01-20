@@ -31,7 +31,9 @@ export default function AppRoutes() {
       <Route path="about-us" element={<AboutUs />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/properties/:id" element={<PropertyDetails />} />
-      <Route path="/checkout/:propertyId" element={<Checkout />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/checkout/:propertyId" element={<Checkout />} />
+      </Route>
       <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/payment-policy" element={<PaymentPolicy />} />

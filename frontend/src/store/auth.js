@@ -9,7 +9,7 @@ export const useAuthStore = create(
       user: null,
       accessToken: null,
       refreshToken: null,
-      wishlist: [],  
+      wishlist: [],
 
       loginModalOpen: false,
       showAuthModal: () => set({ loginModalOpen: true }),
@@ -23,6 +23,7 @@ export const useAuthStore = create(
 
       clearAuth: () => {
         set({ user: null, accessToken: null, refreshToken: null, wishlist: [] });
+        localStorage.removeItem("checkout");
       },
 
       init: async () => {

@@ -24,6 +24,16 @@ export default function Checkout() {
     const guestRef = useRef(null);
     const [includeMeals, setIncludeMeals] = useState(false);
 
+    const location = useLocation();
+    const checkoutState = location.state;
+
+    useEffect(() => {
+        if (!checkoutState?.from || !checkoutState?.to || !checkoutState?.guests) {
+            toast.error("Invalid checkout session");
+            navigate("/", { replace: true });
+        }
+    }, [checkoutState, navigate]);
+
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
         nonVeg: 0,
@@ -245,16 +255,24 @@ export default function Checkout() {
                 name: "Villa Booking",
                 description: "Confirm & Pay",
                 order_id: order.id,
-                handler: (response) => {
-                    Axios.post(SummaryApi.verifyBookingPayment.url, response)
-                        .catch(() => { });
-                    toast.success("Payment successful!");
-                    navigate("/thank-you", {
-                        replace: true,
-                        state: {
-                            bookingId: booking._id,
-                        },
-                    });
+                handler: async (response) => {
+                    try {
+                        const verifyRes = await Axios.post(
+                            SummaryApi.verifyBookingPayment.url,
+                            response
+                        );
+
+                        const bookingId = verifyRes.data.booking._id;
+
+                        toast.success("Payment successful!");
+
+                        navigate("/thank-you", {
+                            replace: true,
+                            state: { bookingId },
+                        });
+                    } catch (err) {
+                        toast.error("Payment verified but redirect failed");
+                    }
                 },
 
                 prefill: { contact },
