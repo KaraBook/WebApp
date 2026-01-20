@@ -11,6 +11,8 @@ export const useAuthStore = create(
       refreshToken: null,
       wishlist: [],
 
+      _hasHydrated: false,
+
       loginModalOpen: false,
       showAuthModal: () => set({ loginModalOpen: true }),
       hideAuthModal: () => set({ loginModalOpen: false }),
@@ -65,6 +67,9 @@ export const useAuthStore = create(
     {
       name: "auth",
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => (state) => {
+        state._hasHydrated = true;
+      },
       partialize: (s) => ({
         user: s.user,
         accessToken: s.accessToken,

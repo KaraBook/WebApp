@@ -54,7 +54,7 @@ export default function Checkout() {
         return all.some((range) => date >= range.start && date <= range.end);
     };
 
-    const { from, to, guests } = state || {};
+    const { from, to, guests } = checkoutState || {};
     const [guestData, setGuestData] = useState(
         guests || { adults: 1, children: 0, }
     );
@@ -266,10 +266,7 @@ export default function Checkout() {
                         const bookingId = verifyRes.data.booking._id;
 
                         toast.success("Payment successful!");
-                        navigate("/thank-you", {
-                            replace: true,
-                            state: { bookingId },
-                        });
+                        navigate(`/thank-you/${bookingId}`, { replace: true });
                         return;
 
                     } catch (err) {

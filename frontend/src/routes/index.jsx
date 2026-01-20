@@ -40,7 +40,7 @@ export default function AppRoutes() {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/list-your-property" element={<ListYourProperty />} />
       <Route element={<ProtectedRoute />}>
-        <Route path="/thank-you" element={<ThankYou />} />
+        <Route path="/thank-you/:bookingId" element={<ThankYou />} />
       </Route>
 
       {/* Dashboard-only area */}
