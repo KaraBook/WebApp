@@ -187,8 +187,8 @@ export default function Checkout() {
 
     const basePrice = calcBasePrice();
 
-    const extraAdultCost = extraAdults * extraAdultCharge;
-    const extraChildCost = extraChildren * extraChildCharge;
+    const extraAdultCost = extraAdults * extraAdultCharge * nights;
+    const extraChildCost = extraChildren * extraChildCharge * nights;
 
     const extraGuestPrice = extraAdultCost + extraChildCost;
 
@@ -618,14 +618,14 @@ export default function Checkout() {
 
                         {weekdays > 0 && (
                             <div className="flex justify-between">
-                                <span>Weekdays ({weekdays} × ₹{weekday})</span>
+                                <span>Weekdays ({weekdays} nights × ₹{weekday})</span>
                                 <span>₹{weekdayTotal.toLocaleString()}</span>
                             </div>
                         )}
 
                         {weekends > 0 && (
                             <div className="flex justify-between">
-                                <span>Weekend ({weekends} × ₹{weekend})</span>
+                                <span>Weekend ({weekends} nights × ₹{weekend})</span>
                                 <span>₹{weekendTotal.toLocaleString()}</span>
                             </div>
                         )}
@@ -640,14 +640,14 @@ export default function Checkout() {
 
                                 {extraAdults > 0 && (
                                     <div className="flex justify-between">
-                                        <span>Adults ({extraAdults} × ₹{extraAdultCharge})</span>
+                                        <span>Adults ({extraAdults} × ₹{extraAdultCharge} × {nights} nights)</span>
                                         <span>₹{extraAdultCost.toLocaleString()}</span>
                                     </div>
                                 )}
 
                                 {extraChildren > 0 && (
                                     <div className="flex justify-between">
-                                        <span>Children ({extraChildren} × ₹{extraChildCharge})</span>
+                                        <span>Children ({extraChildren} × ₹{extraChildCharge} × {nights} nights)</span>
                                         <span>₹{extraChildCost.toLocaleString()}</span>
                                     </div>
                                 )}

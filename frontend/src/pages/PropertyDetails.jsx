@@ -900,7 +900,7 @@ export default function PropertyDetails() {
                 {extraAdults > 0 && (
                   <div className="flex justify-between mb-1">
                     <span>
-                      Extra adults ({extraAdults} × ₹{extraAdultCharge} × {nights})
+                      Extra adults ({extraAdults} × ₹{extraAdultCharge} × {nights}/night)
                     </span>
                     <span>₹{extraAdultTotal}</span>
                   </div>
@@ -909,7 +909,7 @@ export default function PropertyDetails() {
                 {extraChildren > 0 && (
                   <div className="flex justify-between mb-1">
                     <span>
-                      Extra children ({extraChildren} × ₹{extraChildCharge} × {nights})
+                      Extra children ({extraChildren} × ₹{extraChildCharge} × {nights}/night)
                     </span>
                     <span>₹{extraChildTotal}</span>
                   </div>
