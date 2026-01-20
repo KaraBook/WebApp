@@ -33,7 +33,7 @@ export default function Checkout() {
             toast.error("Invalid checkout session");
             navigate("/", { replace: true });
         }
-    }, [checkoutState, navigate]);
+    }, []);
 
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
