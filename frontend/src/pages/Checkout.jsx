@@ -14,7 +14,6 @@ import "react-date-range/dist/theme/default.css";
 export default function Checkout() {
     const { propertyId } = useParams();
     const navigate = useNavigate();
-    const { state } = useLocation();
     const [property, setProperty] = useState(null);
     const [contact, setContact] = useState("");
     const [loading, setLoading] = useState(true);
@@ -25,15 +24,13 @@ export default function Checkout() {
     const [includeMeals, setIncludeMeals] = useState(false);
 
     const location = useLocation();
-    const checkoutStateRef = useRef(location.state);
-    const checkoutState = checkoutStateRef.current;
+    const checkoutState = location.state;
 
-    useEffect(() => {
-        if (!checkoutState?.from || !checkoutState?.to || !checkoutState?.guests) {
-            toast.error("Invalid checkout session");
-            navigate("/", { replace: true });
-        }
-    }, []);
+    if (!checkoutState?.from || !checkoutState?.to || !checkoutState?.guests) {
+        toast.error("Invalid checkout session");
+        return null;
+    }
+
 
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
