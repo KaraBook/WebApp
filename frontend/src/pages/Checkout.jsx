@@ -14,6 +14,7 @@ import "react-date-range/dist/theme/default.css";
 export default function Checkout() {
     const { propertyId } = useParams();
     const navigate = useNavigate();
+    const { state } = useLocation();
     const [property, setProperty] = useState(null);
     const [contact, setContact] = useState("");
     const [loading, setLoading] = useState(true);
@@ -22,15 +23,6 @@ export default function Checkout() {
     const [blockedDates, setBlockedDates] = useState([]);
     const guestRef = useRef(null);
     const [includeMeals, setIncludeMeals] = useState(false);
-
-    const location = useLocation();
-    const checkoutState = location.state;
-
-    if (!checkoutState?.from || !checkoutState?.to || !checkoutState?.guests) {
-        toast.error("Invalid checkout session");
-        return null;
-    }
-
 
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
@@ -51,7 +43,7 @@ export default function Checkout() {
         return all.some((range) => date >= range.start && date <= range.end);
     };
 
-    const { from, to, guests } = checkoutState || {};
+    const { from, to, guests } = state || {};
     const [guestData, setGuestData] = useState(
         guests || { adults: 1, children: 0, }
     );
@@ -253,22 +245,11 @@ export default function Checkout() {
                 name: "Villa Booking",
                 description: "Confirm & Pay",
                 order_id: order.id,
-                handler: async (response) => {
-                    try {
-                        const verifyRes = await Axios.post(
-                            SummaryApi.verifyBookingPayment.url,
-                            response
-                        );
-
-                        const bookingId = verifyRes.data.booking._id;
-
-                        toast.success("Payment successful!");
-                        navigate(`/thank-you/${bookingId}`, { replace: true });
-                        return;
-
-                    } catch (err) {
-                        toast.error("Payment verified but redirect failed");
-                    }
+                handler: (response) => {
+                    Axios.post(SummaryApi.verifyBookingPayment.url, response)
+                        .catch(() => { });
+                    toast.success("Payment successful!");
+                    navigate("/account/bookings/", { replace: true });
                 },
 
                 prefill: { contact },

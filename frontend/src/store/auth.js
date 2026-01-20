@@ -9,9 +9,7 @@ export const useAuthStore = create(
       user: null,
       accessToken: null,
       refreshToken: null,
-      wishlist: [],
-
-      _hasHydrated: false,
+      wishlist: [],  
 
       loginModalOpen: false,
       showAuthModal: () => set({ loginModalOpen: true }),
@@ -25,7 +23,6 @@ export const useAuthStore = create(
 
       clearAuth: () => {
         set({ user: null, accessToken: null, refreshToken: null, wishlist: [] });
-        localStorage.removeItem("checkout");
       },
 
       init: async () => {
@@ -67,9 +64,6 @@ export const useAuthStore = create(
     {
       name: "auth",
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state) => {
-        state._hasHydrated = true;
-      },
       partialize: (s) => ({
         user: s.user,
         accessToken: s.accessToken,
