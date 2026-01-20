@@ -25,7 +25,8 @@ export default function Checkout() {
     const [includeMeals, setIncludeMeals] = useState(false);
 
     const location = useLocation();
-    const checkoutState = location.state;
+    const checkoutStateRef = useRef(location.state);
+    const checkoutState = checkoutStateRef.current;
 
     useEffect(() => {
         if (!checkoutState?.from || !checkoutState?.to || !checkoutState?.guests) {
@@ -265,11 +266,12 @@ export default function Checkout() {
                         const bookingId = verifyRes.data.booking._id;
 
                         toast.success("Payment successful!");
-
                         navigate("/thank-you", {
                             replace: true,
                             state: { bookingId },
                         });
+                        return;
+
                     } catch (err) {
                         toast.error("Payment verified but redirect failed");
                     }
