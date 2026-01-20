@@ -249,7 +249,12 @@ export default function Checkout() {
                     Axios.post(SummaryApi.verifyBookingPayment.url, response)
                         .catch(() => { });
                     toast.success("Payment successful!");
-                    navigate("/account/bookings/", { replace: true });
+                    navigate("/thank-you", {
+                        replace: true,
+                        state: {
+                            bookingId: booking._id,
+                        },
+                    });
                 },
 
                 prefill: { contact },
