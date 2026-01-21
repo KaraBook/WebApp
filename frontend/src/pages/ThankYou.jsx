@@ -38,7 +38,7 @@ export default function ThankYou() {
     }
 
     const {
-        property,
+        propertyId: property,
         checkIn,
         checkOut,
         guests,
