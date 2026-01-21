@@ -94,17 +94,17 @@ export default function ThankYou() {
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                                 <p className="text-gray-500">Check-in</p>
-                                <p className="font-medium">{format(new Date(checkIn), "dd MMM yyyy")}</p>
+                                <p className="font-bold">{format(new Date(checkIn), "dd MMM yyyy")}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500">Check-out</p>
-                                <p className="font-medium">{format(new Date(checkOut), "dd MMM yyyy")}</p>
+                                <p className="font-bold">{format(new Date(checkOut), "dd MMM yyyy")}</p>
                             </div>
                         </div>
 
                         <div className="text-sm">
                             <p>
-                                Guests: <b>{guests.adults} Adults</b>
+                                Guests: {guests.adults} Adults
                                 {guests.children > 0 && `, ${guests.children} Children`}
                             </p>
 
@@ -121,7 +121,7 @@ export default function ThankYou() {
                         <div className="text-sm space-y-2">
                             <div className="flex justify-between">
                                 <span>Room charges</span>
-                                <span>₹{totalAmount.toLocaleString()}</span>
+                                <span className="font-bold">₹{totalAmount.toLocaleString()}</span>
                             </div>
 
                             <div className="flex justify-between">

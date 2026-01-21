@@ -296,7 +296,7 @@ const PropertiesPage = () => {
                 <TableRow
                   key={property._id}
                   className="cursor-pointer hover:bg-muted/40 transition-colors"
-                  onClickCapture={() => navigate(`/view-property/${property._id}`)}
+                  onClick={() => navigate(`/view-property/${property._id}`)}
                 >
                   <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
