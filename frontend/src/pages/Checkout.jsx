@@ -245,11 +245,21 @@ export default function Checkout() {
                 name: "Villa Booking",
                 description: "Confirm & Pay",
                 order_id: order.id,
-                handler: (response) => {
-                    Axios.post(SummaryApi.verifyBookingPayment.url, response)
-                        .catch(() => { });
-                    toast.success("Payment successful!");
-                    navigate("/account/bookings/", { replace: true });
+                handler: async (response) => {
+                    try {
+                        const verifyRes = await Axios.post(
+                            SummaryApi.verifyBookingPayment.url,
+                            response
+                        );
+
+                        const bookingId = verifyRes.data.booking._id;
+
+                        toast.success("Payment successful!");
+                        navigate(`/thank-you/${bookingId}`, { replace: true });
+
+                    } catch (err) {
+                        toast.error("Payment verified but redirect failed");
+                    }
                 },
 
                 prefill: { contact },
