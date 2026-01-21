@@ -1,6 +1,6 @@
 import express from "express";
 import { requireAuth } from "../middlewares/requireAuth.js";
-import { createOrder, verifyPayment, getBookedDates, getUserBookings, getBookingInvoice  } from "../controllers/bookingController.js";
+import { createOrder, verifyPayment, getBookedDates, getUserBookings, getBookingInvoice, getBookingById  } from "../controllers/bookingController.js";
 
 const router = express.Router();
 
