@@ -39,9 +39,7 @@ export default function AppRoutes() {
       <Route path="/payment-policy" element={<PaymentPolicy />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/list-your-property" element={<ListYourProperty />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/thank-you/:bookingId" element={<ThankYou />} />
-      </Route>
+      <Route path="/thank-you/:bookingId" element={<ThankYou />} />
 
       {/* Dashboard-only area */}
       <Route element={<ProtectedRoute />}>

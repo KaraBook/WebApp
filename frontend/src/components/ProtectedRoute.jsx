@@ -3,7 +3,16 @@ import { useAuthStore } from "@/store/auth";
 
 export default function ProtectedRoute() {
   const user = useAuthStore((s) => s.user);
+  const hasHydrated = useAuthStore.persist.hasHydrated();
   const loc = useLocation();
-  if (!user) return <Navigate to="/" state={{ from: loc }} replace />;
+
+  if (!hasHydrated) {
+    return null; 
+  }
+
+  if (!user) {
+    return <Navigate to="/" state={{ from: loc }} replace />;
+  }
+
   return <Outlet />;
 }
