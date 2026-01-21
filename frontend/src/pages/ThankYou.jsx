@@ -59,9 +59,9 @@ export default function ThankYou() {
                 {/* SUCCESS HEADER */}
                 <div className="text-center mb-10">
                     <div className="relative inline-flex items-center justify-center mb-4">
-                        <span className="absolute inline-flex h-24 w-24 rounded-full bg-green-200 opacity-75 animate-ping"></span>
-                        <span className="relative inline-flex h-20 w-20 rounded-full bg-green-500 items-center justify-center">
-                            <CheckCircle className="text-white w-10 h-10 animate-bounce" />
+                        <span className="absolute inline-flex h-24 w-24 rounded-full bg-primary opacity-75 animate-ping"></span>
+                        <span className="relative inline-flex h-20 w-20 rounded-full bg-primary items-center justify-center">
+                            <CheckCircle className="text-white w-10 h-10" />
                         </span>
                     </div>
 
