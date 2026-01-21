@@ -9,5 +9,6 @@ router.post("/verify-payment", verifyPayment);
 router.get("/booked-dates/:propertyId", getBookedDates);
 router.get("/user", requireAuth, getUserBookings);
 router.get("/invoice/:bookingId", requireAuth, getBookingInvoice);
+router.get("/:bookingId", requireAuth, getBookingById);
 
 export default router;

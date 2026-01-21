@@ -385,3 +385,32 @@ export const getBookingInvoice = async (req, res) => {
   }
 };
 
+
+export const getBookingById = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const userId = req.user.id;
+
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      userId: userId   
+    })
+      .populate("propertyId", "propertyName city state address")
+      .populate("userId", "firstName lastName email mobile");
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found"
+      });
+    }
+
+    res.json({ success: true, data: booking });
+  } catch (err) {
+    console.error("getBookingById error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch booking"
+    });
+  }
+};
