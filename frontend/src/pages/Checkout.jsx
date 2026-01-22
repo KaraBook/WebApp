@@ -11,6 +11,17 @@ import { ArrowLeft } from "lucide-react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return isMobile;
+}
+
+
 export default function Checkout() {
     const { propertyId } = useParams();
     const navigate = useNavigate();
@@ -23,6 +34,7 @@ export default function Checkout() {
     const [blockedDates, setBlockedDates] = useState([]);
     const guestRef = useRef(null);
     const [includeMeals, setIncludeMeals] = useState(false);
+    const isMobile = useIsMobile();
 
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
@@ -324,7 +336,7 @@ export default function Checkout() {
                     <div className="flex justify-between text-sm mb-3 relative" ref={calendarRef}>
                         <div>
                             <span className="block text-gray-700 font-medium">Dates</span>
-                            <span>
+                            <span className="text-[15px] font-bold">
                                 {format(dateRange[0].startDate, "dd MMM")} – {format(dateRange[0].endDate, "dd MMM")}
                             </span>
                         </div>
@@ -340,7 +352,7 @@ export default function Checkout() {
                             <div className="absolute pl-[42px] top-10 left-0 bg-white p-3 rounded-[12px] shadow-2xl border border-gray-100 z-50">
                                 <DateRange
                                     ranges={dateRange}
-                                    months={2}
+                                    months={isMobile ? 1 : 2}
                                     direction="horizontal"
                                     showDateDisplay={false}
                                     moveRangeOnFirstSelection={false}
@@ -436,7 +448,7 @@ export default function Checkout() {
                     <div className="flex justify-between text-sm items-center relative" ref={guestRef}>
                         <div>
                             <span className="block text-gray-700 font-medium">Guests</span>
-                            <span>{totalMainGuests} guests</span>
+                            <span className="text-[15px] font-bold">{totalMainGuests} guests</span>
                         </div>
 
                         <button
