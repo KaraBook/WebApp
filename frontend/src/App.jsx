@@ -33,10 +33,10 @@ export default function App() {
   ];
 
   const isAccountRoute = location.pathname.startsWith("/account");
-const isCheckoutRoute = location.pathname.startsWith("/checkout");
+  const isCheckoutRoute = location.pathname.startsWith("/checkout");
 
-const shouldHideFooter =
-  isAccountRoute || (isMobile && isCheckoutRoute);
+  const shouldHideFooter =
+    isAccountRoute || (isMobile && isCheckoutRoute);
 
 
   useEffect(() => {

@@ -112,33 +112,43 @@ export default function BookingDetailsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange} className="z-[9999999]">
       <DialogContent
-        className="
-           fixed
-    inset-y-0
-    right-0
+  className="
+    fixed
     z-[9999999]
-    h-full
-    w-[420px]
-    max-w-[90vw]
-    p-0
-    pb-4
-    rounded-none
-    border-l
     bg-white
     shadow-xl
     overflow-y-auto
+    p-0
 
-    !translate-x-0
-    !translate-y-0
-    !left-auto
-    !top-0
+    /* ---------- MOBILE (BOTTOM DRAWER) ---------- */
+    inset-x-0
+    bottom-0
+    h-[85vh]
+    max-h-[85vh]
+    rounded-t-2xl
 
     data-[state=open]:animate-in
-    data-[state=open]:slide-in-from-right
+    data-[state=open]:slide-in-from-bottom
     data-[state=closed]:animate-out
-    data-[state=closed]:slide-out-to-right
-    duration-300"
-      >
+    data-[state=closed]:slide-out-to-bottom
+
+    /* ---------- DESKTOP (RIGHT DRAWER) ---------- */
+    md:inset-y-0
+    md:right-0
+    md:left-auto
+    md:top-0
+    md:h-full
+    md:w-[420px]
+    md:max-w-[90vw]
+    md:rounded-none
+    md:border-l
+
+    md:data-[state=open]:slide-in-from-right
+    md:data-[state=closed]:slide-out-to-right
+    duration-300
+  "
+>
+
         {/* HEADER */}
         <div className="relative px-4 pt-4 pb-3 border-b">
           <button
