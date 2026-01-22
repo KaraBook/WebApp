@@ -57,7 +57,7 @@ export default function MobileBookingCard({
   const bookingStatus = resolveBookingStatus(booking);
 
   return (
-    <div className="bg-white rounded-[14px] border shadow-sm p-4 flex flex-col gap-3">
+    <div onClick={() => onView(booking)} className="bg-white rounded-[14px] border shadow-sm p-4 flex flex-col gap-3">
       {/* HEADER */}
       <div className="flex items-start justify-between">
         <div>
@@ -87,7 +87,7 @@ export default function MobileBookingCard({
           {/* DROPDOWN */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="p-1 rounded-md hover:bg-gray-100">
+              <button onClick={(e) => e.stopPropagation()} className="p-1 rounded-md hover:bg-gray-100">
                 <MoreVertical className="w-4 h-4 text-gray-500" />
               </button>
             </DropdownMenuTrigger>
@@ -106,7 +106,10 @@ export default function MobileBookingCard({
             >
               <DropdownMenuItem
                 className="py-3 gap-3"
-                onClick={() => onView(booking)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onView(booking);
+                }}
               >
                 <Eye className="w-4 h-4" />
                 View Booking
