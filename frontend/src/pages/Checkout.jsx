@@ -605,7 +605,7 @@ export default function Checkout() {
                     <Button
                         onClick={handlePayment}
                         disabled={contact.length !== 10}
-                        className="w-full bg-primary text-white rounded-[10px] py-3 text-lg hover:bg-primary"
+                        className="w-full bg-primary text-white rounded-[10px] py-4 text-lg hover:bg-primary"
                     >
                         Pay Now
                     </Button>
@@ -719,7 +719,7 @@ export default function Checkout() {
             </div>
 
             {/* MOBILE STICKY PAY BAR */}
-            <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t shadow-lg z-[999] px-4 py-3">
+            <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t shadow-lg z-[999] px-4 py-2 md:py-3">
                 <div className="flex items-center justify-between gap-3">
                     <div>
                         <p className="text-xs text-gray-500">Total payable</p>
@@ -729,7 +729,7 @@ export default function Checkout() {
                     <Button
                         onClick={handlePayment}
                         disabled={contact.length !== 10}
-                        className="bg-primary text-white rounded-[10px] px-6 py-3 text-base"
+                        className="bg-primary text-white rounded-[10px] px-12 py-4 text-base"
                     >
                         Pay Now →
                     </Button>
