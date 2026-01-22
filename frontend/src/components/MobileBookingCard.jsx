@@ -133,7 +133,9 @@ export default function MobileBookingCard({
               )}
               <DropdownMenuItem
                 className="py-3 gap-3"
-                onClick={() => onRate(booking)}
+                onClick={(e) =>{ 
+                  e.stopPropagation();
+                  onRate(booking)}}
               >
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 Rate this Resort
@@ -141,9 +143,10 @@ export default function MobileBookingCard({
 
               <DropdownMenuItem
                 className="py-3 gap-3"
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation(e);
                   window.open(`tel:${booking.property?.contactNumber}`)
-                }
+                }}
               >
                 <Phone className="w-4 h-4" />
                 Call Resort
