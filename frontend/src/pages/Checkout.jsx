@@ -464,7 +464,7 @@ export default function Checkout() {
                         </button>
 
                         {showGuestDropdown && (
-                            <div className="absolute right-0 top-8 bg-white border rounded-[10px] shadow-xl p-4 w-[55%] z-50">
+                            <div className="absolute right-0 top-8 bg-white border rounded-[10px] shadow-xl p-4 w-[75%] md:w-[55%] z-50">
 
                                 {/* Adults */}
                                 <div className="flex justify-between items-center py-2">
