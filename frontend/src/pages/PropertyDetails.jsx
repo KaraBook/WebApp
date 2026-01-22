@@ -685,11 +685,11 @@ export default function PropertyDetails() {
 
                 {showCalendar && (
                   <div
-                    className="
-      absolute mt-3 -left-[10%] md:-left-[95%] bg-white border shadow-2xl rounded-[12px]
-      z-[999] p-4 w-[680px] max-w-[90vw] pl-[42px] right-0
-    "
-                  >
+                    className={`absolute mt-3 z-[999] bg-white border shadow-2xl rounded-[12px] p-4
+                    ${isDesktop
+                        ? "-left-[95%] w-[680px]"
+                        : "left-1/2 -translate-x-1/2 w-[95vw]"}
+                      `}>
                     <DateRange
                       ranges={dateRange}
                       months={isDesktop ? 2 : 1}
