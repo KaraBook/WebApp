@@ -171,18 +171,10 @@ export default function ThankYou() {
                 {/* ACTION BUTTONS */}
                 <div className="flex flex-wrap justify-center gap-4 mt-10">
                     <Button
-                        variant="default"
-                        className="bg-teal-600 hover:bg-teal-700"
-                        disabled
-                    >
-                        Download Invoice (coming soon)
-                    </Button>
-
-                    <Button
-                        variant="outline"
+                        className="bg-primary text-white"
                         onClick={() => navigate("/account/bookings")}
                     >
-                        <List className="w-4 h-4 mr-2" />
+                        <List className="w-4 h-4 mr-2 " />
                         View My Bookings
                     </Button>
 

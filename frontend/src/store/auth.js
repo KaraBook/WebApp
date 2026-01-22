@@ -9,7 +9,7 @@ export const useAuthStore = create(
       user: null,
       accessToken: null,
       refreshToken: null,
-      wishlist: [],  
+      wishlist: [],
 
       loginModalOpen: false,
       showAuthModal: () => set({ loginModalOpen: true }),
@@ -17,6 +17,13 @@ export const useAuthStore = create(
 
       setAuth: ({ user, accessToken, refreshToken }) => {
         set({ user, accessToken, refreshToken, loginModalOpen: false });
+      },
+
+      setTokens: ({ accessToken, refreshToken }) => {
+        set((s) => ({
+          accessToken: accessToken ?? s.accessToken,
+          refreshToken: refreshToken ?? s.refreshToken,
+        }));
       },
 
       setWishlist: (ids) => set({ wishlist: ids }),

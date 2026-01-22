@@ -7,13 +7,13 @@ const issueTokens = (user) => {
   const accessToken = jwt.sign(
     { id: user._id, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "30m" }
+    { expiresIn: "6h" }
   );
 
   const refreshToken = jwt.sign(
     { id: user._id },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "1d" }
+    { expiresIn: "30d" }
   );
 
   return { accessToken, refreshToken };
@@ -68,27 +68,35 @@ export const login = async (req, res) => {
 /* ---------------------------- REFRESH TOKEN --------------------------- */
 export const refreshToken = async (req, res) => {
   try {
-    const authHeader = req.headers.authorization || "";
-    if (!authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "No token provided" });
-    }
-    const token = authHeader.split(" ")[1];
-
+    const token = req.headers.authorization?.split(" ")[1];
     const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-    const user = await User.findById(decoded.id);
-    if (!user) return res.status(401).json({ message: "Invalid refresh token" });
 
-    const accessToken = jwt.sign(
+    const user = await User.findById(decoded.id);
+    if (!user) throw new Error();
+
+    const newAccessToken = jwt.sign(
       { id: user._id, role: user.role },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "6h" }
     );
 
-    return res.status(200).json({ message: "Token refreshed", data: { accessToken } });
-  } catch (err) {
+    const newRefreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "30d" }
+    );
+
+    return res.json({
+      data: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken, 
+      },
+    });
+  } catch {
     return res.status(403).json({ message: "Invalid refresh token" });
   }
 };
+
 
 /* ---------------------------- TRAVELLER LOGIN --------------------------- */
 export const travellerLogin = async (req, res) => {
