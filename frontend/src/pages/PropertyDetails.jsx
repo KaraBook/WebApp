@@ -639,7 +639,7 @@ export default function PropertyDetails() {
 
           {/* RIGHT BOOKING BOX */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 border rounded-[12px] shadow-xl p-6 bg-white">
+            <div className="sticky top-24 border rounded-[12px] shadow-xl p-4 md:p-6 bg-white">
 
               <div className="flex items-center justify-between">
                 <h3 className="text-3xl font-semibold text-black">
@@ -930,8 +930,10 @@ export default function PropertyDetails() {
                 Reserve →
               </Button>
 
-              <p className="text-center text-xs text-gray-500 mt-2">
-                You won’t be charged yet
+              <p className="text-left text-xs text-gray-500 mt-2">
+                <b>Note:</b> Weekday and weekend prices may vary. Final price is calculated based on selected dates.<br></br>
+                Weekdays: <b>₹{property.pricingPerNightWeekdays}</b> / night ·
+                Weekends: <b>₹{property.pricingPerNightWeekend || property.pricingPerNightWeekdays}</b> / night
               </p>
             </div>
           </div>

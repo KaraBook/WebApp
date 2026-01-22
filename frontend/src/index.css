@@ -198,16 +198,15 @@
 @media screen and (max-width:578px){
   .rdrCalendarWrapper {
     transform: scale(0.98);
+    margin-left: -5px;
   }
 }
 
-/* ================= MOBILE PROPERTY GALLERY ================= */
 
 .mobile-property-gallery {
   height: 260px;
 }
 
-/* ---------- Arrows ---------- */
 .mobile-property-gallery .swiper-button-prev,
 .mobile-property-gallery .swiper-button-next {
   width: 40px;
@@ -224,7 +223,6 @@
   color: #1f2937;
 }
 
-/* Arrow positioning (EXACT) */
 .mobile-property-gallery .swiper-button-prev {
   left: 14px;
 }
@@ -232,7 +230,6 @@
   right: 14px;
 }
 
-/* ---------- Pagination ---------- */
 .mobile-property-gallery .swiper-pagination {
   bottom: 12px !important;
 }
@@ -276,9 +273,6 @@
 .react-select__control:hover{
   border-color: #038ba0 !important;
 }
-/* ================= PDF FORCE DESKTOP ================= */
-
-/* ================= PDF DESKTOP LOCK ================= */
 
 .pdf-desktop {
   width: 794px !important; /* A4 */
@@ -290,12 +284,10 @@
   width: 100% !important;
 }
 
-/* Kill mobile responsiveness */
 .pdf-layout * {
   line-height: 1.45 !important;
 }
 
-/* ================= BILL / HEADER ================= */
 
 .pdf-layout .bill-grid {
   display: grid !important;
@@ -303,7 +295,6 @@
   gap: 32px !important;
 }
 
-/* ================= BOOKING DETAILS ================= */
 
 .pdf-layout .booking-details-grid {
   display: grid !important;
@@ -311,7 +302,6 @@
   gap: 16px !important;
 }
 
-/* ================= TABLE FIX ================= */
 
 .pdf-layout table {
   width: 100% !important;
@@ -336,7 +326,6 @@
   word-break: break-word !important;
 }
 
-/* ================= PAYMENT INFO ================= */
 
 .pdf-layout .payment-grid {
   display: grid !important;
@@ -345,7 +334,6 @@
   gap: 24px !important;
 }
 
-/* Disable overflow containers */
 .pdf-layout .overflow-x-auto {
   overflow: visible !important;
 }
