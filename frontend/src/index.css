@@ -22,7 +22,7 @@
     --popover-foreground: 240 10% 3.9%;
     --primary: 188 96% 32%;
     --primary-foreground: 0 0% 100%;
-    --primary-from: 187 78% 46%; 
+    --primary-from: 187 78% 46%;
     --primary-to: 196 84% 35%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -42,6 +42,7 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem
   }
+
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
@@ -73,11 +74,9 @@
 
 @layer utilities {
   .bg-primary-gradient {
-    background: linear-gradient(
-      180deg,
-      hsl(var(--primary-from)) 0%,
-      hsl(var(--primary-to)) 100%
-    );
+    background: linear-gradient(180deg,
+        hsl(var(--primary-from)) 0%,
+        hsl(var(--primary-to)) 100%);
   }
 }
 
@@ -86,6 +85,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     @apply font-sans;
@@ -95,20 +95,28 @@
 
 
 .rdrDays button {
-  color: black!important;
+  color: black !important;
 }
-.rdrInRange, .rdrStartEdge, .rdrEndEdge {
-  background-color: #00000000!important;   
+
+.rdrInRange,
+.rdrStartEdge,
+.rdrEndEdge {
+  background-color: #00000000 !important;
 }
-.rdrStartEdge, .rdrEndEdge {
+
+.rdrStartEdge,
+.rdrEndEdge {
   background-color: #04929f !important;
 }
+
 .rdrInRange {
-  background: rgba(4, 146, 159, 0.18) !important; 
+  background: rgba(4, 146, 159, 0.18) !important;
 }
-.rdrMonths{
-  margin-left:-32px;
+
+.rdrMonths {
+  margin-left: -32px;
 }
+
 .break-inside-avoid {
   break-inside: avoid-column;
 }
@@ -117,6 +125,7 @@
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -127,19 +136,19 @@
 }
 
 
-.css-26l3qy-menu,      
-.css-1nmdiq5-menu,     
-.css-14el2xx-menu {    
-    z-index: 999999 !important;
+.css-26l3qy-menu,
+.css-1nmdiq5-menu,
+.css-14el2xx-menu {
+  z-index: 999999 !important;
 }
 
 .css-b62m3t-container {
-    position: relative !important;
-    z-index: 99999 !important;
+  position: relative !important;
+  z-index: 99999 !important;
 }
 
 .react-select__menu-portal {
-    z-index: 999999 !important;
+  z-index: 999999 !important;
 }
 
 
@@ -147,9 +156,11 @@
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-14px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -172,13 +183,14 @@
 }
 
 .rdrCalendarWrapper {
-    transform: none;
-  }
+  transform: none;
+}
 
 @keyframes scroll-left {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-50%);
   }
@@ -195,7 +207,12 @@
 }
 
 
-@media screen and (max-width:578px){
+.rdrCalendarWrapper {
+  margin-left: 40px;
+}
+
+
+@media screen and (max-width:578px) {
   .rdrCalendarWrapper {
     transform: scale(0.98);
     margin-left: 25px;
@@ -226,6 +243,7 @@
 .mobile-property-gallery .swiper-button-prev {
   left: 14px;
 }
+
 .mobile-property-gallery .swiper-button-next {
   right: 14px;
 }
@@ -248,20 +266,24 @@
   width: 20px;
   background: #ffffff;
 }
-.swiper-navigation-icon{
+
+.swiper-navigation-icon {
   color: #000;
 }
-.swiper-button-next svg{
-  width : 8px;
-}
-.swiper-button-prev svg{
-  width : 8px;
+
+.swiper-button-next svg {
+  width: 8px;
 }
 
-.lucide-x{
+.swiper-button-prev svg {
+  width: 8px;
+}
+
+.lucide-x {
   display: none;
 }
-.swiper-pagination-bullet-active{
+
+.swiper-pagination-bullet-active {
   background: #038ba0 !important;
 }
 
@@ -270,12 +292,13 @@
   font-size: 38px;
 }
 
-.react-select__control:hover{
+.react-select__control:hover {
   border-color: #038ba0 !important;
 }
 
 .pdf-desktop {
-  width: 794px !important; /* A4 */
+  width: 794px !important;
+  /* A4 */
   max-width: 794px !important;
   font-size: 14px;
 }
@@ -315,11 +338,25 @@
   vertical-align: middle !important;
 }
 
-.pdf-layout colgroup col:nth-child(1) { width: 6% !important; }
-.pdf-layout colgroup col:nth-child(2) { width: 44% !important; }
-.pdf-layout colgroup col:nth-child(3) { width: 12% !important; }
-.pdf-layout colgroup col:nth-child(4) { width: 18% !important; }
-.pdf-layout colgroup col:nth-child(5) { width: 20% !important; }
+.pdf-layout colgroup col:nth-child(1) {
+  width: 6% !important;
+}
+
+.pdf-layout colgroup col:nth-child(2) {
+  width: 44% !important;
+}
+
+.pdf-layout colgroup col:nth-child(3) {
+  width: 12% !important;
+}
+
+.pdf-layout colgroup col:nth-child(4) {
+  width: 18% !important;
+}
+
+.pdf-layout colgroup col:nth-child(5) {
+  width: 20% !important;
+}
 
 .pdf-layout td:nth-child(2) {
   white-space: normal !important;
