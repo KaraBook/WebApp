@@ -316,7 +316,7 @@ export default function Checkout() {
 
 
     return (
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-4 py-10 pb-28 md:pb-10">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-0 md:gap-10 px-4 py-10 pb-28 md:pb-10">
             {/* LEFT SECTION */}
             <div>
                 <button
@@ -729,7 +729,7 @@ export default function Checkout() {
                     <Button
                         onClick={handlePayment}
                         disabled={contact.length !== 10}
-                        className="bg-primary text-white rounded-[10px] px-12 py-6 text-base"
+                        className="bg-primary text-white h-12 rounded-[10px] px-12 py-6 text-base"
                     >
                         Pay Now →
                     </Button>
