@@ -12,13 +12,13 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-  return isMobile;
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
+    return isMobile;
 }
 
 
@@ -349,7 +349,12 @@ export default function Checkout() {
                         </button>
 
                         {showCalendar && (
-                            <div className="absolute pl-[42px] top-10 left-0 bg-white p-3 rounded-[12px] shadow-2xl border border-gray-100 z-50">
+                            <div
+                                className={`absolute top-10 z-50 bg-white p-3 rounded-[12px] shadow-2xl border border-gray-100
+                                 ${isMobile
+                                        ? "left-1/2 -translate-x-1/2 w-[95vw]"
+                                        : "left-0"}
+                                `}>
                                 <DateRange
                                     ranges={dateRange}
                                     months={isMobile ? 1 : 2}
