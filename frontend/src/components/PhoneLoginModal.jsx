@@ -4,13 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -32,7 +26,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
   const [timer, setTimer] = useState(0);
   const timerRef = useRef(null);
 
-  /* ================= RESET ON CLOSE ================= */
   useEffect(() => {
     if (!open) {
       setStep("phone");
@@ -49,7 +42,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
     } catch { }
   }, [open]);
 
-  /* ================= TIMER ================= */
   useEffect(() => {
     if (timer <= 0) {
       clearInterval(timerRef.current);
@@ -63,20 +55,18 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
     return () => clearInterval(timerRef.current);
   }, [timer]);
 
-  /* ================= SEND OTP ================= */
+
   const sendOtp = async () => {
     if (phone.length !== 10) return;
 
     setSending(true);
     try {
-      // 🔐 PRECHECK (via SummaryApi)
       await axios({
         method: SummaryApi.travellerPrecheck.method,
         url: baseURL + SummaryApi.travellerPrecheck.url,
         data: { mobile: phone },
       });
 
-      // 🔐 ONLY IF ALLOWED → SEND OTP
       await auth.signOut().catch(() => { });
       const verifier = window.recaptchaVerifier || buildRecaptcha();
 
@@ -101,7 +91,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
   };
 
 
-  /* ================= VERIFY OTP ================= */
   const verifyOtp = async (code = otp) => {
     if (!confirmResult || code.length !== 6) return;
 
@@ -143,7 +132,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
     }
   };
 
-  /* ================= AUTO VERIFY WHEN 6 DIGITS ================= */
   useEffect(() => {
     if (otp.length === 6 && !verifying) {
       verifyOtp(otp);
@@ -231,7 +219,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
                   onChange={(e) =>
                     setOtp(e.target.value.replace(/\D/g, ""))
                   }
-                  className="rounded-[14px] text-center tracking-[6px]"
+                  className="rounded-[14px] p-6 text-center tracking-[6px]"
                 />
               </div>
 
