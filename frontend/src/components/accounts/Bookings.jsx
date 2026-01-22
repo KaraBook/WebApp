@@ -173,7 +173,8 @@ export default function Bookings() {
                   return (
                     <tr
                       key={b._id}
-                      className="hover:bg-gray-50 border-b border-gray-200"
+                      className="hover:bg-gray-50 border-b border-gray-200 cursor-pointer"
+                      onClick={() => setSelectedBooking(b)}
                     >
                       <td className="px-4 py-3 font-medium uppercase text-[#233b19]">
                         #{b._id.slice(-5)}
