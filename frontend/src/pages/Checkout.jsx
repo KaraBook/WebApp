@@ -729,7 +729,7 @@ export default function Checkout() {
                     <Button
                         onClick={handlePayment}
                         disabled={contact.length !== 10}
-                        className="bg-primary text-white rounded-[10px] px-12 py-4 text-base"
+                        className="bg-primary text-white rounded-[10px] px-12 py-6 text-base"
                     >
                         Pay Now →
                     </Button>
