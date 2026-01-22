@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/auth";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";   
+import Footer from "@/components/Footer";
 import PhoneLoginModal from "@/components/PhoneLoginModal";
 import AppRoutes from "@/routes";
 import ScrollToTop from "./components/ScrollToTop";
@@ -13,8 +13,15 @@ import MobileAccountBottomNav from "./components/accounts/MobileAccountBottomNav
 export default function App() {
   const { init, loginModalOpen, showAuthModal, hideAuthModal } = useAuthStore();
   const location = useLocation();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-   const hideFooterRoutes = [
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const hideFooterRoutes = [
     "/checkout",
     "/account/dashboard",
     "/account/bookings",
@@ -26,32 +33,32 @@ export default function App() {
   ];
 
   const shouldHideFooter =
-  hideFooterRoutes.some((route) => {
-    if (route === "/checkout") {
-      return location.pathname.startsWith("/checkout");
-    }
-    if (route.includes(":id")) {
-      return location.pathname.startsWith(route.replace("/:id", ""));
-    }
-    return location.pathname === route;
-  });
-
-
-useEffect(() => {
-  const run = () => {
-    init().finally(() => {
-      const { user } = useAuthStore.getState();
-      const alreadyShown = localStorage.getItem("loginPromptShown");
-      if (!user && !alreadyShown) {
-        showAuthModal();
-        localStorage.setItem("loginPromptShown", "true");
+    isMobile &&
+    hideFooterRoutes.some((route) => {
+      if (route === "/checkout") {
+        return location.pathname.startsWith("/checkout");
       }
+      if (route.includes(":id")) {
+        return location.pathname.startsWith(route.replace("/:id", ""));
+      }
+      return location.pathname === route;
     });
-  };
-  const unsub = useAuthStore.persist?.onFinishHydration?.(() => run()) || null;
-  run();
-  return () => unsub?.();
-}, []);
+
+  useEffect(() => {
+    const run = () => {
+      init().finally(() => {
+        const { user } = useAuthStore.getState();
+        const alreadyShown = localStorage.getItem("loginPromptShown");
+        if (!user && !alreadyShown) {
+          showAuthModal();
+          localStorage.setItem("loginPromptShown", "true");
+        }
+      });
+    };
+    const unsub = useAuthStore.persist?.onFinishHydration?.(() => run()) || null;
+    run();
+    return () => unsub?.();
+  }, []);
 
 
   return (
@@ -67,7 +74,7 @@ useEffect(() => {
 
       <MobileAccountBottomNav />
 
-      <PhoneLoginModal 
+      <PhoneLoginModal
         open={loginModalOpen}
         onOpenChange={(o) => (o ? showAuthModal() : hideAuthModal())}
       />
