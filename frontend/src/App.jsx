@@ -15,6 +15,7 @@ export default function App() {
   const location = useLocation();
 
    const hideFooterRoutes = [
+    "/checkout",
     "/account/dashboard",
     "/account/bookings",
     "/account/wishlist",
@@ -26,6 +27,9 @@ export default function App() {
 
   const shouldHideFooter =
   hideFooterRoutes.some((route) => {
+    if (route === "/checkout") {
+      return location.pathname.startsWith("/checkout");
+    }
     if (route.includes(":id")) {
       return location.pathname.startsWith(route.replace("/:id", ""));
     }

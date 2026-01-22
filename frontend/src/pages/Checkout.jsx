@@ -316,7 +316,7 @@ export default function Checkout() {
 
 
     return (
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-4 py-10">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 px-4 py-10 pb-28 md:pb-10">
             {/* LEFT SECTION */}
             <div>
                 <button
@@ -601,18 +601,20 @@ export default function Checkout() {
                     </p>
                 </div>
 
-                <Button
-                    onClick={handlePayment}
-                    disabled={contact.length !== 10}
-                    className="w-full bg-primary text-white rounded-[10px] py-3 text-lg hover:bg-primary"
-                >
-                    Pay Now
-                </Button>
+                <div className="hidden md:block">
+                    <Button
+                        onClick={handlePayment}
+                        disabled={contact.length !== 10}
+                        className="w-full bg-primary text-white rounded-[10px] py-3 text-lg hover:bg-primary"
+                    >
+                        Pay Now
+                    </Button>
+                </div>
             </div>
 
             {/* RIGHT SECTION */}
             <div>
-                <div className="border rounded-[12px] mt-[120px] p-5 shadow-sm space-y-4">
+                <div className="border rounded-[12px] mt-[0px] md:mt-[120px] p-5 shadow-sm space-y-4">
 
                     {/* Property */}
                     <div className="flex gap-3">
@@ -715,6 +717,27 @@ export default function Checkout() {
                     </div>
                 </div>
             </div>
+
+            {/* MOBILE STICKY PAY BAR */}
+            <div className="md:hidden fixed bottom-0 left-0 w-full bg-white border-t shadow-lg z-[999] px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                    <div>
+                        <p className="text-xs text-gray-500">Total payable</p>
+                        <p className="text-lg font-bold">₹{total.toLocaleString()}</p>
+                    </div>
+
+                    <Button
+                        onClick={handlePayment}
+                        disabled={contact.length !== 10}
+                        className="bg-primary text-white rounded-[10px] px-6 py-3 text-base"
+                    >
+                        Pay Now →
+                    </Button>
+                </div>
+            </div>
+
         </div>
+
+
     );
 }
