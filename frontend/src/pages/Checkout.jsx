@@ -350,7 +350,7 @@ export default function Checkout() {
 
                         {showCalendar && (
                             <div
-                                className={`absolute top-10 z-50 bg-white p-3 rounded-[12px] shadow-2xl border border-gray-100
+                                className={`absolute top-10 z-50 bg-white p-3 rounded-[12px] shadow-2xl border border-gray-100 flex items-center justify-center
                                  ${isMobile
                                         ? "left-1/2 -translate-x-1/2 w-[95vw]"
                                         : "left-0"}
