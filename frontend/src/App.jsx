@@ -32,17 +32,12 @@ export default function App() {
     "/account/invoice/:id",
   ];
 
-  const shouldHideFooter =
-    isMobile &&
-    hideFooterRoutes.some((route) => {
-      if (route === "/checkout") {
-        return location.pathname.startsWith("/checkout");
-      }
-      if (route.includes(":id")) {
-        return location.pathname.startsWith(route.replace("/:id", ""));
-      }
-      return location.pathname === route;
-    });
+  const isAccountRoute = location.pathname.startsWith("/account");
+const isCheckoutRoute = location.pathname.startsWith("/checkout");
+
+const shouldHideFooter =
+  isAccountRoute || (isMobile && isCheckoutRoute);
+
 
   useEffect(() => {
     const run = () => {
