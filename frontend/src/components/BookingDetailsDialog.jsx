@@ -114,25 +114,32 @@ export default function BookingDetailsDialog({
       <DialogContent
   className="
     fixed
+    inset-0
     z-[9999999]
     bg-white
     shadow-xl
-    overflow-y-auto
     p-0
+    overflow-y-auto
 
-    /* ---------- MOBILE (BOTTOM DRAWER) ---------- */
-    inset-x-0
-    bottom-0
-    h-[85vh]
-    max-h-[85vh]
-    rounded-t-2xl
+    /* Kill Radix centering */
+    !translate-x-0
+    !translate-y-0
+    !left-0
+    !top-0
+
+    /* ---------- MOBILE: TRUE BOTTOM SHEET ---------- */
+    md:inset-auto
+    h-[88vh]
+    mt-auto
+    rounded-t-3xl
 
     data-[state=open]:animate-in
     data-[state=open]:slide-in-from-bottom
     data-[state=closed]:animate-out
     data-[state=closed]:slide-out-to-bottom
 
-    /* ---------- DESKTOP (RIGHT DRAWER) ---------- */
+    /* ---------- DESKTOP: RIGHT DRAWER ---------- */
+    md:fixed
     md:inset-y-0
     md:right-0
     md:left-auto
@@ -149,7 +156,10 @@ export default function BookingDetailsDialog({
   "
 >
 
-        {/* HEADER */}
+        <div className="md:hidden flex justify-center pt-2 pb-1">
+          <div className="w-10 h-1.5 rounded-full bg-gray-300" />
+        </div>
+        { }
         <div className="relative px-4 pt-4 pb-3 border-b">
           <button
             onClick={() => onOpenChange(false)}
