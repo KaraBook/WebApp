@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Review from "../models/Review.js";
 import Property from "../models/Property.js";
 import Booking from "../models/Booking.js";
