@@ -43,7 +43,7 @@ export default function RateBookingDialog({ open, booking, onClose }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()} modal={false}>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md md:-top-[65vh] -top-[150vh] p-6 z-[9999999] rounded-[14px] relative">
 
         {/* CLOSE BUTTON */}
