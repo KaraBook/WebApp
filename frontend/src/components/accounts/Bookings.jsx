@@ -337,20 +337,30 @@ export default function Bookings() {
                                 </div>
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (b.paymentStatus !== "paid") {
-                                  toast.error("You can rate only after payment is completed.");
-                                  return;
-                                }
-                                setRatingBooking(b);
-                              }}
-                            >
-                              <div className="flex items-center gap-2">
-                                <Star size={16} className="text-yellow-500 fill-yellow-500" /> Rate this Resort
-                              </div>
-                            </DropdownMenuItem>
+                            {b.hasReview ? (
+                              <DropdownMenuItem disabled className="text-green-600">
+                                <div className="flex items-center gap-2">
+                                  <Star size={16} className="fill-green-600 text-green-600" />
+                                  Review submitted
+                                </div>
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (b.paymentStatus !== "paid") {
+                                    toast.error("You can rate only after payment is completed.");
+                                    return;
+                                  }
+                                  setRatingBooking(b);
+                                }}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Star size={16} className="text-yellow-500 fill-yellow-500" />
+                                  Rate this Resort
+                                </div>
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               onClick={(e) => {
                                 e.stopPropagation();

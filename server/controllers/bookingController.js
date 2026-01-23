@@ -7,6 +7,7 @@ import Property from "../models/Property.js";
 import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
 import { computePricing } from "../utils/pricing.js";
+import Review from "../models/Review.js";
 
 
 const razorpay = new Razorpay({
@@ -289,12 +290,26 @@ export const getUserBookings = async (req, res) => {
     const bookings = await Booking.find({ userId })
       .populate("propertyId", "propertyName city state coverImage contactNumber")
       .populate("userId", "firstName lastName email mobile")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean(); 
+
+    const bookingIds = bookings.map(b => b._id);
+
+    const reviews = await Review.find({
+      userId,
+      bookingId: { $in: bookingIds }
+    }).select("bookingId");
+
+    const reviewedMap = {};
+    reviews.forEach(r => {
+      reviewedMap[r.bookingId.toString()] = true;
+    });
 
     const formatted = bookings.map((b) => ({
-      ...b._doc,
+      ...b,
       property: b.propertyId,
       user: b.userId,
+      hasReview: !!reviewedMap[b._id.toString()], 
     }));
 
     res.json({ success: true, data: formatted });
