@@ -129,7 +129,23 @@ export default function OwnerBookings() {
     );
 
     if (paymentFilter !== "all") {
-      data = data.filter((b) => b.paymentStatus === paymentFilter);
+      data = data.filter((b) => {
+        const s = b.paymentStatus;
+
+        if (paymentFilter === "confirmed") {
+          return s === "paid";
+        }
+
+        if (paymentFilter === "pending") {
+          return ["pending", "initiated", "failed"].includes(s);
+        }
+
+        if (paymentFilter === "cancelled") {
+          return s === "cancelled";
+        }
+
+        return true;
+      });
     }
 
     setFiltered(data);
@@ -278,10 +294,10 @@ export default function OwnerBookings() {
                 <SelectValue placeholder="Payment" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Payment: All</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
           </div>
