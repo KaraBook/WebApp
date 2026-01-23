@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { sendOtp } from "/firebase";
+import { sendOtp as firebaseSendOtp } from "/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
@@ -40,7 +40,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
   }, [timer]);
 
 
-  const sendOtp = async () => {
+ const handleSendOtp = async () => {
     if (phone.length !== 10) return;
 
     setSending(true);
@@ -51,7 +51,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         data: { mobile: phone },
       });
 
-      const confirmation = await sendOtp(`+91${phone}`);
+      const confirmation = await firebaseSendOtp(`+91${phone}`);
 
       setConfirmResult(confirmation);
       setStep("otp");
@@ -173,7 +173,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
               <Button
                 className="w-full py-5 rounded-[14px] bg-primary text-white"
                 disabled={phone.length !== 10 || sending}
-                onClick={sendOtp}
+                onClick={handleSendOtp}
               >
                 {sending ? "Sending OTP..." : "Continue →"}
               </Button>
@@ -205,7 +205,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
                   <span>Resend OTP in {timer}s</span>
                 ) : (
                   <button
-                    onClick={sendOtp}
+                    onClick={handleSendOtp}
                     className="text-primary font-medium"
                   >
                     Resend OTP

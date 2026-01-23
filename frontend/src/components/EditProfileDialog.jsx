@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import Axios from "@/utils/Axios"; 
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { toast } from "sonner";
-import { sendOtp } from "/firebase";
+import { sendOtp as firebaseSendOtp } from "/firebase";
 import {
     Select,
     SelectContent,
@@ -68,7 +68,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
     }, [timer]);
 
     /* ================= SEND OTP ================= */
-    const sendOtp = async () => {
+    const handleSendOtp = async () => {
         if (mobile.length !== 10) return;
 
         setSending(true);
@@ -78,7 +78,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                 { mobile }
             );
 
-           const confirmation = await sendOtp(`+91${mobile}`);
+           const confirmation = await firebaseSendOtp(`+91${mobile}`);
 
             setConfirmResult(confirmation);
             setTimer(60);
@@ -238,13 +238,13 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
                                 <div className="text-sm text-gray-600">
                                     {timer > 0 ? `Resend OTP in ${timer}s` : (
-                                        <button className="underline" onClick={sendOtp}>Resend OTP</button>
+                                        <button className="underline" onClick={handleSendOtp}>Resend OTP</button>
                                     )}
                                 </div>
 
                                 <div className="flex gap-2">
                                     {!confirmResult ? (
-                                        <Button size="sm" onClick={sendOtp} disabled={sending || mobile.length !== 10}>
+                                        <Button size="sm" onClick={handleSendOtp} disabled={sending || mobile.length !== 10}>
                                             {sending ? "Sending..." : "Send OTP"}
                                         </Button>
                                     ) : (
