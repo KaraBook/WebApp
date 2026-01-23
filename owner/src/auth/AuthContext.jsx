@@ -22,15 +22,8 @@ export function AuthProvider({ children }) {
     }
 
     const access = localStorage.getItem("owner_access");
-    const expiry = parseInt(localStorage.getItem("owner_access_expiry"), 10);
 
-    if (!access || !expiry) {
-      setReady(true);
-      return;
-    }
-
-    if (Date.now() > expiry) {
-      logout();
+    if (!access) {
       setReady(true);
       return;
     }
@@ -46,7 +39,8 @@ export function AuthProvider({ children }) {
 
         if (possibleUser) setUser(possibleUser);
       } catch (err) {
-        logout(false);
+        // Only logout if refresh also fails (handled by axios interceptor)
+        setUser(null);
       } finally {
         setReady(true);
       }
@@ -54,15 +48,9 @@ export function AuthProvider({ children }) {
   }, [isAuthPage]);
 
   const loginWithTokens = (payload) => {
-    const now = Date.now();
-    const accessExpiry = now + 30 * 60 * 1000;
-    const refreshExpiry = now + 24 * 60 * 60 * 1000;
-
     localStorage.setItem("owner_access", payload.accessToken);
     localStorage.setItem("owner_refresh", payload.refreshToken);
     localStorage.setItem("owner_user", JSON.stringify(payload.user));
-    localStorage.setItem("owner_access_expiry", accessExpiry);
-    localStorage.setItem("owner_refresh_expiry", refreshExpiry);
 
     setUser(payload.user);
     setReady(true);
@@ -76,7 +64,7 @@ export function AuthProvider({ children }) {
     if (
       redirect &&
       !location.pathname.startsWith("/owner/login") &&
-      !location.pathname.startsWith("/owner/login")
+      !location.pathname.startsWith("/manager/login")
     ) {
       window.location.href = "/owner/login";
     }
