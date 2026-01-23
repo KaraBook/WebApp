@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { useAuthStore } from "@/store/auth";
-import { Phone, MoreVertical, Download, FileDown, Eye, Star, PhoneCall, XCircle } from "lucide-react";
+import { Phone, MoreVertical, Download, FileDown, Eye, Star, PhoneCall, XCircle, ChevronDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -119,14 +119,18 @@ export default function Bookings() {
         </h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="border w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center gap-2">
-            {statusFilter === "all"
-              ? "All"
-              : statusFilter === "confirmed"
-                ? "Confirmed"
-                : statusFilter === "pending"
-                  ? "Pending"
-                  : "Cancelled"}
+          <DropdownMenuTrigger className="border w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center justify-between">
+            <span>
+              {statusFilter === "all"
+                ? "All"
+                : statusFilter === "confirmed"
+                  ? "Confirmed"
+                  : statusFilter === "pending"
+                    ? "Pending"
+                    : "Cancelled"}
+            </span>
+
+            <ChevronDown className="w-4 h-4 text-gray-500" />
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-[180px]" align="end">
