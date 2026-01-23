@@ -22,7 +22,6 @@ import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import { Link, useNavigate } from "react-router-dom";
 import MobileBookingsList from "@/components/MobileBookingList";
 
-/* -------------------- Pagination (matches your screenshot) -------------------- */
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
 
@@ -86,7 +85,6 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
   );
 }
 
-/* -------------------- Stat Card -------------------- */
 function StatCard({
   icon: Icon,
   label,
@@ -134,19 +132,23 @@ function StatCard({
 }
 
 
-/* -------------------- Payment Chip -------------------- */
 function PaymentChip({ status }) {
+  const s = normalizePaymentStatus(status);
   const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
   const map = {
-    paid: `${base} bg-emerald-50 text-emerald-700`,
+    confirmed: `${base} bg-emerald-50 text-emerald-700`,
     pending: `${base} bg-amber-50 text-amber-700`,
-    initiated: `${base} bg-gray-100 text-gray-600`,
-    failed: `${base} bg-red-50 text-red-600`,
+    cancelled: `${base} bg-gray-100 text-gray-600`,
   };
-  return <span className={map[status] || base}>{status}</span>;
+  return <span className={map[s]}>{s}</span>;
 }
 
-
+const normalizePaymentStatus = (status) => {
+  if (["paid", "confirmed"].includes(status)) return "confirmed";
+  if (["pending", "initiated", "failed"].includes(status)) return "pending";
+  if (status === "cancelled") return "cancelled";
+  return "pending";
+};
 
 
 export default function Dashboard() {
@@ -155,6 +157,8 @@ export default function Dashboard() {
 
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [openBookingDialog, setOpenBookingDialog] = useState(false);
+
+  const displayStatus = normalizePaymentStatus(paymentStatus);
 
   const [data, setData] = useState(null);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
@@ -345,7 +349,7 @@ export default function Dashboard() {
             caption="Ready to check-in"
             iconBg="bg-emerald-50"
             iconColor="text-emerald-600"
-            onClick={() => navigate("/bookings?status=paid")}
+            onClick={() => navigate("/bookings?status=confirmed")}
           />
 
           {/* PENDING */}
@@ -487,7 +491,9 @@ export default function Dashboard() {
                         </td>
 
                         <td className="py-3 px-4 sm:px-6">
-                          <PaymentChip status={b.paymentStatus} />
+                          <span className="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
+                            {displayStatus}
+                          </span>
                         </td>
 
                         <td className="py-3 px-4 sm:px-6">
