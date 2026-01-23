@@ -133,7 +133,7 @@ export default function BookingDetailsDialog({
       open={open}
       onClose={() => onOpenChange(false)}
     >
-      <div className="max-h-[85vh] overflow-y-auto">
+      <div className="max-h-[75vh] overflow-y-auto">
 
         {/* HEADER */}
         <div className="relative px-4 pt-4 pb-3 border-b">
