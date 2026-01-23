@@ -2,7 +2,7 @@ export function propertyCreatedTemplate({
   ownerFirstName,
   propertyName,
   createdNewUser,
-  tempPassword,         
+  tempPassword,
   portalUrl,
 }) {
   const greeting = ownerFirstName ? `Hi ${ownerFirstName},` : "Hi,";
@@ -52,15 +52,21 @@ export function bookingConfirmationTemplate({
   propertyName,
   checkIn,
   checkOut,
-  totalAmount,
   bookingId,
   nights,
   guests,
+  subtotal,
+  taxAmount,
+  grandTotal,
+  paymentMethod,
+  orderId,
   portalUrl
 }) {
   const formattedCheckIn = new Date(checkIn).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
   const formattedCheckOut = new Date(checkOut).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-  const formattedAmount = `₹${Number(totalAmount).toLocaleString("en-IN")}`;
+  const formattedSubtotal = `₹${Number(subtotal).toLocaleString("en-IN")}`;
+  const formattedTax = `₹${Number(taxAmount).toLocaleString("en-IN")}`;
+  const formattedTotal = `₹${Number(grandTotal).toLocaleString("en-IN")}`;
 
   return {
     subject: `Booking Confirmed – ${propertyName}`,
@@ -79,7 +85,18 @@ export function bookingConfirmationTemplate({
               <tr><td style="padding:6px 0;"><strong>Check-out:</strong></td><td>${formattedCheckOut}</td></tr>
               <tr><td style="padding:6px 0;"><strong>Nights:</strong></td><td>${nights}</td></tr>
               <tr><td style="padding:6px 0;"><strong>Guests:</strong></td><td>${guests}</td></tr>
-              <tr><td style="padding:6px 0;"><strong>Total Amount:</strong></td><td>${formattedAmount}</td></tr>
+              <tr><td><strong>Subtotal:</strong></td><td>${formattedSubtotal}</td></tr>
+<tr><td><strong>Tax (10%):</strong></td><td>${formattedTax}</td></tr>
+<tr>
+  <td style="border-top:1px solid #eee;padding-top:8px">
+    <strong>Total Paid:</strong>
+  </td>
+  <td style="border-top:1px solid #eee;padding-top:8px">
+    <strong>${formattedTotal}</strong>
+  </td>
+</tr>
+<tr><td><strong>Payment Method:</strong></td><td>${paymentMethod}</td></tr>
+<tr><td><strong>Order ID:</strong></td><td>${orderId}</td></tr>
               <tr><td style="padding:6px 0;"><strong>Booking ID:</strong></td><td>${bookingId}</td></tr>
             </table>
 

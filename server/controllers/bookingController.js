@@ -6,7 +6,9 @@ import { bookingConfirmationTemplate } from "../utils/emailTemplates.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
+import { computePricing } from "../utils/pricing.js";
 
+const pricing = computePricing(booking, booking.propertyId);
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -210,6 +212,7 @@ export const verifyPayment = async (req, res) => {
     console.log("✅ Payment verified for:", booking._id);
 
     if (booking.userId?.email) {
+      const pricing = computePricing(booking, booking.propertyId);
       const mailData = bookingConfirmationTemplate({
         travellerName: `${booking.userId.firstName} ${booking.userId.lastName}`,
         propertyName: booking.propertyId.propertyName,
@@ -217,7 +220,11 @@ export const verifyPayment = async (req, res) => {
         checkOut: booking.checkOut,
         nights: booking.totalNights,
         guests: booking.guests,
-        totalAmount: booking.totalAmount,
+        subtotal: pricing.subtotal,
+        taxAmount: pricing.tax,
+        grandTotal: pricing.grandTotal,
+        paymentMethod: booking.paymentMethod,
+        orderId: booking.orderId,
         bookingId: booking._id,
         portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
       });
@@ -337,9 +344,11 @@ export const getBookingInvoice = async (req, res) => {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
-    const subtotal = Number(booking.totalAmount);
-    const taxAmount = Number(booking.taxAmount ?? Math.round(subtotal * 0.10));
-    const grandTotal = Number(booking.grandTotal ?? subtotal + taxAmount);
+    const pricing = computePricing(booking, booking.propertyId);
+
+    const subtotal = pricing.subtotal;
+    const taxAmount = pricing.tax;
+    const grandTotal = pricing.grandTotal;
     const perNight = Math.floor(subtotal / booking.totalNights);
 
     const invoiceData = {
