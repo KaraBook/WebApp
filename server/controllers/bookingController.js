@@ -8,7 +8,6 @@ import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
 import { computePricing } from "../utils/pricing.js";
 
-const pricing = computePricing(booking, booking.propertyId);
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -220,11 +219,7 @@ export const verifyPayment = async (req, res) => {
         checkOut: booking.checkOut,
         nights: booking.totalNights,
         guests: booking.guests,
-        subtotal: pricing.subtotal,
-        taxAmount: pricing.tax,
-        grandTotal: pricing.grandTotal,
-        paymentMethod: booking.paymentMethod,
-        orderId: booking.orderId,
+        totalAmount: pricing.grandTotal,
         bookingId: booking._id,
         portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
       });
