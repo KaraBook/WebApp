@@ -178,9 +178,13 @@ export default function Dashboard() {
       try {
         const res = await api.get(SummaryApi.getOwnerDashboard.url);
 
-        const sorted = [...(res.data?.data?.bookings || [])].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        const now = new Date();
+        const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        const sorted = (res.data?.data?.bookings || [])
+          .filter(b => new Date(b.checkIn) >= startOfCurrentMonth)
+
+          .sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 
         setData({ ...res.data.data, bookings: sorted });
       } catch {
@@ -200,7 +204,7 @@ export default function Dashboard() {
           setPropertyName(firstProperty.propertyName);
         }
       } catch {
-       
+
       }
     })();
   }, []);
