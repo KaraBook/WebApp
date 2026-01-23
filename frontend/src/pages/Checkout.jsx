@@ -221,9 +221,16 @@ export default function Checkout() {
             return;
         }
 
-        if (includeMeals && totalMealsSelected !== totalGuests) {
-            toast.error("Meal selection must match total guests");
-            return;
+        if (includeMeals) {
+            if (totalMealsSelected < 1) {
+                toast.error("Select at least 1 meal");
+                return;
+            }
+
+            if (totalMealsSelected > totalGuests) {
+                toast.error("Meal count cannot exceed total guests");
+                return;
+            }
         }
 
         try {
@@ -580,7 +587,7 @@ export default function Checkout() {
                             />
 
                             <p className="text-xs text-gray-500">
-                                Total meals selected: {totalMealsSelected} / {totalGuests}
+                                Select meals for 1 to {totalGuests} guests
                             </p>
                         </div>
                     )}

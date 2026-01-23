@@ -72,10 +72,17 @@ export const createOrder = async (req, res) => {
         Number(meals.veg || 0) +
         Number(meals.nonVeg || 0);
 
-      if (totalMeals !== totalGuests) {
+      if (totalMeals < 1) {
         return res.status(400).json({
           success: false,
-          message: "Meal count must match total guests",
+          message: "Select at least 1 meal",
+        });
+      }
+
+      if (totalMeals > totalGuests) {
+        return res.status(400).json({
+          success: false,
+          message: "Meal count cannot exceed total guests",
         });
       }
     }
@@ -141,12 +148,12 @@ export const createOrder = async (req, res) => {
       checkOut,
       guests: { adults, children },
       meals: meals
-  ? {
-      includeMeals: true,
-      veg: meals.veg,
-      nonVeg: meals.nonVeg,
-    }
-  : { includeMeals: false },
+        ? {
+          includeMeals: true,
+          veg: meals.veg,
+          nonVeg: meals.nonVeg,
+        }
+        : { includeMeals: false },
       totalNights,
       totalAmount: baseTotal,
       taxAmount,
@@ -395,7 +402,7 @@ export const getBookingById = async (req, res) => {
 
     const booking = await Booking.findOne({
       _id: bookingId,
-      userId: userId   
+      userId: userId
     })
       .populate("propertyId", "propertyName city state address")
       .populate("userId", "firstName lastName email mobile");
