@@ -51,9 +51,9 @@ export default function OwnerBookings() {
 
   const [searchParams] = useSearchParams();
   const statusFromUrl = searchParams.get("status") || "upcoming";
-  const [statusFilter, setStatusFilter] = useState(statusFromUrl);
-
-  const [paymentFilter, setPaymentFilter] = useState(statusFromUrl);
+  
+  const [timeFilter, setTimeFilter] = useState(statusFromUrl);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
@@ -143,9 +143,24 @@ export default function OwnerBookings() {
       data = data.filter((b) => {
         const s = b.paymentStatus;
 
-        if (paymentFilter === "confirmed") return s === "paid";
-        if (paymentFilter === "pending") return ["pending", "initiated", "failed"].includes(s);
-        if (paymentFilter === "cancelled") return s === "cancelled";
+        // TIME
+        if (timeFilter === "upcoming") {
+          data = data.filter(b => new Date(b.checkOut) >= todayStart);
+        }
+
+        if (timeFilter === "past") {
+          data = data.filter(b => new Date(b.checkOut) < todayStart);
+        }
+
+        if (statusFilter !== "all") {
+          data = data.filter(b => {
+            const s = b.paymentStatus;
+
+            if (statusFilter === "confirmed") return s === "paid";
+            if (statusFilter === "pending") return ["pending", "initiated", "failed"].includes(s);
+            if (statusFilter === "cancelled") return s === "cancelled";
+          });
+        }
         return true;
       });
     }
@@ -288,21 +303,30 @@ export default function OwnerBookings() {
               />
             </div>
 
-            {/* Payment Filter */}
-            <Select value={paymentFilter} onValueChange={(val) => {
-              setPaymentFilter(val);
+            <Select value={timeFilter} onValueChange={(val) => {
+              setTimeFilter(val);
               navigate(`/bookings?status=${val}`);
-            }}
-            >
-              <SelectTrigger className="md:w-[160px] w-[100%] bg-gray-50 border-gray-200">
-                <SelectValue placeholder="Payment" />
+            }}>
+              <SelectTrigger className="md:w-[160px] w-full bg-gray-50 border-gray-200">
+                <SelectValue placeholder="Time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="upcoming">Upcoming</SelectItem>
+                <SelectItem value="past">Past</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* STATUS FILTER */}
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="md:w-[160px] w-full bg-gray-50 border-gray-200">
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="confirmed">Confirmed</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
-                <SelectItem value="past">Past bookings</SelectItem>
               </SelectContent>
             </Select>
           </div>
