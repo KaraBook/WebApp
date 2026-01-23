@@ -60,6 +60,7 @@ export const amenitiesCategories = [
     items: [
       { label: "Kitchen", value: "kitchen", icon: Utensils },
       { label: "Refrigerator", value: "fridge", icon: Refrigerator },
+      { label: "Tea", value: "tea", icon: Utensils },
       { label: "Dining Area", value: "diningArea", icon: Utensils },
     ]
   },
