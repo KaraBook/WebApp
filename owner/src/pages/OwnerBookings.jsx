@@ -50,10 +50,13 @@ export default function OwnerBookings() {
   const [query, setQuery] = useState("");
 
   const [searchParams] = useSearchParams();
-  const statusFromUrl = searchParams.get("status") || "all";
+  const statusFromUrl = searchParams.get("status") || "upcoming";
   const [statusFilter, setStatusFilter] = useState(statusFromUrl);
 
   const [paymentFilter, setPaymentFilter] = useState(statusFromUrl);
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
 
   const pageSize = 10;
   const [page, setPage] = useState(1);
@@ -128,31 +131,32 @@ export default function OwnerBookings() {
         b.propertyId?.propertyName?.toLowerCase().includes(q)
     );
 
-    if (paymentFilter !== "all") {
+    if (paymentFilter === "upcoming") {
+      data = data.filter(b => new Date(b.checkOut) >= todayStart);
+    }
+
+    if (paymentFilter === "past") {
+      data = data.filter(b => new Date(b.checkOut) < todayStart);
+    }
+
+    if (["confirmed", "pending", "cancelled"].includes(paymentFilter)) {
       data = data.filter((b) => {
         const s = b.paymentStatus;
 
-        if (paymentFilter === "confirmed") {
-          return s === "paid";
-        }
-
-        if (paymentFilter === "pending") {
-          return ["pending", "initiated", "failed"].includes(s);
-        }
-
-        if (paymentFilter === "cancelled") {
-          return s === "cancelled";
-        }
-
+        if (paymentFilter === "confirmed") return s === "paid";
+        if (paymentFilter === "pending") return ["pending", "initiated", "failed"].includes(s);
+        if (paymentFilter === "cancelled") return s === "cancelled";
         return true;
       });
     }
+
+    data.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 
     setFiltered(data);
     setPage(1);
   }, [query, paymentFilter, bookings]);
 
-  // PAGINATION
+
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginatedData = filtered.slice(
     (page - 1) * pageSize,
@@ -298,6 +302,7 @@ export default function OwnerBookings() {
                 <SelectItem value="confirmed">Confirmed</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="past">Past bookings</SelectItem>
               </SelectContent>
             </Select>
           </div>
