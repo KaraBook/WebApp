@@ -51,13 +51,6 @@ export default function InvoicePage() {
   const invoiceRef = useRef(null);
   const { accessToken } = useAuthStore();
 
-  const meals = invoice.meals || null;
-
-  const hasMeals = meals?.enabled;
-  const vegCount = Number(meals?.veg || 0);
-  const nonVegCount = Number(meals?.nonVeg || 0);
-
-
   useEffect(() => {
     (async () => {
       const res = await Axios.get(SummaryApi.getInvoice.url(id), {
@@ -68,6 +61,12 @@ export default function InvoicePage() {
   }, [id]);
 
   if (!invoice) return null;
+
+  const meals = invoice.meals || null;
+
+  const hasMeals = meals?.enabled;
+  const vegCount = Number(meals?.veg || 0);
+  const nonVegCount = Number(meals?.nonVeg || 0);
 
   const guestsData = invoice.guests;
 
