@@ -152,9 +152,11 @@ export default function Checkout() {
         };
     }, []);
 
+    const startDate = dateRange[0].startDate;
+    const endDate = dateRange[0].endDate;
 
     useEffect(() => {
-        if (!property) return;
+        if (!property || !startDate || !endDate) return;
 
         const fetchPricing = async () => {
             const res = await Axios.post(
@@ -172,14 +174,11 @@ export default function Checkout() {
         };
 
         fetchPricing();
-    }, [property, dateRange, guestData, mealCounts, includeMeals]);
+    }, [property, startDate, endDate, guestData, mealCounts, includeMeals]);
 
 
     if (loading) return <div className="text-center py-20">Loading...</div>;
     if (!property) return <div className="text-center py-20">Property not found.</div>;
-
-    const startDate = dateRange[0].startDate;
-    const endDate = dateRange[0].endDate;
 
     const handleContactChange = (e) => {
         const value = e.target.value.replace(/\D/g, "");
