@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { auth, signInWithPhoneNumber } from "/firebase";
+import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
@@ -38,7 +38,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
     }
 
     try {
-      
+      buildRecaptcha();
     } catch { }
   }, [open]);
 
@@ -68,7 +68,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       });
 
       await auth.signOut().catch(() => { });
-      const verifier = window.recaptchaVerifier;
+      const verifier = window.recaptchaVerifier || buildRecaptcha();
 
       const confirmation = await signInWithPhoneNumber(
         auth,
@@ -256,7 +256,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           </p>
         </div>
 
-        
+        <div id="recaptcha-container" className="hidden" />
       </DialogContent>
 
     </Dialog>

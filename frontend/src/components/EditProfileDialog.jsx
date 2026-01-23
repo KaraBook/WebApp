@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import Axios from "@/utils/Axios"; // ONLY for normal profile update
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { toast } from "sonner";
-import { auth, signInWithPhoneNumber } from "/firebase";
+import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
 import {
     Select,
     SelectContent,
@@ -59,6 +59,20 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
         setMobile(profile.mobile);
     }, [profile]);
 
+    /* ================= RESET + RECAPTCHA ================= */
+    useEffect(() => {
+        if (!open) {
+            setEditingMobile(false);
+            setOtp("");
+            setConfirmResult(null);
+            setTimer(0);
+            return;
+        }
+        try {
+            buildRecaptcha();
+        } catch { }
+    }, [open]);
+
     /* ================= TIMER ================= */
     useEffect(() => {
         if (timer <= 0) return;
@@ -68,34 +82,34 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
     /* ================= SEND OTP ================= */
     const sendOtp = async () => {
-  if (mobile.length !== 10) return;
+        if (mobile.length !== 10) return;
 
-  setSending(true);
-  try {
-    await axios.post(
-      baseURL + SummaryApi.travellerPrecheck.url,
-      { mobile }
-    );
+        setSending(true);
+        try {
+            // 🔓 PUBLIC PRECHECK (NO INTERCEPTOR)
+            await axios.post(
+                baseURL + SummaryApi.travellerPrecheck.url,
+                { mobile }
+            );
 
-    await auth.signOut().catch(() => { });
+            await auth.signOut().catch(() => { });
+            const verifier = window.recaptchaVerifier || buildRecaptcha();
 
-    const verifier = window.recaptchaVerifier; 
+            const confirmation = await signInWithPhoneNumber(
+                auth,
+                `+91${mobile}`,
+                verifier
+            );
 
-    const confirmation = await signInWithPhoneNumber(
-      auth,
-      `+91${mobile}`,
-      verifier
-    );
-
-    setConfirmResult(confirmation);
-    setTimer(60);
-    toast.success("OTP sent successfully");
-  } catch (err) {
-    toast.error(err?.response?.data?.message || "Cannot send OTP");
-  } finally {
-    setSending(false);
-  }
-};
+            setConfirmResult(confirmation);
+            setTimer(60);
+            toast.success("OTP sent successfully");
+        } catch (err) {
+            toast.error(err?.response?.data?.message || "Cannot send OTP");
+        } finally {
+            setSending(false);
+        }
+    };
 
     /* ================= VERIFY OTP + UPDATE MOBILE ================= */
     const verifyOtpAndUpdate = async (code = otp) => {

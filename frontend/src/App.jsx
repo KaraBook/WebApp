@@ -8,8 +8,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "sonner";
 import { useLocation } from "react-router-dom";
 import MobileAccountBottomNav from "./components/accounts/MobileAccountBottomNav";
-import { RecaptchaVerifier } from "firebase/auth"
-import { auth } from "/firebase";
 
 
 export default function App() {
@@ -57,18 +55,6 @@ export default function App() {
     return () => unsub?.();
   }, []);
 
-  useEffect(() => {
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      { size: "invisible" }
-    );
-    window.recaptchaVerifier.render();
-  }
-}, []);
-
-
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -87,7 +73,6 @@ export default function App() {
         open={loginModalOpen}
         onOpenChange={(o) => (o ? showAuthModal() : hideAuthModal())}
       />
-      <div id="recaptcha-container" />
 
       <Toaster richColors position="top-center" />
     </div>
