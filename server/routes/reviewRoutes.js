@@ -1,6 +1,6 @@
 import express from "express";
 import { requireAuth } from "../middlewares/requireAuth.js";
-import { addReview, getPropertyReviews, getUserReviews } from "../controllers/reviewController.js";
+import { addReview, getPropertyReviews, getUserReviews, updateReview } from "../controllers/reviewController.js";
 
 const router = express.Router();
 
