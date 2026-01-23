@@ -41,15 +41,28 @@ export const getOwnerDashboard = async (req, res) => {
         .filter(Boolean)
     );
 
+    const isConfirmed = (b) =>
+      b.paymentStatus === "paid" ||
+      b.status === "confirmed" ||
+      b.paymentId;
+
+    const isPending = (b) =>
+      !isConfirmed(b) && b.status !== "cancelled";
+
+    const isCancelled = (b) =>
+      b.status === "cancelled";
+
     const stats = {
       totalProperties: properties.length,
       totalBookings: bookings.length,
       totalUsers: uniqueUserIds.size,
-      confirmed: bookings.filter((b) => b.paymentStatus === "paid").length,
-      pending: bookings.filter((b) => b.paymentStatus === "pending").length,
-      failed: bookings.filter((b) => b.paymentStatus === "failed").length,
+
+      confirmed: bookings.filter(isConfirmed).length,
+      pending: bookings.filter(isPending).length,
+      cancelled: bookings.filter(isCancelled).length,
+
       totalRevenue: bookings
-        .filter((b) => b.paymentStatus === "paid")
+        .filter(isConfirmed)
         .reduce((sum, b) => sum + (b.totalAmount || 0), 0),
     };
 
@@ -623,7 +636,7 @@ export const createOfflineBooking = async (req, res) => {
     let cursor = new Date(start);
 
     while (cursor < end) {
-      const day = cursor.getDay(); 
+      const day = cursor.getDay();
       const isWeekend = day === 0 || day === 6;
 
       let nightlyBase = isWeekend
@@ -718,10 +731,10 @@ export const createOfflineBooking = async (req, res) => {
       guests: { adults, children },
       meals: meals?.includeMeals
         ? {
-            includeMeals: true,
-            veg: meals.veg,
-            nonVeg: meals.nonVeg,
-          }
+          includeMeals: true,
+          veg: meals.veg,
+          nonVeg: meals.nonVeg,
+        }
         : { includeMeals: false },
       totalNights,
       totalAmount,
