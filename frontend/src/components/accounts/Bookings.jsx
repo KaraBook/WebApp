@@ -279,7 +279,7 @@ export default function Bookings() {
                         ₹{b.totalAmount.toLocaleString()}
                       </td>
 
-                      <td className="px-4 py-3 relative group cursor-default flex justify-center">
+                      <td className="px-4 py-5 relative group cursor-default flex justify-center">
                         <span
                           className={`inline-block w-3 h-3 rounded-full ${statusDot(
                             b.paymentStatus
