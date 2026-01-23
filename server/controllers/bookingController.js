@@ -218,8 +218,14 @@ export const verifyPayment = async (req, res) => {
         checkIn: booking.checkIn,
         checkOut: booking.checkOut,
         nights: booking.totalNights,
-        guests: booking.guests,
-        totalAmount: pricing.grandTotal,
+        guests: `${booking.guests.adults} Adults, ${booking.guests.children} Children`,
+
+        subtotal: pricing.subtotal,
+        taxAmount: pricing.tax,
+        grandTotal: pricing.grandTotal,
+        paymentMethod: booking.paymentMethod,
+        orderId: booking.orderId,
+
         bookingId: booking._id,
         portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
       });
