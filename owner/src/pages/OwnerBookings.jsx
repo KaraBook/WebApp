@@ -148,21 +148,24 @@ export default function OwnerBookings() {
     const base =
       "px-3 py-1 rounded-full text-xs font-medium border inline-block";
 
-    if (status === "paid")
+    if (status === "paid") {
       return (
         <span className={`${base} bg-green-50 border-green-200 text-green-700`}>
-          Paid
+          Confirmed
         </span>
       );
-    if (status === "pending")
+    }
+
+    if (status === "cancelled") {
       return (
-        <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
-          Pending
+        <span className={`${base} bg-gray-100 border-gray-300 text-gray-600`}>
+          Cancelled
         </span>
       );
+    }
     return (
-      <span className={`${base} bg-red-50 border-red-200 text-red-700`}>
-        Initiated
+      <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
+        Pending
       </span>
     );
   };
