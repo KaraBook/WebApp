@@ -119,7 +119,7 @@ export default function Bookings() {
         </h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="border w-full md:w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center justify-between">
+          <DropdownMenuTrigger className="border w-[87%] md:w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center justify-between">
             <span>
               {statusFilter === "all"
                 ? "All"
