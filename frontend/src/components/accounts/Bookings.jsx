@@ -119,8 +119,8 @@ export default function Bookings() {
         </h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="border px-4 py-2 rounded-md text-sm flex items-center gap-2">
-            Filter: {statusFilter === "all"
+          <DropdownMenuTrigger className="border px-6 py-2 rounded-md bg-white text-sm flex items-center gap-2">
+            {statusFilter === "all"
               ? "All"
               : statusFilter === "confirmed"
                 ? "Confirmed"
