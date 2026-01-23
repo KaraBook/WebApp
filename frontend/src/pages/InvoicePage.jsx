@@ -64,7 +64,7 @@ export default function InvoicePage() {
 
   const meals = invoice.meals || null;
 
-  const hasMeals = meals?.enabled;
+  const hasMeals = meals?.includeMeals === true;
   const vegCount = Number(meals?.veg || 0);
   const nonVegCount = Number(meals?.nonVeg || 0);
 
@@ -202,8 +202,7 @@ export default function InvoicePage() {
             <p className="uppercase text-xs font-semibold text-muted-foreground mb-2">
               Booking Details
             </p>
-            <div className={`booking-details-grid grid grid-cols-2 ${
-                 hasMeals ? "sm:grid-cols-5" : "sm:grid-cols-4" } gap-4 text-sm`}>
+            <div className={`booking-details-grid grid grid-cols-2 ${hasMeals ? "sm:grid-cols-5" : "sm:grid-cols-4"} gap-4 text-sm`}>
               <BD label="Check-in" value="27 Nov 2025" />
               <BD label="Check-out" value="30 Nov 2025" />
               <BD label="Duration" value={`${invoice.nights} Nights`} />
