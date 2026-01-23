@@ -144,10 +144,10 @@ export default function Bookings() {
               All
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setStatusFilter("confirmed")}>
-              Confirmed / Paid
+              Confirmed
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setStatusFilter("pending")}>
-              Pending / Initiated
+              Pending
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setStatusFilter("cancelled")}>
               Cancelled
