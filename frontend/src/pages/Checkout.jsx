@@ -35,6 +35,7 @@ export default function Checkout() {
     const guestRef = useRef(null);
     const [includeMeals, setIncludeMeals] = useState(false);
     const isMobile = useIsMobile();
+    const [pricing, setPricing] = useState(null);
 
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
@@ -157,58 +158,6 @@ export default function Checkout() {
 
     const startDate = dateRange[0].startDate;
     const endDate = dateRange[0].endDate;
-    const nights =
-        Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24))) || 1;
-
-    const weekday = Number(property.pricingPerNightWeekdays);
-    const weekend = Number(property.pricingPerNightWeekend || weekday);
-
-    const getNightBreakdown = () => {
-        let d = new Date(startDate);
-        const end = new Date(endDate);
-        let weekdays = 0;
-        let weekends = 0;
-
-        while (d < end) {
-            const day = d.getDay();
-            if (day === 0 || day === 6) weekends++;
-            else weekdays++;
-            d.setDate(d.getDate() + 1);
-        }
-
-        return { weekdays, weekends };
-    };
-    const { weekdays, weekends } = getNightBreakdown();
-    const weekdayTotal = weekdays * weekday;
-    const weekendTotal = weekends * weekend;
-
-    const calcBasePrice = () => {
-        let d = new Date(startDate);
-        const end = new Date(endDate);
-        let total = 0;
-
-        while (d < end) {
-            const day = d.getDay();
-            const isWeekend = day === 0 || day === 6;
-            total += isWeekend ? weekend : weekday;
-            d.setDate(d.getDate() + 1);
-        }
-
-        return total;
-    };
-
-    const basePrice = calcBasePrice();
-
-    const extraAdultCost = extraAdults * extraAdultCharge * nights;
-    const extraChildCost = extraChildren * extraChildCharge * nights;
-
-    const extraGuestPrice = extraAdultCost + extraChildCost;
-
-    const subtotal = basePrice + extraGuestPrice;
-    const tax = Math.round(subtotal * 0.10);
-    const total = subtotal + tax;
-
-
 
     const handleContactChange = (e) => {
         const value = e.target.value.replace(/\D/g, "");
@@ -253,7 +202,8 @@ export default function Checkout() {
                 }
             );
 
-            const { order } = res.data;
+            const { order, pricing } = res.data;
+            setPricing(pricing);
             const loaded = await loadRazorpayScript();
             if (!loaded) return toast.error("Razorpay SDK failed to load");
 
@@ -611,7 +561,7 @@ export default function Checkout() {
                 <div className="hidden md:block">
                     <Button
                         onClick={handlePayment}
-                        disabled={contact.length !== 10}
+                        disabled={!pricing || contact.length !== 10}
                         className="w-full bg-primary text-white rounded-[10px] py-6 text-lg hover:bg-primary"
                     >
                         Pay Now
@@ -652,19 +602,24 @@ export default function Checkout() {
                     <div className="text-sm space-y-2">
                         <p className="font-medium">Room charges</p>
 
-                        {weekdays > 0 && (
+                        {pricing?.room.weekdayNights > 0 && (
                             <div className="flex justify-between">
-                                <span>Weekdays ({weekdays} nights × ₹{weekday})</span>
-                                <span>₹{weekdayTotal.toLocaleString()}</span>
+                                <span>
+                                    Weekdays ({pricing.room.weekdayNights} nights × ₹{pricing.room.weekdayRate})
+                                </span>
+                                <span>₹{pricing.room.roomWeekdayAmount.toLocaleString()}</span>
                             </div>
                         )}
 
-                        {weekends > 0 && (
+                        {pricing?.room.weekendNights > 0 && (
                             <div className="flex justify-between">
-                                <span>Weekend ({weekends} nights × ₹{weekend})</span>
-                                <span>₹{weekendTotal.toLocaleString()}</span>
+                                <span>
+                                    Weekend ({pricing.room.weekendNights} nights × ₹{pricing.room.weekendRate})
+                                </span>
+                                <span>₹{pricing.room.roomWeekendAmount.toLocaleString()}</span>
                             </div>
                         )}
+
                     </div>
 
                     {/* Extra Guests */}
@@ -674,19 +629,24 @@ export default function Checkout() {
                             <div className="text-sm space-y-2">
                                 <p className="font-medium">Extra guest charges</p>
 
-                                {extraAdults > 0 && (
+                                {pricing?.extraGuests.extraAdults > 0 && (
                                     <div className="flex justify-between">
-                                        <span>Adults ({extraAdults} × ₹{extraAdultCharge} × {nights} nights)</span>
-                                        <span>₹{extraAdultCost.toLocaleString()}</span>
+                                        <span>
+                                            Adults ({pricing.extraGuests.extraAdults} × ₹{pricing.extraGuests.extraAdultRate} × {pricing.totalNights} nights)
+                                        </span>
+                                        <span>₹{pricing.extraGuests.extraAdultAmount.toLocaleString()}</span>
                                     </div>
                                 )}
 
-                                {extraChildren > 0 && (
+                                {pricing?.extraGuests.extraChildren > 0 && (
                                     <div className="flex justify-between">
-                                        <span>Children ({extraChildren} × ₹{extraChildCharge} × {nights} nights)</span>
-                                        <span>₹{extraChildCost.toLocaleString()}</span>
+                                        <span>
+                                            Children ({pricing.extraGuests.extraChildren} × ₹{pricing.extraGuests.extraChildRate} × {pricing.totalNights} nights)
+                                        </span>
+                                        <span>₹{pricing.extraGuests.extraChildAmount.toLocaleString()}</span>
                                     </div>
                                 )}
+
                             </div>
                         </>
                     )}
@@ -697,8 +657,13 @@ export default function Checkout() {
                             <hr />
                             <div className="text-sm">
                                 <p className="font-medium">Meals selected</p>
-                                <p>Veg: {mealCounts.veg}</p>
-                                <p>Non-veg: {mealCounts.nonVeg}</p>
+                                {pricing?.meals.veg > 0 && (
+                                    <p>Veg: {pricing.meals.veg} (₹{pricing.meals.vegAmount})</p>
+                                )}
+
+                                {pricing?.meals.nonVeg > 0 && (
+                                    <p>Non-veg: {pricing.meals.nonVeg} (₹{pricing.meals.nonVegAmount})</p>
+                                )}
                             </div>
                         </>
                     )}
@@ -709,17 +674,17 @@ export default function Checkout() {
                     <div className="text-sm space-y-2">
                         <div className="flex justify-between">
                             <span>Subtotal</span>
-                            <span>₹{subtotal.toLocaleString()}</span>
+                            <span>₹{pricing?.subtotal.toLocaleString()}</span>
                         </div>
 
                         <div className="flex justify-between">
                             <span>Taxes (10%)</span>
-                            <span>₹{tax.toLocaleString()}</span>
+                            <span>₹{pricing?.tax.toLocaleString()}</span>
                         </div>
 
-                        <div className="flex justify-between font-semibold text-base border-t pt-2">
+                        <div className="flex justify-between font-semibold">
                             <span>Total payable</span>
-                            <span>₹{total.toLocaleString()}</span>
+                            <span>₹{pricing?.grandTotal.toLocaleString()}</span>
                         </div>
                     </div>
                 </div>
@@ -730,12 +695,14 @@ export default function Checkout() {
                 <div className="flex items-center justify-between gap-3">
                     <div>
                         <p className="text-xs text-gray-500">Total payable</p>
-                        <p className="text-lg font-bold">₹{total.toLocaleString()}</p>
+                        <p className="text-lg font-bold">
+                            ₹{pricing?.grandTotal.toLocaleString()}
+                        </p>
                     </div>
 
                     <Button
                         onClick={handlePayment}
-                        disabled={contact.length !== 10}
+                        disabled={!pricing || contact.length !== 10}
                         className="bg-primary text-white rounded-[10px] px-12 py-6 text-base"
                     >
                         Pay Now →

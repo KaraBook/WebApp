@@ -58,7 +58,6 @@ export const createOrder = async (req, res) => {
 
     const adults = Number(guests?.adults || 0);
     const children = Number(guests?.children || 0);
-
     const totalGuests = adults + children;
 
     if (totalGuests > Number(property.maxGuests)) {
@@ -68,6 +67,7 @@ export const createOrder = async (req, res) => {
       });
     }
 
+    // Meal validations
     if (meals?.includeMeals) {
       const totalMeals =
         Number(meals.veg || 0) +
@@ -88,42 +88,24 @@ export const createOrder = async (req, res) => {
       }
     }
 
-    const baseGuests = Number(property.baseGuests || 0);
-    const basePricePerNight = Number(property.pricingPerNightWeekdays || 0);
-    const extraAdultCharge = Number(property.extraAdultCharge || 0);
-    const extraChildCharge = Number(property.extraChildCharge || 0);
+    // 🔥 ONLY pricing engine
+    const pricing = computePricing(
+      {
+        checkIn,
+        checkOut,
+        guests: { adults, children },
+        meals: meals
+          ? { veg: meals.veg, nonVeg: meals.nonVeg }
+          : { veg: 0, nonVeg: 0 },
+        totalNights
+      },
+      property
+    );
 
-    if (basePricePerNight <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Property pricing not configured",
-      });
-    }
-
-    const baseUsedByAdults = Math.min(adults, baseGuests);
-    const remainingBaseSlots = Math.max(0, baseGuests - baseUsedByAdults);
-
-    const extraAdults = Math.max(0, adults - baseGuests);
-    const extraChildren = Math.max(0, children - remainingBaseSlots);
-
-    const extraAdultCost = extraAdults * extraAdultCharge;
-    const extraChildCost = extraChildren * extraChildCharge;
-
-    const perNightTotal =
-      basePricePerNight + extraAdultCost + extraChildCost;
-
-    const baseTotal = perNightTotal * totalNights;
-    const taxAmount = Math.round(baseTotal * 0.1);
-    const grandTotal = baseTotal + taxAmount;
+    const { subtotal, tax, grandTotal } = pricing;
 
     if (!Number.isFinite(grandTotal) || grandTotal <= 0) {
-      console.error("❌ Invalid amount calc", {
-        basePricePerNight,
-        extraAdultCost,
-        extraChildCost,
-        totalNights,
-      });
-
+      console.error("❌ Invalid pricing", pricing);
       return res.status(400).json({
         success: false,
         message: "Invalid booking amount",
@@ -150,14 +132,14 @@ export const createOrder = async (req, res) => {
       guests: { adults, children },
       meals: meals
         ? {
-          includeMeals: true,
-          veg: meals.veg,
-          nonVeg: meals.nonVeg,
-        }
+            includeMeals: true,
+            veg: meals.veg,
+            nonVeg: meals.nonVeg,
+          }
         : { includeMeals: false },
       totalNights,
-      totalAmount: baseTotal,
-      taxAmount,
+      totalAmount: subtotal,
+      taxAmount: tax,
       grandTotal,
       orderId: order.id,
       contactNumber,
@@ -169,6 +151,7 @@ export const createOrder = async (req, res) => {
       success: true,
       order,
       booking,
+      pricing,
     });
 
   } catch (err) {
@@ -179,6 +162,7 @@ export const createOrder = async (req, res) => {
     });
   }
 };
+
 
 
 
@@ -202,9 +186,7 @@ export const verifyPayment = async (req, res) => {
       { new: true }
     )
       .populate("userId", "firstName lastName email mobile")
-      .populate("propertyId",
-        "propertyName city state address baseGuests pricingPerNightWeekdays pricingPerNightWeekend extraAdultCharge extraChildCharge vegMealRate nonVegMealRate"
-      );
+      .populate("propertyId", "propertyName city state address");
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
@@ -213,7 +195,6 @@ export const verifyPayment = async (req, res) => {
     console.log("✅ Payment verified for:", booking._id);
 
     if (booking.userId?.email) {
-      const pricing = computePricing(booking, booking.propertyId);
       const mailData = bookingConfirmationTemplate({
         travellerName: `${booking.userId.firstName} ${booking.userId.lastName}`,
         propertyName: booking.propertyId.propertyName,
@@ -222,9 +203,9 @@ export const verifyPayment = async (req, res) => {
         nights: booking.totalNights,
         guests: `${booking.guests.adults} Adults, ${booking.guests.children} Children`,
 
-        subtotal: pricing.subtotal,
-        taxAmount: pricing.tax,
-        grandTotal: pricing.grandTotal,
+        subtotal: booking.totalAmount,
+        taxAmount: booking.taxAmount,
+        grandTotal: booking.grandTotal,
         paymentMethod: booking.paymentMethod,
         orderId: booking.orderId,
 
@@ -252,15 +233,11 @@ Dear ${booking.userId.firstName},
 
 Your stay at *${booking.propertyId.propertyName}* is confirmed!
 
-📅 *Check-in:* ${new Date(booking.checkIn).toLocaleDateString("en-IN")}
-📅 *Check-out:* ${new Date(booking.checkOut).toLocaleDateString("en-IN")}
-🧍‍♂️ *Guests:* ${typeof booking.guests === "number"
-            ? booking.guests
-            : `${booking.guests.adults + booking.guests.children} Guests` +
-            (booking.guests.infants ? ` + ${booking.guests.infants} Infants` : "")
-          }
-💰 *Amount Paid:* ₹${booking.totalAmount.toLocaleString("en-IN")}
-📍 *Location:* ${booking.propertyId.city}, ${booking.propertyId.state}
+📅 Check-in: ${new Date(booking.checkIn).toLocaleDateString("en-IN")}
+📅 Check-out: ${new Date(booking.checkOut).toLocaleDateString("en-IN")}
+🧍 Guests: ${booking.guests.adults + booking.guests.children}
+💰 Amount Paid: ₹${booking.grandTotal.toLocaleString("en-IN")}
+📍 Location: ${booking.propertyId.city}, ${booking.propertyId.state}
 
 🔗 View Booking:
 ${process.env.PORTAL_URL}/traveller/bookings/${booking._id}
@@ -280,6 +257,7 @@ Thank you for choosing us! 🏡`;
     res.status(500).json({ success: false, message: "Verification failed" });
   }
 };
+
 
 
 
@@ -334,24 +312,21 @@ export const getUserBookings = async (req, res) => {
 export const getBookingInvoice = async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const requesterId = req.user?.id;
 
     const booking = await Booking.findById(bookingId)
       .populate("userId", "firstName lastName email mobile")
       .populate(
         "propertyId",
-        "propertyName propertyType address city state ownerUserId resortOwner pricingPerNightWeekdays pricingPerNightWeekend"
+        "propertyName propertyType address city state"
       );
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
-    const pricing = computePricing(booking, booking.propertyId);
-
-    const subtotal = pricing.subtotal;
-    const taxAmount = pricing.tax;
-    const grandTotal = pricing.grandTotal;
+    const subtotal = booking.totalAmount;
+    const taxAmount = booking.taxAmount;
+    const grandTotal = booking.grandTotal;
     const perNight = Math.floor(subtotal / booking.totalNights);
 
     const invoiceData = {
@@ -370,7 +345,6 @@ export const getBookingInvoice = async (req, res) => {
       checkOut: booking.checkOut,
       nights: booking.totalNights,
       guests: booking.guests,
-
       meals: booking.meals,
 
       totalAmount: subtotal,
@@ -405,6 +379,7 @@ export const getBookingInvoice = async (req, res) => {
     });
   }
 };
+
 
 
 export const getBookingById = async (req, res) => {
