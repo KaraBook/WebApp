@@ -72,7 +72,7 @@ export default function RateBookingDialog({ open, booking, onClose }) {
           onClick={onClose}
           className="absolute top-3 right-3 z-20 bg-white/80 rounded-full p-1 hover:bg-white"
         >
-          <X className="w-5 h-5" />
+          <span>X</span>
         </button>
 
         {/* IMAGE HEADER */}
@@ -91,11 +91,6 @@ export default function RateBookingDialog({ open, booking, onClose }) {
             <div className="flex items-center gap-2 text-sm opacity-90">
               <MapPin className="w-4 h-4" />
               {booking.property?.city}, {booking.property?.state}
-            </div>
-            <div className="flex items-center gap-2 text-xs opacity-80 mt-1">
-              <Calendar className="w-4 h-4" />
-              {format(new Date(booking.checkIn), "dd MMM yyyy")} –{" "}
-              {format(new Date(booking.checkOut), "dd MMM yyyy")}
             </div>
           </div>
         </div>
