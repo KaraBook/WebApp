@@ -60,8 +60,10 @@ export const amenitiesCategories = [
     items: [
       { label: "Kitchen", value: "kitchen", icon: Utensils },
       { label: "Refrigerator", value: "fridge", icon: Refrigerator },
-      { label: "Tea", value: "tea", icon: Utensils },
       { label: "Dining Area", value: "diningArea", icon: Utensils },
+      { label: "Glasses", value: "glasses", icon: Utensils },
+      { label: "Tea", value: "tea", icon: Utensils },
+      { label: "Microwave", value: "microwave", icon: Utensils },
     ]
   },
 
@@ -79,6 +81,7 @@ export const amenitiesCategories = [
     key: "transport",
     items: [
       { label: "Parking", value: "parking", icon: Car },
+      { label: "Transport", value: "transport", icon: Car },
     ]
   },
 

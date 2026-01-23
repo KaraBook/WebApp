@@ -78,6 +78,7 @@ export const amenitiesCategories = [
       { label: "Microwave", value: "microwave", icon: Utensils },
     ]
   },
+  
   {
     label: "High Tea & Barbeque",
     key: "barbeque",
