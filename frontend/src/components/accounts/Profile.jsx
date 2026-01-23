@@ -57,6 +57,8 @@ export default function Profile() {
       setAvatarPreview(url);
       updateUser({ avatarUrl: url });
 
+      fileRef.current.value = "";
+
       toast.success("Profile photo updated");
     } catch (err) {
       console.error(err);
@@ -83,18 +85,20 @@ export default function Profile() {
     : "—";
 
   const handleRemoveAvatar = async () => {
-    try {
-      await Axios.delete(SummaryApi.removeTravellerAvatar.url);
+  try {
+    await Axios.delete(SummaryApi.removeTravellerAvatar.url);
 
-      setAvatarPreview("");
-      updateUser({ avatarUrl: "" });   // 🔥
+    setAvatarPreview("");
+    updateUser({ avatarUrl: "" });
 
-      toast.success("Profile photo removed");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to remove photo");
-    }
-  };
+    fileRef.current.value = "";   
+
+    toast.success("Profile photo removed");
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to remove photo");
+  }
+};
 
 
   return (
