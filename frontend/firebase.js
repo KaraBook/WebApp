@@ -17,29 +17,16 @@ export const auth = getAuth(app);
 
 let recaptchaVerifier = null;
 
-export const initRecaptcha = () => {
-  if (recaptchaVerifier) return recaptchaVerifier;
-
-  recaptchaVerifier = new RecaptchaVerifier(
-    auth,
-    "recaptcha-container",
-    { size: "invisible" }
-  );
-
-  return recaptchaVerifier;
-};
-
 export const sendOtp = async (phoneNumber) => {
-  if (window.recaptchaVerifier) {
-    window.recaptchaVerifier.clear();
+  if (!recaptchaVerifier) {
+    recaptchaVerifier = new RecaptchaVerifier(
+      auth,
+      "recaptcha-container",
+      {
+        size: "invisible",
+      }
+    );
   }
 
-  window.recaptchaVerifier = new RecaptchaVerifier(
-    auth,
-    "recaptcha-container",
-    { size: "invisible" }
-  );
-
-  return signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+  return signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
 };
-
