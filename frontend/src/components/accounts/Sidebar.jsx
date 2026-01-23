@@ -38,9 +38,16 @@ export default function Sidebar({ onNavigate, className }) {
       {/* USER BOX */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 bg-primary flex items-center rounded-[8px] justify-center text-white text-lg font-semibold">
-            {user?.name?.[0] || "U"}
-          </div>
+          {user?.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              className="h-12 w-12 rounded-[8px] object-cover"
+            />
+          ) : (
+            <div className="h-12 w-12 bg-primary flex items-center justify-center rounded-[8px] text-white text-lg font-semibold">
+              {user?.name?.[0] || "U"}
+            </div>
+          )}
 
           {!collapsed && (
             <div>

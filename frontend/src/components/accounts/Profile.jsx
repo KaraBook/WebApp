@@ -8,7 +8,7 @@ import { useAuthStore } from "@/store/auth";
 import EditProfileDialog from "../EditProfileDialog";
 
 export default function Profile() {
-  const { accessToken, clearAuth, updatedUser } = useAuthStore();
+  const { accessToken, clearAuth, updateUser } = useAuthStore();
   const [profile, setProfile] = useState(null);
   const [bookingCount, setBookingCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -47,18 +47,19 @@ export default function Profile() {
     formData.append("image", file);
 
     try {
-      const res = await Axios.post(SummaryApi.uploadTravellerAvatar.url, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
+      const res = await Axios.post(
+        SummaryApi.uploadTravellerAvatar.url,
+        formData
+      );
 
       const url = res.data.avatarUrl + "?t=" + Date.now();
+
       setAvatarPreview(url);
-      updatedUser({ avatarUrl: url });
+      updateUser({ avatarUrl: url });
+
       toast.success("Profile photo updated");
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Upload failed");
     } finally {
       setUploading(false);
@@ -83,14 +84,14 @@ export default function Profile() {
 
   const handleRemoveAvatar = async () => {
     try {
-      await Axios.delete(SummaryApi.removeTravellerAvatar.url, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      });
+      await Axios.delete(SummaryApi.removeTravellerAvatar.url);
 
       setAvatarPreview("");
-      updatedUser({ avatarUrl: "" });
+      updateUser({ avatarUrl: "" });   // 🔥
+
       toast.success("Profile photo removed");
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Failed to remove photo");
     }
   };
