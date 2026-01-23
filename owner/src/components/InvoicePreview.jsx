@@ -73,7 +73,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       </div>
 
       {/* ================= BOOKING DETAILS BOX ================= */}
-      <div className="mt-6 bg-[#f9f9f9] border rounded-lg p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+      <div className="mt-6 bg-[#f9f9f9] border rounded-lg p-4 grid grid-cols-1 sm:grid-cols-5 gap-4 text-xs">
         <p className="col-span-full text-xs font-semibold text-gray-600 mb-1">
           BOOKING DETAILS
         </p>
@@ -81,13 +81,11 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
         <div>
           <p className="text-gray-500 mb-1">Check-in</p>
           <p className="font-[600] text-[13px]">{safeFormat(invoice.checkIn)}</p>
-          <p className="text-gray-400">2:00 PM</p>
         </div>
 
         <div>
           <p className="text-gray-500 mb-1">Check-out</p>
           <p className="font-[600] text-[13px]">{safeFormat(invoice.checkOut)}</p>
-          <p className="text-gray-400">11:00 AM</p>
         </div>
 
         <div>
@@ -104,6 +102,17 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
             {invoice.guests.adults} Adults, {invoice.guests.children} Children
           </p>
         </div>
+
+        <div>
+          <p className="text-gray-500 mb-1">Meals</p>
+          <p className="font-[600] text-[13px]">
+            {(invoice.meals?.veg || 0) + (invoice.meals?.nonVeg || 0)} Guests
+          </p>
+          <p className="text-gray-400">
+            {invoice.meals?.veg || 0} Veg, {invoice.meals?.nonVeg || 0} Non-Veg
+          </p>
+        </div>
+
       </div>
 
       {/* ================= TABLE ================= */}
