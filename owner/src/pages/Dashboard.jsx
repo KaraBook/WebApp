@@ -178,12 +178,15 @@ export default function Dashboard() {
       try {
         const res = await api.get(SummaryApi.getOwnerDashboard.url);
 
-        const now = new Date();
-        const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
         const sorted = (res.data?.data?.bookings || [])
-          .filter(b => new Date(b.checkIn) >= startOfCurrentMonth)
-
+          .filter(b => {
+            const checkOut = new Date(b.checkOut);
+            checkOut.setHours(0, 0, 0, 0);
+            return checkOut >= today;
+          })
           .sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 
         setData({ ...res.data.data, bookings: sorted });
