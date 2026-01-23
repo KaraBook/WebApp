@@ -1,50 +1,33 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Star, X } from "lucide-react";
+import { Star, X, MapPin, Calendar } from "lucide-react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/auth";
+import { format } from "date-fns";
 
-// ✅ Custom portal modal (no Radix Dialog)
-// ✅ Always centered on mobile + desktop
-// ✅ Not affected by parent layout/overflow/transform
 export default function RateBookingDialog({ open, booking, onClose }) {
   const { accessToken } = useAuthStore();
   const [mounted, setMounted] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
-  // avoid SSR / hydration issues (Vite usually fine, but safe)
   useEffect(() => setMounted(true), []);
 
-  // reset values when booking changes
   useEffect(() => {
     if (booking) {
-      setRating(booking.rating || 0);
+      setRating(0);
       setComment("");
     }
   }, [booking]);
 
-  // lock body scroll when modal is open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return () => (document.body.style.overflow = prev);
   }, [open]);
-
-  // close on ESC
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (e) => {
-      if (e.key === "Escape") onClose?.();
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
 
   if (!mounted || !open || !booking) return null;
 
@@ -69,7 +52,7 @@ export default function RateBookingDialog({ open, booking, onClose }) {
       );
 
       toast.success("Review submitted!");
-      onClose?.();
+      onClose();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to submit review");
     }
@@ -78,51 +61,79 @@ export default function RateBookingDialog({ open, booking, onClose }) {
   return createPortal(
     <div
       className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/60 px-3"
-      role="dialog"
-      aria-modal="true"
       onMouseDown={(e) => {
-        // click outside closes
-        if (e.target === e.currentTarget) onClose?.();
+        if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-md rounded-[14px] bg-white p-6 shadow-2xl relative">
+      <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden relative">
+
         {/* CLOSE */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-black"
-          aria-label="Close"
+          className="absolute top-3 right-3 z-20 bg-white/80 rounded-full p-1 hover:bg-white"
         >
-          <span>X</span>
+          <X className="w-5 h-5" />
         </button>
 
-        <h2 className="text-xl font-semibold">Rate this Resort</h2>
+        {/* IMAGE HEADER */}
+        <div className="relative h-40">
+          <img
+            src={booking.property?.coverImage}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/40" />
 
-        <div className="mt-4 space-y-4">
+          <div className="absolute bottom-3 left-4 text-white">
+            <h3 className="text-lg font-semibold">
+              {booking.property?.propertyName}
+            </h3>
+            <div className="flex items-center gap-2 text-sm opacity-90">
+              <MapPin className="w-4 h-4" />
+              {booking.property?.city}, {booking.property?.state}
+            </div>
+            <div className="flex items-center gap-2 text-xs opacity-80 mt-1">
+              <Calendar className="w-4 h-4" />
+              {format(new Date(booking.checkIn), "dd MMM yyyy")} –{" "}
+              {format(new Date(booking.checkOut), "dd MMM yyyy")}
+            </div>
+          </div>
+        </div>
+
+        {/* BODY */}
+        <div className="p-6 text-center space-y-4">
+          <h2 className="text-xl font-semibold">How was your stay?</h2>
+          <p className="text-sm text-gray-500">
+            Share your experience to help other travelers
+          </p>
+
           {/* STARS */}
-          <div className="flex gap-2">
+          <div className="flex justify-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
-                className={`w-7 h-7 cursor-pointer transition ${
+                className={`w-8 h-8 cursor-pointer transition ${
                   star <= rating
-                    ? "text-black fill-black"
-                    : "text-gray-300 hover:text-gray-500"
+                    ? "text-yellow-500 fill-yellow-500"
+                    : "text-gray-300 hover:text-gray-400"
                 }`}
                 onClick={() => setRating(star)}
               />
             ))}
           </div>
 
+          <p className="text-xs text-gray-400">Select a rating</p>
+
           {/* COMMENT */}
           <textarea
-            className="w-full border rounded-[10px] p-3 text-sm outline-none focus:ring-2 focus:ring-black/10"
-            rows={3}
-            placeholder="Write your review..."
+            className="w-full border rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+            rows={4}
+            placeholder="Tell us about your experience... What did you enjoy? Any suggestions?"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
           />
 
-          {/* SUBMIT */}
+          {/* BUTTON */}
           <button
             disabled={!rating}
             onClick={submitReview}
@@ -131,9 +142,11 @@ export default function RateBookingDialog({ open, booking, onClose }) {
               bg-primary
               text-white
               py-3
-              rounded-[12px]
+              rounded-xl
               font-semibold
+              text-sm
               disabled:opacity-50
+              hover:opacity-90
             "
           >
             Submit Review

@@ -57,10 +57,13 @@ export const addReview = async (req, res) => {
       },
     ]);
 
-    await Property.findByIdAndUpdate(propertyId, {
-      averageRating: stats[0]?.avgRating || 0,
-      reviewCount: stats[0]?.count || 0,
-    });
+    await Property.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId(propertyId) },
+      {
+        averageRating: stats[0]?.avgRating || 0,
+        reviewCount: stats[0]?.count || 0,
+      }
+    );
 
     res.status(201).json({ success: true, data: review });
 
