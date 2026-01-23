@@ -98,10 +98,6 @@ export default function OwnerBookings() {
     fetchBookings();
   }, []);
 
-  useEffect(() => {
-    setStatusFilter(statusFromUrl);
-  }, [statusFromUrl]);
-
   const fetchBookings = async () => {
     try {
       const res = await api.get(SummaryApi.getOwnerBookings.url);
