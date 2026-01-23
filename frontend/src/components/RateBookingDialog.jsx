@@ -70,7 +70,7 @@ export default function RateBookingDialog({ open, booking, onClose }) {
         {/* CLOSE */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-20 bg-white/80 rounded-full p-1 hover:bg-white"
+          className="absolute top-3 right-3 z-20 bg-white/80 rounded-full px-2 py-1 hover:bg-white"
         >
           <span>X</span>
         </button>
