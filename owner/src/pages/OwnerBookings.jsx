@@ -113,41 +113,41 @@ export default function OwnerBookings() {
   };
 
   useEffect(() => {
-  let data = [...bookings];
+    let data = [...bookings];
 
-  const q = query.toLowerCase();
-  data = data.filter(
-    (b) =>
-      b._id?.toLowerCase().includes(q) ||
-      b?.userId?.firstName?.toLowerCase().includes(q) ||
-      b.userId?.lastName?.toLowerCase().includes(q) ||
-      b.userId?.mobile?.includes(q) ||
-      b.propertyId?.propertyName?.toLowerCase().includes(q)
-  );
+    const q = query.toLowerCase();
+    data = data.filter(
+      (b) =>
+        b._id?.toLowerCase().includes(q) ||
+        b?.userId?.firstName?.toLowerCase().includes(q) ||
+        b.userId?.lastName?.toLowerCase().includes(q) ||
+        b.userId?.mobile?.includes(q) ||
+        b.propertyId?.propertyName?.toLowerCase().includes(q)
+    );
 
-  if (timeFilter === "upcoming") {
-    data = data.filter(b => new Date(b.checkOut) >= todayStart);
-  }
+    if (timeFilter === "upcoming") {
+      data = data.filter(b => new Date(b.checkOut) >= todayStart);
+    }
 
-  if (timeFilter === "past") {
-    data = data.filter(b => new Date(b.checkOut) < todayStart);
-  }
+    if (timeFilter === "past") {
+      data = data.filter(b => new Date(b.checkOut) < todayStart);
+    }
 
-  if (statusFilter !== "all") {
-    data = data.filter(b => {
-      const s = b.paymentStatus;
-      if (statusFilter === "confirmed") return s === "paid";
-      if (statusFilter === "pending") return ["pending", "initiated", "failed"].includes(s);
-      if (statusFilter === "cancelled") return s === "cancelled";
-      return true;
-    });
-  }
+    if (statusFilter !== "all") {
+      data = data.filter(b => {
+        const s = b.paymentStatus;
+        if (statusFilter === "confirmed") return s === "paid";
+        if (statusFilter === "pending") return ["pending", "initiated", "failed"].includes(s);
+        if (statusFilter === "cancelled") return s === "cancelled";
+        return true;
+      });
+    }
 
-  data.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+    data.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 
-  setFiltered(data);
-  setPage(1);
-}, [query, timeFilter, statusFilter, bookings]);
+    setFiltered(data);
+    setPage(1);
+  }, [query, timeFilter, statusFilter, bookings]);
 
 
 
@@ -415,11 +415,25 @@ export default function OwnerBookings() {
                               View Booking
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                              onSelect={() => navigate(`/invoice/${b._id}`)}
-                            >
-                              View Invoice
-                            </DropdownMenuItem>
+                            {b.paymentStatus === "paid" ? (
+                              <>
+                                <DropdownMenuItem
+                                  onSelect={() => navigate(`/invoice/${b._id}`)}
+                                >
+                                  View Invoice
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                  onSelect={() => openConfirm("invoice", b)}
+                                >
+                                  Download Invoice
+                                </DropdownMenuItem>
+                              </>
+                            ) : (
+                              <DropdownMenuItem disabled className="text-gray-400">
+                                Invoice available after payment
+                              </DropdownMenuItem>
+                            )}
 
                             <DropdownMenuItem
                               onSelect={() => openConfirm("invoice", b)}

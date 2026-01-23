@@ -510,9 +510,15 @@ export default function Dashboard() {
                                 View Booking
                               </DropdownMenuItem>
 
-                              <DropdownMenuItem onSelect={() => navigate(`/invoice/${b._id}`)}>
-                                View Invoice
-                              </DropdownMenuItem>
+                              {b.paymentStatus === "paid" ? (
+                                <DropdownMenuItem onSelect={() => navigate(`/invoice/${b._id}`)}>
+                                  View Invoice
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem disabled className="text-gray-400 italic">
+                                  Invoice available after payment
+                                </DropdownMenuItem>
+                              )}
 
                               <DropdownMenuItem
                                 onSelect={() =>
