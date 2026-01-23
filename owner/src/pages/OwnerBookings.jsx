@@ -51,7 +51,7 @@ export default function OwnerBookings() {
 
   const [searchParams] = useSearchParams();
   const statusFromUrl = searchParams.get("status") || "upcoming";
-  
+
   const [timeFilter, setTimeFilter] = useState(statusFromUrl);
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -94,7 +94,6 @@ export default function OwnerBookings() {
   const openConfirm = (type, booking) =>
     setConfirm({ open: true, type, booking });
 
-  // FETCH BOOKINGS
   useEffect(() => {
     fetchBookings();
   }, []);
@@ -117,59 +116,43 @@ export default function OwnerBookings() {
     }
   };
 
-  // FILTER LOGIC
   useEffect(() => {
-    let data = [...bookings];
+  let data = [...bookings];
 
-    const q = query.toLowerCase();
-    data = data.filter(
-      (b) =>
-        b._id?.toLowerCase().includes(q) ||
-        b?.userId?.firstName?.toLowerCase().includes(q) ||
-        b.userId?.lastName?.toLowerCase().includes(q) ||
-        b.userId?.mobile?.includes(q) ||
-        b.propertyId?.propertyName?.toLowerCase().includes(q)
-    );
+  const q = query.toLowerCase();
+  data = data.filter(
+    (b) =>
+      b._id?.toLowerCase().includes(q) ||
+      b?.userId?.firstName?.toLowerCase().includes(q) ||
+      b.userId?.lastName?.toLowerCase().includes(q) ||
+      b.userId?.mobile?.includes(q) ||
+      b.propertyId?.propertyName?.toLowerCase().includes(q)
+  );
 
-    if (paymentFilter === "upcoming") {
-      data = data.filter(b => new Date(b.checkOut) >= todayStart);
-    }
+  if (timeFilter === "upcoming") {
+    data = data.filter(b => new Date(b.checkOut) >= todayStart);
+  }
 
-    if (paymentFilter === "past") {
-      data = data.filter(b => new Date(b.checkOut) < todayStart);
-    }
+  if (timeFilter === "past") {
+    data = data.filter(b => new Date(b.checkOut) < todayStart);
+  }
 
-    if (["confirmed", "pending", "cancelled"].includes(paymentFilter)) {
-      data = data.filter((b) => {
-        const s = b.paymentStatus;
+  if (statusFilter !== "all") {
+    data = data.filter(b => {
+      const s = b.paymentStatus;
+      if (statusFilter === "confirmed") return s === "paid";
+      if (statusFilter === "pending") return ["pending", "initiated", "failed"].includes(s);
+      if (statusFilter === "cancelled") return s === "cancelled";
+      return true;
+    });
+  }
 
-        // TIME
-        if (timeFilter === "upcoming") {
-          data = data.filter(b => new Date(b.checkOut) >= todayStart);
-        }
+  data.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 
-        if (timeFilter === "past") {
-          data = data.filter(b => new Date(b.checkOut) < todayStart);
-        }
+  setFiltered(data);
+  setPage(1);
+}, [query, timeFilter, statusFilter, bookings]);
 
-        if (statusFilter !== "all") {
-          data = data.filter(b => {
-            const s = b.paymentStatus;
-
-            if (statusFilter === "confirmed") return s === "paid";
-            if (statusFilter === "pending") return ["pending", "initiated", "failed"].includes(s);
-            if (statusFilter === "cancelled") return s === "cancelled";
-          });
-        }
-        return true;
-      });
-    }
-
-    data.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
-
-    setFiltered(data);
-    setPage(1);
-  }, [query, paymentFilter, bookings]);
 
 
   const totalPages = Math.ceil(filtered.length / pageSize);
