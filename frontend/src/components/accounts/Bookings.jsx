@@ -133,7 +133,7 @@ export default function Bookings() {
             <ChevronDown className="w-4 h-4 text-gray-500" />
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="!min-w-[100%] !w-[100%] -left-[17px] md:w-[180px]" align="end">
+          <DropdownMenuContent className="!min-w-[100%] !w-[100%] -left-[17px] md:w-[220px]" align="end">
             <DropdownMenuItem onClick={() => setStatusFilter("all")}>
               All
             </DropdownMenuItem>
