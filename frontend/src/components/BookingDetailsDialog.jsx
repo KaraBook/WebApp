@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Mail,
@@ -12,6 +13,8 @@ import {
   Clock,
 } from "lucide-react";
 import { format } from "date-fns";
+
+/* ---------- helpers (unchanged) ---------- */
 
 const Badge = ({ children, tone = "green" }) => {
   const styles =
@@ -52,11 +55,10 @@ function getStatusTone(status) {
 
 function calcNights(checkIn, checkOut, fallbackNights) {
   if (typeof fallbackNights === "number") return fallbackNights;
-
   try {
     const s = new Date(checkIn);
     const e = new Date(checkOut);
-    const diff = Math.round((e - s) / (1000 * 60 * 60 * 24));
+    const diff = Math.round((e - s) / 86400000);
     return Math.max(1, diff);
   } catch {
     return "—";
@@ -64,13 +66,9 @@ function calcNights(checkIn, checkOut, fallbackNights) {
 }
 
 function guestsText(guests) {
-  // supports both number & object
   if (!guests) return "—";
   if (typeof guests === "number") return `${guests} Guests`;
-
-  const a = guests.adults ?? 0;
-  const c = guests.children ?? 0;
-  return `${a} Adults, ${c} Children`;
+  return `${guests.adults ?? 0} Adults, ${guests.children ?? 0} Children`;
 }
 
 function money(n) {
@@ -78,10 +76,8 @@ function money(n) {
   return `₹${n.toLocaleString("en-IN")}`;
 }
 
-
 function normalizeStatus(booking) {
   if (booking?.status === "cancelled") return "cancelled";
-
   if (
     booking?.paymentStatus === "paid" ||
     booking?.status === "paid" ||
@@ -93,12 +89,18 @@ function normalizeStatus(booking) {
   return "pending";
 }
 
+/* ---------- MAIN ---------- */
 
-export default function BookingDetailsDialog({
-  open,
-  onOpenChange,
-  booking,
-}) {
+export default function BookingDetailsDialog({ open, onOpenChange, booking }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   if (!booking) return null;
 
   const userName =
@@ -109,68 +111,61 @@ export default function BookingDetailsDialog({
   const email = booking?.user?.email || booking?.contactEmail || "—";
   const phone = booking?.user?.mobile || booking?.contactPhone || "—";
 
-  const propertyName = booking?.property?.propertyName || booking?.property?.name || "—";
+  const propertyName =
+    booking?.property?.propertyName ||
+    booking?.property?.name ||
+    "—";
 
   const checkIn = booking?.checkIn || booking?.startDate;
   const checkOut = booking?.checkOut || booking?.endDate;
-
   const nights = calcNights(checkIn, checkOut, booking?.totalNights);
 
-  // If your backend already returns these, use them:
   const amount = booking?.amount ?? booking?.totalAmount ?? 0;
-  const tax = booking?.tax ?? booking?.taxAmount ?? Math.round(amount * 0.1);
+  const tax = booking?.tax ?? Math.round(amount * 0.1);
   const grandTotal = booking?.grandTotal ?? amount + tax;
 
   const status = normalizeStatus(booking);
-  const paymentMethod = booking?.paymentProvider || booking?.paymentMethod || "—";
-  const orderId = booking?.orderId || booking?.razorpayOrderId || "—";
+  const paymentMethod =
+    booking?.paymentProvider || booking?.paymentMethod || "—";
+  const orderId =
+    booking?.orderId || booking?.razorpayOrderId || "—";
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} className="z-[9999999]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="
-           fixed
-    inset-y-0
-    right-0
-    z-[9999999]
-    h-full
-    w-[420px]
-    max-w-[90vw]
-    p-0
-    pb-4
-    rounded-none
-    border-l
-    bg-white
-    shadow-xl
-    overflow-y-auto
+        className={`
+          fixed z-[9999999] bg-white shadow-xl overflow-y-auto p-0 pb-4
 
-    !translate-x-0
-    !translate-y-0
-    !left-auto
-    !top-0
+          /* DESKTOP → RIGHT PANEL */
+          md:inset-y-0 md:right-0 md:h-full md:w-[420px] md:rounded-none md:border-l
+          md:data-[state=open]:slide-in-from-right
+          md:data-[state=closed]:slide-out-to-right
 
-    data-[state=open]:animate-in
-    data-[state=open]:slide-in-from-right
-    data-[state=closed]:animate-out
-    data-[state=closed]:slide-out-to-right
-    duration-300"
+          /* MOBILE → BOTTOM DRAWER */
+          inset-x-0 bottom-0 h-[90vh] rounded-t-2xl
+          data-[state=open]:slide-in-from-bottom
+          data-[state=closed]:slide-out-to-bottom
+          duration-300
+        `}
       >
+        {/* mobile drag bar */}
+        <div className="md:hidden mx-auto mt-2 mb-1 w-12 h-1.5 rounded-full bg-gray-300" />
+
         {/* HEADER */}
         <div className="relative px-4 pt-4 pb-3 border-b">
           <button
             onClick={() => onOpenChange(false)}
             className="absolute right-3 top-3 text-black hover:text-red-700"
-            aria-label="Close"
           >
             ✕
           </button>
 
-          <div className="flex items-start md:justify-between justify-start gap-4">
+          <div className="flex items-start md:justify-between gap-4">
             <div>
-              <p className="text-[16px] font-semibold text-gray-900 leading-tight">
+              <p className="text-[16px] font-semibold text-gray-900">
                 {userName}
               </p>
-              <p className="text-[14px] text-gray-500 mt-0.5">{email}</p>
+              <p className="text-[14px] text-gray-500">{email}</p>
             </div>
 
             <Badge tone={getStatusTone(status)}>
@@ -179,125 +174,95 @@ export default function BookingDetailsDialog({
           </div>
         </div>
 
-        {/* BODY */}
+        {/* BODY (unchanged content) */}
         <div className="p-4 space-y-4">
           {/* Property */}
-          <div className="rounded-xl border border-gray-200 bg-white p-3">
+          <div className="rounded-xl border p-3">
             <div className="flex items-start gap-2">
               <Home className="w-4 h-4 text-gray-400 mt-0.5" />
               <div>
                 <p className="text-[14px] text-gray-500">Property</p>
-                <p className="text-[16px] font-medium text-gray-900 mt-0.5">
-                  {propertyName}
-                </p>
+                <p className="text-[16px] font-medium">{propertyName}</p>
               </div>
             </div>
           </div>
 
-          {/* Dates + Nights + Guests (2x2) */}
+          {/* Dates grid */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border bg-neutral-50 border-gray-200 p-3">
-              <div className="flex items-center gap-2">
-                <CalendarDays className="w-4 h-4 text-gray-400" />
-                <p className="text-[14px] text-gray-500">Check-in</p>
-              </div>
-              <p className="text-[16px] font-medium text-gray-900 mt-1">
-                {checkIn ? format(new Date(checkIn), "dd MMM, yyyy") : "—"}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-gray-200 bg-neutral-50 p-3">
-              <div className="flex items-center gap-2">
-                <CalendarDays className="w-4 h-4 text-gray-400" />
-                <p className="text-[14px] text-gray-500">Check-out</p>
-              </div>
-              <p className="text-[16px] font-medium text-gray-900 mt-1">
-                {checkOut ? format(new Date(checkOut), "dd MMM, yyyy") : "—"}
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-gray-200 bg-neutral-50 p-3">
-              <div className="flex items-center gap-2">
-                <Moon className="w-4 h-4 text-gray-400" />
-                <p className="text-[14px] text-gray-500">Nights</p>
-              </div>
-              <p className="text-[16px] font-medium text-gray-900 mt-1">{nights}</p>
-            </div>
-
-            <div className="rounded-xl border border-gray-200 bg-neutral-50 p-3">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-gray-400" />
-                <p className="text-[14px] text-gray-500">Guests</p>
-              </div>
-              <p className="text-[16px] font-medium text-gray-900 mt-1">
-                {guestsText(booking?.guests)}
-              </p>
-            </div>
+            <Box icon={CalendarDays} label="Check-in" value={checkIn ? format(new Date(checkIn), "dd MMM, yyyy") : "—"} />
+            <Box icon={CalendarDays} label="Check-out" value={checkOut ? format(new Date(checkOut), "dd MMM, yyyy") : "—"} />
+            <Box icon={Moon} label="Nights" value={nights} />
+            <Box icon={Users} label="Guests" value={guestsText(booking?.guests)} />
           </div>
 
-          {/* Contact Information */}
-          <div>
-            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-              Contact Information
-            </p>
-            <div className="space-y-2">
-              <InfoLine icon={Mail} text={email} />
-              <InfoLine icon={Phone} text={phone} />
-            </div>
-          </div>
+          {/* Contact */}
+          <Section title="Contact Information">
+            <InfoLine icon={Mail} text={email} />
+            <InfoLine icon={Phone} text={phone} />
+          </Section>
 
-          {/* Payment Information */}
-          <div>
-            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
-              Payment Information
-            </p>
-
-            <div className="rounded-xl border border-gray-200 bg-white">
-              <div className="px-3">
-                <div className="py-2 flex items-center justify-between">
-                  <span className="text-[13px] text-gray-500">Payment Status</span>
-                  <Badge tone={getStatusTone(status)}>
-                    {status.toUpperCase()}
-                  </Badge>
-                </div>
+          {/* Payment */}
+          <Section title="Payment Information">
+            <div className="rounded-xl border">
+              <div className="px-3 py-2 flex justify-between">
+                <span className="text-gray-500">Payment Status</span>
+                <Badge tone={getStatusTone(status)}>
+                  {status.toUpperCase()}
+                </Badge>
               </div>
 
               <div className="border-t" />
 
               <div className="px-3">
-                <Row label="Payment Method" value={String(paymentMethod)} />
+                <Row label="Payment Method" value={paymentMethod} />
                 <Row label="Amount" value={money(amount)} />
                 <Row label="Tax" value={money(tax)} />
               </div>
 
-              <div className="bg-gray-50 px-3 py-2 border-t flex items-center justify-between">
-                <span className="text-[13px] text-gray-500">Grand Total</span>
-                <span className="text-[13px] font-semibold text-gray-900">{money(grandTotal)}</span>
+              <div className="bg-gray-50 px-3 py-2 border-t flex justify-between">
+                <span className="text-gray-500">Grand Total</span>
+                <span className="font-semibold">{money(grandTotal)}</span>
               </div>
 
-              <div className="border-t" />
-
-              <div className="px-3 py-2 flex items-center justify-between text-[12px]">
+              <div className="border-t px-3 py-2 flex justify-between text-[12px]">
                 <span className="text-gray-500 flex items-center gap-2">
-                  <Hash className="w-4 h-4 text-gray-400" />
-                  Order ID
+                  <Hash className="w-4 h-4" /> Order ID
                 </span>
-                <span className="text-gray-800 font-medium break-all text-right">{orderId}</span>
+                <span className="font-medium">{orderId}</span>
               </div>
             </div>
 
             <div className="mt-2 flex items-center gap-2 text-[11px] text-gray-500">
-              <Clock className="w-4 h-4 text-gray-400" />
-              <span>
-                Booking created on{" "}
-                {booking?.createdAt
-                  ? format(new Date(booking.createdAt), "dd MMM, yyyy")
-                  : "—"}
-              </span>
+              <Clock className="w-4 h-4" />
+              Booking created on{" "}
+              {booking?.createdAt
+                ? format(new Date(booking.createdAt), "dd MMM, yyyy")
+                : "—"}
             </div>
-          </div>
+          </Section>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
+/* small helpers */
+
+const Box = ({ icon: Icon, label, value }) => (
+  <div className="rounded-xl border bg-neutral-50 p-3">
+    <div className="flex items-center gap-2">
+      <Icon className="w-4 h-4 text-gray-400" />
+      <p className="text-[14px] text-gray-500">{label}</p>
+    </div>
+    <p className="text-[16px] font-medium mt-1">{value}</p>
+  </div>
+);
+
+const Section = ({ title, children }) => (
+  <div>
+    <p className="text-[11px] font-semibold text-gray-500 uppercase mb-2">
+      {title}
+    </p>
+    <div className="space-y-2">{children}</div>
+  </div>
+);
