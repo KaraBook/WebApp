@@ -313,7 +313,8 @@ export default function Bookings() {
                             </DropdownMenuItem>
                             {canViewInvoice(b) ? (
                               <DropdownMenuItem
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   window.location.href = `/account/invoice/${b._id}`;
                                 }}
                               >
@@ -337,7 +338,8 @@ export default function Bookings() {
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 if (b.paymentStatus !== "paid") {
                                   toast.error("You can rate only after payment is completed.");
                                   return;
@@ -350,16 +352,22 @@ export default function Bookings() {
                               </div>
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() =>
-                                window.open(`tel:${b.property?.contactNumber}`)
-                              }
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(`tel:${b.property?.contactNumber}`);
+                              }}
                             >
                               <div className="flex items-center gap-2">
                                 <PhoneCall size={16} /> Call Resort
                               </div>
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem className="text-red-600">
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
+                            >
                               <div className="flex items-center gap-2">
                                 <XCircle size={16} />
                                 Cancel Booking
