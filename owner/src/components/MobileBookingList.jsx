@@ -15,15 +15,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 
+function normalizePaymentStatus(status) {
+    if (["paid", "confirmed"].includes(status)) return "confirmed";
+    if (["pending", "initiated", "failed"].includes(status)) return "pending";
+    if (status === "cancelled") return "cancelled";
+    return "pending";
+}
+
 function PaymentChip({ status }) {
+    const s = normalizePaymentStatus(status);
     const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
     const map = {
-        paid: `${base} bg-emerald-50 text-emerald-700`,
+        confirmed: `${base} bg-emerald-50 text-emerald-700`,
         pending: `${base} bg-amber-50 text-amber-700`,
-        initiated: `${base} bg-gray-100 text-gray-600`,
-        failed: `${base} bg-red-50 text-red-600`,
+        cancelled: `${base} bg-gray-100 text-gray-600`,
     };
-    return <span className={map[status] || base}>{status}</span>;
+    return <span className={map[s]}>{s}</span>;
 }
 
 
