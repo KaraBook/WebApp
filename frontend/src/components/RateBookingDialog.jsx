@@ -92,7 +92,7 @@ export default function RateBookingDialog({ open, booking, onClose }) {
           className="absolute top-3 right-3 text-gray-500 hover:text-black"
           aria-label="Close"
         >
-          <X className="w-5 h-5" />
+          <span>X</span>
         </button>
 
         <h2 className="text-xl font-semibold">Rate this Resort</h2>
