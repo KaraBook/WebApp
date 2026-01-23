@@ -117,7 +117,6 @@ export default function BookingDetailsDialog({
 
   const nights = calcNights(checkIn, checkOut, booking?.totalNights);
 
-  // If your backend already returns these, use them:
   const amount = booking?.amount ?? booking?.totalAmount ?? 0;
   const tax = booking?.tax ?? booking?.taxAmount ?? Math.round(amount * 0.1);
   const grandTotal = booking?.grandTotal ?? amount + tax;
@@ -161,7 +160,121 @@ export default function BookingDetailsDialog({
 
         {/* BODY */}
         <div className="p-4 space-y-4">
-          {/* all your existing body exactly same */}
+          {/* Property */}
+          <div className="rounded-xl border border-gray-200 bg-white p-3">
+            <div className="flex items-start gap-2">
+              <Home className="w-4 h-4 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-[14px] text-gray-500">Property</p>
+                <p className="text-[16px] font-medium text-gray-900 mt-0.5">
+                  {propertyName}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Dates + Nights + Guests (2x2) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl border bg-neutral-50 border-gray-200 p-3">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="w-4 h-4 text-gray-400" />
+                <p className="text-[14px] text-gray-500">Check-in</p>
+              </div>
+              <p className="text-[16px] font-medium text-gray-900 mt-1">
+                {checkIn ? format(new Date(checkIn), "dd MMM, yyyy") : "—"}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-neutral-50 p-3">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="w-4 h-4 text-gray-400" />
+                <p className="text-[14px] text-gray-500">Check-out</p>
+              </div>
+              <p className="text-[16px] font-medium text-gray-900 mt-1">
+                {checkOut ? format(new Date(checkOut), "dd MMM, yyyy") : "—"}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-neutral-50 p-3">
+              <div className="flex items-center gap-2">
+                <Moon className="w-4 h-4 text-gray-400" />
+                <p className="text-[14px] text-gray-500">Nights</p>
+              </div>
+              <p className="text-[16px] font-medium text-gray-900 mt-1">{nights}</p>
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-neutral-50 p-3">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-gray-400" />
+                <p className="text-[14px] text-gray-500">Guests</p>
+              </div>
+              <p className="text-[16px] font-medium text-gray-900 mt-1">
+                {guestsText(booking?.guests)}
+              </p>
+            </div>
+          </div>
+
+          {/* Contact Information */}
+          <div>
+            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              Contact Information
+            </p>
+            <div className="space-y-2">
+              <InfoLine icon={Mail} text={email} />
+              <InfoLine icon={Phone} text={phone} />
+            </div>
+          </div>
+
+          {/* Payment Information */}
+          <div>
+            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              Payment Information
+            </p>
+
+            <div className="rounded-xl border border-gray-200 bg-white">
+              <div className="px-3">
+                <div className="py-2 flex items-center justify-between">
+                  <span className="text-[13px] text-gray-500">Payment Status</span>
+                  <Badge tone={getStatusTone(status)}>
+                    {status.toUpperCase()}
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="border-t" />
+
+              <div className="px-3">
+                <Row label="Payment Method" value={String(paymentMethod)} />
+                <Row label="Amount" value={money(amount)} />
+                <Row label="Tax" value={money(tax)} />
+              </div>
+
+              <div className="bg-gray-50 px-3 py-2 border-t flex items-center justify-between">
+                <span className="text-[13px] text-gray-500">Grand Total</span>
+                <span className="text-[13px] font-semibold text-gray-900">{money(grandTotal)}</span>
+              </div>
+
+              <div className="border-t" />
+
+              <div className="px-3 py-2 flex items-center justify-between text-[12px]">
+                <span className="text-gray-500 flex items-center gap-2">
+                  <Hash className="w-4 h-4 text-gray-400" />
+                  Order ID
+                </span>
+                <span className="text-gray-800 font-medium break-all text-right">{orderId}</span>
+              </div>
+            </div>
+
+            <div className="mt-2 flex items-center gap-2 text-[11px] text-gray-500">
+              <Clock className="w-4 h-4 text-gray-400" />
+              <span>
+                Booking created on{" "}
+                {booking?.createdAt
+                  ? format(new Date(booking.createdAt), "dd MMM, yyyy")
+                  : "—"}
+              </span>
+            </div>
+          </div>
         </div>
 
       </div>
