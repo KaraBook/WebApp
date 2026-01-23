@@ -50,6 +50,12 @@ export default function Dashboard() {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
 
+    const goToBookings = (filter) => {
+        navigate("/account/bookings", {
+            state: { statusFilter: filter },
+        });
+    };
+
 
     const fetchDashboardData = async () => {
         try {
@@ -143,10 +149,31 @@ export default function Dashboard() {
 
             {/* STATS */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-5 mb-2 md:mb-6">
-                <StatCard title="Total Bookings" value={totalBookings} icon={<Calendar />} dark />
-                <StatCard title="Paid" value={confirmed} icon={<CheckCircle2 />} />
-                <StatCard title="Pending" value={pending} icon={<Clock />} />
-                <StatCard title="Cancelled" value={cancelled} icon={<XCircle />} />
+                <StatCard
+                    title="Total Bookings"
+                    value={totalBookings}
+                    icon={<Calendar />}
+                    dark
+                    onClick={() => goToBookings("all")}
+                />
+                <StatCard
+                    title="Confirmed"
+                    value={confirmed}
+                    icon={<CheckCircle2 />}
+                    onClick={() => goToBookings("confirmed")}
+                />
+                <StatCard
+                    title="Pending"
+                    value={pending}
+                    icon={<Clock />}
+                    onClick={() => goToBookings("pending")}
+                />
+                <StatCard
+                    title="Cancelled"
+                    value={cancelled}
+                    icon={<XCircle />}
+                    onClick={() => goToBookings("cancelled")}
+                />
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-5 mb-8">
@@ -154,6 +181,7 @@ export default function Dashboard() {
                     title="Wishlist Items"
                     value={wishlistCount}
                     icon={<Heart />}
+                    onClick={() => navigate("/account/wishlist")}
                 />
 
                 <StatCard
@@ -336,12 +364,13 @@ export default function Dashboard() {
 
 
 
-function StatCard({ title, value, subtitle, icon, dark }) {
+function StatCard({ title, value, subtitle, icon, dark, onClick }) {
     return (
         <div
+            onClick={onClick}
             className={cn(
-                "rounded-xl border p-3 md:p-5 flex justify-between items-start",
-                dark ? "bg-primary text-white border-none" : "bg-white"
+                "rounded-xl border p-3 md:p-5 flex justify-between items-start cursor-pointer transition",
+                dark ? "bg-primary text-white border-none" : "bg-white hover:bg-gray-50"
             )}
         >
             <div>
@@ -364,6 +393,7 @@ function StatCard({ title, value, subtitle, icon, dark }) {
     );
 }
 
+
 function StatusChip({ status }) {
     const normalized =
         status === "initiated" ? "pending" :
@@ -372,7 +402,7 @@ function StatusChip({ status }) {
 
     const label =
         normalized === "confirmed"
-            ? "Paid"
+            ? "Confirmed"
             : normalized === "pending"
                 ? "Pending"
                 : "Cancelled";
