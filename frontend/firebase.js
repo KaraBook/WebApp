@@ -22,10 +22,11 @@ export const sendOtp = async (phoneNumber) => {
     recaptchaVerifier = new RecaptchaVerifier(
       auth,
       "recaptcha-container",
-      {
-        size: "invisible",
-      }
+      { size: "invisible" }
     );
+
+    // 🔥 THIS LINE WAS MISSING
+    await recaptchaVerifier.render();
   }
 
   return signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
