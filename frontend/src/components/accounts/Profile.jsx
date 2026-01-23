@@ -8,7 +8,7 @@ import { useAuthStore } from "@/store/auth";
 import EditProfileDialog from "../EditProfileDialog";
 
 export default function Profile() {
-  const { accessToken, clearAuth } = useAuthStore();
+  const { accessToken, clearAuth, updatedUser } = useAuthStore();
   const [profile, setProfile] = useState(null);
   const [bookingCount, setBookingCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -54,7 +54,9 @@ export default function Profile() {
         }
       });
 
-      setAvatarPreview(res.data.avatarUrl);
+      const url = res.data.avatarUrl + "?t=" + Date.now();
+      setAvatarPreview(url);
+      updatedUser({ avatarUrl: url });
       toast.success("Profile photo updated");
     } catch {
       toast.error("Upload failed");
@@ -86,6 +88,7 @@ export default function Profile() {
       });
 
       setAvatarPreview("");
+      updatedUser({ avatarUrl: "" });
       toast.success("Profile photo removed");
     } catch {
       toast.error("Failed to remove photo");
