@@ -119,7 +119,7 @@ export default function Bookings() {
         </h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="border px-6 py-2 rounded-md bg-white text-sm flex items-center gap-2">
+          <DropdownMenuTrigger className="border w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center gap-2">
             {statusFilter === "all"
               ? "All"
               : statusFilter === "confirmed"
@@ -129,7 +129,7 @@ export default function Bookings() {
                   : "Cancelled"}
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent className="w-[180px]" align="end">
             <DropdownMenuItem onClick={() => setStatusFilter("all")}>
               All
             </DropdownMenuItem>
