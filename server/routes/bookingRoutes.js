@@ -10,6 +10,6 @@ router.get("/booked-dates/:propertyId", getBookedDates);
 router.get("/user", requireAuth, getUserBookings);
 router.get("/invoice/:bookingId", requireAuth, getBookingInvoice);
 router.get("/:bookingId", requireAuth, getBookingById);
-router.get("/preview-pricing", requireAuth, previewPricing);
+router.post("/preview-pricing", requireAuth, previewPricing);
 
 export default router;
