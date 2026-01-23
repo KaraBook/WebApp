@@ -6,7 +6,7 @@ import { Phone, MoreVertical, Download, FileDown, Eye, Star, PhoneCall, XCircle,
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import BookingDetailsDialog from "../BookingDetailsDialog";
 import MobileBookingCard from "../MobileBookingCard";
@@ -42,7 +42,13 @@ export default function Bookings() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [ratingBooking, setRatingBooking] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
+  const location = useLocation();
 
+  useEffect(() => {
+    if (location.state?.statusFilter) {
+      setStatusFilter(location.state.statusFilter);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     (async () => {
