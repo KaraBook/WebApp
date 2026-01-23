@@ -202,7 +202,9 @@ export const verifyPayment = async (req, res) => {
       { new: true }
     )
       .populate("userId", "firstName lastName email mobile")
-      .populate("propertyId", "propertyName city state address");
+      .populate("propertyId",
+        "propertyName city state address baseGuests pricingPerNightWeekdays pricingPerNightWeekend extraAdultCharge extraChildCharge vegMealRate nonVegMealRate"
+      );
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
