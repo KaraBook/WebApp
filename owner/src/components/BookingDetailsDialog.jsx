@@ -37,6 +37,14 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
     contactEmail,
   } = booking;
 
+  const normalizePaymentStatus = (status) => {
+    if (status === "paid") return "confirmed";
+    if (status === "cancelled") return "cancelled";
+    return "pending";
+  };
+
+  const uiStatus = normalizePaymentStatus(paymentStatus);
+
   const adults = guests?.adults || 0;
   const children = guests?.children || 0;
 
@@ -60,7 +68,7 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
     <Dialog
       open={open}
       onOpenChange={(isOpen) => {
-        if (!isOpen) onClose(); 
+        if (!isOpen) onClose();
       }}
     >
       <DialogContent
@@ -93,12 +101,14 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
 
           <span
             className={`mt-2 w-fit px-3 py-1 rounded-full text-xs font-medium capitalize
-              ${paymentStatus === "paid"
+    ${uiStatus === "confirmed"
                 ? "bg-emerald-100 text-emerald-700"
-                : "bg-gray-100 text-gray-600"
+                : uiStatus === "cancelled"
+                  ? "bg-gray-100 text-gray-600"
+                  : "bg-yellow-100 text-yellow-700"
               }`}
           >
-            {paymentStatus}
+            {uiStatus}
           </span>
 
           <button
@@ -167,8 +177,16 @@ export default function BookingDetailsDialog({ open, booking, onClose }) {
             {/* Payment Status */}
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Payment Status</span>
-              <span className="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
-                Paid
+              <span
+                className={`px-3 py-1 rounded-full text-xs capitalize
+    ${uiStatus === "confirmed"
+                    ? "bg-emerald-100 text-emerald-700"
+                    : uiStatus === "cancelled"
+                      ? "bg-gray-100 text-gray-600"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
+              >
+                {uiStatus}
               </span>
             </div>
 
