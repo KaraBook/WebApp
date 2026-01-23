@@ -51,6 +51,13 @@ export default function InvoicePage() {
   const invoiceRef = useRef(null);
   const { accessToken } = useAuthStore();
 
+  const meals = invoice.meals || null;
+
+  const hasMeals = meals?.enabled;
+  const vegCount = Number(meals?.veg || 0);
+  const nonVegCount = Number(meals?.nonVeg || 0);
+
+
   useEffect(() => {
     (async () => {
       const res = await Axios.get(SummaryApi.getInvoice.url(id), {
@@ -62,7 +69,6 @@ export default function InvoicePage() {
 
   if (!invoice) return null;
 
-  /* ----------------- SAFE DERIVED VALUES ----------------- */
   const guestsData = invoice.guests;
 
   let adults = 0;
@@ -87,41 +93,41 @@ export default function InvoicePage() {
       : "—";
 
   const downloadPDF = async () => {
-  const original = invoiceRef.current;
-  if (!original) return;
+    const original = invoiceRef.current;
+    if (!original) return;
 
-  const clone = original.cloneNode(true);
+    const clone = original.cloneNode(true);
 
-  // 🔒 FORCE DESKTOP PDF MODE
-  clone.classList.add("pdf-desktop");
-  clone.querySelector(".invoice-pdf")?.classList.add("pdf-layout");
+    // 🔒 FORCE DESKTOP PDF MODE
+    clone.classList.add("pdf-desktop");
+    clone.querySelector(".invoice-pdf")?.classList.add("pdf-layout");
 
-  clone.style.position = "fixed";
-  clone.style.top = "0";
-  clone.style.left = "-9999px";
-  clone.style.background = "#fff";
+    clone.style.position = "fixed";
+    clone.style.top = "0";
+    clone.style.left = "-9999px";
+    clone.style.background = "#fff";
 
-  document.body.appendChild(clone);
+    document.body.appendChild(clone);
 
-  await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 300));
 
-  const canvas = await html2canvas(clone, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#ffffff",
-  });
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
 
-  document.body.removeChild(clone);
+    document.body.removeChild(clone);
 
-  const imgData = canvas.toDataURL("image/png");
-  const pdf = new jsPDF("p", "mm", "a4");
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
 
-  const pdfWidth = 210;
-  const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pdfWidth = 210;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-  pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
-};
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
+  };
 
 
 
@@ -197,9 +203,10 @@ export default function InvoicePage() {
             <p className="uppercase text-xs font-semibold text-muted-foreground mb-2">
               Booking Details
             </p>
-            <div className="booking-details-grid grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-              <BD label="Check-in" value="27 Nov 2025" sub="2:00 PM" />
-              <BD label="Check-out" value="30 Nov 2025" sub="11:00 AM" />
+            <div className={`booking-details-grid grid grid-cols-2 ${
+                 hasMeals ? "sm:grid-cols-5" : "sm:grid-cols-4" } gap-4 text-sm`}>
+              <BD label="Check-in" value="27 Nov 2025" />
+              <BD label="Check-out" value="30 Nov 2025" />
               <BD label="Duration" value={`${invoice.nights} Nights`} />
               <BD
                 label="Guests"
@@ -210,6 +217,13 @@ export default function InvoicePage() {
                     : "—"
                 }
               />
+              {hasMeals && (
+                <BD
+                  label="Meals"
+                  value={`${vegCount + nonVegCount} Guests`}
+                  sub={`${vegCount} Veg, ${nonVegCount} Non-Veg`}
+                />
+              )}
             </div>
           </div>
 
@@ -336,29 +350,29 @@ export default function InvoicePage() {
           </p>
         </div>
       </div>
-      </div>
-      );
+    </div>
+  );
 }
 
-      /* ---------- HELPERS ---------- */
+/* ---------- HELPERS ---------- */
 
-      function KV({label, value, mono, bold}) {
+function KV({ label, value, mono, bold }) {
   return (
-      <div className="flex justify-between">
-        <span className="text-muted-foreground">{label}:</span>
-        <span className={`${mono ? "font-mono text-xs" : ""} ${bold ? "font-semibold" : ""}`}>
-          {value}
-        </span>
-      </div>
-      );
+    <div className="flex justify-between">
+      <span className="text-muted-foreground">{label}:</span>
+      <span className={`${mono ? "font-mono text-xs" : ""} ${bold ? "font-semibold" : ""}`}>
+        {value}
+      </span>
+    </div>
+  );
 }
 
-      function BD({label, value, sub}) {
+function BD({ label, value, sub }) {
   return (
-      <div>
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="font-medium">{value}</p>
-        {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
-      </div>
-      );
+    <div>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="font-medium">{value}</p>
+      {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
+    </div>
+  );
 }
