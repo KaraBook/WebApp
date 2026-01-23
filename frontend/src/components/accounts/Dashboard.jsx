@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import MobileBookingCard from "../MobileBookingCard";
+import RateBookingDialog from "../RateBookingDialog";
 
 
 function resolveBookingStatus(b) {
@@ -49,6 +50,8 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+    const [rateDialogOpen, setRateDialogOpen] = useState(false);
+    const [rateBooking, setRateBooking] = useState(null);
 
     const goToBookings = (filter) => {
         navigate("/account/bookings", {
@@ -229,9 +232,10 @@ export default function Dashboard() {
                                 setSelectedBooking(booking);
                                 setBookingDialogOpen(true);
                             }}
-                            onRate={(booking) =>
-                                navigate(`/account/ratings?booking=${booking._id}`)
-                            }
+                            onRate={(booking) => {
+                                setRateBooking(booking);
+                                setRateDialogOpen(true);
+                            }}
                         />
                     ))}
                 </div>
@@ -364,6 +368,15 @@ export default function Dashboard() {
                     if (!open) setSelectedBooking(null);
                 }}
                 booking={selectedBooking}
+            />
+
+            <RateBookingDialog
+                open={rateDialogOpen}
+                booking={rateBooking}
+                onClose={() => {
+                    setRateDialogOpen(false);
+                    setRateBooking(null);
+                }}
             />
 
         </div>
