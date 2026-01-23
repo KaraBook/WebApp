@@ -263,7 +263,11 @@ export default function Dashboard() {
                             {recentBookings.map((b) => (
                                 <tr
                                     key={b._id}
-                                    className="border-b last:border-0 hover:bg-gray-50"
+                                    className="border-b last:border-0 hover:bg-gray-50 cursor-pointer"
+                                    onClick={() => {
+                                        setSelectedBooking(b);
+                                        setBookingDialogOpen(true);
+                                    }}
                                 >
                                     <td className="px-6 py-4 font-medium">
                                         {b.propertyName || b.propertyId?.propertyName}
@@ -283,14 +287,18 @@ export default function Dashboard() {
                                     <td className="px-0 text-center">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <button className="p-2 rounded hover:bg-gray-100">
+                                                <button
+                                                    className="p-2 rounded hover:bg-gray-100"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
                                                     <MoreVertical className="w-4 h-4 text-gray-500" />
                                                 </button>
                                             </DropdownMenuTrigger>
 
                                             <DropdownMenuContent align="end" className="w-48">
                                                 <DropdownMenuItem
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         setSelectedBooking(b);
                                                         setBookingDialogOpen(true);
                                                     }}
