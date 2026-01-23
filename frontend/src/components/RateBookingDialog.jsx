@@ -77,7 +77,7 @@ export default function RateBookingDialog({ open, booking, onClose }) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/60 px-3"
+      className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/60 px-3"
       role="dialog"
       aria-modal="true"
       onMouseDown={(e) => {
