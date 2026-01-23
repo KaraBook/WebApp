@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
+import { sendOtp } from "/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
@@ -25,22 +25,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   const [timer, setTimer] = useState(0);
   const timerRef = useRef(null);
-
-  useEffect(() => {
-    if (!open) {
-      setStep("phone");
-      setPhone("");
-      setOtp("");
-      setTimer(0);
-      setConfirmResult(null);
-      clearInterval(timerRef.current);
-      return;
-    }
-
-    try {
-      buildRecaptcha();
-    } catch { }
-  }, [open]);
 
   useEffect(() => {
     if (timer <= 0) {
@@ -67,14 +51,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         data: { mobile: phone },
       });
 
-      await auth.signOut().catch(() => { });
-      const verifier = window.recaptchaVerifier || buildRecaptcha();
-
-      const confirmation = await signInWithPhoneNumber(
-        auth,
-        `+91${phone}`,
-        verifier
-      );
+      const confirmation = await sendOtp(`+91${phone}`);
 
       setConfirmResult(confirmation);
       setStep("otp");

@@ -1,5 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import {
+  getAuth,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FB_API_KEY,
@@ -11,30 +15,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
+let recaptchaVerifier = null;
 
-export const buildRecaptcha = () => {
-  if (typeof window === "undefined") return null;
+export const initRecaptcha = () => {
+  if (recaptchaVerifier) return recaptchaVerifier;
 
-  if (window.recaptchaVerifier) {
-    try { window.recaptchaVerifier.clear(); } catch {}
-    window.recaptchaVerifier = null;
-  }
-  window.recaptchaVerifier = new RecaptchaVerifier(
+  recaptchaVerifier = new RecaptchaVerifier(
     auth,
     "recaptcha-container",
-    {
-      size: "invisible",
-      callback: () => console.log("reCAPTCHA verified"),
-      "expired-callback": () => {
-        console.log("Recaptcha expired");
-        window.recaptchaVerifier = null;
-      }
-    }
+    { size: "invisible" }
   );
-  window.recaptchaVerifier.render();
-  return window.recaptchaVerifier;
+
+  return recaptchaVerifier;
 };
 
-
-
-export { signInWithPhoneNumber };
+export const sendOtp = async (phoneNumber) => {
+  const verifier = initRecaptcha();
+  return signInWithPhoneNumber(auth, phoneNumber, verifier);
+};

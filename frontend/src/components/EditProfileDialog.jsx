@@ -9,10 +9,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Axios from "@/utils/Axios"; // ONLY for normal profile update
+import Axios from "@/utils/Axios"; 
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { toast } from "sonner";
-import { auth, buildRecaptcha, signInWithPhoneNumber } from "/firebase";
+import { sendOtp } from "/firebase";
 import {
     Select,
     SelectContent,
@@ -59,19 +59,6 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
         setMobile(profile.mobile);
     }, [profile]);
 
-    /* ================= RESET + RECAPTCHA ================= */
-    useEffect(() => {
-        if (!open) {
-            setEditingMobile(false);
-            setOtp("");
-            setConfirmResult(null);
-            setTimer(0);
-            return;
-        }
-        try {
-            buildRecaptcha();
-        } catch { }
-    }, [open]);
 
     /* ================= TIMER ================= */
     useEffect(() => {
@@ -86,20 +73,12 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
         setSending(true);
         try {
-            // 🔓 PUBLIC PRECHECK (NO INTERCEPTOR)
             await axios.post(
                 baseURL + SummaryApi.travellerPrecheck.url,
                 { mobile }
             );
 
-            await auth.signOut().catch(() => { });
-            const verifier = window.recaptchaVerifier || buildRecaptcha();
-
-            const confirmation = await signInWithPhoneNumber(
-                auth,
-                `+91${mobile}`,
-                verifier
-            );
+           const confirmation = await sendOtp(`+91${mobile}`);
 
             setConfirmResult(confirmation);
             setTimer(60);
