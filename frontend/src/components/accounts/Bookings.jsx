@@ -295,7 +295,7 @@ export default function Bookings() {
       pointer-events-none z-50
     "
                         >
-                          {b.paymentStatus?.toUpperCase()}
+                          {resolveBookingStatus(b).toUpperCase()}
                         </div>
                       </td>
 
