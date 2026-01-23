@@ -5,7 +5,6 @@ import { useAuthStore } from "@/store/auth";
 import { Star, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import EditReviewDialog from "../EditReviewDialog";
 
 export default function Ratings() {
   const { accessToken } = useAuthStore();
@@ -79,8 +78,8 @@ export default function Ratings() {
                     <Star
                       key={i}
                       className={`w-4 h-4 ${i < r.rating
-                        ? "text-yellow-500 fill-yellow-500"
-                        : "text-gray-300"
+                          ? "text-yellow-500 fill-yellow-500"
+                          : "text-gray-300"
                         }`}
                     />
                   ))}
@@ -105,15 +104,6 @@ export default function Ratings() {
           </div>
         ))}
       </div>
-
-
-      <EditReviewDialog
-        open={!!editingReview}
-        review={editingReview}
-        onClose={() => setEditingReview(null)}
-        onUpdated={fetchReviews}
-      />
-
     </div>
   );
 }
