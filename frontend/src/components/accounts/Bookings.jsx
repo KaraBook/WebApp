@@ -113,13 +113,13 @@ export default function Bookings() {
   return (
     <div className="w-full px-0 md:px-4 min-h-[calc(100vh-160px)]">
       {/* TITLE */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex md:flex-row flex-col justify-between items-start gap-4 md:items-center mb-6">
         <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19]">
           My Bookings
         </h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="border w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center justify-between">
+          <DropdownMenuTrigger className="border w-full md:w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center justify-between">
             <span>
               {statusFilter === "all"
                 ? "All"
@@ -133,7 +133,7 @@ export default function Bookings() {
             <ChevronDown className="w-4 h-4 text-gray-500" />
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="w-[180px]" align="end">
+          <DropdownMenuContent className="w-full md:w-[180px]" align="end">
             <DropdownMenuItem onClick={() => setStatusFilter("all")}>
               All
             </DropdownMenuItem>
@@ -141,7 +141,7 @@ export default function Bookings() {
               Confirmed / Paid
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setStatusFilter("pending")}>
-              Pending
+              Pending / Initiated
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setStatusFilter("cancelled")}>
               Cancelled
