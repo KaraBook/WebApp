@@ -400,7 +400,7 @@ export default function Dashboard() {
                     <th className="py-3 px-4 sm:px-6 text-left">Nights</th>
                     <th className="py-3 px-4 sm:px-6 text-left">Guests</th>
                     <th className="py-3 px-4 sm:px-6 text-left">Amount</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Payment</th>
+                    <th className="py-3 px-4 sm:px-6 text-left">Status</th>
                     <th className="py-3 px-4 sm:px-6 text-left">Actions</th>
                   </tr>
                 </thead>

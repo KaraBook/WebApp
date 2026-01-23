@@ -323,7 +323,7 @@ export default function OwnerBookings() {
                     <th className="py-3 px-4 text-left">Nights</th>
                     <th className="py-3 px-4 text-left">Guests</th>
                     <th className="py-3 px-4 text-left">Amount</th>
-                    <th className="py-3 px-4 text-left">Payment</th>
+                    <th className="py-3 px-4 text-left">Status</th>
                     <th className="py-3 px-4 text-left">Created</th>
                     <th className="py-3 px-4 text-left">Actions</th>
                   </tr>
