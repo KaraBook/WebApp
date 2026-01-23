@@ -36,7 +36,7 @@ function resolveBookingStatus(b) {
 }
 
 function getStatusLabel(status) {
-  if (status === "confirmed") return "Paid";
+  if (status === "confirmed") return "Confirmed";
   if (status === "pending") return "Pending";
   if (status === "cancelled") return "Cancelled";
   return status;

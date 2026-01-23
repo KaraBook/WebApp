@@ -158,8 +158,6 @@ export default function Dashboard() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [openBookingDialog, setOpenBookingDialog] = useState(false);
 
-  const displayStatus = normalizePaymentStatus(paymentStatus);
-
   const [data, setData] = useState(null);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
 
@@ -175,7 +173,6 @@ export default function Dashboard() {
   const [openGuestRow, setOpenGuestRow] = useState(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 
-  /* -------------------- Fetch dashboard -------------------- */
   useEffect(() => {
     (async () => {
       try {
@@ -187,14 +184,12 @@ export default function Dashboard() {
 
         setData({ ...res.data.data, bookings: sorted });
       } catch {
-        // optionally toast error
       } finally {
         setLoadingDashboard(false);
       }
     })();
   }, []);
 
-  /* -------------------- Fetch properties (ONLY ONCE) -------------------- */
   useEffect(() => {
     (async () => {
       try {
@@ -205,12 +200,11 @@ export default function Dashboard() {
           setPropertyName(firstProperty.propertyName);
         }
       } catch {
-        // optionally toast error
+       
       }
     })();
   }, []);
 
-  /* -------------------- Close guest popup on outside click -------------------- */
   useEffect(() => {
     const close = (e) => {
       if (!e.target.closest(".guest-dropdown-btn") && !e.target.closest(".guest-popover")) {
@@ -222,7 +216,6 @@ export default function Dashboard() {
     return () => document.removeEventListener("click", close);
   }, []);
 
-  /* -------------------- Fetch blocked/booked dates -------------------- */
   useEffect(() => {
     if (!propertyId) return;
 
@@ -491,9 +484,7 @@ export default function Dashboard() {
                         </td>
 
                         <td className="py-3 px-4 sm:px-6">
-                          <span className="px-3 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700">
-                            {displayStatus}
-                          </span>
+                          <PaymentChip status={b.paymentStatus} />
                         </td>
 
                         <td className="py-3 px-4 sm:px-6">
