@@ -153,6 +153,28 @@ export default function Checkout() {
     }, []);
 
 
+    useEffect(() => {
+        if (!property) return;
+
+        const fetchPricing = async () => {
+            const res = await Axios.post(
+                SummaryApi.previewPricing.url,
+                {
+                    propertyId,
+                    checkIn: startDate,
+                    checkOut: endDate,
+                    guests: guestData,
+                    meals: includeMeals ? mealCounts : null
+                }
+            );
+
+            setPricing(res.data.pricing);
+        };
+
+        fetchPricing();
+    }, [property, dateRange, guestData, mealCounts, includeMeals]);
+
+
     if (loading) return <div className="text-center py-20">Loading...</div>;
     if (!property) return <div className="text-center py-20">Property not found.</div>;
 

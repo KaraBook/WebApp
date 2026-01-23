@@ -65,6 +65,10 @@ updateTravellerMobile: {
     url: "/api/bookings/create-order",
     method: "post"
   },
+  previewPricing: {
+  url: "/api/bookings/preview-pricing",
+  method: "post"
+  },
   verifyBookingPayment: {
     url: "/api/bookings/verify-payment",
     method: "post"
@@ -101,7 +105,10 @@ getUniqueLocations: {
   url: "/api/location/unique",
   method: "get",
 },
-
+previewPricing: {
+  url: "/api/bookings/preview-pricing",
+  method: "post"
+},
 
 };
 

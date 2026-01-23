@@ -410,3 +410,36 @@ export const getBookingById = async (req, res) => {
     });
   }
 };
+
+
+
+export const previewPricing = async (req, res) => {
+  try {
+    const { propertyId, checkIn, checkOut, guests, meals } = req.body;
+
+    const property = await Property.findById(propertyId).lean();
+    if (!property) {
+      return res.status(404).json({ success: false, message: "Property not found" });
+    }
+
+    const start = new Date(checkIn);
+    const end = new Date(checkOut);
+    const totalNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+    const pricing = computePricing(
+      {
+        checkIn,
+        checkOut,
+        guests,
+        meals: meals || { veg: 0, nonVeg: 0 },
+        totalNights
+      },
+      property
+    );
+
+    res.json({ success: true, pricing });
+
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to preview pricing" });
+  }
+};
