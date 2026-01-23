@@ -41,6 +41,7 @@ export default function Bookings() {
   const itemsPerPage = 8;
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [ratingBooking, setRatingBooking] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
 
 
   useEffect(() => {
@@ -66,14 +67,23 @@ export default function Bookings() {
     return user.mobile;
   };
 
+  const filteredBookings = bookings.filter((b) => {
+    if (statusFilter === "all") return true;
+    if (statusFilter === "confirmed")
+      return resolveBookingStatus(b) === "confirmed";
+    if (statusFilter === "pending")
+      return resolveBookingStatus(b) === "pending";
+    if (statusFilter === "cancelled")
+      return b.status === "cancelled";
+    return true;
+  });
 
-  const totalPages = Math.ceil(bookings.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredBookings.length / itemsPerPage);
 
-  const paginatedBookings = bookings.slice(
+  const paginatedBookings = filteredBookings.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -103,7 +113,38 @@ export default function Bookings() {
   return (
     <div className="w-full px-0 md:px-4 min-h-[calc(100vh-160px)]">
       {/* TITLE */}
-      <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19] mb-6">My Bookings</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-[600] uppercase tracking-[1px] text-[#233b19]">
+          My Bookings
+        </h1>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger className="border px-4 py-2 rounded-md text-sm flex items-center gap-2">
+            Filter: {statusFilter === "all"
+              ? "All"
+              : statusFilter === "confirmed"
+                ? "Confirmed"
+                : statusFilter === "pending"
+                  ? "Pending"
+                  : "Cancelled"}
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setStatusFilter("all")}>
+              All
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStatusFilter("confirmed")}>
+              Confirmed / Paid
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStatusFilter("pending")}>
+              Pending
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStatusFilter("cancelled")}>
+              Cancelled
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
 
       {/* MOBILE CARDS */}
