@@ -18,8 +18,8 @@ const Badge = ({ children, tone = "green" }) => {
     tone === "green"
       ? "bg-green-100 text-green-700 border-green-200"
       : tone === "yellow"
-      ? "bg-yellow-100 text-yellow-800 border-yellow-200"
-      : "bg-red-100 text-red-700 border-red-200";
+        ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+        : "bg-red-100 text-red-700 border-red-200";
 
   return (
     <span className={`inline-flex md:mr-[25px] hidden md:block items-center px-2.5 py-1 text-xs font-semibold rounded-full border ${styles}`}>
@@ -43,11 +43,11 @@ const InfoLine = ({ icon: Icon, text }) => (
 );
 
 function getStatusTone(status) {
-  if (!status) return "yellow";
-  const s = status.toLowerCase();
-  if (s === "paid" || s === "confirmed") return "green";
+  const s = status?.toLowerCase();
+  if (s === "confirmed") return "green";
   if (s === "pending") return "yellow";
-  return "red";
+  if (s === "cancelled") return "red";
+  return "yellow";
 }
 
 function calcNights(checkIn, checkOut, fallbackNights) {
@@ -78,6 +78,22 @@ function money(n) {
   return `₹${n.toLocaleString("en-IN")}`;
 }
 
+
+function normalizeStatus(booking) {
+  if (booking?.status === "cancelled") return "cancelled";
+
+  if (
+    booking?.paymentStatus === "paid" ||
+    booking?.status === "paid" ||
+    booking?.status === "confirmed" ||
+    booking?.paymentId
+  ) {
+    return "confirmed";
+  }
+  return "pending";
+}
+
+
 export default function BookingDetailsDialog({
   open,
   onOpenChange,
@@ -105,7 +121,7 @@ export default function BookingDetailsDialog({
   const tax = booking?.tax ?? booking?.taxAmount ?? Math.round(amount * 0.1);
   const grandTotal = booking?.grandTotal ?? amount + tax;
 
-  const status = booking?.paymentStatus || booking?.status || "pending";
+  const status = normalizeStatus(booking);
   const paymentMethod = booking?.paymentProvider || booking?.paymentMethod || "—";
   const orderId = booking?.orderId || booking?.razorpayOrderId || "—";
 
@@ -157,7 +173,9 @@ export default function BookingDetailsDialog({
               <p className="text-[14px] text-gray-500 mt-0.5">{email}</p>
             </div>
 
-            <Badge tone={getStatusTone(status)}>{String(status).toUpperCase()}</Badge>
+            <Badge tone={getStatusTone(status)}>
+              {status.toUpperCase()}
+            </Badge>
           </div>
         </div>
 
@@ -238,7 +256,9 @@ export default function BookingDetailsDialog({
               <div className="px-3">
                 <div className="py-2 flex items-center justify-between">
                   <span className="text-[13px] text-gray-500">Payment Status</span>
-                  <Badge tone={getStatusTone(status)}>{String(status).toUpperCase()}</Badge>
+                  <Badge tone={getStatusTone(status)}>
+                    {status.toUpperCase()}
+                  </Badge>
                 </div>
               </div>
 
