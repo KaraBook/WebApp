@@ -115,12 +115,21 @@ export default function MobileBookingsList({
                                                 View Booking
                                             </DropdownMenuItem>
 
-                                            <DropdownMenuItem
-                                                className="p-[14px] text-[16px]"
-                                                onSelect={() => navigate(`/invoice/${b._id}`)}
-                                            >
-                                                View Invoice
-                                            </DropdownMenuItem>
+                                            {normalizePaymentStatus(b.paymentStatus) === "confirmed" ? (
+                                                <DropdownMenuItem
+                                                    className="p-[14px] text-[16px]"
+                                                    onSelect={() => navigate(`/invoice/${b._id}`)}
+                                                >
+                                                    View Invoice
+                                                </DropdownMenuItem>
+                                            ) : (
+                                                <DropdownMenuItem
+                                                    disabled
+                                                    className="p-[14px] text-[16px] text-gray-400 italic"
+                                                >
+                                                    Invoice available after payment
+                                                </DropdownMenuItem>
+                                            )}
 
                                             <DropdownMenuItem
                                                 className="p-[14px] text-[16px]"
