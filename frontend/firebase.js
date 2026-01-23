@@ -30,6 +30,16 @@ export const initRecaptcha = () => {
 };
 
 export const sendOtp = async (phoneNumber) => {
-  const verifier = initRecaptcha();
-  return signInWithPhoneNumber(auth, phoneNumber, verifier);
+  if (window.recaptchaVerifier) {
+    window.recaptchaVerifier.clear();
+  }
+
+  window.recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    "recaptcha-container",
+    { size: "invisible" }
+  );
+
+  return signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
 };
+

@@ -200,9 +200,6 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                     <DialogTitle>Edit Profile</DialogTitle>
                 </DialogHeader>
 
-                {/* 🔐 REQUIRED FOR FIREBASE */}
-                <div id="recaptcha-container" className="hidden" />
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {/* MOBILE */}
                     <div className="sm:col-span-2">

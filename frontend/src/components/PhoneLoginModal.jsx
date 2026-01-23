@@ -233,7 +233,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           </p>
         </div>
 
-        <div id="recaptcha-container" className="hidden" />
       </DialogContent>
 
     </Dialog>
