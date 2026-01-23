@@ -103,20 +103,23 @@ export const getUserReviews = async (req, res) => {
 
 
 
-export const deleteReview = async (req, res) => {
+export const updateReview = async (req, res) => {
   try {
     const { reviewId } = req.params;
+    const { rating, comment } = req.body;
     const userId = req.user.id;
 
     const review = await Review.findOne({ _id: reviewId, userId });
     if (!review) {
-      return res.status(404).json({ message: "Review not found or unauthorized" });
+      return res.status(404).json({ message: "Review not found" });
     }
 
-    const propertyId = review.propertyId;
-    await Review.deleteOne({ _id: reviewId });
+    review.rating = rating;
+    review.comment = comment;
+    await review.save();
+
     const stats = await Review.aggregate([
-      { $match: { propertyId: new mongoose.Types.ObjectId(propertyId) } },
+      { $match: { propertyId: review.propertyId } },
       {
         $group: {
           _id: "$propertyId",
@@ -126,14 +129,13 @@ export const deleteReview = async (req, res) => {
       },
     ]);
 
-    await Property.findByIdAndUpdate(propertyId, {
+    await Property.findByIdAndUpdate(review.propertyId, {
       averageRating: stats[0]?.avgRating || 0,
       reviewCount: stats[0]?.count || 0,
     });
 
-    res.json({ success: true, message: "Review removed" });
+    res.json({ success: true, data: review });
   } catch (err) {
-    console.error("Delete review error:", err);
-    res.status(500).json({ message: "Failed to delete review" });
+    res.status(500).json({ message: "Failed to update review" });
   }
 };

@@ -5,10 +5,12 @@ import { useAuthStore } from "@/store/auth";
 import { Star, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import EditReviewDialog from "../EditReviewDialog";
 
 export default function Ratings() {
   const { accessToken } = useAuthStore();
   const [reviews, setReviews] = useState([]);
+  const [editingReview, setEditingReview] = useState(null);
 
   const fetchReviews = async () => {
     try {
@@ -25,20 +27,6 @@ export default function Ratings() {
     fetchReviews();
   }, []);
 
-  const handleDelete = async (id) => {
-    try {
-      await Axios.delete(SummaryApi.deleteReview.url(id), {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-
-      setReviews((prev) => prev.filter((r) => r._id !== id));
-
-      toast.success("Review removed successfully");
-    } catch (err) {
-      toast.error("Failed to remove review");
-      console.error(err);
-    }
-  };
 
   if (!reviews.length)
     return (
@@ -60,10 +48,10 @@ export default function Ratings() {
             className="relative rounded-[10px] border border-gray-200 bg-white shadow-sm p-4 flex gap-4 hover:shadow-md transition-all duration-200"
           >
             <button
-              onClick={() => handleDelete(r._id)}
+              onClick={() => setEditingReview(r)}
               className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded-full"
             >
-              <X className="w-5 h-5 text-gray-500 hover:text-red-600" />
+              ✎
             </button>
 
             <Link to={`/properties/${r.propertyId?._id}`}>
@@ -90,11 +78,10 @@ export default function Ratings() {
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-4 h-4 ${
-                        i < r.rating
-                          ? "text-yellow-500 fill-yellow-500"
-                          : "text-gray-300"
-                      }`}
+                      className={`w-4 h-4 ${i < r.rating
+                        ? "text-yellow-500 fill-yellow-500"
+                        : "text-gray-300"
+                        }`}
                     />
                   ))}
                 </div>
@@ -118,6 +105,15 @@ export default function Ratings() {
           </div>
         ))}
       </div>
+
+
+      <EditReviewDialog
+        open={!!editingReview}
+        review={editingReview}
+        onClose={() => setEditingReview(null)}
+        onUpdated={fetchReviews}
+      />
+
     </div>
   );
 }

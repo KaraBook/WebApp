@@ -105,6 +105,10 @@ getUniqueLocations: {
   url: "/api/location/unique",
   method: "get",
 },
+updateReview: {
+    url: (id) => `/api/reviews/${id}`,
+    method: 'put',
+  },
 
 };
 
