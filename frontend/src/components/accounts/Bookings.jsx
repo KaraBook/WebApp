@@ -119,7 +119,7 @@ export default function Bookings() {
         </h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="border w-[87%] md:w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center justify-between">
+          <DropdownMenuTrigger className="border w-full md:w-[180px] px-6 py-2 rounded-md bg-white text-sm flex items-center justify-between">
             <span>
               {statusFilter === "all"
                 ? "All"
@@ -133,7 +133,7 @@ export default function Bookings() {
             <ChevronDown className="w-4 h-4 text-gray-500" />
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="w-full md:w-[180px]" align="end">
+          <DropdownMenuContent className="w-[87%] md:w-[180px]" align="end">
             <DropdownMenuItem onClick={() => setStatusFilter("all")}>
               All
             </DropdownMenuItem>
