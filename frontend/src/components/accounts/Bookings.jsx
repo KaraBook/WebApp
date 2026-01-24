@@ -105,7 +105,7 @@ export default function Bookings() {
 
 
   const statusDot = (b) => {
-    if (b.cancelled) return "bg-gray-400";
+    if (b.cancelled) return "bg-red-400";
     if (b.paymentStatus === "paid") return "bg-green-500";
     return "bg-yellow-500";
   };
