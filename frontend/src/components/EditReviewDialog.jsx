@@ -60,7 +60,7 @@ export default function EditReviewDialog({ open, review, onClose, onUpdated }) {
           {/* CLOSE BUTTON */}
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 bg-white hover:bg-black text-black px-4 py-2 rounded-full"
+            className="absolute top-3 right-3 bg-white text-black px-4 py-2 rounded-full"
           >
             <span>X</span>
           </button>

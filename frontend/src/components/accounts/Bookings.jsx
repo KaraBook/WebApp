@@ -339,7 +339,9 @@ export default function Bookings() {
                             )}
                             {b.hasReview ? (
                               <DropdownMenuItem disabled className="text-green-600">
-                                <div className="flex items-center gap-2">
+                                <div onClick={(e)=>{
+                                  e.stopPropagation();
+                                }} className="flex items-center gap-2">
                                   <Star size={16} className="fill-green-600 text-green-600" />
                                   Review submitted
                                 </div>
