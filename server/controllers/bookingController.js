@@ -190,7 +190,10 @@ export const verifyPayment = async (req, res) => {
       { paymentStatus: "paid", paymentId: razorpay_payment_id },
       { new: true }
     )
-      .populate("userId", "firstName lastName email mobile")
+      .populate(
+        "propertyId",
+        "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
+      )
       .populate("propertyId", "propertyName city state address");
 
     if (!booking) {
@@ -292,7 +295,10 @@ export const getUserBookings = async (req, res) => {
     const userId = req.user.id;
 
     const bookings = await Booking.find({ userId })
-      .populate("propertyId", "propertyName city state coverImage contactNumber")
+      .populate(
+        "propertyId",
+        "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
+      )
       .populate("userId", "firstName lastName email mobile")
       .sort({ createdAt: -1 })
       .lean();
@@ -336,8 +342,8 @@ export const getBookingInvoice = async (req, res) => {
       .populate("userId", "firstName lastName email mobile")
       .populate(
         "propertyId",
-        "propertyName propertyType address city state"
-      );
+        "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
+      )
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
@@ -410,7 +416,10 @@ export const getBookingById = async (req, res) => {
       _id: bookingId,
       userId: userId
     })
-      .populate("propertyId", "propertyName city state address")
+      .populate(
+        "propertyId",
+        "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
+      )
       .populate("userId", "firstName lastName email mobile");
 
     if (!booking) {
