@@ -466,25 +466,52 @@ export const previewPricing = async (req, res) => {
 
 
 export const previewCancellation = async (req, res) => {
-const { bookingId } = req.params;
-const userId = req.user.id;
+  try {
+    const { bookingId } = req.params;
+    const userId = req.user.id;
 
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      userId,
+      cancelled: { $ne: true }
+    });
 
-const booking = await Booking.findOne({
-_id: bookingId,
-userId,
-cancelled: false
-});
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found or already cancelled"
+      });
+    }
 
+    if (booking.paymentStatus !== "paid") {
+      return res.status(400).json({
+        success: false,
+        message: "Only paid bookings can be cancelled"
+      });
+    }
 
-const property = await Property.findById(booking.propertyId);
+    const property = await Property.findById(booking.propertyId);
 
+    if (!property) {
+      return res.status(404).json({
+        success: false,
+        message: "Property not found"
+      });
+    }
 
-const result = computeRefund(booking, property);
+    const result = computeRefund(booking, property);
 
+    res.json({ success: true, ...result });
 
-res.json({ success: true, ...result });
+  } catch (err) {
+    console.error("previewCancellation error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to preview cancellation"
+    });
+  }
 };
+
 
 
 export const cancelBooking = async (req, res) => {
@@ -498,6 +525,13 @@ export const cancelBooking = async (req, res) => {
     computeRefund(booking, property);
 
   let refund = null;
+
+  if (!booking) {
+    return res.status(404).json({
+      success: false,
+      message: "Booking not found"
+    });
+  }
 
   if (refundAmount > 0) {
     refund = await razorpay.payments.refund(
