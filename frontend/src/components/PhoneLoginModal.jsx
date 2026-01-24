@@ -262,8 +262,13 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
           <Button
             onClick={handleGoogleLogin}
-            className="w-full py-5 rounded-[14px] bg-white text-black border"
+            className="w-full py-5 rounded-[14px] hover:bg-white bg-white text-black border flex items-center justify-center gap-3"
           >
+            <img
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="Google"
+              className="w-5 h-5"
+            />
             Continue with Google
           </Button>
 
