@@ -234,7 +234,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         </div>
 
       </DialogContent>
-
+  <div id="recaptcha-container"/>
     </Dialog>
   );
 }
