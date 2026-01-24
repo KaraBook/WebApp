@@ -7,6 +7,6 @@ const router = express.Router();
 router.post("/", requireAuth, addReview);
 router.get("/property/:propertyId", getPropertyReviews);
 router.get("/user", requireAuth, getUserReviews);
-router.put("/reviews/:reviewId", requireAuth, updateReview);
+router.put("/:reviewId", requireAuth, updateReview);
 
 export default router;

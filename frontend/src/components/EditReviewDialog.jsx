@@ -26,7 +26,7 @@ export default function EditReviewDialog({ open, review, onClose, onUpdated }) {
   const updateReview = async () => {
     try {
       await Axios.put(
-        SummaryApi.updateReview.url(review._id),   // ✅ FIXED
+        SummaryApi.updateReview.url(review._id),   
         { rating, comment },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
@@ -42,7 +42,7 @@ export default function EditReviewDialog({ open, review, onClose, onUpdated }) {
   return createPortal(
     <div
       className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/60 px-3"
-      onClick={onClose}   // ✅ outside click
+      onClick={onClose}   
     >
       <div
         className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden"
@@ -60,9 +60,9 @@ export default function EditReviewDialog({ open, review, onClose, onUpdated }) {
           {/* CLOSE BUTTON */}
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 bg-black/60 hover:bg-black text-white p-2 rounded-full"
+            className="absolute top-3 right-3 bg-white hover:bg-black text-white px-4 py-2 rounded-full"
           >
-            <X className="w-5 h-5" />
+            <span>X</span>
           </button>
 
           <div className="absolute bottom-3 left-4 text-white">
