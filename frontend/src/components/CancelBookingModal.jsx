@@ -172,9 +172,11 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
                         <>
                             <p className="font-medium">Cancellation Policy</p>
 
-                            {Array.isArray(booking.cancellationPolicy) && booking.cancellationPolicy.length > 0 ? (
+                            {Array.isArray(booking.propertyId?.cancellationPolicy) &&
+                                booking.propertyId.cancellationPolicy.length > 0 ? (
+
                                 <div className="border rounded-lg overflow-hidden">
-                                    {booking.cancellationPolicy.map((p, i) => (
+                                    {booking.propertyId.cancellationPolicy.map((p, i) => (
                                         <div key={i} className="flex justify-between px-4 py-2 border-b last:border-0">
                                             <span>{p.minDaysBefore}+ days before check-in</span>
                                             <span className="font-medium">
@@ -183,6 +185,7 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
                                         </div>
                                     ))}
                                 </div>
+
                             ) : (
                                 <div className="bg-yellow-50 text-yellow-700 p-3 rounded text-sm">
                                     This booking is non-refundable.
