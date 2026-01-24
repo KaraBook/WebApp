@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Star, MapPin } from "lucide-react";
+import { Star, MapPin, X } from "lucide-react";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ export default function EditReviewDialog({ open, review, onClose, onUpdated }) {
   const updateReview = async () => {
     try {
       await Axios.put(
-        SummaryApi.updateReview.url.replace(":id", review._id),
+        SummaryApi.updateReview.url(review._id),   // ✅ FIXED
         { rating, comment },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
@@ -40,8 +40,14 @@ export default function EditReviewDialog({ open, review, onClose, onUpdated }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/60 px-3">
-      <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
+    <div
+      className="fixed inset-0 z-[9999999] flex items-center justify-center bg-black/60 px-3"
+      onClick={onClose}   // ✅ outside click
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
 
         {/* HEADER */}
         <div className="relative h-40">
@@ -50,6 +56,15 @@ export default function EditReviewDialog({ open, review, onClose, onUpdated }) {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/40" />
+
+          {/* CLOSE BUTTON */}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 bg-black/60 hover:bg-black text-white p-2 rounded-full"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
           <div className="absolute bottom-3 left-4 text-white">
             <h3 className="text-lg font-semibold">
               {review.propertyId?.propertyName}
