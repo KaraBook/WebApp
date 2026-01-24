@@ -89,7 +89,7 @@ export const refreshToken = async (req, res) => {
     return res.json({
       data: {
         accessToken: newAccessToken,
-        refreshToken: newRefreshToken, 
+        refreshToken: newRefreshToken,
       },
     });
   } catch {
@@ -182,11 +182,19 @@ export const travellerPrecheck = async (req, res) => {
 
 export const travellerSignup = async (req, res) => {
   try {
-    if (!req.firebaseUser?.phone_number) {
-      return res.status(401).json({ message: "Invalid Firebase token" });
+    let mobile = null;
+
+    if (req.firebaseUser?.phone_number) {
+      mobile = normalizeMobile(req.firebaseUser.phone_number);
     }
 
-    const mobile = normalizeMobile(req.firebaseUser.phone_number);
+    if (!mobile && req.body.mobile) {
+      mobile = normalizeMobile(req.body.mobile);
+    }
+
+    if (!mobile || mobile.length !== 10) {
+      return res.status(400).json({ message: "Valid mobile number required" });
+    }
     if (!mobile || mobile.length !== 10) {
       return res.status(400).json({ message: "Invalid phone token" });
     }
@@ -659,22 +667,22 @@ export const travellerLoginGoogle = async (req, res) => {
   if (!user) return res.status(404).json({ message: "Not registered" });
 
   if (user.role === "resortOwner") {
-  return res.status(403).json({
-    message: "This account belongs to a Resort Owner. Please log in through the Owner Portal."
-  });
-}
+    return res.status(403).json({
+      message: "This account belongs to a Resort Owner. Please log in through the Owner Portal."
+    });
+  }
 
-if (user.role === "admin") {
-  return res.status(403).json({
-    message: "This account belongs to an Admin. Please log in through the Admin Portal."
-  });
-}
+  if (user.role === "admin") {
+    return res.status(403).json({
+      message: "This account belongs to an Admin. Please log in through the Admin Portal."
+    });
+  }
 
-if (user.role !== "traveller") {
-  return res.status(403).json({
-    message: "This account is not allowed on the Traveller portal."
-  });
-}
+  if (user.role !== "traveller") {
+    return res.status(403).json({
+      message: "This account is not allowed on the Traveller portal."
+    });
+  }
 
   const tokens = issueTokens(user);
   return res.json({

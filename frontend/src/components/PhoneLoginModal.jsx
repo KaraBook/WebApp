@@ -143,7 +143,13 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         onOpenChange(false);
       } else {
         onOpenChange(false);
-        navigate("/signup", { state: { idToken, method: "google" } });
+        navigate("/signup", {
+          state: {
+            idToken,
+            method: "google",
+            email: result.user.email
+          }
+        });
       }
     } catch (err) {
       toast.error(

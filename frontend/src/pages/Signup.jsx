@@ -17,6 +17,11 @@ import { toast } from "sonner";
 const nameRegex = /^[a-zA-Z][a-zA-Z\s'.-]{1,49}$/;
 
 const schema = z.object({
+  mobile: z
+    .string()
+    .regex(/^[6-9]\d{9}$/, "Enter valid 10-digit mobile")
+    .optional(),
+
   firstName: z.string()
     .min(2, "First name is too short")
     .max(50)
@@ -66,11 +71,19 @@ export default function Signup() {
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+
+
+  useEffect(() => {
+    if (isGoogle && state?.email) {
+      setValue("email", state.email);
+    }
+  }, [isGoogle, state, setValue]);
 
   useEffect(() => {
     if (!state?.idToken) navigate("/");
@@ -88,18 +101,25 @@ export default function Signup() {
   const onSubmit = async (values) => {
 
     try {
+      const payload = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        state: values.state,
+        city: values.city,
+        dateOfBirth: values.dateOfBirth,
+        address: values.address,
+        pinCode: values.pinCode,
+      };
+
+      if (isGoogle) {
+        payload.mobile = values.mobile;
+      }
+
       const signupResp = await axios.post(
         baseURL + SummaryApi.travellerSignup.url,
-        {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          email: values.email,
-          state: values.state,
-          city: values.city,
-          dateOfBirth: values.dateOfBirth,
-          address: values.address,
-          pinCode: values.pinCode,
-        },
+        payload,
+
         { headers: { Authorization: `Bearer ${state.idToken}` } }
       );
 
@@ -136,13 +156,6 @@ export default function Signup() {
       alert(err?.response?.data?.message || "Signup failed");
     }
   };
-
-  useEffect(() => {
-    if (isGoogle && state?.firebaseUser?.email) {
-      setValue("email", state.firebaseUser.email);
-    }
-  }, [isGoogle]);
-
 
   return (
     <div className="container mx-auto max-w-2xl p-4 md:p-6">
@@ -204,6 +217,17 @@ export default function Signup() {
             )}
           </div>
 
+          {isGoogle && (
+            <div className="grid gap-1">
+              <Label htmlFor="mobile">Mobile Number</Label>
+              <Input
+                id="mobile"
+                maxLength={10}
+                placeholder="Enter mobile number"
+                {...register("mobile")}
+              />
+            </div>
+          )}
 
           {/* STATE + CITY + DOB */}
           <div className="flex justify-between flex-wrap gap-2">
