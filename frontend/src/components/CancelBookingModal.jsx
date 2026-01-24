@@ -139,26 +139,32 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
 
                     {/* ================= STEP 3 ================= */}
                     {step === 2 && (
-                        <>
-                            <div className="border rounded-lg p-4 space-y-2">
-                                <div className="flex justify-between">
-                                    <span>Total Paid</span>
-                                    <span>₹{booking.grandTotal}</span>
+                        preview ? (
+                            <>
+                                <div className="border rounded-lg p-4 space-y-2">
+                                    <div className="flex justify-between">
+                                        <span>Total Paid</span>
+                                        <span>₹{booking.grandTotal}</span>
+                                    </div>
+                                    <div className="flex justify-between text-red-500">
+                                        <span>Cancellation Fee</span>
+                                        <span>-₹{booking.grandTotal - preview.refundAmount}</span>
+                                    </div>
+                                    <div className="flex justify-between text-green-600 font-semibold">
+                                        <span>Refund Amount</span>
+                                        <span>₹{preview.refundAmount}</span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between text-red-500">
-                                    <span>Cancellation Fee</span>
-                                    <span>-₹{booking.grandTotal - preview.refundAmount}</span>
-                                </div>
-                                <div className="flex justify-between text-green-600 font-semibold">
-                                    <span>Refund Amount</span>
-                                    <span>₹{preview.refundAmount}</span>
-                                </div>
-                            </div>
 
-                            <div className="bg-green-50 text-green-700 p-3 rounded text-sm">
-                                ✔ You'll receive {preview.refundPercent}% refund within 5–7 business days
+                                <div className="bg-green-50 text-green-700 p-3 rounded text-sm">
+                                    ✔ You'll receive {preview.refundPercent}% refund within 5–7 business days
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-center py-10 text-gray-500">
+                                Calculating refund...
                             </div>
-                        </>
+                        )
                     )}
 
                     {/* ================= STEP 4 ================= */}
