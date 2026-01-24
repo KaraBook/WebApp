@@ -1,6 +1,6 @@
 import express from "express";
 import { requireAuth } from "../middlewares/requireAuth.js";
-import { createOrder, verifyPayment, getBookedDates, getUserBookings, getBookingInvoice, getBookingById, previewPricing  } from "../controllers/bookingController.js";
+import { createOrder, verifyPayment, getBookedDates, getUserBookings, getBookingInvoice, getBookingById, previewPricing, previewCancellation, cancelBooking  } from "../controllers/bookingController.js";
 
 const router = express.Router();
 
@@ -11,5 +11,7 @@ router.get("/user", requireAuth, getUserBookings);
 router.get("/invoice/:bookingId", requireAuth, getBookingInvoice);
 router.get("/:bookingId", requireAuth, getBookingById);
 router.post("/preview-pricing", requireAuth, previewPricing);
+router.get("/cancel-preview/:bookingId", requireAuth, previewCancellation);
+router.post("/cancel/:bookingId", requireAuth, cancelBooking);
 
 export default router;

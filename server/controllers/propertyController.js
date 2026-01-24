@@ -101,6 +101,14 @@ export const createPropertyDraft = async (req, res) => {
       duplicatePayload.gstin = req.body.gstin.toUpperCase();
     }
 
+    if (req.body.cancellationPolicy && typeof req.body.cancellationPolicy === "string") {
+      try {
+        req.body.cancellationPolicy = JSON.parse(req.body.cancellationPolicy);
+      } catch {
+        return res.status(400).json({ message: "Invalid cancellation policy format" });
+      }
+    }
+
     const duplicateField = await checkDuplicateFields(duplicatePayload);
 
     if (duplicateField) {
@@ -163,6 +171,15 @@ export const createPropertyDraft = async (req, res) => {
 
       if (req.body.isRefundable === false) {
         req.body.refundNotes = "";
+        req.body.cancellationPolicy = [];
+      }
+
+      if (req.body.isRefundable === true && !req.body.cancellationPolicy) {
+        req.body.cancellationPolicy = [
+          { minDaysBefore: 14, refundPercent: 100 },
+          { minDaysBefore: 7, refundPercent: 50 },
+          { minDaysBefore: 0, refundPercent: 0 }
+        ];
       }
 
       propertyDoc = new Property({
@@ -443,6 +460,14 @@ export const updateProperty = async (req, res) => {
           } catch (_) { }
         }
 
+        if (req.body.cancellationPolicy && typeof req.body.cancellationPolicy === "string") {
+          try {
+            req.body.cancellationPolicy = JSON.parse(req.body.cancellationPolicy);
+          } catch {
+            return res.status(400).json({ message: "Invalid cancellation policy format" });
+          }
+        }
+
         const ac = Number(rb.ac || 0);
         const nonAc = Number(rb.nonAc || 0);
         const deluxe = Number(rb.deluxe || 0);
@@ -462,6 +487,17 @@ export const updateProperty = async (req, res) => {
 
     if (req.is("multipart/form-data")) {
       Object.assign(updatedData, req.body);
+
+      console.log("RAW:", req.body.cancellationPolicy, typeof req.body.cancellationPolicy);
+
+      if (req.body.cancellationPolicy && typeof req.body.cancellationPolicy === "string") {
+        try {
+          req.body.cancellationPolicy = JSON.parse(req.body.cancellationPolicy);
+          updatedData.cancellationPolicy = req.body.cancellationPolicy;
+        } catch {
+          return res.status(400).json({ message: "Invalid cancellation policy format" });
+        }
+      }
 
       [
         "maxGuests",
@@ -565,6 +601,19 @@ export const updateProperty = async (req, res) => {
         success: false,
         message: "At least 3 gallery photos are required.",
       });
+    }
+
+    if (updatedData.isRefundable === false) {
+      updatedData.refundNotes = "";
+      updatedData.cancellationPolicy = [];
+    }
+
+    if (updatedData.isRefundable && !Array.isArray(updatedData.cancellationPolicy)) {
+      updatedData.cancellationPolicy = [
+        { minDaysBefore: 14, refundPercent: 100 },
+        { minDaysBefore: 7, refundPercent: 50 },
+        { minDaysBefore: 0, refundPercent: 0 }
+      ];
     }
 
     let updatedProperty;

@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import BookingDetailsDialog from "../BookingDetailsDialog";
 import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
+import CancelBookingDialog from "../CancelBookingModal";
 
 
 function resolveBookingStatus(b) {
@@ -43,6 +44,7 @@ export default function Bookings() {
   const [ratingBooking, setRatingBooking] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const location = useLocation();
+  const [cancelBooking, setCancelBooking] = useState(null);
 
   useEffect(() => {
     if (location.state?.statusFilter) {
@@ -339,7 +341,7 @@ export default function Bookings() {
                             )}
                             {b.hasReview ? (
                               <DropdownMenuItem disabled className="text-green-600">
-                                <div onClick={(e)=>{
+                                <div onClick={(e) => {
                                   e.stopPropagation();
                                 }} className="flex items-center gap-2">
                                   <Star size={16} className="fill-green-600 text-green-600" />
@@ -378,12 +380,11 @@ export default function Bookings() {
                               className="text-red-600"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                setCancelBooking(b);
                               }}
                             >
-                              <div className="flex items-center gap-2">
-                                <XCircle size={16} />
-                                Cancel Booking
-                              </div>
+                              <XCircle size={16} />
+                              Cancel Booking
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -445,6 +446,16 @@ export default function Bookings() {
         open={!!ratingBooking}
         booking={ratingBooking}
         onClose={() => setRatingBooking(null)}
+      />
+
+
+      <CancelBookingDialog
+        open={!!cancelBooking}
+        booking={cancelBooking}
+        onClose={(refresh) => {
+          setCancelBooking(null);
+          if (refresh) window.location.reload();
+        }}
       />
 
     </div>

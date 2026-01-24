@@ -39,6 +39,19 @@ const bookingSchema = new mongoose.Schema(
       default: "pending",
     },
 
+    cancelled: { type: Boolean, default: false },
+    cancelledAt: Date,
+    cancelReason: String,
+    cancelNotes: String,
+
+    refundAmount: Number,
+    refundStatus: {
+      type: String,
+      enum: ["pending", "initiated", "completed", "failed"],
+      default: "pending"
+    },
+    refundId: String,
+
     bookedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
     isOffline: { type: Boolean, default: false },

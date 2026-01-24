@@ -117,6 +117,14 @@ const SummaryApi = {
     url: "/api/auth/traveller/google/login",
     method: "post"
   },
+  cancelPreview: {
+    url: (id) => `/api/bookings/cancel-preview/${id}`,
+    method: "get"
+  },
+  cancelBooking: {
+    url: (id) => `/api/bookings/cancel/${id}`,
+    method: "post"
+  },
 };
 
 export default SummaryApi;

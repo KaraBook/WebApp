@@ -92,6 +92,7 @@ const EditProperty = () => {
     internalNotes: "",
     isRefundable: false,
     refundNotes: "",
+    cancellationPolicy: [],
   });
 
   const nextStep = () => {
@@ -180,6 +181,9 @@ const EditProperty = () => {
           internalNotes: prop.internalNotes || "",
           isRefundable: !!prop.isRefundable,
           refundNotes: prop.refundNotes || "",
+          cancellationPolicy: Array.isArray(prop.cancellationPolicy)
+            ? prop.cancellationPolicy
+            : [],
         });
 
         setCoverImagePreview(prop.coverImage || null);
@@ -216,6 +220,14 @@ const EditProperty = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (
+      formData.isRefundable &&
+      (!formData.refundNotes || !formData.refundNotes.trim())
+    ) {
+      toast.error("Please enter refund policy / notes");
+      return;
+    }
+
     if (submitMode === "step" && currentStep === 5) {
       setCurrentStep(6);
       return;
@@ -235,19 +247,35 @@ const EditProperty = () => {
       formData.roomBreakdown = { ...rb, total };
       formData.totalRooms = total;
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === "resortOwner") {
-          Object.entries(value).forEach(([ownerKey, ownerValue]) => {
-            data.append(`resortOwner[${ownerKey}]`, ownerValue);
-          });
-        } else if (Array.isArray(value)) {
-          value.forEach((v) => data.append(`${key}[]`, v));
-        } else if (typeof value === "object" && value !== null) {
-          data.append(key, JSON.stringify(value));
-        } else {
-          data.append(key, value);
-        }
-      });
 
+        // 1️⃣ Always handle complex JSON FIRST
+        if (key === "cancellationPolicy") {
+          data.append("cancellationPolicy", JSON.stringify(value));
+          return;
+        }
+
+        if (key === "resortOwner") {
+          data.append("resortOwner", JSON.stringify(value));
+          return;
+        }
+
+        if (key === "roomBreakdown") {
+          data.append("roomBreakdown", JSON.stringify(value));
+          return;
+        }
+
+        if (Array.isArray(value)) {
+          value.forEach(v => data.append(`${key}[]`, v));
+          return;
+        }
+
+        if (typeof value === "object" && value !== null) {
+          data.append(key, JSON.stringify(value));
+          return;
+        }
+
+        data.append(key, value);
+      });
       if (coverImageFile) {
         data.append("coverImage", coverImageFile);
       }
@@ -883,21 +911,49 @@ const EditProperty = () => {
             </div>
 
             {formData.isRefundable === true && (
-              <div className="w-[48%]">
-                <Label className="text-sm">
-                  Refund Policy / Notes <span className="text-red-500">*</span>
+              <div className="w-full mt-4">
+                <Label className="text-sm font-semibold">
+                  Cancellation Rules (Days before check-in)
                 </Label>
 
-                <textarea
-                  rows={4}
-                  className="w-full mt-2 border rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-black"
-                  placeholder="Example: 100% refund if cancelled 7 days before check-in"
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="flex gap-3 mt-2">
+                    <Input
+                      type="number"
+                      placeholder="Min days"
+                      value={formData.cancellationPolicy[i]?.minDaysBefore ?? ""}
+                      onChange={(e) => {
+                        const arr = [...formData.cancellationPolicy];
+                        arr[i] = {
+                          ...arr[i],
+                          minDaysBefore: Number(e.target.value),
+                        };
+                        setFormData(p => ({ ...p, cancellationPolicy: arr }));
+                      }}
+                    />
+
+                    <Input
+                      type="number"
+                      placeholder="Refund %"
+                      value={formData.cancellationPolicy[i]?.refundPercent ?? ""}
+                      onChange={(e) => {
+                        const arr = [...formData.cancellationPolicy];
+                        arr[i] = {
+                          ...arr[i],
+                          refundPercent: Number(e.target.value),
+                        };
+                        setFormData(p => ({ ...p, cancellationPolicy: arr }));
+                      }}
+                    />
+                  </div>
+                ))}
+
+                <Textarea
+                  className="mt-3"
+                  placeholder="Human readable notes"
                   value={formData.refundNotes}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      refundNotes: e.target.value,
-                    }))
+                    setFormData(p => ({ ...p, refundNotes: e.target.value }))
                   }
                 />
               </div>

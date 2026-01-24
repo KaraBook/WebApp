@@ -187,6 +187,9 @@ export const updateOwnerProperty = async (req, res) => {
       "roomBreakdown",
       "bedrooms",
       "bathrooms",
+      "isRefundable",
+      "refundNotes",
+      "cancellationPolicy"
     ];
 
     const body = req.body;
@@ -726,6 +729,8 @@ export const createOfflineBooking = async (req, res) => {
     const booking = await Booking.create({
       userId: user._id,
       propertyId,
+      isRefundable: property.isRefundable,
+      cancellationPolicy: property.cancellationPolicy,
       checkIn,
       checkOut,
       guests: { adults, children },

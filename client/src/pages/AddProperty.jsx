@@ -91,6 +91,7 @@ const AddProperty = () => {
         internalNotes: "",
         isRefundable: false,
         refundNotes: "",
+        cancellationPolicy: []
     });
 
     const nextStep = () => {
@@ -181,11 +182,24 @@ const AddProperty = () => {
             internalNotes: formData.internalNotes,
             isRefundable: !!formData.isRefundable,
             refundNotes: formData.isRefundable ? formData.refundNotes?.trim() : "",
+            cancellationPolicy: formData.isRefundable
+                ? formData.cancellationPolicy
+                : [],
         };
         return payload;
     };
 
+
     const createDraft = async () => {
+        if (
+            formData.isRefundable &&
+            (!formData.cancellationPolicy.length ||
+                formData.cancellationPolicy.some(r =>
+                    r.minDaysBefore === undefined || r.refundPercent === undefined))
+        ) {
+            toast.error("Please complete cancellation rules");
+            return;
+        }
         if (
             formData.gstin &&
             !GSTIN_REGEX.test(formData.gstin.toUpperCase())
@@ -578,7 +592,7 @@ const AddProperty = () => {
 
 
                         <div className="md:w-[32%] w-[48%]">
-                           <Label htmlFor="city" className="text-sm">
+                            <Label htmlFor="city" className="text-sm">
                                 City <span className="text-red-500">*</span>
                             </Label>
                             <Select
@@ -773,7 +787,7 @@ const AddProperty = () => {
                             </div>
                         </div>
 
-                         <div className="md:w-[15%] w-[48%]">
+                        <div className="md:w-[15%] w-[48%]">
                             <Label className="text-sm">
                                 Base Guests <span className="text-red-500">*</span>
                             </Label>
@@ -943,6 +957,47 @@ const AddProperty = () => {
                                         }))
                                     }
                                 />
+                            </div>
+                        )}
+
+
+                        {formData.isRefundable && (
+                            <div className="w-full mt-4">
+                                <Label className="text-sm font-semibold">
+                                    Cancellation Rules (in days before check-in)
+                                </Label>
+
+                                {[0, 1, 2].map((i) => (
+                                    <div key={i} className="flex gap-3 mt-2">
+                                        <Input
+                                            placeholder="Min days"
+                                            type="number"
+                                            value={formData.cancellationPolicy[i]?.minDaysBefore || ""}
+                                            onChange={(e) => {
+                                                const arr = [...formData.cancellationPolicy];
+                                                arr[i] = {
+                                                    ...arr[i],
+                                                    minDaysBefore: Number(e.target.value),
+                                                };
+                                                setFormData(p => ({ ...p, cancellationPolicy: arr }));
+                                            }}
+                                        />
+
+                                        <Input
+                                            placeholder="Refund %"
+                                            type="number"
+                                            value={formData.cancellationPolicy[i]?.refundPercent || ""}
+                                            onChange={(e) => {
+                                                const arr = [...formData.cancellationPolicy];
+                                                arr[i] = {
+                                                    ...arr[i],
+                                                    refundPercent: Number(e.target.value),
+                                                };
+                                                setFormData(p => ({ ...p, cancellationPolicy: arr }));
+                                            }}
+                                        />
+                                    </div>
+                                ))}
                             </div>
                         )}
 

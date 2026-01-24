@@ -175,11 +175,20 @@ const draftSchema = Joi.object(baseFields).custom((value, helpers) => {
   if (value.isRefundable === false && value.refundNotes) {
     value.refundNotes = "";
   }
+  if (value.isRefundable === true && (!value.cancellationPolicy || !value.cancellationPolicy.length)) {
+    return helpers.message("Cancellation policy is required for refundable property");
+  }
   return value;
 });
 
 const updateSchema = Joi.object({
   ...baseFields,
+  cancellationPolicy: Joi.array().min(1).items(
+    Joi.object({
+      minDaysBefore: Joi.number().min(0).required(),
+      refundPercent: Joi.number().min(0).max(100).required()
+    })
+  ).optional(),
   coverImage: Joi.string().uri().optional(),
   shopAct: Joi.string().uri().optional(),
   galleryPhotos: Joi.array().items(Joi.string().uri()).optional(),
@@ -293,11 +302,11 @@ export const validatePropertyUpdate = (req, res, next) => {
   const payload = { ...req.body };
 
   if (payload.roomBreakdown && typeof payload.roomBreakdown === "string") {
-    try {
-      payload.roomBreakdown = JSON.parse(payload.roomBreakdown);
-    } catch {
-      payload.roomBreakdown = {};
-    }
+    payload.roomBreakdown = JSON.parse(payload.roomBreakdown);
+  }
+
+  if (payload.cancellationPolicy && typeof payload.cancellationPolicy === "string") {
+    payload.cancellationPolicy = JSON.parse(payload.cancellationPolicy);
   }
 
   payload.resortOwner = parseResortOwnerFromBody(payload);
@@ -309,9 +318,7 @@ export const validatePropertyUpdate = (req, res, next) => {
   });
 
   if (error) {
-    return res
-      .status(400)
-      .json({ success: false, message: error.details[0].message });
+    return res.status(400).json({ success: false, message: error.details[0].message });
   }
 
   next();

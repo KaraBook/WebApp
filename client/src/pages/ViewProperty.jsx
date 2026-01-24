@@ -144,15 +144,16 @@ export default function ViewProperty() {
     coverImage,
     shopAct,
     galleryPhotos = [],
+    cancellationPolicy = [],
   } = property;
 
   return (
     <div className="md:p-4 p-0 max-w-[1400px] mx-auto space-y-6">
       {/* Header */}
-       <Button className="bg-gray-200 text-black hover:bg-gray-200" onClick={() => navigate(-1)}>
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back
-        </Button>
+      <Button className="bg-gray-200 text-black hover:bg-gray-200" onClick={() => navigate(-1)}>
+        <ArrowLeft className="h-4 w-4 mr-1" />
+        Back
+      </Button>
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-2xl font-bold -mt-2">{propertyName}</h1>
@@ -360,13 +361,53 @@ export default function ViewProperty() {
               </div>
             </div>
 
-            {/* Refund Policy */}
-            {isRefundable && refundNotes && (
-              <div className="mt-4 bg-slate-50 rounded-lg p-4">
-                <p className="text-sm font-medium mb-1">Refund Policy</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {refundNotes}
-                </p>
+            {isRefundable && (refundNotes || cancellationPolicy.length > 0) && (
+              <div className="mt-4 space-y-3">
+
+                {refundNotes && (
+                  <div className="bg-slate-50 rounded-lg p-4">
+                    <p className="text-sm font-medium mb-1">Refund Policy</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {refundNotes}
+                    </p>
+                  </div>
+                )}
+
+                {cancellationPolicy.length > 0 && (
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="bg-slate-100 px-4 py-2 text-sm font-semibold">
+                      Cancellation Policy
+                    </div>
+
+                    {[...cancellationPolicy]
+                      .sort((a, b) => b.minDaysBefore - a.minDaysBefore)
+                      .map((rule, i) => (
+                        <div
+                          key={i}
+                          className="flex justify-between items-center px-4 py-2 text-sm border-t"
+                        >
+                          <span>
+                            {rule.minDaysBefore >= 14
+                              ? "14+ days before check-in"
+                              : rule.minDaysBefore >= 7
+                                ? "7–13 days before check-in"
+                                : "Less than 7 days"}
+                          </span>
+
+                          <span
+                            className={`font-semibold ${rule.refundPercent === 100
+                                ? "text-emerald-600"
+                                : rule.refundPercent === 0
+                                  ? "text-red-500"
+                                  : "text-amber-600"
+                              }`}
+                          >
+                            {rule.refundPercent}% refund
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             )}
           </SectionCard>

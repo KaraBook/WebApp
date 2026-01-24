@@ -8,6 +8,7 @@ import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
 import { computePricing } from "../utils/pricing.js";
 import Review from "../models/Review.js";
+import { computeRefund } from "../utils/cancellation.js";
 
 
 const razorpay = new Razorpay({
@@ -133,12 +134,15 @@ export const createOrder = async (req, res) => {
       guests: { adults, children },
       meals: meals
         ? {
-            includeMeals: true,
-            veg: meals.veg,
-            nonVeg: meals.nonVeg,
-          }
+          includeMeals: true,
+          veg: meals.veg,
+          nonVeg: meals.nonVeg,
+        }
         : { includeMeals: false },
       totalNights,
+      isRefundable: property.isRefundable,
+      cancellationPolicy: property.cancellationPolicy,
+      refundNotes: property.refundNotes,
       totalAmount: subtotal,
       taxAmount: tax,
       grandTotal,
@@ -291,7 +295,7 @@ export const getUserBookings = async (req, res) => {
       .populate("propertyId", "propertyName city state coverImage contactNumber")
       .populate("userId", "firstName lastName email mobile")
       .sort({ createdAt: -1 })
-      .lean(); 
+      .lean();
 
     const bookingIds = bookings.map(b => b._id);
 
@@ -309,7 +313,7 @@ export const getUserBookings = async (req, res) => {
       ...b,
       property: b.propertyId,
       user: b.userId,
-      hasReview: !!reviewedMap[b._id.toString()], 
+      hasReview: !!reviewedMap[b._id.toString()],
     }));
 
     res.json({ success: true, data: formatted });
@@ -457,4 +461,63 @@ export const previewPricing = async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: "Failed to preview pricing" });
   }
+};
+
+
+
+export const previewCancellation = async (req, res) => {
+const { bookingId } = req.params;
+const userId = req.user.id;
+
+
+const booking = await Booking.findOne({
+_id: bookingId,
+userId,
+cancelled: false
+});
+
+
+const property = await Property.findById(booking.propertyId);
+
+
+const result = computeRefund(booking, property);
+
+
+res.json({ success: true, ...result });
+};
+
+
+export const cancelBooking = async (req, res) => {
+  const { bookingId } = req.params;
+  const { reason, notes } = req.body;
+
+  const booking = await Booking.findById(bookingId);
+  const property = await Property.findById(booking.propertyId);
+
+  const { refundAmount } =
+    computeRefund(booking, property);
+
+  let refund = null;
+
+  if (refundAmount > 0) {
+    refund = await razorpay.payments.refund(
+      booking.paymentId,
+      { amount: refundAmount * 100 }
+    );
+  }
+
+  booking.cancelled = true;
+  booking.cancelReason = reason;
+  booking.cancelNotes = notes;
+  booking.refundAmount = refundAmount;
+  booking.refundId = refund?.id;
+  booking.refundStatus = refund ? "initiated" : "completed";
+  booking.cancelledAt = new Date();
+
+  await booking.save();
+
+  res.json({
+    success: true,
+    refundAmount
+  });
 };
