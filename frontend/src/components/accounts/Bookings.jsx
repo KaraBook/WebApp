@@ -15,8 +15,7 @@ import CancelBookingDialog from "../CancelBookingModal";
 
 
 function resolveBookingStatus(b) {
-  if (b.status === "cancelled") return "cancelled";
-
+  if (b.cancelled) return "cancelled";
   if (
     b.paymentStatus === "paid" ||
     b.status === "paid" ||
@@ -82,7 +81,7 @@ export default function Bookings() {
     if (statusFilter === "pending")
       return resolveBookingStatus(b) === "pending";
     if (statusFilter === "cancelled")
-      return b.status === "cancelled";
+      return b.cancelled === true;
     return true;
   });
 
@@ -105,17 +104,10 @@ export default function Bookings() {
   }, []);
 
 
-  const statusDot = (status) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-500";
-      case "pending":
-        return "bg-yellow-500";
-      case "failed":
-        return "bg-red-500";
-      default:
-        return "bg-gray-400";
-    }
+  const statusDot = (b) => {
+    if (b.cancelled) return "bg-gray-400";
+    if (b.paymentStatus === "paid") return "bg-green-500";
+    return "bg-yellow-500";
   };
 
   return (
@@ -283,9 +275,7 @@ export default function Bookings() {
 
                       <td className="px-4 py-5 relative group cursor-default flex justify-center">
                         <span
-                          className={`inline-block w-3 h-3 rounded-full ${statusDot(
-                            b.paymentStatus
-                          )}`}
+                          className={`inline-block w-3 h-3 rounded-full ${statusDot(b)}`}
                         ></span>
 
                         <div
@@ -376,16 +366,23 @@ export default function Bookings() {
                               </div>
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                              className="text-red-600"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setCancelBooking(b);
-                              }}
-                            >
-                              <XCircle size={16} />
-                              Cancel Booking
-                            </DropdownMenuItem>
+                            {b.cancelled ? (
+                              <DropdownMenuItem disabled className="text-gray-400 cursor-not-allowed">
+                                <XCircle size={16} />
+                                Cancelled
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setCancelBooking(b);
+                                }}
+                              >
+                                <XCircle size={16} />
+                                Cancel Booking
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
