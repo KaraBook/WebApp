@@ -1,4 +1,3 @@
-// firebase.js
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -18,20 +17,19 @@ export const auth = getAuth(app);
 
 let recaptchaVerifier = null;
 
+export const initRecaptcha = () => {
+  if (recaptchaVerifier) return recaptchaVerifier;
+
+  recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    "recaptcha-container",
+    { size: "invisible" }
+  );
+
+  return recaptchaVerifier;
+};
+
 export const sendOtp = async (phoneNumber) => {
-  // create only once
-  if (!recaptchaVerifier) {
-    recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      {
-        size: "invisible",
-      }
-    );
-
-    // must render once
-    await recaptchaVerifier.render();
-  }
-
-  return signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+  const verifier = initRecaptcha();
+  return signInWithPhoneNumber(auth, phoneNumber, verifier);
 };

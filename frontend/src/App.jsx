@@ -73,17 +73,7 @@ export default function App() {
         open={loginModalOpen}
         onOpenChange={(o) => (o ? showAuthModal() : hideAuthModal())}
       />
-      <div
-        id="recaptcha-container"
-        style={{
-          position: "fixed",
-          bottom: "10px",
-          right: "10px",
-          width: "300px",
-          height: "60px",
-          zIndex: 9999999
-        }}
-      ></div>
+      <div id="recaptcha-container" />
       <Toaster richColors position="top-center" />
     </div>
   );
