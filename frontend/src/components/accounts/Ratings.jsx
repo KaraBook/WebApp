@@ -48,7 +48,7 @@ export default function Ratings() {
           >
             <button
               onClick={() => setEditingReview(r)}
-              className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded-full"
+              className="absolute right-2 top-2 p-2 bg-[#8080802e] hover:bg-gray-100 rounded-[10px]"
             >
               ✎
             </button>
