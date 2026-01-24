@@ -640,3 +640,31 @@ export const removeTravellerAvatar = async (req, res) => {
     return res.status(500).json({ message: "Failed to remove avatar" });
   }
 };
+
+
+
+export const travellerCheckGoogle = async (req, res) => {
+  const email = req.firebaseUser?.email;
+  if (!email) return res.status(400).json({ message: "No email" });
+
+  const exists = !!(await User.findOne({ email }));
+  return res.json({ exists });
+};
+
+export const travellerLoginGoogle = async (req, res) => {
+  const email = req.firebaseUser?.email;
+  if (!email) return res.status(400).json({ message: "No email" });
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: "Not registered" });
+
+  if (user.role !== "traveller") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  const tokens = issueTokens(user);
+  return res.json({
+    ...tokens,
+    user: publicUser(user),
+  });
+};

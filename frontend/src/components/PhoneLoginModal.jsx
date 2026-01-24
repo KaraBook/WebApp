@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { sendOtp as firebaseSendOtp } from "/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Phone, Shield } from "lucide-react";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "/firebase";
 
 export default function PhoneLoginModal({ open, onOpenChange }) {
   const navigate = useNavigate();
@@ -40,7 +42,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
   }, [timer]);
 
 
- const handleSendOtp = async () => {
+  const handleSendOtp = async () => {
     if (phone.length !== 10) return;
 
     setSending(true);
@@ -114,6 +116,39 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       verifyOtp(otp);
     }
   }, [otp]);
+
+
+
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken(true);
+
+      const check = await axios.post(
+        baseURL + SummaryApi.travellerCheckGoogle.url,
+        {},
+        { headers: { Authorization: `Bearer ${idToken}` } }
+      );
+
+      if (check.data.exists) {
+        const resp = await axios.post(
+          baseURL + SummaryApi.travellerLoginGoogle.url,
+          {},
+          { headers: { Authorization: `Bearer ${idToken}` } }
+        );
+
+        setAuth(resp.data);
+        toast.success("Welcome back!");
+        onOpenChange(false);
+      } else {
+        onOpenChange(false);
+        navigate("/signup", { state: { idToken, method: "google" } });
+      }
+    } catch (err) {
+      toast.error("Google login failed");
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -223,6 +258,15 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
             </>
           )}
 
+          <div className="text-center text-xs text-gray-400">or</div>
+
+          <Button
+            onClick={handleGoogleLogin}
+            className="w-full py-5 rounded-[14px] bg-white text-black border"
+          >
+            Continue with Google
+          </Button>
+
           {/* SIGN UP LINK */}
           <p className="text-xs text-center text-gray-500 leading-relaxed px-4">
             If you are new to KaraBook, you’ll be redirected to the sign-up page after mobile verification.
@@ -234,7 +278,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         </div>
 
       </DialogContent>
-  <div id="recaptcha-container"/>
+      <div id="recaptcha-container" />
     </Dialog>
   );
 }

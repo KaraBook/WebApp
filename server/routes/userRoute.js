@@ -18,6 +18,8 @@ import {
   updateOwnerProfile,
   uploadOwnerAvatar,
   removeOwnerAvatar,
+  travellerCheckGoogle,
+  travellerLoginGoogle,
 } from "../controllers/userController.js";
 import { verifyFirebaseToken } from "../middlewares/verifyFirebaseToken.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
@@ -67,7 +69,8 @@ router.post("/manager/precheck", managerPrecheck);
 router.post("/manager/login", verifyFirebaseToken, managerLogin);
 
 
-
+router.post("/traveller/google/check", verifyFirebaseToken, travellerCheckGoogle);
+router.post("/traveller/google/login", verifyFirebaseToken, travellerLoginGoogle);
 router.get("/me", requireAuth, me);
 
 export default router;

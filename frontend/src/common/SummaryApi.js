@@ -22,17 +22,17 @@ const SummaryApi = {
     method: "post"
   },
   removeTravellerAvatar: {
-  url: "/api/auth/traveller/avatar",
-  method: "delete"
-},
-updateTravellerProfile: {
-  url: "/api/auth/traveller/profile",
-  method: "put"
-},
-updateTravellerMobile: {
-  url: "/api/auth/traveller/mobile",
-  method: "put"
-},
+    url: "/api/auth/traveller/avatar",
+    method: "delete"
+  },
+  updateTravellerProfile: {
+    url: "/api/auth/traveller/profile",
+    method: "put"
+  },
+  updateTravellerMobile: {
+    url: "/api/auth/traveller/mobile",
+    method: "put"
+  },
   refreshToken: {
     url: "/api/auth/refresh-token",
     method: "post"
@@ -69,7 +69,7 @@ updateTravellerMobile: {
     url: "/api/bookings/verify-payment",
     method: "post"
   },
-   previewPricing: {
+  previewPricing: {
     url: "/api/bookings/preview-pricing",
     method: "post"
   },
@@ -94,22 +94,29 @@ updateTravellerMobile: {
     method: "get",
   },
   getPropertyBlockedDates: {
-  url: (id) => `/api/properties/${id}/blocked-dates`,
-  method: "GET",
- },
- deleteReview: {
-  url: (id) => `/api/reviews/${id}`,
-  method: "delete"
-},
-getUniqueLocations: {
-  url: "/api/location/unique",
-  method: "get",
-},
-updateReview: {
+    url: (id) => `/api/properties/${id}/blocked-dates`,
+    method: "GET",
+  },
+  deleteReview: {
+    url: (id) => `/api/reviews/${id}`,
+    method: "delete"
+  },
+  getUniqueLocations: {
+    url: "/api/location/unique",
+    method: "get",
+  },
+  updateReview: {
     url: (id) => `/api/reviews/${id}`,
     method: 'put',
   },
-
+  travellerCheckGoogle: {
+    url: "/api/auth/traveller/google/check",
+    method: "post"
+  },
+  travellerLoginGoogle: {
+    url: "/api/auth/traveller/google/login",
+    method: "post"
+  },
 };
 
 export default SummaryApi;

@@ -60,6 +60,7 @@ export default function Signup() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
+  const isGoogle = state?.method === "google"
 
   const {
     register,
@@ -136,6 +137,12 @@ export default function Signup() {
     }
   };
 
+  useEffect(() => {
+    if (isGoogle && state?.firebaseUser?.email) {
+      setValue("email", state.firebaseUser.email);
+    }
+  }, [isGoogle]);
+
 
   return (
     <div className="container mx-auto max-w-2xl p-4 md:p-6">
@@ -189,6 +196,7 @@ export default function Signup() {
               type="email"
               className="mt-1 rounded-[10px]"
               placeholder="john@example.com"
+              readOnly={isGoogle}
               {...register("email")}
             />
             {errors.email && (
