@@ -658,9 +658,23 @@ export const travellerLoginGoogle = async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) return res.status(404).json({ message: "Not registered" });
 
-  if (user.role !== "traveller") {
-    return res.status(403).json({ message: "Access denied" });
-  }
+  if (user.role === "resortOwner") {
+  return res.status(403).json({
+    message: "This account belongs to a Resort Owner. Please log in through the Owner Portal."
+  });
+}
+
+if (user.role === "admin") {
+  return res.status(403).json({
+    message: "This account belongs to an Admin. Please log in through the Admin Portal."
+  });
+}
+
+if (user.role !== "traveller") {
+  return res.status(403).json({
+    message: "This account is not allowed on the Traveller portal."
+  });
+}
 
   const tokens = issueTokens(user);
   return res.json({
