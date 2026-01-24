@@ -146,7 +146,9 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         navigate("/signup", { state: { idToken, method: "google" } });
       }
     } catch (err) {
-      toast.error("Google login failed");
+      toast.error(
+        err?.response?.data?.message || "Google login failed"
+      );
     }
   };
 
