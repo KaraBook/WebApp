@@ -171,16 +171,23 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
                     {step === 3 && (
                         <>
                             <p className="font-medium">Cancellation Policy</p>
-                            <div className="border rounded-lg overflow-hidden">
-                                {booking.cancellationPolicy.map((p, i) => (
-                                    <div key={i} className="flex justify-between px-4 py-2 border-b last:border-0">
-                                        <span>{p.minDaysBefore}+ days before check-in</span>
-                                        <span className="font-medium">
-                                            {p.refundPercent}% refund
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
+
+                            {Array.isArray(booking.cancellationPolicy) && booking.cancellationPolicy.length > 0 ? (
+                                <div className="border rounded-lg overflow-hidden">
+                                    {booking.cancellationPolicy.map((p, i) => (
+                                        <div key={i} className="flex justify-between px-4 py-2 border-b last:border-0">
+                                            <span>{p.minDaysBefore}+ days before check-in</span>
+                                            <span className="font-medium">
+                                                {p.refundPercent}% refund
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="bg-yellow-50 text-yellow-700 p-3 rounded text-sm">
+                                    This booking is non-refundable.
+                                </div>
+                            )}
 
                             <ul className="text-xs text-gray-500 mt-2 space-y-1">
                                 <li>• Refund initiated within 24 hours</li>
