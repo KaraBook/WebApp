@@ -81,7 +81,7 @@ function money(n) {
 
 
 function normalizeStatus(booking) {
-  if (booking?.status === "cancelled") return "cancelled";
+  if (booking?.cancelled === true) return "cancelled";
 
   if (
     booking?.paymentStatus === "paid" ||
@@ -91,6 +91,7 @@ function normalizeStatus(booking) {
   ) {
     return "confirmed";
   }
+
   return "pending";
 }
 
