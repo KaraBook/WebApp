@@ -13,18 +13,18 @@ import RateBookingDialog from "../RateBookingDialog";
 
 
 function resolveBookingStatus(b) {
-    if (b.status === "cancelled") return "cancelled";
-
+    if (b?.cancelled === true) return "cancelled";
     if (
-        b.paymentStatus === "paid" ||
-        b.status === "paid" ||
-        b.status === "confirmed" ||
-        b.paymentId
+        b?.paymentStatus === "paid" ||
+        b?.status === "paid" ||
+        b?.status === "confirmed" ||
+        b?.paymentId
     ) {
         return "confirmed";
     }
     return "pending";
 }
+
 
 function canViewInvoice(b) {
     return resolveBookingStatus(b) === "confirmed";
@@ -300,6 +300,7 @@ export default function Dashboard() {
                                             </DropdownMenuTrigger>
 
                                             <DropdownMenuContent align="end" className="w-48">
+                                                {/* View */}
                                                 <DropdownMenuItem
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -310,6 +311,7 @@ export default function Dashboard() {
                                                     View Booking
                                                 </DropdownMenuItem>
 
+                                                {/* Invoice */}
                                                 {canViewInvoice(b) ? (
                                                     <DropdownMenuItem
                                                         onClick={() => navigate(`/account/invoice/${b._id}`)}
@@ -325,25 +327,31 @@ export default function Dashboard() {
                                                     </DropdownMenuItem>
                                                 )}
 
-                                                {b.status === "confirmed" && (
+                                                {/* Rate */}
+                                                {resolveBookingStatus(b) === "confirmed" && (
                                                     <DropdownMenuItem
-                                                        onClick={() =>
-                                                            navigate(`/account/ratings?booking=${b._id}`)
-                                                        }
+                                                        onClick={() => {
+                                                            setRateBooking(b);
+                                                            setRateDialogOpen(true);
+                                                        }}
                                                     >
                                                         Rate this Resort
                                                     </DropdownMenuItem>
                                                 )}
 
-                                                {b.ownerPhone && (
+                                                {/* Call */}
+                                                {b.propertyId?.contactNumber && (
                                                     <DropdownMenuItem
-                                                        onClick={() => window.open(`tel:${b.ownerPhone}`)}
+                                                        onClick={() =>
+                                                            window.open(`tel:${b.propertyId.contactNumber}`)
+                                                        }
                                                     >
                                                         Call Resort
                                                     </DropdownMenuItem>
                                                 )}
 
-                                                {b.status === "pending" && (
+                                                {/* Cancel */}
+                                                {resolveBookingStatus(b) === "pending" && (
                                                     <DropdownMenuItem
                                                         className="text-red-600"
                                                         onClick={() => cancelBooking(b._id)}
