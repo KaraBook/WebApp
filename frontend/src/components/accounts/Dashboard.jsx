@@ -332,15 +332,21 @@ export default function Dashboard() {
                                                 )}
 
                                                 {/* Rate */}
-                                                {resolveBookingStatus(b) === "confirmed" && (
-                                                    <DropdownMenuItem
-                                                        onClick={() => {
-                                                            setRateBooking(b);
-                                                            setRateDialogOpen(true);
-                                                        }}
-                                                    >
-                                                        Rate this Resort
+                                                {b.hasReview ? (
+                                                    <DropdownMenuItem disabled className="text-green-600">
+                                                        Review submitted
                                                     </DropdownMenuItem>
+                                                ) : (
+                                                    canViewInvoice(b) && (
+                                                        <DropdownMenuItem
+                                                            onClick={() => {
+                                                                setRateBooking(b);
+                                                                setRateDialogOpen(true);
+                                                            }}
+                                                        >
+                                                            Rate this Resort
+                                                        </DropdownMenuItem>
+                                                    )
                                                 )}
 
                                                 {/* Call */}
