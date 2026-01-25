@@ -21,13 +21,13 @@ import RateBookingDialog from "./RateBookingDialog";
 
 
 function resolveBookingStatus(b) {
-  if (b.status === "cancelled") return "cancelled";
+  if (b?.cancelled === true) return "cancelled";
 
   if (
-    b.paymentStatus === "paid" ||
-    b.status === "paid" ||
-    b.status === "confirmed" ||
-    b.paymentId
+    b?.paymentStatus === "paid" ||
+    b?.status === "paid" ||
+    b?.status === "confirmed" ||
+    b?.paymentId
   ) {
     return "confirmed";
   }
@@ -133,9 +133,10 @@ export default function MobileBookingCard({
               )}
               <DropdownMenuItem
                 className="py-3 gap-3"
-                onClick={(e) =>{ 
+                onClick={(e) => {
                   e.stopPropagation();
-                  onRate(booking)}}
+                  onRate(booking)
+                }}
               >
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 Rate this Resort
@@ -152,12 +153,25 @@ export default function MobileBookingCard({
                 Call Resort
               </DropdownMenuItem>
 
-              <DropdownMenuItem
-                className="py-3 gap-3 text-red-600 focus:text-red-600"
-              >
-                <XCircle className="w-4 h-4" />
-                Cancel Booking
-              </DropdownMenuItem>
+              {bookingStatus === "cancelled" ? (
+                <DropdownMenuItem
+                  disabled
+                  className="py-3 gap-3 text-gray-400 cursor-not-allowed"
+                >
+                  <XCircle className="w-4 h-4" />
+                  Booking Cancelled
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  className="py-3 gap-3 text-red-600 focus:text-red-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <XCircle className="w-4 h-4" />
+                  Cancel Booking
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
