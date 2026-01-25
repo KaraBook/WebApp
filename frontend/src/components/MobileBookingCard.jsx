@@ -115,7 +115,11 @@ export default function MobileBookingCard({
                 View Booking
               </DropdownMenuItem>
 
-              {bookingStatus === "confirmed" ? (
+              {(
+                booking?.paymentStatus === "paid" ||
+                booking?.status === "paid" ||
+                !!booking?.paymentId
+              ) ? (
                 <DropdownMenuItem asChild className="py-3 gap-3">
                   <Link to={`/account/invoice/${booking._id}`}>
                     <FileDown className="w-4 h-4" />
@@ -131,16 +135,22 @@ export default function MobileBookingCard({
                   Invoice available after payment confirmation
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem
-                className="py-3 gap-3"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRate(booking)
-                }}
-              >
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                Rate this Resort
-              </DropdownMenuItem>
+              {(
+                booking?.paymentStatus === "paid" ||
+                booking?.status === "paid" ||
+                !!booking?.paymentId
+              ) && (
+                  <DropdownMenuItem
+                    className="py-3 gap-3"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRate(booking)
+                    }}
+                  >
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    Rate this Resort
+                  </DropdownMenuItem>
+                )}
 
               <DropdownMenuItem
                 className="py-3 gap-3"
@@ -153,7 +163,18 @@ export default function MobileBookingCard({
                 Call Resort
               </DropdownMenuItem>
 
-              {bookingStatus === "cancelled" ? (
+              {bookingStatus === "pending" ? (
+                <DropdownMenuItem
+                  className="py-3 gap-3 text-red-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // open cancel modal here if you have one
+                  }}
+                >
+                  <XCircle className="w-4 h-4" />
+                  Cancel Booking
+                </DropdownMenuItem>
+              ) : bookingStatus === "cancelled" ? (
                 <DropdownMenuItem
                   disabled
                   className="py-3 gap-3 text-gray-400 cursor-not-allowed"
@@ -161,17 +182,7 @@ export default function MobileBookingCard({
                   <XCircle className="w-4 h-4" />
                   Booking Cancelled
                 </DropdownMenuItem>
-              ) : (
-                <DropdownMenuItem
-                  className="py-3 gap-3 text-red-600 focus:text-red-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  <XCircle className="w-4 h-4" />
-                  Cancel Booking
-                </DropdownMenuItem>
-              )}
+              ) : null}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

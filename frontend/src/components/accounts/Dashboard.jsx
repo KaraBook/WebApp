@@ -27,7 +27,11 @@ function resolveBookingStatus(b) {
 
 
 function canViewInvoice(b) {
-    return resolveBookingStatus(b) === "confirmed";
+    return (
+        b?.paymentStatus === "paid" ||
+        b?.status === "paid" ||
+        !!b?.paymentId
+    );
 }
 
 function getNights(checkIn, checkOut) {

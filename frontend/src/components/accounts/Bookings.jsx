@@ -29,7 +29,11 @@ function resolveBookingStatus(b) {
 }
 
 function canViewInvoice(b) {
-  return resolveBookingStatus(b) === "confirmed";
+  return (
+    b?.paymentStatus === "paid" ||
+    b?.status === "paid" ||
+    !!b?.paymentId
+  );
 }
 
 
@@ -366,12 +370,7 @@ export default function Bookings() {
                               </div>
                             </DropdownMenuItem>
 
-                            {b.cancelled ? (
-                              <DropdownMenuItem disabled className="text-gray-400 cursor-not-allowed">
-                                <XCircle size={16} />
-                                Cancelled
-                              </DropdownMenuItem>
-                            ) : (
+                            {resolveBookingStatus(b) === "pending" ? (
                               <DropdownMenuItem
                                 className="text-red-600"
                                 onClick={(e) => {
@@ -382,7 +381,12 @@ export default function Bookings() {
                                 <XCircle size={16} />
                                 Cancel Booking
                               </DropdownMenuItem>
-                            )}
+                            ) : b.cancelled ? (
+                              <DropdownMenuItem disabled className="text-gray-400 cursor-not-allowed">
+                                <XCircle size={16} />
+                                Cancelled
+                              </DropdownMenuItem>
+                            ) : null}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
