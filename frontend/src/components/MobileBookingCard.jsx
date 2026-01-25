@@ -135,22 +135,31 @@ export default function MobileBookingCard({
                   Invoice available after payment confirmation
                 </DropdownMenuItem>
               )}
-              {(
-                booking?.paymentStatus === "paid" ||
-                booking?.status === "paid" ||
-                !!booking?.paymentId
-              ) && (
+              {/* RATE / REVIEW */}
+              {booking.hasReview ? (
+                <DropdownMenuItem
+                  disabled
+                  className="py-3 gap-3 text-green-600 cursor-not-allowed"
+                >
+                  <Star className="w-4 h-4 fill-green-600 text-green-600" />
+                  Review submitted
+                </DropdownMenuItem>
+              ) : (
+                (booking?.paymentStatus === "paid" ||
+                  booking?.status === "paid" ||
+                  !!booking?.paymentId) && (
                   <DropdownMenuItem
                     className="py-3 gap-3"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onRate(booking)
+                      onRate(booking);
                     }}
                   >
                     <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     Rate this Resort
                   </DropdownMenuItem>
-                )}
+                )
+              )}
 
               <DropdownMenuItem
                 className="py-3 gap-3"
