@@ -62,14 +62,29 @@ export default function OwnerCalendar() {
     loadDates();
   }, [propertyId]);
 
-  /* ================= HELPERS ================= */
+
+  const normalize = (d) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
   const isDateBlocked = (date) =>
-    blockedDates.some((r) => date >= new Date(r.start) && date <= new Date(r.end));
+    blockedDates.some((r) => {
+      const start = normalize(new Date(r.start));
+      const end = normalize(new Date(r.end));
+      const target = normalize(date);
+
+      return target >= start && target <= end;
+    });
 
   const isDateBooked = (date) =>
-    bookedDates.some((r) => date >= new Date(r.start) && date <= new Date(r.end));
+    bookedDates.some((r) => {
+      const start = normalize(new Date(r.start));
+      const end = normalize(new Date(r.end));
+      const target = normalize(date);
 
-  /* ================= ACTIONS ================= */
+      return target >= start && target <= end;
+    });
+
+
   const handleBlockDates = async () => {
     if (!propertyId) return;
     const { startDate, endDate } = dateRange[0];
@@ -91,27 +106,27 @@ export default function OwnerCalendar() {
   };
 
   const handleUnblock = async (range) => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const start = new Date(range.start).toISOString();
-    const end = new Date(range.end).toISOString();
+      const start = new Date(range.start).toISOString();
+      const end = new Date(range.end).toISOString();
 
-    const res = await api.delete(
-      `${SummaryApi.removeBlockedDates.url(propertyId)}?start=${start}&end=${end}`
-    );
+      const res = await api.delete(
+        `${SummaryApi.removeBlockedDates.url(propertyId)}?start=${start}&end=${end}`
+      );
 
-    toast.success("Dates unblocked");
-    setBlockedDates(res.data?.data || []);
+      toast.success("Dates unblocked");
+      setBlockedDates(res.data?.data || []);
 
-  } catch (err) {
-    toast.error(
-      err.response?.data?.message || "Failed to unblock dates"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Failed to unblock dates"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
