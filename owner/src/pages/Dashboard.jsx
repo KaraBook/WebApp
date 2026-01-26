@@ -401,7 +401,7 @@ export default function Dashboard() {
             value={stats?.totalBookings}
             caption="All bookings so far"
             variant="primary"
-            onClick={() => navigate("/bookings?status=all")}
+            onClick={() => navigate("/bookings?time=all&status=all")}
           />
 
           <StatCard
@@ -445,7 +445,7 @@ export default function Dashboard() {
             value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
             caption="From all bookings"
             variant="primary"
-            onClick={() => navigate("/bookings?status=confirmed")}
+            onClick={() => navigate("/bookings?time=all&status=confirmed")}
           />
 
         </div>
