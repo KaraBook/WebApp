@@ -361,14 +361,14 @@ export default function Dashboard() {
                                                 )}
 
                                                 {/* Cancel */}
-                                                {resolveBookingStatus(b) === "pending" ? (
+                                                {!b.cancelled && new Date(b.checkIn) > new Date() ? (
                                                     <DropdownMenuItem
                                                         className="text-red-600"
                                                         onClick={() => cancelBooking(b._id)}
                                                     >
                                                         Cancel Booking
                                                     </DropdownMenuItem>
-                                                ) : resolveBookingStatus(b) === "cancelled" ? (
+                                                ) : b.cancelled ? (
                                                     <DropdownMenuItem
                                                         disabled
                                                         className="text-gray-400 cursor-not-allowed"
