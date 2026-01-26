@@ -62,7 +62,6 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
         (1000 * 60 * 60 * 24)
     );
 
-    if (booking?.cancelled) {
         return (
             <Dialog open={open} onOpenChange={() => onClose(false)}>
                 <DialogContent className="max-w-lg p-0 z-[9999999] overflow-hidden">
@@ -267,4 +266,3 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
             </Dialog>
         );
     }
-}
