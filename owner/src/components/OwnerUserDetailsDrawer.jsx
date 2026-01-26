@@ -101,7 +101,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
                                 user.email ? (
                                     <a
                                         href={`mailto:${user.email}`}
-                                        className="text-primary hover:underline"
+                                        className="text-black hover:underline"
                                     >
                                         {user.email}
                                     </a>
@@ -115,7 +115,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
                                 user.mobile ? (
                                     <a
                                         href={`tel:${user.mobile}`}
-                                        className="text-primary hover:underline"
+                                        className="text-black hover:underline"
                                     >
                                         {user.mobile}
                                     </a>
