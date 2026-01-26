@@ -703,7 +703,7 @@ export default function Dashboard() {
   <div className="mt-4">
     <Calendar
       mode="single"
-      numberOfMonths={3}
+      numberOfMonths={1}
       fromDate={new Date()}
       className="rounded-xl border"
       modifiers={{
