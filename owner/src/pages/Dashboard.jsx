@@ -215,78 +215,65 @@ export default function Dashboard() {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await api.get(SummaryApi.getOwnerDashboard.url);
+  (async () => {
+    try {
+      const res = await api.get(SummaryApi.getOwnerDashboard.url);
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-        const sorted = (res.data?.data?.bookings || [])
-          .filter(b => {
-            const checkOut = new Date(b.checkOut);
-            checkOut.setHours(0, 0, 0, 0);
-            return checkOut >= today;
-          })
-          .sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+      const all = res.data?.data?.bookings || [];
 
-        const upcoming = all.filter(b => {
-          const checkOut = new Date(b.checkOut);
-          checkOut.setHours(0, 0, 0, 0);
-          return checkOut >= today;
-        });
+      const upcoming = all.filter(b => {
+        const checkOut = new Date(b.checkOut);
+        checkOut.setHours(0, 0, 0, 0);
+        return checkOut >= today;
+      });
 
+      const past = all.filter(b => {
+        const checkOut = new Date(b.checkOut);
+        checkOut.setHours(0, 0, 0, 0);
+        return checkOut < today;
+      });
 
-        const past = all.filter(b => {
-          const checkOut = new Date(b.checkOut);
-          checkOut.setHours(0, 0, 0, 0);
-          return checkOut < today;
-        });
+      const stats = {
+        totalBookings: all.length,
 
+        confirmed: upcoming.filter(
+          b => b.paymentStatus === "paid" && !b.cancelled
+        ).length,
 
-        // ---- Industry standard stats ----
-        const stats = {
-          totalBookings: all.length,
+        pending: upcoming.filter(
+          b => ["pending", "initiated", "failed"].includes(b.paymentStatus)
+        ).length,
 
+        cancelled: all.filter(
+          b => b.cancelled || b.paymentStatus === "cancelled"
+        ).length,
 
-          confirmed: upcoming.filter(
-            b => b.paymentStatus === "paid" && !b.cancelled
-          ).length,
+        totalRevenue: all
+          .filter(b => b.paymentStatus === "paid" && !b.cancelled)
+          .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
 
+        totalUsers: new Set(
+          all.map(b => b.userId?._id)
+        ).size
+      };
 
-          pending: upcoming.filter(
-            b => ["pending", "initiated", "failed"].includes(b.paymentStatus)
-          ).length,
+      setData({
+        stats,
+        bookings: upcoming.sort(
+          (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
+        )
+      });
 
-
-          cancelled: all.filter(
-            b => b.cancelled || b.paymentStatus === "cancelled"
-          ).length,
-
-
-          totalRevenue: all
-            .filter(b => b.paymentStatus === "paid" && !b.cancelled)
-            .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
-
-
-          totalUsers: new Set(
-            all.map(b => b.userId?._id)
-          ).size
-        };
-
-
-        setData({
-          stats,
-          bookings: upcoming.sort(
-            (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
-          )
-        });
-      } catch {
-      } finally {
-        setLoadingDashboard(false);
-      }
-    })();
-  }, []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingDashboard(false);
+    }
+  })();
+}, []);
 
   useEffect(() => {
     (async () => {
