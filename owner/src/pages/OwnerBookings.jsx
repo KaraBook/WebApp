@@ -129,6 +129,24 @@ export default function OwnerBookings() {
       data = data.filter(b => new Date(b.checkOut) >= todayStart);
     }
 
+    if (statusFilter === "confirmed") {
+      data = data.filter(b =>
+        b.paymentStatus === "paid" && !b.cancelled
+      );
+    }
+
+    if (statusFilter === "pending") {
+      data = data.filter(b =>
+        ["pending", "initiated", "failed"].includes(b.paymentStatus)
+      );
+    }
+
+    if (statusFilter === "cancelled") {
+      data = data.filter(b =>
+        b.cancelled || b.paymentStatus === "cancelled"
+      );
+    }
+
     if (timeFilter === "past") {
       data = data.filter(b => new Date(b.checkOut) < todayStart);
     }

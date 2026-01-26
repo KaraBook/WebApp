@@ -230,7 +230,57 @@ export default function Dashboard() {
           })
           .sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 
-        setData({ ...res.data.data, bookings: sorted });
+        const upcoming = all.filter(b => {
+          const checkOut = new Date(b.checkOut);
+          checkOut.setHours(0, 0, 0, 0);
+          return checkOut >= today;
+        });
+
+
+        const past = all.filter(b => {
+          const checkOut = new Date(b.checkOut);
+          checkOut.setHours(0, 0, 0, 0);
+          return checkOut < today;
+        });
+
+
+        // ---- Industry standard stats ----
+        const stats = {
+          totalBookings: all.length,
+
+
+          confirmed: upcoming.filter(
+            b => b.paymentStatus === "paid" && !b.cancelled
+          ).length,
+
+
+          pending: upcoming.filter(
+            b => ["pending", "initiated", "failed"].includes(b.paymentStatus)
+          ).length,
+
+
+          cancelled: all.filter(
+            b => b.cancelled || b.paymentStatus === "cancelled"
+          ).length,
+
+
+          totalRevenue: all
+            .filter(b => b.paymentStatus === "paid" && !b.cancelled)
+            .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
+
+
+          totalUsers: new Set(
+            all.map(b => b.userId?._id)
+          ).size
+        };
+
+
+        setData({
+          stats,
+          bookings: upcoming.sort(
+            (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
+          )
+        });
       } catch {
       } finally {
         setLoadingDashboard(false);
@@ -364,6 +414,7 @@ export default function Dashboard() {
             value={stats?.totalBookings}
             caption="All bookings so far"
             variant="primary"
+            onClick={() => navigate("/bookings?status=all")}
           />
 
           <StatCard
@@ -371,7 +422,7 @@ export default function Dashboard() {
             label="Users"
             value={stats?.totalUsers}
             caption="Total travellers"
-            variant="default"
+            onClick={() => navigate("/users")}
           />
 
           <StatCard
@@ -380,6 +431,7 @@ export default function Dashboard() {
             value={stats?.confirmed}
             caption="Ready to check-in"
             variant="success"
+            onClick={() => navigate("/bookings?status=confirmed")}
           />
 
           <StatCard
@@ -388,6 +440,7 @@ export default function Dashboard() {
             value={stats?.pending}
             caption="Awaiting confirmation"
             variant="warning"
+            onClick={() => navigate("/bookings?status=pending")}
           />
 
           <StatCard
@@ -396,6 +449,7 @@ export default function Dashboard() {
             value={stats?.cancelled}
             caption="Cancelled bookings"
             variant="danger"
+            onClick={() => navigate("/bookings?status=cancelled")}
           />
 
           <StatCard
@@ -404,6 +458,7 @@ export default function Dashboard() {
             value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
             caption="From all bookings"
             variant="primary"
+            onClick={() => navigate("/bookings?status=confirmed")}
           />
 
         </div>
@@ -423,7 +478,7 @@ export default function Dashboard() {
           {/* BOOKINGS TABLE */}
           <div className="hidden md:block lg:col-span-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-4 sm:px-6 pt-5 pb-3">
-              <h2 className="text-sm font-semibold text-gray-900">Last bookings</h2>
+              <h2 className="text-sm font-semibold text-gray-900">Recent bookings</h2>
             </div>
 
             <div className="overflow-x-auto">
