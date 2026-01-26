@@ -719,7 +719,7 @@ const isDateCancelled = (date) =>
                   booked: "bg-green-100 rounded-md text-green-800",
                   blocked: "bg-blue-100 rounded-md text-blue-800",
                   pending: "bg-yellow-100 rounded-md text-yellow-800",
-                  cancelled: "bg-gray-200 rounded-md text-gray-600",
+                  cancelled: "bg-red-200 rounded-md text-gray-600",
                 }}
                 components={{
                   DayContent: ({ date }) => (
@@ -730,7 +730,7 @@ const isDateCancelled = (date) =>
                       <div className="absolute bottom-1 flex gap-[2px]">
                         {isDateBooked(date) && <Dot color="green" />}
                         {isDatePending(date) && <Dot color="yellow" />}
-                        {isDateCancelled(date) && <Dot color="gray" />}
+                        {isDateCancelled(date) && <Dot color="red" />}
                         {isDateBlocked(date) && <Dot color="blue" />}
                       </div>
                     </div>
