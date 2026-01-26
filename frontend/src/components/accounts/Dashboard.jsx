@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
+import CancelBookingDialog from "../CancelBookingModal";
 
 
 function resolveBookingStatus(b) {
@@ -56,6 +57,7 @@ export default function Dashboard() {
     const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
     const [rateDialogOpen, setRateDialogOpen] = useState(false);
     const [rateBooking, setRateBooking] = useState(null);
+    const [cancelBookingObj, setCancelBookingObj] = useState(null);
 
     const goToBookings = (filter) => {
         navigate("/account/bookings", {
@@ -364,7 +366,10 @@ export default function Dashboard() {
                                                 {!b.cancelled && new Date(b.checkIn) > new Date() ? (
                                                     <DropdownMenuItem
                                                         className="text-red-600"
-                                                        onClick={() => cancelBooking(b._id)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setCancelBookingObj(b);
+                                                        }}
                                                     >
                                                         Cancel Booking
                                                     </DropdownMenuItem>
@@ -401,6 +406,15 @@ export default function Dashboard() {
                 onClose={() => {
                     setRateDialogOpen(false);
                     setRateBooking(null);
+                }}
+            />
+
+            <CancelBookingDialog
+                open={!!cancelBookingObj}
+                booking={cancelBookingObj}
+                onClose={(refresh) => {
+                    if (refresh) fetchDashboardData();
+                    setCancelBookingObj(null);
                 }}
             />
 
