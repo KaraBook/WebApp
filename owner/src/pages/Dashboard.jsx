@@ -5,7 +5,7 @@ import SummaryApi from "../common/SummaryApi";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { Loader2, CheckCircle2, CalendarCheck, Clock, IndianRupee, MoreVertical, Users, XCircle } from "lucide-react";
-import BookingDetailsDialog from "@/components/BookingDetailsDialog";
+import BookingDetailsDrawer from "@/components/BookingDetailsDrawer";
 import { Link, useNavigate } from "react-router-dom";
 import MobileBookingsList from "@/components/MobileBookingList";
 import { Calendar } from "@/components/ui/calendar"; // shadcn
@@ -378,19 +378,19 @@ export default function Dashboard() {
 
 
   const isDatePending = (date) =>
-  bookings?.some(b =>
-    b.paymentStatus !== "paid" &&
-    !b.cancelled &&
-    date >= new Date(b.checkIn) &&
-    date <= new Date(b.checkOut)
-  );
+    bookings?.some(b =>
+      b.paymentStatus !== "paid" &&
+      !b.cancelled &&
+      date >= new Date(b.checkIn) &&
+      date <= new Date(b.checkOut)
+    );
 
-const isDateCancelled = (date) =>
-  bookings?.some(b =>
-    b.cancelled &&
-    date >= new Date(b.checkIn) &&
-    date <= new Date(b.checkOut)
-  );
+  const isDateCancelled = (date) =>
+    bookings?.some(b =>
+      b.cancelled &&
+      date >= new Date(b.checkIn) &&
+      date <= new Date(b.checkOut)
+    );
 
 
   const { stats, bookings } = data || {};
@@ -777,7 +777,7 @@ const isDateCancelled = (date) =>
         )}
       </div>
 
-      <BookingDetailsDialog
+      <BookingDetailsDrawer
         open={openBookingDialog}
         booking={selectedBooking}
         onClose={() => setOpenBookingDialog(false)}
