@@ -716,10 +716,10 @@ const isDateCancelled = (date) =>
                   cancelled: isDateCancelled,
                 }}
                 modifiersClassNames={{
-                  booked: "bg-green-100 text-green-800",
-                  blocked: "bg-blue-100 text-blue-800",
-                  pending: "bg-yellow-100 text-yellow-800",
-                  cancelled: "bg-gray-200 text-gray-600",
+                  booked: "bg-green-100 rounded-md text-green-800",
+                  blocked: "bg-blue-100 rounded-md text-blue-800",
+                  pending: "bg-yellow-100 rounded-md text-yellow-800",
+                  cancelled: "bg-gray-200 rounded-md text-gray-600",
                 }}
                 components={{
                   DayContent: ({ date }) => (
