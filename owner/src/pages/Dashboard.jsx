@@ -90,43 +90,83 @@ function StatCard({
   label,
   value,
   caption,
-  iconBg = "bg-gray-100",
-  iconColor = "text-gray-700",
-  cardBg = "bg-white",
-  textColor = "text-gray-900",
-  subTextColor = "text-gray-400",
+  variant = "default",
   onClick,
   fullWidthMobile = false,
 }) {
+  const styles = {
+    primary: {
+      card: "bg-[#26a69a] text-white",
+      iconBg: "bg-white/20",
+      iconColor: "text-white",
+      label: "text-white/80",
+      caption: "text-white/80",
+    },
+    success: {
+      card: "bg-white",
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-600",
+      label: "text-green-500",
+      caption: "text-gray-500",
+    },
+    warning: {
+      card: "bg-white",
+      iconBg: "bg-amber-100",
+      iconColor: "text-amber-600",
+      label: "text-orange-500",
+      caption: "text-gray-500",
+    },
+    danger: {
+      card: "bg-white",
+      iconBg: "bg-red-100",
+      iconColor: "text-red-600",
+      label: "text-red-500",
+      caption: "text-gray-500",
+    },
+    default: {
+      card: "bg-white",
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
+      label: "text-blue-500",
+      caption: "text-gray-500",
+    },
+  };
+
+  const s = styles[variant];
+
   return (
     <div
       onClick={onClick}
       className={`
-        ${cardBg}
+        ${s.card}
         ${fullWidthMobile ? "col-span-2 sm:col-span-1" : ""}
-        rounded-2xl border border-gray-100 shadow-sm
-        px-5 sm:px-6 py-5
-        flex flex-col gap-3 cursor-pointer
-        hover:shadow-md transition
+        rounded-xl
+        px-5 py-5
+        cursor-pointer
+        transition
+        hover:scale-[1.01]
+        shadow-[0_10px_25px_rgba(0,0,0,0.08)]
       `}
     >
-      <div
-        className={`h-8 w-8 rounded-full ${iconBg} flex items-center justify-center`}
-      >
-        <Icon className={`w-4 h-4 ${iconColor}`} />
+      <div className="flex justify-between items-start">
+        <div>
+          <p className={`text-xs font-semibold tracking-wider uppercase ${s.label}`}>
+            {label}
+          </p>
+
+          <p className="text-[32px] font-bold mt-2 leading-none">
+            {value ?? 0}
+          </p>
+
+          <p className={`text-sm mt-2 ${s.caption}`}>
+            {caption}
+          </p>
+        </div>
+
+        <div className={`h-10 w-10 rounded-full ${s.iconBg} flex items-center justify-center`}>
+          <Icon className={`w-5 h-5 ${s.iconColor}`} />
+        </div>
       </div>
-
-      <p className={`text-xs ${subTextColor}`}>{label}</p>
-
-      <p className={`text-2xl sm:text-[28px] font-[700] leading-tight ${textColor}`}>
-        {value ?? 0}
-      </p>
-
-      {caption && (
-        <p className={`text-[11px] ${subTextColor}`}>
-          {caption}
-        </p>
-      )}
     </div>
   );
 }
@@ -315,67 +355,56 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* STATS */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
 
-          {/* TOTAL BOOKINGS (PRIMARY BG) */}
           <StatCard
             icon={CheckCircle2}
             label="Total Bookings"
             value={stats?.totalBookings}
             caption="All bookings so far"
-            cardBg="bg-primary"
-            textColor="text-white"
-            subTextColor="text-white/70"
-            iconBg="bg-white/20"
-            iconColor="text-white"
-            onClick={() => navigate("/bookings?status=all")}
+            variant="primary"
           />
 
-          {/* USERS */}
           <StatCard
             icon={Users}
             label="Users"
             value={stats?.totalUsers}
             caption="Total travellers"
-            onClick={() => navigate("/users")}
+            variant="default"
           />
 
-          {/* CONFIRMED */}
           <StatCard
             icon={CalendarCheck}
             label="Confirmed"
             value={stats?.confirmed}
             caption="Ready to check-in"
-            iconBg="bg-emerald-50"
-            iconColor="text-emerald-600"
-            onClick={() => navigate("/bookings?status=confirmed")}
+            variant="success"
           />
 
-          {/* PENDING */}
           <StatCard
             icon={Clock}
             label="Pending"
             value={stats?.pending}
             caption="Awaiting confirmation"
-            iconBg="bg-amber-50"
-            iconColor="text-amber-600"
-            onClick={() => navigate("/bookings?status=pending")}
+            variant="warning"
           />
 
-          {/* TOTAL REVENUE (PRIMARY + FULL WIDTH ON MOBILE) */}
+          <StatCard
+            icon={XCircle}
+            label="Cancelled"
+            value={stats?.cancelled}
+            caption="Cancelled bookings"
+            variant="danger"
+          />
+
           <StatCard
             icon={IndianRupee}
             label="Total Revenue"
             value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
             caption="From all bookings"
-            cardBg="bg-primary"
-            textColor="text-white"
-            subTextColor="text-white/70"
-            iconBg="bg-white/20"
-            iconColor="text-white"
-            fullWidthMobile
+            variant="primary"
           />
+
         </div>
 
         {/* GRID — BOOKINGS + CALENDAR */}
