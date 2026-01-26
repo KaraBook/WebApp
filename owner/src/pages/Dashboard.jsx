@@ -97,7 +97,7 @@ function StatCard({
 }) {
   const styles = {
     primary: {
-      card: "bg-[#26a69a] text-white",
+      card: "bg-primary text-white",
       iconBg: "bg-white/20",
       iconColor: "text-white",
       label: "text-white/80",
