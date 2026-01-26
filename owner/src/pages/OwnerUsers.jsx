@@ -189,11 +189,7 @@ export default function OwnerUsers() {
             <div className="hidden md:block bg-white rounded-xl border overflow-hidden">
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50 text-gray-600">
-                        <tr
-                            key={u.userId}
-                            onClick={() => openUser(u)}
-                            className="border-t hover:bg-gray-50 transition cursor-pointer"
-                        >
+                        <tr>
                             <th className="text-left px-4 py-3">Sr. No</th>
                             <th className="text-left px-4 py-3">User</th>
                             <th className="text-left px-4 py-3">Email</th>
@@ -206,7 +202,11 @@ export default function OwnerUsers() {
 
                     <tbody>
                         {paginatedUsers.map((u, i) => (
-                            <tr key={u.userId} className="border-t">
+                            <tr
+                                key={u.userId}
+                                onClick={() => openUser(u)}
+                                className="border-t hover:bg-gray-50 transition cursor-pointer"
+                            >
                                 <td className="px-4 py-4">{i + 1}</td>
 
                                 <td className="px-4 py-4">
