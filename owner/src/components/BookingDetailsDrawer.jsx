@@ -174,13 +174,16 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         <Key label="Tax" value={`₹${safeTax.toLocaleString("en-IN")}`} />
                         <Key label="Grand Total" value={`₹${safeGrandTotal.toLocaleString("en-IN")}`} bold />
                         <Key label="Order ID" value={orderId} mono />
+
+                        <div className="pt-2">
+                            <Row
+                                icon={<Clock size={14} />}
+                                text={`Booking created on ${formatDate(createdAt)}`}
+                                muted
+                            />
+                        </div>
                     </Section>
 
-                    <Row
-                        icon={<Clock size={14} />}
-                        text={`Booking created on ${formatDate(createdAt)}`}
-                        muted
-                    />
                 </div>
             </div>
         </>

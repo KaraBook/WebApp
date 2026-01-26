@@ -41,7 +41,7 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
-import BookingDetailsDialog from "@/components/BookingDetailsDialog";
+import BookingDetailsDrawer from "@/components/BookingDetailsDrawer";
 
 
 export default function OwnerBookings() {
@@ -560,7 +560,7 @@ export default function OwnerBookings() {
         </div>
       )}
 
-      <BookingDetailsDialog
+      <BookingDetailsDrawer
         open={viewBooking.open}
         booking={viewBooking.booking}
         onClose={closeBookingDialog}
