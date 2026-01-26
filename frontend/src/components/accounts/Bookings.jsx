@@ -446,7 +446,19 @@ export default function Bookings() {
       <RateBookingDialog
         open={!!ratingBooking}
         booking={ratingBooking}
-        onClose={() => setRatingBooking(null)}
+        onClose={(bookingId) => {
+          setRatingBooking(null);
+
+          if (bookingId) {
+            setBookings(prev =>
+              prev.map(b =>
+                b._id === bookingId
+                  ? { ...b, hasReview: true }
+                  : b
+              )
+            );
+          }
+        }}
       />
 
 
