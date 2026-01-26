@@ -2,26 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import {
-  Loader2,
-  CheckCircle2,
-  CalendarCheck,
-  Clock,
-  IndianRupee,
-  MoreVertical,
-  Users,
-  XCircle
-} from "lucide-react";
+import { Loader2, CheckCircle2, CalendarCheck, Clock, IndianRupee, MoreVertical, Users, XCircle } from "lucide-react";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import { Link, useNavigate } from "react-router-dom";
 import MobileBookingsList from "@/components/MobileBookingList";
+import { Calendar } from "@/components/ui/calendar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
@@ -30,7 +18,6 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
     if (totalPages <= 5) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
-
     return [
       1,
       ...(currentPage > 3 ? ["..."] : []),
@@ -192,6 +179,45 @@ const normalizePaymentStatus = (status) => {
 };
 
 
+function Dot({ color }) {
+  const map = {
+    green: "bg-green-500",
+    yellow: "bg-yellow-400",
+    gray: "bg-gray-400",
+    blue: "bg-blue-500",
+  };
+  return (
+    <span className={`w-1.5 h-1.5 rounded-full ${map[color]}`} />
+  );
+}
+
+
+function CalendarLegend() {
+  return (
+    <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+      <LegendItem color="green" label="Confirmed Booking" />
+      <LegendItem color="yellow" label="Pending Payment" />
+      <LegendItem color="gray" label="Cancelled" />
+      <LegendItem color="blue" label="Owner Blocked" />
+    </div>
+  );
+}
+
+function LegendItem({ color, label }) {
+  const map = {
+    green: "bg-green-500",
+    yellow: "bg-yellow-400",
+    gray: "bg-gray-400",
+    blue: "bg-blue-500",
+  };
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`w-3 h-3 rounded-full ${map[color]}`} />
+      <span className="text-gray-700">{label}</span>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -215,65 +241,65 @@ export default function Dashboard() {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
-  (async () => {
-    try {
-      const res = await api.get(SummaryApi.getOwnerDashboard.url);
+    (async () => {
+      try {
+        const res = await api.get(SummaryApi.getOwnerDashboard.url);
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-      const all = res.data?.data?.bookings || [];
+        const all = res.data?.data?.bookings || [];
 
-      const upcoming = all.filter(b => {
-        const checkOut = new Date(b.checkOut);
-        checkOut.setHours(0, 0, 0, 0);
-        return checkOut >= today;
-      });
+        const upcoming = all.filter(b => {
+          const checkOut = new Date(b.checkOut);
+          checkOut.setHours(0, 0, 0, 0);
+          return checkOut >= today;
+        });
 
-      const past = all.filter(b => {
-        const checkOut = new Date(b.checkOut);
-        checkOut.setHours(0, 0, 0, 0);
-        return checkOut < today;
-      });
+        const past = all.filter(b => {
+          const checkOut = new Date(b.checkOut);
+          checkOut.setHours(0, 0, 0, 0);
+          return checkOut < today;
+        });
 
-      const stats = {
-        totalBookings: all.length,
+        const stats = {
+          totalBookings: all.length,
 
-        confirmed: upcoming.filter(
-          b => b.paymentStatus === "paid" && !b.cancelled
-        ).length,
+          confirmed: upcoming.filter(
+            b => b.paymentStatus === "paid" && !b.cancelled
+          ).length,
 
-        pending: upcoming.filter(
-          b => ["pending", "initiated", "failed"].includes(b.paymentStatus)
-        ).length,
+          pending: upcoming.filter(
+            b => ["pending", "initiated", "failed"].includes(b.paymentStatus)
+          ).length,
 
-        cancelled: all.filter(
-          b => b.cancelled || b.paymentStatus === "cancelled"
-        ).length,
+          cancelled: all.filter(
+            b => b.cancelled || b.paymentStatus === "cancelled"
+          ).length,
 
-        totalRevenue: all
-          .filter(b => b.paymentStatus === "paid" && !b.cancelled)
-          .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
+          totalRevenue: all
+            .filter(b => b.paymentStatus === "paid" && !b.cancelled)
+            .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
 
-        totalUsers: new Set(
-          all.map(b => b.userId?._id)
-        ).size
-      };
+          totalUsers: new Set(
+            all.map(b => b.userId?._id)
+          ).size
+        };
 
-      setData({
-        stats,
-        bookings: upcoming.sort(
-          (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
-        )
-      });
+        setData({
+          stats,
+          bookings: upcoming.sort(
+            (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
+          )
+        });
 
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingDashboard(false);
-    }
-  })();
-}, []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingDashboard(false);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -323,6 +349,21 @@ export default function Dashboard() {
       const end = new Date(range.end);
       return date >= start && date <= end;
     });
+
+  const isDatePending = (date) =>
+    bookings?.some(b =>
+      b.paymentStatus !== "paid" &&
+      !b.cancelled &&
+      date >= new Date(b.checkIn) &&
+      date <= new Date(b.checkOut)
+    );
+
+  const isDateCancelled = (date) =>
+    bookings?.some(b =>
+      b.cancelled &&
+      date >= new Date(b.checkIn) &&
+      date <= new Date(b.checkOut)
+    );
 
   const isDateBooked = (date) => {
     const target = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
@@ -651,50 +692,52 @@ export default function Dashboard() {
 
           {/* CALENDAR */}
           <div className="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5">
-            <h3 className="text-sm font-semibold text-gray-900">This month calendar</h3>
-            <p className="text-xs text-gray-500">Blocked dates are greyed out</p>
+            <div className="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5">
+  <h3 className="text-sm font-semibold text-gray-900">
+    Availability Calendar
+  </h3>
+  <p className="text-xs text-gray-500">
+    Upcoming 3 months overview
+  </p>
 
-            <div className="mt-4 text-sm font-medium text-gray-800">{monthLabel}</div>
+  <div className="mt-4">
+    <Calendar
+      mode="single"
+      numberOfMonths={3}
+      fromDate={new Date()}
+      className="rounded-xl border"
+      modifiers={{
+        booked: isDateBooked,
+        blocked: isDateBlocked,
+        pending: isDatePending,
+        cancelled: isDateCancelled,
+      }}
+      modifiersClassNames={{
+        booked: "bg-green-100 text-green-800",
+        blocked: "bg-blue-100 text-blue-800",
+        pending: "bg-yellow-100 text-yellow-800",
+        cancelled: "bg-gray-200 text-gray-600",
+      }}
+      components={{
+        DayContent: ({ date }) => (
+          <div className="relative w-full h-full flex items-center justify-center">
+            {date.getDate()}
 
-            <div className="grid grid-cols-7 text-[11px] text-gray-400 mt-3 mb-2 text-center">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-                <div key={d}>{d}</div>
-              ))}
+            {/* status dot */}
+            <div className="absolute bottom-1 flex gap-[2px]">
+              {isDateBooked(date) && <Dot color="green" />}
+              {isDatePending(date) && <Dot color="yellow" />}
+              {isDateCancelled(date) && <Dot color="gray" />}
+              {isDateBlocked(date) && <Dot color="blue" />}
             </div>
+          </div>
+        )
+      }}
+    />
+  </div>
 
-            <div className="grid grid-cols-7 gap-1.5 text-sm">
-              {calendarDays.map((day, i) => {
-                if (!day) return <div key={i} className="h-9" />;
-
-                const isToday = day.toDateString() === today.toDateString();
-                const blocked = isDateBlocked(day);
-
-                let cls = "h-9 w-9 flex items-center justify-center rounded-lg text-xs transition";
-
-                if (isDateBooked(day)) {
-                  cls += " bg-red-200 text-red-700";
-                } else if (blocked) {
-                  cls += " bg-gray-200 text-gray-500";
-                } else if (isToday) {
-                  cls += " border border-primary text-primary font-semibold";
-                } else {
-                  cls += " text-gray-700 hover:bg-gray-100";
-                }
-
-                return (
-                  <div key={i} className="flex justify-center">
-                    <div className={cls}>{day.getDate()}</div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => navigate("/calendar")}
-              className="mt-5 w-full bg-primary hover:bg-primary-800 text-white rounded-[10px] py-2.5 text-[14px] font-medium"
-            >
-              View full calendar
-            </button>
+  <CalendarLegend />
+</div>
           </div>
         </div>
 
