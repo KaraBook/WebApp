@@ -163,6 +163,7 @@ export default function Bookings() {
             booking={b}
             onView={(booking) => setSelectedBooking(booking)}
             onRate={(booking) => setRatingBooking(booking)}
+            onCancel={(booking) => setCancelBooking(booking)}   // 👈 ADD THIS
           />
         ))}
 

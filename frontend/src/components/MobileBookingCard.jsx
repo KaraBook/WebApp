@@ -48,6 +48,7 @@ export default function MobileBookingCard({
   booking,
   onView,
   onRate,
+  onCancel
 }) {
   const nights = Math.max(
     1,
@@ -177,6 +178,7 @@ export default function MobileBookingCard({
                   className="py-3 gap-3 text-red-600"
                   onClick={(e) => {
                     e.stopPropagation();
+                    onCancel(booking);   // 👈 THIS OPENS MODAL
                   }}
                 >
                   <XCircle className="w-4 h-4" />
