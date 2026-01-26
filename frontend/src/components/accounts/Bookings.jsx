@@ -370,7 +370,7 @@ export default function Bookings() {
                               </div>
                             </DropdownMenuItem>
 
-                            {resolveBookingStatus(b) === "pending" ? (
+                            {!b.cancelled && new Date(b.checkIn) > new Date() ? (
                               <DropdownMenuItem
                                 className="text-red-600"
                                 onClick={(e) => {
