@@ -47,6 +47,9 @@ export const createOrder = async (req, res) => {
     const start = new Date(checkIn);
     const end = new Date(checkOut);
 
+    start.setUTCHours(12, 0, 0, 0);
+    end.setUTCHours(12, 0, 0, 0);
+
     const totalNights = Math.ceil(
       (end - start) / (1000 * 60 * 60 * 24)
     );

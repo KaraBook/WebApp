@@ -239,9 +239,8 @@ export default function PropertyDetails() {
 
 
   const isDateDisabled = (date) => {
-    return bookedDates.some(
-      (range) => date >= range.start && date <= range.end
-    );
+    const all = [...bookedDates, ...blockedDates];
+    return all.some((range) => date >= range.start && date <= range.end);
   };
 
   const toggleWishlist = async () => {
