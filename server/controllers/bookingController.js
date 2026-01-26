@@ -275,7 +275,7 @@ export const getBookedDates = async (req, res) => {
 
     const bookings = await Booking.find({
       propertyId,
-      paymentStatus: { $in: ["paid", "confirmed"] },
+      paymentStatus: "paid",
       cancelled: false
     }).select("checkIn checkOut");
 
@@ -286,8 +286,7 @@ export const getBookedDates = async (req, res) => {
 
     res.json({ success: true, dates });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Failed to fetch booked dates" });
+    res.status(500).json({ success: false });
   }
 };
 
