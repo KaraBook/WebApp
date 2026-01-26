@@ -272,9 +272,11 @@ Thank you for choosing us! 🏡`;
 export const getBookedDates = async (req, res) => {
   try {
     const { propertyId } = req.params;
+
     const bookings = await Booking.find({
       propertyId,
       paymentStatus: "paid",
+      cancelled: { $ne: true },   
     }).select("checkIn checkOut");
 
     const dates = bookings.map((b) => ({
