@@ -50,10 +50,11 @@ export default function OwnerBookings() {
   const [query, setQuery] = useState("");
 
   const [searchParams] = useSearchParams();
-  const statusFromUrl = searchParams.get("status") || "upcoming";
+  const timeFromUrl = searchParams.get("time") || "upcoming";
+  const statusFromUrl = searchParams.get("status") || "all";
 
-  const [timeFilter, setTimeFilter] = useState(statusFromUrl);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [timeFilter, setTimeFilter] = useState(timeFromUrl);
+  const [statusFilter, setStatusFilter] = useState(statusFromUrl);
 
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
@@ -302,7 +303,7 @@ export default function OwnerBookings() {
 
             <Select value={timeFilter} onValueChange={(val) => {
               setTimeFilter(val);
-              navigate(`/bookings?status=${val}`);
+              navigate(`/bookings?time=${val}&status=${statusFilter}`);
             }}>
               <SelectTrigger className="md:w-[160px] w-full bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Time" />
@@ -315,7 +316,10 @@ export default function OwnerBookings() {
             </Select>
 
             {/* STATUS FILTER */}
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={statusFilter} onValueChange={(val) => {
+              setStatusFilter(val);
+              navigate(`/bookings?time=${timeFilter}&status=${val}`);
+            }}>
               <SelectTrigger className="md:w-[160px] w-full bg-gray-50 border-gray-200">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
