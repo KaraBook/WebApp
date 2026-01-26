@@ -239,8 +239,9 @@ export default function PropertyDetails() {
 
 
   const isDateDisabled = (date) => {
-    const all = [...bookedDates, ...blockedDates];
-    return all.some((range) => date >= range.start && date <= range.end);
+    return bookedDates.some(
+      (range) => date >= range.start && date <= range.end
+    );
   };
 
   const toggleWishlist = async () => {
@@ -283,13 +284,10 @@ export default function PropertyDetails() {
   ]
     .filter(Boolean)
     .filter((img) => {
-      // normalize
       if (typeof img === "string") {
-        // HARD BLOCK Aadhaar / Shop Act by content
         return !img.toLowerCase().includes("aadhaar");
       }
 
-      // object-based images
       if (img?.fieldname === "shopAct") return false;
       if (img?.type === "shopAct") return false;
 
