@@ -458,12 +458,6 @@ export default function OwnerBookings() {
                             )}
 
                             <DropdownMenuItem
-                              onSelect={() => openConfirm("invoice", b)}
-                            >
-                              Download Invoice
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
                               onSelect={() =>
                                 navigator.clipboard.writeText(b.userId.email)
                               }

@@ -9,7 +9,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import OwnerUserDetailsDialog from "@/components/OwnerUserDetailsDialog";
+import OwnerUserDetailsDrawer from "@/components/OwnerUserDetailsDrawer";
 
 export default function OwnerUsers() {
     const [users, setUsers] = useState([]);
@@ -390,7 +390,7 @@ export default function OwnerUsers() {
                 </div>
             )}
 
-            <OwnerUserDetailsDialog
+            <OwnerUserDetailsDrawer
                 open={openUserDialog}
                 user={selectedUser}
                 onClose={() => setOpenUserDialog(false)}
