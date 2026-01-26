@@ -220,10 +220,11 @@ export default function PropertyDetails() {
   };
 
 
-  const isDateDisabled = (date) => {
-    const all = [...bookedDates, ...blockedDates];
-    return all.some((range) => date >= range.start && date <= range.end);
-  };
+ const isDateDisabled = (date) => {
+  return bookedDates.some(
+    (range) => date >= range.start && date <= range.end
+  );
+};
 
   const toggleWishlist = async () => {
     if (!user) return showAuthModal();
