@@ -26,10 +26,10 @@ export default function OwnerUsers() {
 
 
     const [search, setSearch] = useState("");
-    const [roleFilter, setRoleFilter] = useState("all"); 
+    const [roleFilter, setRoleFilter] = useState("all");
 
     const getFullName = (u) =>
-  `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Guest";
+        `${u.firstName || ""} ${u.lastName || ""}`.trim() || "Guest";
 
     const fetchUsers = async () => {
         try {
@@ -54,7 +54,7 @@ export default function OwnerUsers() {
 
             const matchesSearch =
                 !q ||
-                `${u.firstName || ""} ${u.lastName || ""}`.toLowerCase().includes(q)||
+                `${u.firstName || ""} ${u.lastName || ""}`.toLowerCase().includes(q) ||
                 u.email?.toLowerCase().includes(q) ||
                 u.mobile?.includes(q) ||
                 u.city?.toLowerCase().includes(q) ||
@@ -189,7 +189,11 @@ export default function OwnerUsers() {
             <div className="hidden md:block bg-white rounded-xl border overflow-hidden">
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50 text-gray-600">
-                        <tr>
+                        <tr
+                            key={u.userId}
+                            onClick={() => openUser(u)}
+                            className="border-t hover:bg-gray-50 transition cursor-pointer"
+                        >
                             <th className="text-left px-4 py-3">Sr. No</th>
                             <th className="text-left px-4 py-3">User</th>
                             <th className="text-left px-4 py-3">Email</th>
@@ -229,7 +233,10 @@ export default function OwnerUsers() {
                                 </td>
 
                                 {/* ACTION MENU */}
-                                <td className="px-4 py-4 text-right">
+                                <td
+                                    className="px-4 py-4 text-right"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button>
@@ -261,7 +268,13 @@ export default function OwnerUsers() {
                 {paginatedUsers.map((u) => (
                     <div
                         key={u.userId}
-                        className="bg-white border rounded-xl p-4 flex justify-between items-start"
+                        onClick={() => openUser(u)}
+                        className="
+    bg-white border rounded-xl p-4
+    flex justify-between items-start
+    hover:bg-gray-50 transition
+    cursor-pointer
+  "
                     >
                         <div className="flex gap-3">
                             <div className="h-11 w-11 rounded-full bg-black text-white flex items-center justify-center font-semibold">
