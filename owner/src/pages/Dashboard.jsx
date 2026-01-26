@@ -701,18 +701,17 @@ export default function Dashboard() {
   </p>
 
   <div className="mt-4">
-    <Calendar
+ <Calendar
   mode="single"
-  numberOfMonths={1}
-  month={new Date()}          // 👈 lock to current month
-  fromDate={new Date()}      // no past navigation
-  toDate={new Date(
-    new Date().getFullYear(),
-    new Date().getMonth() + 1,
-    0
-  )}
-  disabled={() => true}      // 👈 disables ALL clicks
+  month={new Date()}        // always current month
+  numberOfMonths={1}       // only one month
+  showOutsideDays={false}  // no prev/next month days
+  disabled={() => true}    // disable all clicks
   className="rounded-xl border pointer-events-none select-none"
+  components={{
+    IconLeft: () => null,   // remove left arrow
+    IconRight: () => null,  // remove right arrow
+  }}
   modifiers={{
     booked: isDateBooked,
     blocked: isDateBlocked,
@@ -737,7 +736,7 @@ export default function Dashboard() {
           {isDateBlocked(date) && <Dot color="blue" />}
         </div>
       </div>
-    )
+    ),
   }}
 />
   </div>
