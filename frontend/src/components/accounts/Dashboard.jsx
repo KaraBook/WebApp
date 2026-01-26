@@ -232,7 +232,6 @@ export default function Dashboard() {
 
                     {recentBookings.map((b) => (
                         <MobileBookingCard
-                            key={b._id}
                             booking={b}
                             onView={(booking) => {
                                 setSelectedBooking(booking);
@@ -242,6 +241,7 @@ export default function Dashboard() {
                                 setRateBooking(booking);
                                 setRateDialogOpen(true);
                             }}
+                            onCancel={(booking) => setCancelBookingObj(booking)}   
                         />
                     ))}
                 </div>
