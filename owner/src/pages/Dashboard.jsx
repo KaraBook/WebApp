@@ -16,7 +16,8 @@ import {
   Clock,
   IndianRupee,
   MoreVertical,
-  Users
+  Users,
+  XCircle
 } from "lucide-react";
 import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import { Link, useNavigate } from "react-router-dom";
