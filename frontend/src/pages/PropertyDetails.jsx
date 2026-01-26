@@ -151,6 +151,22 @@ export default function PropertyDetails() {
     });
 
 
+  const fetchDates = async () => {
+    try {
+      const bookedRes = await Axios.get(
+        SummaryApi.getBookedDates.url(property._id)
+      );
+      const blockedRes = await Axios.get(
+        SummaryApi.getPropertyBlockedDates.url(property._id)
+      );
+
+      setBookedDates(normalizeRanges(bookedRes.data.dates || []));
+      setBlockedDates(normalizeRanges(blockedRes.data.dates || []));
+    } catch (err) {
+      console.error("Failed to fetch property dates", err);
+    }
+  };
+
   useEffect(() => {
     if (!property?._id) return;
 
@@ -162,20 +178,22 @@ export default function PropertyDetails() {
         console.log("Failed to load reviews");
       }
     };
-    const fetchDates = async () => {
-      try {
-        const bookedRes = await Axios.get(SummaryApi.getBookedDates.url(property._id));
-        const blockedRes = await Axios.get(SummaryApi.getPropertyBlockedDates.url(property._id));
-
-        setBookedDates(normalizeRanges(bookedRes.data.dates || []));
-        setBlockedDates(normalizeRanges(blockedRes.data.dates || []));
-      } catch (err) {
-        console.error("Failed to fetch property dates", err);
-      }
-    };
 
     fetchReviews();
     fetchDates();
+  }, [property]);
+
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail.propertyId === property?._id) {
+        fetchDates();
+      }
+    };
+
+    window.addEventListener("REFRESH_PROPERTY_CALENDAR", handler);
+    return () =>
+      window.removeEventListener("REFRESH_PROPERTY_CALENDAR", handler);
   }, [property]);
 
   useEffect(() => {

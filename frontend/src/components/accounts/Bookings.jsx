@@ -453,9 +453,15 @@ export default function Bookings() {
       <CancelBookingDialog
         open={!!cancelBooking}
         booking={cancelBooking}
-        onClose={(refresh) => {
+        onClose={(refresh, propertyId) => {
           setCancelBooking(null);
-          if (refresh) window.location.reload();
+          if (refresh) {
+            window.dispatchEvent(
+              new CustomEvent("REFRESH_PROPERTY_CALENDAR", {
+                detail: { propertyId }
+              })
+            );
+          }
         }}
       />
 

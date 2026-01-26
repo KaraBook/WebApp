@@ -47,7 +47,7 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
                 { reason, notes }
             );
             toast.success("Booking cancelled successfully");
-            onClose(true);
+            onClose(true, booking.propertyId._id);
         } catch {
             toast.error("Cancellation failed");
         } finally {

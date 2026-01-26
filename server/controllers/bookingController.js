@@ -526,43 +526,54 @@ export const previewCancellation = async (req, res) => {
 
 
 export const cancelBooking = async (req, res) => {
-  const { bookingId } = req.params;
-  const { reason, notes } = req.body;
+  try {
+    const { bookingId } = req.params;
+    const { reason, notes } = req.body;
+    const userId = req.user.id;
 
-  const booking = await Booking.findById(bookingId);
-  const property = await Property.findById(booking.propertyId);
-
-  const { refundAmount } =
-    computeRefund(booking, property);
-
-  let refund = null;
-
-  if (!booking) {
-    return res.status(404).json({
-      success: false,
-      message: "Booking not found"
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      userId,
+      cancelled: { $ne: true }
     });
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found or already cancelled"
+      });
+    }
+
+    const property = await Property.findById(booking.propertyId);
+
+    const { refundAmount } = computeRefund(booking, property);
+
+    let refund = null;
+    if (refundAmount > 0 && booking.paymentId) {
+      refund = await razorpay.payments.refund(
+        booking.paymentId,
+        { amount: refundAmount * 100 }
+      );
+    }
+
+    booking.cancelled = true;
+    booking.cancelReason = reason;
+    booking.cancelNotes = notes;
+    booking.refundAmount = refundAmount;
+    booking.refundId = refund?.id;
+    booking.refundStatus = refund ? "initiated" : "completed";
+    booking.cancelledAt = new Date();
+
+    await booking.save();
+
+    res.json({
+      success: true,
+      refundAmount,
+      propertyId: booking.propertyId
+    });
+
+  } catch (err) {
+    console.error("cancelBooking error:", err);
+    res.status(500).json({ success: false, message: "Cancellation failed" });
   }
-
-  if (refundAmount > 0) {
-    refund = await razorpay.payments.refund(
-      booking.paymentId,
-      { amount: refundAmount * 100 }
-    );
-  }
-
-  booking.cancelled = true;
-  booking.cancelReason = reason;
-  booking.cancelNotes = notes;
-  booking.refundAmount = refundAmount;
-  booking.refundId = refund?.id;
-  booking.refundStatus = refund ? "initiated" : "completed";
-  booking.cancelledAt = new Date();
-
-  await booking.save();
-
-  res.json({
-    success: true,
-    refundAmount
-  });
 };
