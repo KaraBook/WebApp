@@ -702,38 +702,44 @@ export default function Dashboard() {
 
   <div className="mt-4">
     <Calendar
-      mode="single"
-      numberOfMonths={1}
-      fromDate={new Date()}
-      className="rounded-xl border"
-      modifiers={{
-        booked: isDateBooked,
-        blocked: isDateBlocked,
-        pending: isDatePending,
-        cancelled: isDateCancelled,
-      }}
-      modifiersClassNames={{
-        booked: "bg-green-100 text-green-800",
-        blocked: "bg-blue-100 text-blue-800",
-        pending: "bg-yellow-100 text-yellow-800",
-        cancelled: "bg-gray-200 text-gray-600",
-      }}
-      components={{
-        DayContent: ({ date }) => (
-          <div className="relative w-full h-full flex items-center justify-center">
-            {date.getDate()}
+  mode="single"
+  numberOfMonths={1}
+  month={new Date()}          // 👈 lock to current month
+  fromDate={new Date()}      // no past navigation
+  toDate={new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
+    0
+  )}
+  disabled={() => true}      // 👈 disables ALL clicks
+  className="rounded-xl border pointer-events-none select-none"
+  modifiers={{
+    booked: isDateBooked,
+    blocked: isDateBlocked,
+    pending: isDatePending,
+    cancelled: isDateCancelled,
+  }}
+  modifiersClassNames={{
+    booked: "bg-green-100 text-green-800",
+    blocked: "bg-blue-100 text-blue-800",
+    pending: "bg-yellow-100 text-yellow-800",
+    cancelled: "bg-gray-200 text-gray-600",
+  }}
+  components={{
+    DayContent: ({ date }) => (
+      <div className="relative w-full h-full flex items-center justify-center">
+        {date.getDate()}
 
-            {/* status dot */}
-            <div className="absolute bottom-1 flex gap-[2px]">
-              {isDateBooked(date) && <Dot color="green" />}
-              {isDatePending(date) && <Dot color="yellow" />}
-              {isDateCancelled(date) && <Dot color="gray" />}
-              {isDateBlocked(date) && <Dot color="blue" />}
-            </div>
-          </div>
-        )
-      }}
-    />
+        <div className="absolute bottom-1 flex gap-[2px]">
+          {isDateBooked(date) && <Dot color="green" />}
+          {isDatePending(date) && <Dot color="yellow" />}
+          {isDateCancelled(date) && <Dot color="gray" />}
+          {isDateBlocked(date) && <Dot color="blue" />}
+        </div>
+      </div>
+    )
+  }}
+/>
   </div>
 
   <CalendarLegend />
