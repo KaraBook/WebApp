@@ -172,18 +172,17 @@ export default function MobileBookingCard({
                 Call Resort
               </DropdownMenuItem>
 
-              {bookingStatus === "pending" ? (
+              {!booking.cancelled && new Date(booking.checkIn) > new Date() ? (
                 <DropdownMenuItem
                   className="py-3 gap-3 text-red-600"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // open cancel modal here if you have one
                   }}
                 >
                   <XCircle className="w-4 h-4" />
                   Cancel Booking
                 </DropdownMenuItem>
-              ) : bookingStatus === "cancelled" ? (
+              ) : booking.cancelled ? (
                 <DropdownMenuItem
                   disabled
                   className="py-3 gap-3 text-gray-400 cursor-not-allowed"
