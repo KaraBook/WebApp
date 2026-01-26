@@ -467,7 +467,18 @@ export default function Bookings() {
         open={!!cancelBooking}
         booking={cancelBooking}
         onClose={(refresh, propertyId) => {
+          if (refresh && cancelBooking) {
+            setBookings(prev =>
+              prev.map(b =>
+                b._id === cancelBooking._id
+                  ? { ...b, cancelled: true }
+                  : b
+              )
+            );
+          }
+
           setCancelBooking(null);
+
           if (refresh) {
             window.dispatchEvent(
               new CustomEvent("REFRESH_PROPERTY_CALENDAR", {
