@@ -4,7 +4,7 @@ import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, MapPin, IndianRupee, Image as ImageIcon, Utensils, Users, LocationEdit} from "lucide-react";
+import { Loader2, MapPin, IndianRupee, Image as ImageIcon, Utensils, Users, LocationEdit } from "lucide-react";
 import { amenitiesOptions, foodOptions } from "@/constants/dropdownOptions";
 import { Button } from "@/components/ui/button";
 
@@ -58,6 +58,8 @@ export default function Properties() {
     galleryPhotos = [],
     amenities = [],
     foodAvailability = [],
+    bedrooms,
+    bathrooms,
   } = property;
 
   const activeAmenities = new Set(amenities);
@@ -187,6 +189,8 @@ export default function Properties() {
                 <div>Base Guests: <strong>{baseGuests}</strong></div>
                 <div>Min Stays: <strong>{minStayNights}</strong></div>
                 <div>Total Rooms: <strong>{roomBreakdown?.total ?? 0}</strong></div>
+                <div>Bedrooms: <strong>{bedrooms}</strong></div>
+                <div>Bathrooms: <strong>{bathrooms}</strong></div>
               </div>
 
               {/* ROOM BREAKDOWN */}
