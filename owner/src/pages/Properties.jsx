@@ -165,7 +165,7 @@ export default function Properties() {
 
           {/* OVERVIEW */}
           <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h2 className="text-lg font-semibold mb-3">Overview</h2>
+            <h2 className="text-lg font-semibold uppercase mb-3">Overview</h2>
             <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
           </div>
 
@@ -246,7 +246,7 @@ export default function Properties() {
 
             <div className="flex items-center gap-2">
               <Utensils className="w-5 h-5 text-primary" />
-              <h2 className="text-[16px] font-semibold">Amenities & Food</h2>
+              <h2 className="text-[16px] font-semibold uppercase">Amenities & Food</h2>
             </div>
 
             {/* FOOD */}
@@ -294,7 +294,7 @@ export default function Properties() {
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">
                 <ImageIcon className="w-5 h-5 text-primary" />
-                Gallery ({galleryPhotos.length})
+                GALLERY ({galleryPhotos.length})
               </h2>
 
               {/* MOBILE: horizontal scroll */}
