@@ -908,3 +908,8 @@ export const deleteProperty = async (req, res) => {
   res.json({ success: true });
 };
 
+
+export const getDraftProperties = async (req, res) => {
+  const properties = await Property.find({ isDraft: true }).sort({ createdAt: -1 });
+  res.json({ success: true, data: properties });
+};
