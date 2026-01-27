@@ -8,8 +8,9 @@ import { Loader2, CheckCircle2, CalendarCheck, Clock, IndianRupee, MoreVertical,
 import BookingDetailsDrawer from "@/components/BookingDetailsDrawer";
 import { Link, useNavigate } from "react-router-dom";
 import MobileBookingsList from "@/components/MobileBookingList";
-import { Calendar } from "@/components/ui/calendar"; // shadcn
+import { Calendar } from "@/components/ui/calendar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import BookingDesktopCard from "@/components/BookingDesktopCard";
 
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
@@ -513,178 +514,28 @@ export default function Dashboard() {
               <h2 className="text-sm font-semibold text-gray-900">Recent bookings</h2>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full md:min-w-[1200px] min-w-[1000px] text-sm">
-                <thead className="bg-gray-50 text-gray-500 border-y border-gray-100">
-                  <tr className="text-left">
-                    <th className="py-3 px-4 sm:px-6 text-left">Traveller</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Property</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Check-in</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Check-out</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Nights</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Guests</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Amount</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Status</th>
-                    <th className="py-3 px-4 sm:px-6 text-left">Actions</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {paginatedRows?.length ? (
-                    paginatedRows.map((b) => (
-                      <tr
-                        key={b._id}
-                        onClick={() => {
-                          setSelectedBooking(b);
-                          setOpenBookingDialog(true);
-                        }}
-                        className="border-b hover:bg-gray-50/60 transition cursor-pointer"
-                      >
-                        <td className="py-3 px-4 sm:px-6">
-                          <button
-                            onClick={() => {
-                              setSelectedBooking(b);
-                              setOpenBookingDialog(true);
-                            }}
-                            className="text-left"
-                          >
-                            <div className="font-medium text-gray-900 hover:underline">
-                              {b.userId?.firstName} {b.userId?.lastName}
-                            </div>
-                            <div className="text-xs text-gray-500">{b.userId?.mobile}</div>
-                          </button>
-                        </td>
-
-                        <td className="py-3 px-4 sm:px-6">{b.propertyId?.propertyName}</td>
-
-                        <td className="py-3 px-4 sm:px-6">
-                          {new Date(b.checkIn).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </td>
-
-                        <td className="py-3 px-4 sm:px-6">
-                          {new Date(b.checkOut).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </td>
-
-                        <td className="py-3 px-4 sm:px-6">{b.totalNights}</td>
-
-                        <td className="py-3 px-4 sm:px-6 relative">
-                          <button
-                            className="guest-dropdown-btn text-gray-900 font-medium"
-                            onClick={(e) => {
-                              if (typeof b.guests === "object") {
-                                const rect = e.currentTarget.getBoundingClientRect();
-
-                                // initial desired position
-                                let left = rect.left + rect.width / 2 - 80;
-                                const top = rect.bottom + window.scrollY + 8;
-
-                                // clamp inside viewport on mobile
-                                const minLeft = 12;
-                                const maxLeft = window.innerWidth - 12 - 160; // popover width=160
-                                left = Math.max(minLeft, Math.min(left, maxLeft));
-
-                                setDropdownPosition({ top, left });
-                                setOpenGuestRow(openGuestRow === b._id ? null : b._id);
-                              }
-                            }}
-                          >
-                            {typeof b.guests === "number"
-                              ? `${b.guests} Guests`
-                              : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
-                              }`}
-                          </button>
-                        </td>
-
-                        <td className="py-3 px-4 sm:px-6 font-semibold text-gray-900">
-                          ₹{b.totalAmount?.toLocaleString("en-IN")}
-                        </td>
-
-                        <td className="py-3 px-4 sm:px-6">
-                          <PaymentChip status={b.paymentStatus} />
-                        </td>
-
-                        <td className="py-3 px-4 sm:px-6">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <MoreVertical className="w-5 h-5 cursor-pointer text-gray-600" />
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent className="w-48">
-                              <DropdownMenuItem
-                                onSelect={() => {
-                                  setSelectedBooking(b);
-                                  setOpenBookingDialog(true);
-                                }}
-                              >
-                                View Booking
-                              </DropdownMenuItem>
-
-                              {b.paymentStatus === "paid" ? (
-                                <DropdownMenuItem onSelect={() => navigate(`/invoice/${b._id}`)}>
-                                  View Invoice
-                                </DropdownMenuItem>
-                              ) : (
-                                <DropdownMenuItem disabled className="text-gray-400 italic">
-                                  Invoice available after payment
-                                </DropdownMenuItem>
-                              )}
-
-                              <DropdownMenuItem
-                                onSelect={() =>
-                                  navigator.clipboard.writeText(b?.userId?.email || "")
-                                }
-                              >
-                                Copy Email
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                onSelect={() =>
-                                  navigator.clipboard.writeText(b?.userId?.mobile || "")
-                                }
-                              >
-                                Copy Phone
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                onSelect={() =>
-                                  window.open(
-                                    `https://wa.me/${b?.userId?.mobile}?text=${encodeURIComponent(
-                                      `Hello ${b?.userId?.firstName},\nYour booking ${b._id}...`
-                                    )}`,
-                                    "_blank"
-                                  )
-                                }
-                              >
-                                WhatsApp Chat
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem
-                                onSelect={() => toast.success("Resend to traveller triggered")}
-                              >
-                                Resend Links (WA + Email)
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="9" className="py-10 text-center text-gray-500">
-                        No bookings found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="hidden md:block space-y-3">
+              {paginatedData.map((b) => (
+                <BookingDesktopCard
+                  booking={b}
+                  onOpen={(b) => {
+                    setSelectedBooking(b);
+                    setOpenBookingDialog(true);
+                  }}
+                  onViewInvoice={(b) => navigate(`/invoice/${b._id}`)}
+                  onCopyEmail={(b) => navigator.clipboard.writeText(b?.userId?.email || "")}
+                  onCopyPhone={(b) => navigator.clipboard.writeText(b?.userId?.mobile || "")}
+                  onWhatsapp={(b) =>
+                    window.open(
+                      `https://wa.me/${b?.userId?.mobile}?text=${encodeURIComponent(
+                        `Hello ${b?.userId?.firstName},\nYour booking ${b._id}...`
+                      )}`,
+                      "_blank"
+                    )
+                  }
+                  onResend={() => toast.success("Resend to traveller triggered")}
+                />
+              ))}
             </div>
 
             <Pagination
