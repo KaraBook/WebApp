@@ -183,12 +183,16 @@ const draftSchema = Joi.object(baseFields).custom((value, helpers) => {
 
 const updateSchema = Joi.object({
   ...baseFields,
-  cancellationPolicy: Joi.array().min(1).items(
-    Joi.object({
-      minDaysBefore: Joi.number().min(0).required(),
-      refundPercent: Joi.number().min(0).max(100).required()
-    })
-  ).optional(),
+  cancellationPolicy: Joi.when("isRefundable", {
+    is: true,
+    then: Joi.array().min(1).items(
+      Joi.object({
+        minDaysBefore: Joi.number().min(0).required(),
+        refundPercent: Joi.number().min(0).max(100).required()
+      })
+    ).required(),
+    otherwise: Joi.forbidden()
+  }),
   coverImage: Joi.string().uri().optional(),
   shopAct: Joi.string().uri().optional(),
   galleryPhotos: Joi.array().items(Joi.string().uri()).optional(),

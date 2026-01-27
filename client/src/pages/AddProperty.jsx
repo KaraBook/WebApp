@@ -268,6 +268,7 @@ const AddProperty = () => {
             const fd = new FormData();
 
             fd.append("publishNow", String(!!formData.publishNow));
+            fd.append("existingGallery", JSON.stringify(existingGallery));
 
             if (coverImageFile) fd.append("coverImage", coverImageFile);
             if (shopActFile) fd.append("shopAct", shopActFile); // ✅ optional
