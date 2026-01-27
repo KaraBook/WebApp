@@ -687,7 +687,8 @@ export const updateProperty = async (req, res) => {
         updatedData.refundNotes = "";
       }
 
-      if (updatedData.publishNow === true) {
+      if (["true", true, 1, "1", "yes"].includes(updatedData.publishNow)) {
+        updatedData.publishNow = true;
         updatedData.isDraft = false;
       }
 
