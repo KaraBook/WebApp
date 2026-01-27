@@ -191,7 +191,7 @@ const updateSchema = Joi.object({
         refundPercent: Joi.number().min(0).max(100).required()
       })
     ).required(),
-    otherwise: Joi.forbidden()
+    otherwise: Joi.array().max(0).default([])
   }),
   coverImage: Joi.string().uri().optional(),
   shopAct: Joi.string().uri().optional(),
