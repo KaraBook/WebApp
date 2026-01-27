@@ -548,7 +548,8 @@ export default function Dashboard() {
 
             <div className="mt-4">
               <Calendar
-                mode="single"
+                mode="default"
+                disabled={() => true}
                 numberOfMonths={1}
                 fromDate={new Date()}
                 className="rounded-xl border"
