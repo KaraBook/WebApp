@@ -244,7 +244,7 @@ export default function EditProperty() {
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* HEADER */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap md:flex-nowrap justify-between items-center">
           <div>
             <div className="flex items-center gap-2 text-gray-500 text-sm">
               <ArrowLeft onClick={() => navigate(-1)} className="cursor-pointer" />
@@ -258,7 +258,7 @@ export default function EditProperty() {
         </div>
 
         {/* TABS */}
-        <div className="flex bg-[#f3f4f6] p-1 rounded-xl w-full">
+        <div className="flex bg-[#f3f4f6] flex-wrap md:flex-nowrap p-1 rounded-xl w-full">
           <TabButton icon={FileText} label="Details" active={tab === "details"} onClick={() => setTab("details")} />
           <TabButton icon={IndianRupee} label="Pricing" active={tab === "pricing"} onClick={() => setTab("pricing")} />
           <TabButton icon={Bed} label="Rooms" active={tab === "rooms"} onClick={() => setTab("rooms")} />
