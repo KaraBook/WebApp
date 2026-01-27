@@ -66,22 +66,26 @@ export default function BookingDesktopCard({
       <div className="hidden lg:block h-10 w-px bg-gray-200" />
 
       {/* MIDDLE */}
-      <div className="hidden lg:flex items-center gap-6 text-[12px] text-gray-600">
-        <div className="flex items-center gap-1">
+      <div className="hidden lg:flex items-center gap-6 text-[12px] flex-wrap text-gray-600">
+        <div className="flex w-[48%] items-center gap-1 text-[14px] font-[700]">
           <Calendar size={14} />
           {formatDate(b.checkIn)} → {formatDate(b.checkOut)}
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex w-[48%] items-center gap-1 text-[14px]">
           <Moon size={14} />
           {b.totalNights} Nights
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex w-[48%] items-center gap-1">
           <Users size={14} />
           {typeof b.guests === "object"
             ? b.guests.adults + b.guests.children
             : b.guests} Guests
+        </div>
+
+         <div className="text-[14px] w-[48%] font-semibold text-gray-900">
+          ₹{b.totalAmount?.toLocaleString("en-IN")}
         </div>
       </div>
 
@@ -90,9 +94,6 @@ export default function BookingDesktopCard({
         className="flex items-center gap-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-[14px] font-semibold text-gray-900">
-          ₹{b.totalAmount?.toLocaleString("en-IN")}
-        </div>
 
         <PaymentChip status={b.paymentStatus} />
 
