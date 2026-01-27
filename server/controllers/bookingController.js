@@ -47,20 +47,19 @@ export const createOrder = async (req, res) => {
     const start = new Date(checkIn);
     const end = new Date(checkOut);
 
-    start.setUTCHours(12, 0, 0, 0);
-    end.setUTCHours(12, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
 
     const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
 
-
+    // 🚫 Block same-day
     if (start <= today) {
       return res.status(400).json({
         success: false,
         message: "Same-day bookings are not allowed. Please select a future date."
       });
     }
-
     const totalNights = Math.ceil(
       (end - start) / (1000 * 60 * 60 * 24)
     );
