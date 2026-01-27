@@ -116,7 +116,7 @@ export default function AdminLogin() {
             {/* BUTTON */}
             <button
               type="submit"
-              className="w-full h-11 bg-primary hover:bg-primary/10 text-white font-semibold rounded-lg transition"
+              className="w-full h-11 bg-[#00919d] hover:bg-[#00919d]/10 text-white font-semibold rounded-lg transition"
             >
               Continue
             </button>
