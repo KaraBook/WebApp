@@ -28,44 +28,45 @@ export default function BookingDesktopCard({
     <div
       onClick={() => onOpen(b)}
       className="
-        bg-white border border-gray-200
-        rounded-2xl px-5 py-4
+        bg-white border border-emerald-200/60
+        rounded-2xl px-6 py-4
         flex items-center justify-between
-        shadow-[0_4px_14px_rgba(0,0,0,0.04)]
-        hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)]
+        shadow-sm
+        hover:shadow-md
         transition cursor-pointer
       "
     >
       {/* LEFT */}
       <div className="flex items-center gap-4 min-w-0">
-        {/* Avatar */}
         <div className="
-          h-11 w-11 rounded-full
+          h-10 w-10 rounded-full
           bg-emerald-100 text-emerald-700
           flex items-center justify-center
-          text-sm font-bold
+          text-sm font-semibold
         ">
           {name?.[0] || "G"}
         </div>
 
-        {/* Name + meta */}
         <div className="min-w-0 space-y-[2px]">
-          <p className="font-semibold text-[15px] text-gray-900 truncate">
+          <p className="font-semibold text-[14px] text-gray-900 truncate">
             {name || "Guest"}
           </p>
 
-          <div className="flex items-center gap-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-[11px] text-gray-500">
             <Phone size={12} /> {phone}
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
+          <div className="flex items-center gap-2 text-[11px] text-gray-500 truncate">
             <MapPin size={12} /> {property}
           </div>
         </div>
       </div>
 
+      {/* DIVIDER */}
+      <div className="hidden lg:block h-10 w-px bg-gray-200" />
+
       {/* MIDDLE */}
-      <div className="hidden lg:flex items-center gap-6 text-sm text-gray-600">
+      <div className="hidden lg:flex items-center gap-6 text-[12px] text-gray-600">
         <div className="flex items-center gap-1">
           <Calendar size={14} />
           {formatDate(b.checkIn)} → {formatDate(b.checkOut)}
@@ -89,7 +90,7 @@ export default function BookingDesktopCard({
         className="flex items-center gap-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-[15px] font-bold text-gray-900">
+        <div className="text-[14px] font-semibold text-gray-900">
           ₹{b.totalAmount?.toLocaleString("en-IN")}
         </div>
 
@@ -100,9 +101,9 @@ export default function BookingDesktopCard({
             <div className="
               h-8 w-8 rounded-full
               flex items-center justify-center
-              hover:bg-gray-100
+              hover:bg-emerald-50
             ">
-              <MoreVertical className="text-gray-400" />
+              <MoreVertical className="text-emerald-600" />
             </div>
           </DropdownMenuTrigger>
 
