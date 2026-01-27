@@ -179,7 +179,7 @@ export default function EditProperty() {
   if (fetching) return <FullPageLoader />;
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] px-6 py-6">
+    <div className="min-h-screen bg-[#f6f7f8] px-6 py-6">
       <div className="max-w-6xl mx-auto space-y-6">
 
         {/* HEADER */}
