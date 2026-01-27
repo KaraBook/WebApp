@@ -268,12 +268,12 @@ export default function EditProperty() {
         </div>
 
         {/* CARD */}
-        <div className="bg-white rounded-2xl border shadow-sm p-2 md:p-6 space-y-6">
+        <div className="space-y-6">
 
           {/* DETAILS */}
           {tab === "details" && (
             <>
-              <div>
+              <div className="bg-white rounded-2xl border shadow-sm p-4 md:p-6">
                 <Label className="flex items-center gap-2">
                   <FileText size={16} /> Property Description
                 </Label>
@@ -285,7 +285,7 @@ export default function EditProperty() {
                 />
               </div>
 
-              <div>
+              <div className="bg-white rounded-2xl border shadow-sm p-4 md:p-6">
                 <Label className="flex items-center gap-2">
                   <Utensils size={16} /> Food Options
                 </Label>
@@ -300,7 +300,7 @@ export default function EditProperty() {
 
           {/* PRICING */}
           {tab === "pricing" && (
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6 bg-white rounded-2xl border shadow-sm p-4 md:p-6">
               <div>
                 <Label>Weekday Price</Label>
                 <Input className="mt-2" value={form.weekday} onChange={(e) => setForm({ ...form, weekday: e.target.value })} />
@@ -325,8 +325,8 @@ export default function EditProperty() {
             <div className="space-y-6">
 
               {/* ---------------- ROOM CONFIGURATION CARD ---------------- */}
-              <div className="bg-white rounded-2xl border shadow-sm p-6">
-                <div className="flex justify-between items-center mb-6">
+              <div className="bg-white rounded-2xl border shadow-sm p-4 md:p-6">
+                <div className="flex flex-wrap md:flex-nowrap justify-between items-center mb-6">
                   <div>
                     <h2 className="text-base font-semibold flex items-center gap-2">
                       <Bed size={18} className="text-[#0f766e]" />
@@ -342,7 +342,7 @@ export default function EditProperty() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-5 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                   {Object.keys(form.room).map((k) => (
                     <div key={k}>
                       <Label className="text-sm text-gray-600">
