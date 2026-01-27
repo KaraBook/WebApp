@@ -3,27 +3,51 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import MultiSelectButtons from "../components/MultiSelectButtons";
-import FileUploadsSection from "../components/FileUploadsSection";
-import CustomTimePicker from "../components/CustomTimePicker";
-import { QuantityBox } from "@/components/QuantityBox";
+
+import { ArrowLeft } from "lucide-react";
+
 import FullPageLoader from "@/components/FullPageLoader";
-import AmenitiesAccordion from "@/components/AmenitiesAccordion";
 
-import {
-  IndianRupee,
-  Users,
-  ArrowLeft,
-} from "lucide-react";
+/* -------------------------------------------------- */
+/* Reusable UI blocks                                 */
+/* -------------------------------------------------- */
 
-import {
-  foodOptions,
-  amenitiesOptions,
-} from "../constants/dropdownOptions";
+const TabButton = ({ active, children, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium transition
+      ${active ? "bg-white shadow text-primary" : "text-gray-500 hover:text-black"}`}
+  >
+    {children}
+  </button>
+);
+
+const QuantityStepper = ({ value, onChange }) => (
+  <div className="flex items-center gap-2">
+    <button
+      type="button"
+      onClick={() => onChange(Math.max(0, value - 1))}
+      className="w-8 h-8 rounded-lg border text-lg"
+    >
+      –
+    </button>
+    <div className="w-10 text-center font-medium">{value}</div>
+    <button
+      type="button"
+      onClick={() => onChange(value + 1)}
+      className="w-8 h-8 rounded-lg border text-lg"
+    >
+      +
+    </button>
+  </div>
+);
+
+/* -------------------------------------------------- */
 
 export default function EditProperty() {
   const { id } = useParams();
@@ -31,57 +55,43 @@ export default function EditProperty() {
 
   const [fetching, setFetching] = useState(true);
   const [loading, setLoading] = useState(false);
-
-  const [coverImageFile, setCoverImageFile] = useState(null);
-  const [galleryImageFiles, setGalleryImageFiles] = useState([]);
-  const [coverImagePreview, setCoverImagePreview] = useState(null);
-  const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
-  const [shopActFile, setShopActFile] = useState(null);
-  const [shopActPreview, setShopActPreview] = useState(null);
-  const [removedGalleryImages, setRemovedGalleryImages] = useState([]);
+  const [activeTab, setActiveTab] = useState("details");
 
   const [formData, setFormData] = useState({
     description: "",
-    roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, hall: 0, total: 0 },
-    maxGuests: "",
-    baseGuests: "",
-    pricingPerNightWeekdays: "",
-    pricingPerNightWeekend: "",
-    extraAdultCharge: "",
-    extraChildCharge: "",
-    checkInTime: "",
-    checkOutTime: "",
-    foodAvailability: [],
+    weekdayPrice: "",
+    weekendPrice: "",
+    extraAdult: "",
+    extraChild: "",
+    roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, hall: 0 },
+    maxGuests: 10,
+    baseGuests: 8,
+    checkIn: "08:00",
+    checkOut: "23:30",
     amenities: [],
-    petFriendly: false,
+    food: [],
   });
 
   useEffect(() => {
     (async () => {
       try {
-        setFetching(true);
         const res = await api.get(SummaryApi.getSingleProperty(id).url);
-        const prop = res.data?.data;
-        if (!prop) throw new Error();
+        const p = res.data.data;
 
         setFormData({
-          description: prop.description || "",
-          roomBreakdown: prop.roomBreakdown,
-          maxGuests: prop.maxGuests,
-          baseGuests: prop.baseGuests,
-          pricingPerNightWeekdays: `${prop.pricingPerNightWeekdays || ""}`,
-          pricingPerNightWeekend: `${prop.pricingPerNightWeekend || ""}`,
-          extraAdultCharge: `${prop.extraAdultCharge || ""}`,
-          extraChildCharge: `${prop.extraChildCharge || ""}`,
-          checkInTime: prop.checkInTime || "",
-          checkOutTime: prop.checkOutTime || "",
-          foodAvailability: prop.foodAvailability || [],
-          amenities: prop.amenities || [],
+          description: p.description || "",
+          weekdayPrice: p.pricingPerNightWeekdays || "",
+          weekendPrice: p.pricingPerNightWeekend || "",
+          extraAdult: p.extraAdultCharge || "",
+          extraChild: p.extraChildCharge || "",
+          roomBreakdown: p.roomBreakdown,
+          maxGuests: p.maxGuests,
+          baseGuests: p.baseGuests,
+          checkIn: p.checkInTime || "08:00",
+          checkOut: p.checkOutTime || "23:30",
+          amenities: p.amenities || [],
+          food: p.foodAvailability || [],
         });
-
-        setCoverImagePreview(prop.coverImage);
-        setGalleryImagePreviews(prop.galleryPhotos || []);
-        setShopActPreview(prop.shopAct || null);
       } catch {
         toast.error("Failed to load property");
       } finally {
@@ -90,39 +100,11 @@ export default function EditProperty() {
     })();
   }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleSubmit = async () => {
     try {
-      const data = new FormData();
-
-      const rb = formData.roomBreakdown;
-      rb.total = Number(rb.ac) + Number(rb.nonAc) + Number(rb.deluxe) + Number(rb.luxury) + Number(rb.hall);
-
-      Object.entries(formData).forEach(([key, val]) => {
-        if (key === "roomBreakdown") {
-          Object.entries(val).forEach(([k, v]) =>
-            data.append(`roomBreakdown[${k}]`, v)
-          );
-        } else if (Array.isArray(val)) {
-          val.forEach((v) => data.append(`${key}[]`, v));
-        } else {
-          data.append(key, val ?? "");
-        }
-      });
-
-      if (coverImageFile) data.append("coverImage", coverImageFile);
-      if (shopActFile) data.append("shopAct", shopActFile);
-      removedGalleryImages.forEach((url) =>
-        data.append("removedGalleryImages[]", url)
-      );
-      galleryImageFiles.forEach((file) =>
-        data.append("galleryPhotos", file)
-      );
-
-      await api.put(SummaryApi.updateOwnerProperty(id).url, data);
-      toast.success("Property updated!");
+      setLoading(true);
+      await api.put(SummaryApi.updateOwnerProperty(id).url, formData);
+      toast.success("Property updated");
       navigate(`/view-property/${id}`);
     } catch {
       toast.error("Update failed");
@@ -134,182 +116,240 @@ export default function EditProperty() {
   if (fetching) return <FullPageLoader />;
 
   return (
-    <div className="bg-[#f9fafb] min-h-screen px-4 sm:px-6 lg:px-8 py-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#f9fafb] px-6 py-6">
+      <div className="max-w-6xl mx-auto space-y-6">
 
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h1 className="text-[24px] sm:text-[26px] font-bold">Edit Property</h1>
-          <Button variant="outline" onClick={() => navigate(`/view-property/${id}`)}>
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="flex items-center gap-2 text-gray-500 text-sm">
+              <ArrowLeft
+                className="cursor-pointer"
+                onClick={() => navigate(-1)}
+              />
+              Edit Property
+            </div>
+            <h1 className="text-2xl font-bold mt-1">
+              West Valley Villa Casa East
+            </h1>
+          </div>
+
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="rounded-xl px-6"
+          >
+            Save Changes
           </Button>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col lg:flex-row flex-wrap gap-6 lg:gap-8"
-        >
+        {/* TABS */}
+        <div className="flex bg-[#f3f4f6] p-1 rounded-xl w-fit">
+          <TabButton active={activeTab === "details"} onClick={() => setActiveTab("details")}>Details</TabButton>
+          <TabButton active={activeTab === "pricing"} onClick={() => setActiveTab("pricing")}>₹ Pricing</TabButton>
+          <TabButton active={activeTab === "rooms"} onClick={() => setActiveTab("rooms")}>Rooms</TabButton>
+          <TabButton active={activeTab === "amenities"} onClick={() => setActiveTab("amenities")}>Amenities</TabButton>
+          <TabButton active={activeTab === "media"} onClick={() => setActiveTab("media")}>Media</TabButton>
+        </div>
 
-          {/* LEFT */}
-          <div className="space-y-8 w-full lg:w-[48%]">
+        {/* CONTENT CARD */}
+        <div className="bg-white rounded-2xl border p-6 space-y-6">
 
-            <div className="bg-white rounded-2xl border p-4 sm:p-6">
-              <Label>Description *</Label>
-              <Textarea
-                rows={4}
-                className="mt-2"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="bg-white rounded-2xl border p-4 sm:p-6 space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
-                Rooms & Stay Details
-              </h2>
-
-             <div className="flex flex-wrap gap-2 justify-between items-center">
-              {["ac", "nonAc", "deluxe", "luxury", "hall", "total"].map((key) => (
-                <div key={key} className="flex flex-col gap-2 justify-between items-start">
-                  <span className="capitalize">{key === "nonAc" ? "Non AC" : key}</span>
-                  <QuantityBox
-                    value={formData.roomBreakdown[key]}
-                    onChange={(val) =>
-                      setFormData({
-                        ...formData,
-                        roomBreakdown: { ...formData.roomBreakdown, [key]: val },
-                      })
-                    }
-                  />
-                </div>
-              ))}
-              </div>
-
-                {/* Guests */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-[2rem] md:gap-[3.5rem]">
-                <div>
-                  <Label className="pb-2">Max Guests</Label>
-                  <QuantityBox
-                    className="pt-2"
-                    value={formData.maxGuests}
-                    onChange={(val) =>
-                      setFormData({ ...formData, maxGuests: val })
-                    }
-                  />
-                </div>
-
-                <div>
-                  <Label className="pb-2">Base Guests</Label>
-                  <QuantityBox
-                    className="pt-2"
-                    value={formData.baseGuests}
-                    onChange={(val) =>
-                      setFormData({ ...formData, baseGuests: val })
-                    }
-                  />
-                </div>
-              </div>
-
-              <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <CustomTimePicker
-                  label="Check-In Time"
-                  value={formData.checkInTime}
-                  onChange={(v) => setFormData({ ...formData, checkInTime: v })}
-                />
-                <CustomTimePicker
-                  label="Check-Out Time"
-                  value={formData.checkOutTime}
-                  onChange={(v) => setFormData({ ...formData, checkOutTime: v })}
+          {/* DETAILS */}
+          {activeTab === "details" && (
+            <>
+              <div>
+                <Label>Property Description</Label>
+                <Textarea
+                  rows={5}
+                  className="mt-2"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                 />
               </div>
+
+              <div>
+                <Label>Food Options</Label>
+                <div className="flex gap-3 mt-2">
+                  {["Breakfast", "Lunch", "Dinner"].map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() =>
+                        setFormData({
+                          ...formData,
+                          food: formData.food.includes(f)
+                            ? formData.food.filter((x) => x !== f)
+                            : [...formData.food, f],
+                        })
+                      }
+                      className={`px-4 py-2 rounded-full border
+                        ${formData.food.includes(f)
+                          ? "bg-primary text-white"
+                          : "bg-white"}`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* PRICING */}
+          {activeTab === "pricing" && (
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label>Weekday Price</Label>
+                <Input
+                  value={formData.weekdayPrice}
+                  onChange={(e) =>
+                    setFormData({ ...formData, weekdayPrice: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <Label>Weekend Price</Label>
+                <Input
+                  value={formData.weekendPrice}
+                  onChange={(e) =>
+                    setFormData({ ...formData, weekendPrice: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <Label>Extra Adult</Label>
+                <Input
+                  value={formData.extraAdult}
+                  onChange={(e) =>
+                    setFormData({ ...formData, extraAdult: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <Label>Extra Child</Label>
+                <Input
+                  value={formData.extraChild}
+                  onChange={(e) =>
+                    setFormData({ ...formData, extraChild: e.target.value })
+                  }
+                />
+              </div>
             </div>
+          )}
 
-            <div className="bg-white rounded-2xl border p-4 sm:p-6">
-              <h2 className="text-lg font-semibold mb-3">Food</h2>
-              <MultiSelectButtons
-                selected={formData.foodAvailability}
-                onChange={(v) => setFormData({ ...formData, foodAvailability: v })}
-                options={foodOptions}
-              />
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div className="space-y-8 w-full lg:w-[48%]">
-
-            <div className="bg-white rounded-2xl border p-4 sm:p-6 space-y-4">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <IndianRupee className="w-5 h-5 text-primary" />
-                Pricing
-              </h2>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  ["Weekday Price", "pricingPerNightWeekdays"],
-                  ["Weekend Price", "pricingPerNightWeekend"],
-                  ["Extra Adult (₹)", "extraAdultCharge"],
-                  ["Extra Child (₹)", "extraChildCharge"],
-                ].map(([label, key]) => (
+          {/* ROOMS */}
+          {activeTab === "rooms" && (
+            <>
+              <div className="grid grid-cols-5 gap-6">
+                {["ac", "nonAc", "deluxe", "luxury", "hall"].map((key) => (
                   <div key={key}>
-                    <Label>{label}</Label>
-                    <Input
-                      className="bg-[#bec3ff26] mt-2"
-                      value={formData[key]}
-                      onChange={(e) =>
-                        setFormData({ ...formData, [key]: e.target.value })
+                    <Label className="capitalize">
+                      {key === "nonAc" ? "Non AC" : key}
+                    </Label>
+                    <QuantityStepper
+                      value={formData.roomBreakdown[key]}
+                      onChange={(v) =>
+                        setFormData({
+                          ...formData,
+                          roomBreakdown: {
+                            ...formData.roomBreakdown,
+                            [key]: v,
+                          },
+                        })
                       }
                     />
                   </div>
                 ))}
               </div>
-            </div>
 
-            <div className="bg-white rounded-2xl border p-4 sm:p-6">
-              <h2 className="text-lg font-semibold mb-4">Images & Documents</h2>
-              <FileUploadsSection
-                setCoverImageFile={setCoverImageFile}
-                coverImagePreview={coverImagePreview}
-                setCoverImagePreview={setCoverImagePreview}
-                shopActFile={shopActFile}
-                setShopActFile={setShopActFile}
-                shopActPreview={shopActPreview}
-                setShopActPreview={setShopActPreview}
-                showFields={{ coverImage: true, shopAct: true }}
-              />
-              <FileUploadsSection
-                setGalleryImageFiles={setGalleryImageFiles}
-                galleryImagePreviews={galleryImagePreviews}
-                setGalleryImagePreviews={setGalleryImagePreviews}
-                setRemovedGalleryImages={setRemovedGalleryImages}
-                showFields={{ galleryPhotos: true }}
-              />
-            </div>
-          </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <Label>Max Guests</Label>
+                  <QuantityStepper
+                    value={formData.maxGuests}
+                    onChange={(v) =>
+                      setFormData({ ...formData, maxGuests: v })
+                    }
+                  />
+                </div>
 
-          <div className="w-full">
-            <div className="bg-white rounded-2xl border p-4 sm:p-6">
-              <h2 className="text-lg font-semibold mb-4">Amenities</h2>
-              <AmenitiesAccordion
-                options={amenitiesOptions}
-                selected={formData.amenities}
-                onChange={(v) => setFormData({ ...formData, amenities: v })}
-              />
-            </div>
-          </div>
+                <div>
+                  <Label>Base Guests</Label>
+                  <QuantityStepper
+                    value={formData.baseGuests}
+                    onChange={(v) =>
+                      setFormData({ ...formData, baseGuests: v })
+                    }
+                  />
+                </div>
+              </div>
 
-          <div className="w-full flex justify-end">
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl"
-            >
-              {loading ? "Updating..." : "Update Property"}
-            </Button>
-          </div>
-        </form>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <Label>Check In</Label>
+                  <Input
+                    type="time"
+                    value={formData.checkIn}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkIn: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label>Check Out</Label>
+                  <Input
+                    type="time"
+                    value={formData.checkOut}
+                    onChange={(e) =>
+                      setFormData({ ...formData, checkOut: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* AMENITIES */}
+          {activeTab === "amenities" && (
+            <div className="grid grid-cols-4 gap-4">
+              {["WiFi", "AC", "Power Backup", "Parking", "Garden", "Pet Friendly"].map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      amenities: formData.amenities.includes(a)
+                        ? formData.amenities.filter((x) => x !== a)
+                        : [...formData.amenities, a],
+                    })
+                  }
+                  className={`p-4 rounded-xl border text-sm
+                    ${formData.amenities.includes(a)
+                      ? "border-primary bg-primary/10"
+                      : ""}`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* MEDIA */}
+          {activeTab === "media" && (
+            <div className="border-dashed border rounded-xl p-10 text-center text-gray-500">
+              Media upload UI goes here (same structure as screenshot)
+            </div>
+          )}
+
+        </div>
       </div>
     </div>
   );
