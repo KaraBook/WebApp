@@ -116,7 +116,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         {userName || "Guest"}
                     </h2>
 
-                    <div className="pt-1 flex items-center justify-content">
+                    <div className="flex items-center justify-between">
                             <Row
                                 icon={<Clock size={14} />}
                                 text={`Booking created on ${formatDate(createdAt)}`}
