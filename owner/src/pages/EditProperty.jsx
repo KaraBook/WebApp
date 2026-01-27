@@ -18,7 +18,7 @@ import { amenitiesOptions } from "@/constants/dropdownOptions";
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-11 md:px-12 py-3 rounded-xl text-sm font-medium transition
+    className={`flex items-center gap-2 px-10 md:px-12 py-3 rounded-xl text-sm font-medium transition
       ${active
         ? "bg-white shadow-sm text-[#00919e]"
         : "text-gray-500 hover:text-black"}`}
@@ -252,7 +252,7 @@ export default function EditProperty() {
             </div>
             <h1 className="text-2xl font-bold">West Valley Villa Casa East</h1>
           </div>
-          <Button onClick={save} className="bg-primary hover:bg-[#0d5f59]">
+          <Button onClick={save} className="bg-primary hover:bg-[#0d5f59] mt-2 md:mt-0">
             Save Changes
           </Button>
         </div>
