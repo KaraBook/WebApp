@@ -60,6 +60,10 @@ export default function Properties() {
     foodAvailability = [],
     bedrooms,
     bathrooms,
+    petFriendly,
+    isRefundable,
+    refundNotes,
+    cancellationPolicy,
   } = property;
 
   const activeAmenities = new Set(amenities);
@@ -244,6 +248,69 @@ export default function Properties() {
             </div>
 
           </div>
+
+
+
+          {/* POLICIES & RULES */}
+          <div className="bg-white rounded-xl p-6 shadow-sm space-y-5">
+
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">Policies & Rules</Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                Pet Friendly:{" "}
+                <strong className={petFriendly ? "text-emerald-600" : "text-red-600"}>
+                  {petFriendly ? "Yes" : "No"}
+                </strong>
+              </div>
+
+              <div>
+                Refundable:{" "}
+                <strong className={isRefundable ? "text-emerald-600" : "text-red-600"}>
+                  {isRefundable ? "Yes" : "No"}
+                </strong>
+              </div>
+            </div>
+
+            {/* REFUND DETAILS */}
+            {isRefundable && (
+              <>
+                {refundNotes && (
+                  <div className="bg-slate-50 p-4 rounded-lg text-sm">
+                    <p className="font-semibold mb-1">Refund Notes</p>
+                    <p className="text-gray-600 leading-relaxed">{refundNotes}</p>
+                  </div>
+                )}
+
+                {cancellationPolicy?.length > 0 && (
+                  <div className="border rounded-lg overflow-hidden text-sm">
+                    <div className="bg-slate-100 px-4 py-2 font-semibold">
+                      Cancellation Policy
+                    </div>
+
+                    {cancellationPolicy
+                      .sort((a, b) => b.minDaysBefore - a.minDaysBefore)
+                      .map((rule, i) => (
+                        <div
+                          key={i}
+                          className="flex justify-between px-4 py-2 border-t"
+                        >
+                          <span>
+                            {rule.minDaysBefore}+ days before
+                          </span>
+                          <span className="font-medium">
+                            {rule.refundPercent}% refund
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
 
           {/* AMENITIES & FOOD */}
           <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
