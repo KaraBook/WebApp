@@ -128,6 +128,14 @@ export default function EditProperty() {
     checkOut: "23:30",
     food: [],
     amenities: [],
+    petFriendly: false,
+    isRefundable: true,
+    refundNotes: "",
+    cancellationPolicy: [
+      { minDaysBefore: 14, refundPercent: 100 },
+      { minDaysBefore: 7, refundPercent: 50 },
+      { minDaysBefore: 0, refundPercent: 0 }
+    ]
   });
 
   useEffect(() => {
@@ -154,6 +162,14 @@ export default function EditProperty() {
             f.trim().toLowerCase().replace(/^\w/, c => c.toUpperCase())
           ),
           amenities: p.amenities || [],
+          petFriendly: p.petFriendly || false,
+          isRefundable: p.isRefundable ?? true,
+          refundNotes: p.refundNotes || "",
+          cancellationPolicy: p.cancellationPolicy || [
+            { minDaysBefore: 14, refundPercent: 100 },
+            { minDaysBefore: 7, refundPercent: 50 },
+            { minDaysBefore: 0, refundPercent: 0 }
+          ],
         });
 
         setCoverImagePreview(p.coverImage || null);
@@ -192,6 +208,10 @@ export default function EditProperty() {
         foodAvailability: form.food,
         bedrooms: form.bedrooms,
         bathrooms: form.bathrooms,
+        petFriendly: form.petFriendly,
+        isRefundable: form.isRefundable,
+        refundNotes: form.refundNotes,
+        cancellationPolicy: form.cancellationPolicy,
       };
 
       delete payload.checkIn;
@@ -243,6 +263,7 @@ export default function EditProperty() {
           <TabButton icon={IndianRupee} label="Pricing" active={tab === "pricing"} onClick={() => setTab("pricing")} />
           <TabButton icon={Bed} label="Rooms" active={tab === "rooms"} onClick={() => setTab("rooms")} />
           <TabButton icon={Sparkles} label="Amenities" active={tab === "amenities"} onClick={() => setTab("amenities")} />
+          <TabButton icon={Sparkles} label="Policies" active={tab === "policies"} onClick={() => setTab("policies")} />
           <TabButton icon={ImageIcon} label="Media" active={tab === "media"} onClick={() => setTab("media")} />
         </div>
 
@@ -465,6 +486,96 @@ export default function EditProperty() {
                 </div>
               ))}
 
+            </div>
+          )}
+
+
+          {tab === "policies" && (
+            <div className="space-y-8">
+
+              {/* PET FRIENDLY */}
+              <div className="bg-white rounded-2xl border p-6">
+                <h3 className="font-semibold mb-3">Pet Friendly</h3>
+                <div className="flex gap-4">
+                  <Button
+                    variant={form.petFriendly ? "default" : "outline"}
+                    onClick={() => setForm({ ...form, petFriendly: true })}
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    variant={!form.petFriendly ? "default" : "outline"}
+                    onClick={() => setForm({ ...form, petFriendly: false })}
+                  >
+                    No
+                  </Button>
+                </div>
+              </div>
+
+              {/* REFUNDABLE */}
+              <div className="bg-white rounded-2xl border p-6">
+                <h3 className="font-semibold mb-3">Refund Policy</h3>
+
+                <div className="flex gap-4 mb-4">
+                  <Button
+                    variant={form.isRefundable ? "default" : "outline"}
+                    onClick={() => setForm({ ...form, isRefundable: true })}
+                  >
+                    Refundable
+                  </Button>
+                  <Button
+                    variant={!form.isRefundable ? "default" : "outline"}
+                    onClick={() => setForm({ ...form, isRefundable: false })}
+                  >
+                    Non-Refundable
+                  </Button>
+                </div>
+
+                {form.isRefundable && (
+                  <>
+                    <Label>Refund Notes</Label>
+                    <Textarea
+                      className="mt-2"
+                      rows={3}
+                      value={form.refundNotes}
+                      onChange={(e) =>
+                        setForm({ ...form, refundNotes: e.target.value })
+                      }
+                    />
+
+                    {/* POLICY RULES */}
+                    <div className="mt-6 space-y-3">
+                      {form.cancellationPolicy.map((rule, i) => (
+                        <div key={i} className="flex gap-4 items-center">
+                          <Input
+                            type="number"
+                            value={rule.minDaysBefore}
+                            onChange={(e) => {
+                              const cp = [...form.cancellationPolicy];
+                              cp[i].minDaysBefore = Number(e.target.value);
+                              setForm({ ...form, cancellationPolicy: cp });
+                            }}
+                            className="w-24"
+                          />
+                          <span>days before</span>
+
+                          <Input
+                            type="number"
+                            value={rule.refundPercent}
+                            onChange={(e) => {
+                              const cp = [...form.cancellationPolicy];
+                              cp[i].refundPercent = Number(e.target.value);
+                              setForm({ ...form, cancellationPolicy: cp });
+                            }}
+                            className="w-24"
+                          />
+                          <span>% refund</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
 
