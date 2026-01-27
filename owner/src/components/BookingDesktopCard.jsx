@@ -42,74 +42,71 @@ export default function BookingDesktopCard({
       className="
         bg-white
         border border-emerald-200/60
-        rounded-2xl px-6 py-4
-        flex items-center justify-between
+        rounded-2xl
+        px-6 py-4
+        flex items-center
+        gap-6
         shadow-[0_6px_18px_rgba(0,0,0,0.06)]
         hover:shadow-[0_10px_26px_rgba(0,0,0,0.08)]
         transition cursor-pointer
       "
     >
-      {/* LEFT: Avatar + Name */}
-      <div className="flex items-center gap-4 min-w-0">
-        <div className="
-          h-10 w-10 rounded-full
-          bg-emerald-100 text-emerald-700
-          flex items-center justify-center
-          text-sm font-bold
-        ">
-          {name?.[0] || "G"}
-        </div>
+      {/* AVATAR */}
+      <div className="
+        h-10 w-10 rounded-full
+        bg-emerald-100 text-emerald-700
+        flex items-center justify-center
+        text-sm font-bold shrink-0
+      ">
+        {name?.[0] || "G"}
+      </div>
 
-        <div className="min-w-0">
-          <p className="text-[15px] font-semibold text-gray-900 leading-tight">
-            {name || "Guest"}
-          </p>
-
-          <div className="flex items-center gap-2 text-[12px] text-gray-500 mt-[2px]">
-            <Phone size={12} /> {phone}
-          </div>
+      {/* NAME + PHONE */}
+      <div className="min-w-[160px]">
+        <p className="text-[15px] font-semibold text-gray-900 leading-tight">
+          {name}
+        </p>
+        <div className="flex items-center gap-2 text-[12px] text-gray-500 mt-[2px]">
+          <Phone size={12} /> {phone}
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="hidden lg:block h-10 w-px bg-gray-200" />
-
-      {/* CENTER: Property + Dates + Meta */}
-      <div className="hidden lg:flex items-center gap-6 text-[13px] text-gray-600">
-        <div className="flex items-center gap-1 max-w-[220px] truncate">
-          <MapPin size={14} />
-          <span className="truncate">{property}</span>
-        </div>
-
-        <div className="flex items-center gap-1 font-semibold text-gray-800">
-          <Calendar size={14} />
-          {formatDate(b.checkIn)} → {formatDate(b.checkOut)}
-        </div>
-
-        <div className="flex items-center gap-1">
-          <Moon size={14} />
-          {b.totalNights} Nights
-        </div>
-
-        <div className="flex items-center gap-1">
-          <Users size={14} />
-          {typeof b.guests === "object"
-            ? b.guests.adults + b.guests.children
-            : b.guests} Guests
-        </div>
+      {/* PROPERTY */}
+      <div className="flex items-center gap-2 text-[13px] text-gray-600 max-w-[200px] truncate">
+        <MapPin size={14} className="shrink-0" />
+        <span className="truncate">{property}</span>
       </div>
 
-      {/* RIGHT: Amount + Status + Menu */}
-      <div
-        className="flex items-center gap-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="text-[15px] font-bold text-gray-900">
-          ₹{b.totalAmount?.toLocaleString("en-IN")}
-        </div>
+      {/* DATES */}
+      <div className="flex items-center gap-2 text-[13px] text-gray-800 font-semibold">
+        <Calendar size={14} />
+        {formatDate(b.checkIn)} → {formatDate(b.checkOut)}
+      </div>
 
-        <PaymentChip status={b.paymentStatus} />
+      {/* NIGHTS */}
+      <div className="flex items-center gap-2 text-[13px] text-gray-600">
+        <Moon size={14} />
+        {b.totalNights} Nights
+      </div>
 
+      {/* GUESTS */}
+      <div className="flex items-center gap-2 text-[13px] text-gray-600">
+        <Users size={14} />
+        {typeof b.guests === "object"
+          ? b.guests.adults + b.guests.children
+          : b.guests} Guests
+      </div>
+
+      {/* AMOUNT */}
+      <div className="ml-auto text-[15px] font-bold text-gray-900">
+        ₹{b.totalAmount?.toLocaleString("en-IN")}
+      </div>
+
+      {/* STATUS */}
+      <PaymentChip status={b.paymentStatus} />
+
+      {/* MENU */}
+      <div onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className="
