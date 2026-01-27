@@ -45,21 +45,28 @@ export const createOrder = async (req, res) => {
     }
 
     const start = new Date(checkIn);
+    const end = new Date(checkOut);
     const today = new Date();
 
     const startDateOnly = start.toISOString().slice(0, 10);
+    const endDateOnly = end.toISOString().slice(0, 10);
     const todayDateOnly = today.toISOString().slice(0, 10);
 
     if (startDateOnly <= todayDateOnly) {
       return res.status(400).json({
         success: false,
-        message: "Same-day bookings are not allowed. Please select a future date."
+        message: "Same-day bookings are not allowed. Please select a future date.",
       });
     }
 
-    const totalNights = Math.ceil(
-      (end - start) / (1000 * 60 * 60 * 24)
-    );
+    if (endDateOnly <= startDateOnly) {
+      return res.status(400).json({
+        success: false,
+        message: "Minimum stay is 1 night. Please select different dates.",
+      });
+    }
+
+    const totalNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
 
     if (!totalNights || totalNights <= 0) {
       return res.status(400).json({
