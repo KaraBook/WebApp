@@ -687,6 +687,10 @@ export const updateProperty = async (req, res) => {
         updatedData.refundNotes = "";
       }
 
+      if (updatedData.publishNow === true) {
+        updatedData.isDraft = false;
+      }
+
       updatedProperty = await Property.findByIdAndUpdate(
         propertyId,
         { $set: updatedData },
