@@ -190,7 +190,7 @@ function CalendarLegend() {
     <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
       <LegendItem color="green" label="Confirmed Booking" />
       <LegendItem color="yellow" label="Pending Payment" />
-      <LegendItem color="gray" label="Cancelled" />
+      <LegendItem color="red" label="Cancelled" />
       <LegendItem color="blue" label="Owner Blocked" />
     </div>
   );
@@ -560,7 +560,7 @@ export default function Dashboard() {
                   booked: "bg-green-100 rounded-md text-green-800",
                   blocked: "bg-blue-100 rounded-md text-blue-800",
                   pending: "bg-yellow-100 rounded-md text-yellow-800",
-                  cancelled: "bg-red-200 rounded-md text-gray-600",
+                  cancelled: "bg-red-200 rounded-md text-red-600",
                 }}
                 components={{
                   DayContent: ({ date }) => (
