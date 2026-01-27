@@ -275,7 +275,7 @@ export default function Bookings() {
                       </td>
 
                       <td className="px-4 py-3 font-semibold">
-                        ₹{b.grandTotal.toLocaleString()}
+                        ₹{(b.grandTotal ?? b.totalAmount ?? 0).toLocaleString()}
                       </td>
 
                       <td className="px-4 py-5 relative group cursor-default flex justify-center">
