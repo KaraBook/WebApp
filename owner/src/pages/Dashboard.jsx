@@ -505,7 +505,7 @@ export default function Dashboard() {
             </div>
 
             <div className="hidden md:block space-y-3">
-              {paginatedData.map((b) => (
+              {paginatedRows.map((b) => (
                 <BookingDesktopCard
                   booking={b}
                   onOpen={(b) => {
