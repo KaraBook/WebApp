@@ -200,7 +200,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
 
                     <Separator />
 
-                    <Section title="Payment Information">
+                    <Section title="Payment Information" className="mb-6">
                         <Key label="Payment Method" value={paymentMethod} />
                         <Key label="Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
                         <Key label="Tax" value={`₹${safeTax.toLocaleString("en-IN")}`} />
