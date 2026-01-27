@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,19 +10,8 @@ import { Button } from "@/components/ui/button";
 import FullPageLoader from "@/components/FullPageLoader";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Clock } from "lucide-react";
-
-import {
-  ArrowLeft,
-  FileText,
-  Utensils,
-  Sun,
-  Moon,
-  Coffee,
-  IndianRupee,
-  Bed,
-  Sparkles,
-  ImageIcon,
-} from "lucide-react";
+import { ArrowLeft, FileText, Utensils, Sun, Moon, Coffee, IndianRupee, Bed, Sparkles, ImageIcon } from "lucide-react";
+import { amenitiesOptions } from "@/constants/dropdownOptions";
 
 /* ---------------- TAB BUTTON ---------------- */
 
@@ -399,19 +387,51 @@ export default function EditProperty() {
 
           {/* AMENITIES */}
           {tab === "amenities" && (
-            <div className="grid grid-cols-4 gap-4">
-              {["WiFi", "Air Conditioning", "Power Backup", "Parking", "Garden", "Pet Friendly"].map((a) => (
-                <button
-                  key={a}
-                  onClick={() => toggle("amenities", a)}
-                  className={`p-4 rounded-xl border text-sm
-                    ${form.amenities.includes(a)
-                      ? "border-[#0f766e] bg-[#0f766e]/10 text-[#0f766e]"
-                      : ""}`}
-                >
-                  {a}
-                </button>
+            <div className="space-y-8">
+
+              {amenitiesOptions.map((section) => (
+                <div key={section.key} className="bg-white rounded-2xl border p-6">
+
+                  <h3 className="text-base font-semibold mb-1">
+                    {section.label}
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Select the amenities available at your property
+                  </p>
+
+                  <div className="grid grid-cols-4 gap-4">
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = form.amenities.includes(item.value);
+
+                      return (
+                        <button
+                          key={item.value}
+                          onClick={() => toggle("amenities", item.value)}
+                          className={`
+                  flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition
+                  ${active
+                              ? "border-[#0f766e] bg-[#0f766e]/10 text-[#0f766e]"
+                              : "hover:border-gray-300"
+                            }
+                `}
+                        >
+                          <div className={`
+                  p-2 rounded-lg
+                  ${active ? "bg-[#0f766e]/20" : "bg-gray-100"}
+                `}>
+                            <Icon size={18} />
+                          </div>
+
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                </div>
               ))}
+
             </div>
           )}
 
