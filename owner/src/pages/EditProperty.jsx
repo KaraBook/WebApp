@@ -370,8 +370,112 @@ export default function EditProperty() {
 
           {/* MEDIA */}
           {tab === "media" && (
-            <div className="border-dashed border rounded-xl p-10 text-center text-gray-400">
-              Drag & drop images here (same as KaraBook UI)
+            <div className="bg-white rounded-2xl border shadow-sm p-6 space-y-8">
+
+              {/* HEADER */}
+              <div>
+                <h2 className="text-base font-semibold flex items-center gap-2">
+                  <ImageIcon size={18} className="text-[#0f766e]" />
+                  Property Images
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Upload high-quality images to showcase your property
+                </p>
+              </div>
+
+              {/* COVER + SHOP ACT */}
+              <div className="grid grid-cols-2 gap-8">
+
+                {/* COVER */}
+                <div>
+                  <Label className="text-sm">Cover Image</Label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Main image shown in listings
+                  </p>
+
+                  <div className="rounded-xl border overflow-hidden h-48 bg-gray-100 flex items-center justify-center">
+                    {form.coverImage ? (
+                      <img
+                        src={form.coverImage}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-400">No cover uploaded</span>
+                    )}
+                  </div>
+
+                  <input
+                    type="file"
+                    className="hidden"
+                    id="coverUpload"
+                  />
+                  <Button
+                    variant="outline"
+                    className="mt-3"
+                    onClick={() => document.getElementById("coverUpload").click()}
+                  >
+                    Upload Cover
+                  </Button>
+                </div>
+
+                {/* SHOP ACT */}
+                <div>
+                  <Label className="text-sm">Shop Act Document</Label>
+                  <p className="text-xs text-gray-500 mb-2">
+                    Optional - for verification
+                  </p>
+
+                  <div className="rounded-xl border-dashed border h-48 flex flex-col items-center justify-center text-gray-400">
+                    <ImageIcon size={28} />
+                    Click to upload
+                  </div>
+
+                  <input type="file" className="hidden" id="shopActUpload" />
+                  <Button
+                    variant="outline"
+                    className="mt-3"
+                    onClick={() => document.getElementById("shopActUpload").click()}
+                  >
+                    Upload Document
+                  </Button>
+                </div>
+              </div>
+
+              {/* GALLERY */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <div>
+                    <Label className="text-sm">Gallery Photos</Label>
+                    <p className="text-xs text-gray-500">
+                      Add 3-10 photos of your property
+                    </p>
+                  </div>
+                  <div className="bg-gray-100 text-xs px-2 py-1 rounded-full">
+                    {form.gallery?.length || 0}/10
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-5 gap-4">
+                  {form.gallery?.map((img, i) => (
+                    <div
+                      key={i}
+                      className="h-28 rounded-xl overflow-hidden border"
+                    >
+                      <img
+                        src={img}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+
+                  {/* ADD MORE */}
+                  <div className="h-28 rounded-xl border-dashed border flex flex-col items-center justify-center text-gray-400 cursor-pointer">
+                    +
+                    <span className="text-xs">Add More</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           )}
         </div>
