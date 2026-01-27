@@ -72,7 +72,22 @@ const FoodPill = ({ active, icon: Icon, label, onClick }) => (
 );
 
 
+const generateTimes = (step = 30) => {
+  const times = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += step) {
+      const hh = String(h).padStart(2, "0");
+      const mm = String(m).padStart(2, "0");
+      times.push(`${hh}:${mm}`);
+    }
+  }
+  return times;
+};
+
+
 function TimePicker({ value, onChange }) {
+  const times = generateTimes(30); 
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -81,16 +96,25 @@ function TimePicker({ value, onChange }) {
           {value || "Select time"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-48">
-        <Input
-          type="time"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
+
+      <PopoverContent className="w-56 p-0">
+        <div className="max-h-64 overflow-y-auto">
+          {times.map((t) => (
+            <button
+              key={t}
+              onClick={() => onChange(t)}
+              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100
+                ${value === t ? "bg-primary/10 text-primary font-semibold" : ""}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
       </PopoverContent>
     </Popover>
   );
 }
+
 
 
 export default function EditProperty() {
