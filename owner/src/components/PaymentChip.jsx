@@ -9,7 +9,7 @@ export default function PaymentChip({ status }) {
   const s = normalize(status);
 
   const base =
-    "px-3 py-[3px] rounded-full text-[11px] font-medium leading-none";
+    "px-3 py-[3px] rounded-full text-[12px] font-medium leading-none";
 
   const map = {
     confirmed: `${base} bg-emerald-50 text-emerald-700 border border-emerald-100`,

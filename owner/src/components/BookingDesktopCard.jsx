@@ -1,5 +1,17 @@
-import { MoreVertical, Calendar, Moon, Users, Phone, MapPin} from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
+import {
+  MoreVertical,
+  Calendar,
+  Moon,
+  Users,
+  Phone,
+  MapPin,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
 
 export default function BookingDesktopCard({
@@ -28,81 +40,83 @@ export default function BookingDesktopCard({
     <div
       onClick={() => onOpen(b)}
       className="
-        bg-white border border-emerald-200/60
+        bg-white
+        border border-emerald-200/60
         rounded-2xl px-6 py-4
         flex items-center justify-between
-        shadow-sm
-        hover:shadow-md
+        shadow-[0_6px_18px_rgba(0,0,0,0.06)]
+        hover:shadow-[0_10px_26px_rgba(0,0,0,0.08)]
         transition cursor-pointer
       "
     >
-      {/* LEFT */}
+      {/* LEFT: Avatar + Name */}
       <div className="flex items-center gap-4 min-w-0">
         <div className="
           h-10 w-10 rounded-full
           bg-emerald-100 text-emerald-700
           flex items-center justify-center
-          text-sm font-semibold
+          text-sm font-bold
         ">
           {name?.[0] || "G"}
         </div>
 
-        <div className="min-w-0 space-y-[2px]">
-          <p className="font-semibold text-[14px] text-gray-900 truncate">
+        <div className="min-w-0">
+          <p className="text-[15px] font-semibold text-gray-900 leading-tight">
             {name || "Guest"}
           </p>
 
-          <div className="flex items-center gap-2 text-[11px] text-gray-500">
+          <div className="flex items-center gap-2 text-[12px] text-gray-500 mt-[2px]">
             <Phone size={12} /> {phone}
-          </div>
-
-          <div className="flex items-center gap-2 text-[11px] text-gray-500 truncate">
-            <MapPin size={12} /> {property}
           </div>
         </div>
       </div>
 
-      {/* DIVIDER */}
+      {/* Divider */}
       <div className="hidden lg:block h-10 w-px bg-gray-200" />
 
-      {/* MIDDLE */}
-      <div className="hidden lg:flex items-center gap-6 text-[12px] flex-wrap text-gray-600">
-        <div className="flex w-[45%] items-center gap-1 text-[14px] font-[700]">
+      {/* CENTER: Property + Dates + Meta */}
+      <div className="hidden lg:flex items-center gap-6 text-[13px] text-gray-600">
+        <div className="flex items-center gap-1 max-w-[220px] truncate">
+          <MapPin size={14} />
+          <span className="truncate">{property}</span>
+        </div>
+
+        <div className="flex items-center gap-1 font-semibold text-gray-800">
           <Calendar size={14} />
           {formatDate(b.checkIn)} → {formatDate(b.checkOut)}
         </div>
 
-        <div className="flex w-[45%] items-center gap-1 text-[14px]">
+        <div className="flex items-center gap-1">
           <Moon size={14} />
           {b.totalNights} Nights
         </div>
 
-        <div className="flex w-[45%] items-center gap-1">
+        <div className="flex items-center gap-1">
           <Users size={14} />
           {typeof b.guests === "object"
             ? b.guests.adults + b.guests.children
             : b.guests} Guests
         </div>
-
-         <div className="text-[14px] w-[45%] font-semibold text-gray-900">
-          ₹{b.totalAmount?.toLocaleString("en-IN")}
-        </div>
       </div>
 
-      {/* RIGHT */}
+      {/* RIGHT: Amount + Status + Menu */}
       <div
         className="flex items-center gap-4"
         onClick={(e) => e.stopPropagation()}
       >
+        <div className="text-[15px] font-bold text-gray-900">
+          ₹{b.totalAmount?.toLocaleString("en-IN")}
+        </div>
 
         <PaymentChip status={b.paymentStatus} />
 
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className="
-              h-8 w-8 rounded-full
+              h-9 w-9 rounded-full
               flex items-center justify-center
-              hover:bg-emerald-50
+              bg-emerald-50
+              hover:bg-emerald-100
             ">
               <MoreVertical className="text-emerald-600" />
             </div>
