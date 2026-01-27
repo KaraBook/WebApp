@@ -289,7 +289,7 @@ export default function EditProperty() {
                 <Label className="flex items-center gap-2">
                   <Utensils size={16} /> Food Options
                 </Label>
-                <div className="flex gap-3 mt-3">
+                <div className="flex flex-wrap md:flex-nowrap gap-3 mt-3">
                   <FoodPill icon={Coffee} label="Breakfast" active={form.food.includes("Breakfast")} onClick={() => toggle("food", "Breakfast")} />
                   <FoodPill icon={Sun} label="Lunch" active={form.food.includes("Lunch")} onClick={() => toggle("food", "Lunch")} />
                   <FoodPill icon={Moon} label="Dinner" active={form.food.includes("Dinner")} onClick={() => toggle("food", "Dinner")} />
