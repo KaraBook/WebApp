@@ -136,7 +136,9 @@ export default function EditProperty() {
           baseGuests: p.baseGuests,
           checkIn: p.checkInTime,
           checkOut: p.checkOutTime,
-          food: p.foodAvailability || [],
+          food: (p.foodAvailability || []).map(f =>
+            f.trim().toLowerCase().replace(/^\w/, c => c.toUpperCase())
+          ),
           amenities: p.amenities || [],
         });
 
