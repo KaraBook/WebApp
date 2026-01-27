@@ -172,6 +172,9 @@ export default function EditProperty() {
     }
   };
 
+
+  const totalRooms = Object.values(form.room).reduce((a, b) => a + b, 0);
+
   if (fetching) return <FullPageLoader />;
 
   return (
@@ -271,8 +274,8 @@ export default function EditProperty() {
                     </p>
                   </div>
 
-                  <div className="bg-gray-100 text-sm px-3 py-1 rounded-full">
-                    {Object.values(form.room).reduce((a, b) => a + b, 0)} Total Rooms
+                  <div className="bg-gray-100 text-sm px-3 py-1 rounded-full font-semibold">
+                    {totalRooms} Total Rooms
                   </div>
                 </div>
 
