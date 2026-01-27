@@ -63,7 +63,7 @@ const FoodPill = ({ active, icon: Icon, label, onClick }) => (
     onClick={onClick}
     className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium border transition
       ${active
-        ? "bg-[#0f766e] text-white border-[#0f766e]"
+        ? "bg-[#00919e] text-white border-[#0f766e]"
         : "bg-white text-gray-700"}`}
   >
     <Icon size={16} />
@@ -232,7 +232,7 @@ export default function EditProperty() {
             </div>
             <h1 className="text-2xl font-bold">West Valley Villa Casa East</h1>
           </div>
-          <Button onClick={save} className="bg-[#0f766e] hover:bg-[#0d5f59]">
+          <Button onClick={save} className="bg-primary hover:bg-[#0d5f59]">
             Save Changes
           </Button>
         </div>
@@ -342,7 +342,7 @@ export default function EditProperty() {
                 </div>
 
                 {/* BEDROOMS & BATHROOMS */}
-                <div className="mt-8 grid grid-cols-2 gap-10">
+                <div className="mt-8 grid grid-cols-5 gap-10">
                   <div>
                     <Label className="text-sm text-gray-600">
                       Bedrooms
@@ -444,14 +444,14 @@ export default function EditProperty() {
                           className={`
                   flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition
                   ${active
-                              ? "border-[#0f766e] bg-[#0f766e]/10 text-[#0f766e]"
+                              ? "border-primary bg-[#00919e]/10 text-[#0f766e]"
                               : "hover:border-gray-300"
                             }
                 `}
                         >
                           <div className={`
                   p-2 rounded-lg
-                  ${active ? "bg-[#0f766e]/20" : "bg-gray-100"}
+                  ${active ? "bg-[#00919e]/20" : "bg-gray-100"}
                 `}>
                             <Icon size={18} />
                           </div>
