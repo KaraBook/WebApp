@@ -120,6 +120,8 @@ export default function EditProperty() {
     extraAdult: "",
     extraChild: "",
     room: { ac: 4, nonAc: 1, deluxe: 2, luxury: 1, hall: 1 },
+    bedrooms: 4,
+    bathrooms: 3,
     maxGuests: 10,
     baseGuests: 8,
     checkIn: "08:00",
@@ -141,6 +143,8 @@ export default function EditProperty() {
           weekend: p.pricingPerNightWeekend || "",
           extraAdult: p.extraAdultCharge || "",
           extraChild: p.extraChildCharge || "",
+          bedrooms: p.bedrooms || 0,
+          bathrooms: p.bathrooms || 0,
           room: roomOnly,
           maxGuests: p.maxGuests,
           baseGuests: p.baseGuests,
@@ -186,6 +190,8 @@ export default function EditProperty() {
         extraChildCharge: form.extraChild,
         roomBreakdown: form.room,
         foodAvailability: form.food,
+        bedrooms: form.bedrooms,
+        bathrooms: form.bathrooms,
       };
 
       delete payload.checkIn;
@@ -333,6 +339,33 @@ export default function EditProperty() {
                       />
                     </div>
                   ))}
+                </div>
+
+                {/* BEDROOMS & BATHROOMS */}
+                <div className="mt-8 grid grid-cols-2 gap-10">
+                  <div>
+                    <Label className="text-sm text-gray-600">
+                      Bedrooms
+                    </Label>
+                    <Stepper
+                      value={form.bedrooms}
+                      onChange={(v) =>
+                        setForm({ ...form, bedrooms: v })
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="text-sm text-gray-600">
+                      Bathrooms
+                    </Label>
+                    <Stepper
+                      value={form.bathrooms}
+                      onChange={(v) =>
+                        setForm({ ...form, bathrooms: v })
+                      }
+                    />
+                  </div>
                 </div>
               </div>
 
