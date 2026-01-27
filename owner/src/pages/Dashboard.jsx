@@ -11,6 +11,7 @@ import MobileBookingsList from "@/components/MobileBookingList";
 import { Calendar } from "@/components/ui/calendar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import BookingDesktopCard from "@/components/BookingDesktopCard";
+import PaymentChip from "@/components/PaymentChip";
 
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
@@ -161,17 +162,6 @@ function StatCard({
   );
 }
 
-
-function PaymentChip({ status }) {
-  const s = normalizePaymentStatus(status);
-  const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
-  const map = {
-    confirmed: `${base} bg-emerald-50 text-emerald-700`,
-    pending: `${base} bg-amber-50 text-amber-700`,
-    cancelled: `${base} bg-gray-100 text-gray-600`,
-  };
-  return <span className={map[s]}>{s}</span>;
-}
 
 const normalizePaymentStatus = (status) => {
   if (["paid", "confirmed"].includes(status)) return "confirmed";
