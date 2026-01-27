@@ -200,7 +200,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
 
                     <Separator />
 
-                    <Section title="Payment Information" className="mb-6">
+                    <Section title="Payment Information">
                         <Key label="Payment Method" value={paymentMethod} />
                         <Key label="Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
                         <Key label="Tax" value={`₹${safeTax.toLocaleString("en-IN")}`} />
@@ -242,7 +242,7 @@ function InfoCardBlock({ icon, label, value }) {
 
 function Section({ title, children }) {
     return (
-        <div className="mb-6">
+        <div className="pb-6">
             <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-3">
                 {title}
             </h4>
@@ -264,7 +264,7 @@ function Row({ icon, text, muted }) {
 
 function Key({ label, value, bold, mono }) {
     return (
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center">
             <span className="text-muted-foreground text-sm">{label}</span>
             <span
                 className={`text-sm ${bold ? "font-semibold" : "font-medium"} ${mono ? "font-mono text-xs" : ""}`}
