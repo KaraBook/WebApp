@@ -513,7 +513,7 @@ export default function EditProperty() {
               </div>
 
               {/* REFUNDABLE */}
-              <div className="bg-white rounded-2xl border p-6">
+              <div className="bg-white rounded-2xl border p-4 md:p-6">
                 <h3 className="font-semibold mb-3">Refund Policy</h3>
 
                 <div className="flex gap-4 mb-4">
@@ -581,7 +581,7 @@ export default function EditProperty() {
 
           {/* MEDIA */}
           {tab === "media" && (
-            <div className="bg-white rounded-2xl border shadow-sm p-6 space-y-8">
+            <div className="bg-white rounded-2xl border shadow-sm p-4 md:p-6 space-y-8">
 
               {/* HEADER */}
               <div>
@@ -595,7 +595,7 @@ export default function EditProperty() {
               </div>
 
               {/* COVER + SHOP ACT */}
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
 
                 {/* COVER */}
                 <div>
@@ -686,7 +686,7 @@ export default function EditProperty() {
                   }}
                 />
 
-                <div className="grid grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   {galleryImagePreviews.map((img, i) => (
                     <div
                       key={i}
