@@ -77,7 +77,7 @@ export default function BookingDesktopCard({
           {b.totalNights} Nights
         </div>
 
-        <div className="flex w-[26%] items-center gap-1">
+        <div className="flex bg-[#0080001f] p-[5px] flex items-center justify-center rounded-full w-[26%] items-center gap-1">
           <Users size={14} />
           {typeof b.guests === "object"
             ? b.guests.adults + b.guests.children
