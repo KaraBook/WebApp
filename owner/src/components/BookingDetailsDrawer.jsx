@@ -116,15 +116,13 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         {userName || "Guest"}
                     </h2>
 
-                    <div className="pt-2">
+                    <div className="pt-1 flex items-center justify-content">
                             <Row
                                 icon={<Clock size={14} />}
                                 text={`Booking created on ${formatDate(createdAt)}`}
                                 muted
                             />
-                    </div>
-
-                    <span
+                            <span
                         className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-medium capitalize
               ${uiStatus === "confirmed"
                                 ? "bg-emerald-100 text-emerald-700"
@@ -135,6 +133,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     >
                         {uiStatus}
                     </span>
+                    </div>
 
                     <button
                         onClick={onClose}
