@@ -315,10 +315,10 @@ export default function Properties() {
 
 
           {/* AMENITIES & FOOD */}
-          <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
+          <div className="bg-white rounded-xl p-4 shadow-sm space-y-6">
 
             <div className="flex items-center gap-2">
-              <Utensils className="w-5 h-5" />
+              <Utensils className="w-4 h-4" />
               <h2 className="uppercase text-[18px] font-[600] tracking-[1.1px]">Amenities & Food</h2>
             </div>
 
@@ -366,7 +366,7 @@ export default function Properties() {
           {galleryPhotos.length > 0 && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">
-                <ImageIcon className="w-5 h-5" />
+                <ImageIcon className="w-4 h-4" />
                 GALLERY ({galleryPhotos.length})
               </h2>
 
