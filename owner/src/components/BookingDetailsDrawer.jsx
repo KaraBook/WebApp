@@ -116,9 +116,13 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         {userName || "Guest"}
                     </h2>
 
-                    <p className="text-sm text-muted-foreground">
-                        {userEmail}
-                    </p>
+                    <div className="pt-2">
+                            <Row
+                                icon={<Clock size={14} />}
+                                text={`Booking created on ${formatDate(createdAt)}`}
+                                muted
+                            />
+                    </div>
 
                     <span
                         className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-medium capitalize
@@ -162,8 +166,37 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     <Separator />
 
                     <Section title="Contact Information">
-                        <Row icon={<Mail size={14} />} text={userEmail} />
-                        <Row icon={<Phone size={14} />} text={userPhone} />
+                        <Row
+                            icon={<Mail size={14} />}
+                            text={
+                                userEmail !== "—" ? (
+                                    <a
+                                        href={`mailto:${userEmail}`}
+                                        className="hover:opacity-80 hover:underline"
+                                    >
+                                        {userEmail}
+                                    </a>
+                                ) : (
+                                    "—"
+                                )
+                            }
+                        />
+
+                        <Row
+                            icon={<Phone size={14} />}
+                            text={
+                                userPhone !== "—" ? (
+                                    <a
+                                        href={`tel:${userPhone}`}
+                                        className="hover:underline hover:opacity-80"
+                                    >
+                                        {userPhone}
+                                    </a>
+                                ) : (
+                                    "—"
+                                )
+                            }
+                        />
                     </Section>
 
                     <Separator />
@@ -175,13 +208,6 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         <Key label="Grand Total" value={`₹${safeGrandTotal.toLocaleString("en-IN")}`} bold />
                         <Key label="Order ID" value={orderId} mono />
 
-                        <div className="pt-2">
-                            <Row
-                                icon={<Clock size={14} />}
-                                text={`Booking created on ${formatDate(createdAt)}`}
-                                muted
-                            />
-                        </div>
                     </Section>
 
                 </div>
