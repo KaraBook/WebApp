@@ -3,24 +3,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-
 import { ArrowLeft } from "lucide-react";
-
 import FullPageLoader from "@/components/FullPageLoader";
 
-/* -------------------------------------------------- */
-/* Reusable UI blocks                                 */
-/* -------------------------------------------------- */
 
 const TabButton = ({ active, children, onClick }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium transition
+    className={`flex items-center gap-2 px-12 py-2 rounded-xl text-sm font-medium transition
       ${active ? "bg-white shadow text-primary" : "text-gray-500 hover:text-black"}`}
   >
     {children}
@@ -144,7 +138,7 @@ export default function EditProperty() {
         </div>
 
         {/* TABS */}
-        <div className="flex bg-[#f3f4f6] p-1 rounded-xl w-fit">
+        <div className="flex bg-[#f3f4f6] p-1 rounded-xl w-full">
           <TabButton active={activeTab === "details"} onClick={() => setActiveTab("details")}>Details</TabButton>
           <TabButton active={activeTab === "pricing"} onClick={() => setActiveTab("pricing")}>₹ Pricing</TabButton>
           <TabButton active={activeTab === "rooms"} onClick={() => setActiveTab("rooms")}>Rooms</TabButton>
