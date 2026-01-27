@@ -22,6 +22,10 @@ function useIsMobile() {
 }
 
 
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+tomorrow.setHours(0,0,0,0);
+
 export default function Checkout() {
     const { propertyId } = useParams();
     const navigate = useNavigate();
@@ -340,7 +344,7 @@ export default function Checkout() {
                                     showDateDisplay={false}
                                     moveRangeOnFirstSelection={false}
                                     rangeColors={["#04929f"]}
-                                    minDate={new Date()}
+                                    minDate={tomorrow}
                                     dayContentRenderer={(date) => {
                                         const today = new Date();
                                         today.setHours(0, 0, 0, 0);

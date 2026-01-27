@@ -42,6 +42,11 @@ function useIsDesktop() {
 }
 
 
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+tomorrow.setHours(0,0,0,0);
+
+
 export default function PropertyDetails() {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
@@ -712,7 +717,7 @@ export default function PropertyDetails() {
                       showDateDisplay={false}
                       moveRangeOnFirstSelection={false}
                       rangeColors={["#04929f"]}
-                      minDate={new Date()}
+                      minDate={tomorrow}
 
                       dayContentRenderer={(date) => {
                         const today = new Date();
