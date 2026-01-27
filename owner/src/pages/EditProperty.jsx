@@ -87,6 +87,8 @@ export default function EditProperty() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const galleryInputRef = useRef(null);
+
   const [fetching, setFetching] = useState(true);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState("details");
@@ -440,9 +442,15 @@ export default function EditProperty() {
                     Optional - for verification
                   </p>
 
-                  <div className="rounded-xl border-dashed border h-48 flex flex-col items-center justify-center text-gray-400">
-                    <ImageIcon size={28} />
-                    Click to upload
+                  <div className="rounded-xl border overflow-hidden h-48 bg-gray-100 flex items-center justify-center">
+                    {shopActPreview ? (
+                      <img
+                        src={shopActPreview}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-gray-400">No document uploaded</span>
+                    )}
                   </div>
 
                   <input type="file" className="hidden" id="shopActUpload" />
@@ -470,6 +478,19 @@ export default function EditProperty() {
                   </div>
                 </div>
 
+                <input
+                  type="file"
+                  multiple
+                  className="hidden"
+                  ref={galleryInputRef}
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files || []);
+                    const newPreviews = newFiles.map(f => URL.createObjectURL(f));
+                    setGalleryImageFiles(prev => [...prev, ...newFiles]);
+                    setGalleryImagePreviews(prev => [...prev, ...newPreviews]);
+                  }}
+                />
+
                 <div className="grid grid-cols-5 gap-4">
                   {galleryImagePreviews.map((img, i) => (
                     <div
@@ -484,7 +505,10 @@ export default function EditProperty() {
                   ))}
 
                   {/* ADD MORE */}
-                  <div className="h-28 rounded-xl border-dashed border flex flex-col items-center justify-center text-gray-400 cursor-pointer">
+                  <div
+                    onClick={() => galleryInputRef.current.click()}
+                    className="h-28 rounded-xl border-dashed border flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:bg-gray-50"
+                  >
                     +
                     <span className="text-xs">Add More</span>
                   </div>
