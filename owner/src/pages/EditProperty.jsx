@@ -91,6 +91,16 @@ export default function EditProperty() {
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState("details");
 
+  const [coverImageFile, setCoverImageFile] = useState(null);
+  const [coverImagePreview, setCoverImagePreview] = useState(null);
+
+  const [shopActFile, setShopActFile] = useState(null);
+  const [shopActPreview, setShopActPreview] = useState(null);
+
+  const [galleryImageFiles, setGalleryImageFiles] = useState([]);
+  const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
+  const [removedGalleryImages, setRemovedGalleryImages] = useState([]);
+
   const [form, setForm] = useState({
     description: "",
     weekday: "",
@@ -126,6 +136,10 @@ export default function EditProperty() {
           food: p.foodAvailability || [],
           amenities: p.amenities || [],
         });
+
+        setCoverImagePreview(p.coverImage || null);
+        setShopActPreview(p.shopAct || null);
+        setGalleryImagePreviews(p.galleryPhotos || []);
       } catch {
         toast.error("Failed to load");
       } finally {
@@ -393,10 +407,11 @@ export default function EditProperty() {
                     Main image shown in listings
                   </p>
 
+                  {/* COVER */}
                   <div className="rounded-xl border overflow-hidden h-48 bg-gray-100 flex items-center justify-center">
-                    {form.coverImage ? (
+                    {coverImagePreview ? (
                       <img
-                        src={form.coverImage}
+                        src={coverImagePreview}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -451,12 +466,12 @@ export default function EditProperty() {
                     </p>
                   </div>
                   <div className="bg-gray-100 text-xs px-2 py-1 rounded-full">
-                    {form.gallery?.length || 0}/10
+                    {galleryImagePreviews.length}/10
                   </div>
                 </div>
 
                 <div className="grid grid-cols-5 gap-4">
-                  {form.gallery?.map((img, i) => (
+                  {galleryImagePreviews.map((img, i) => (
                     <div
                       key={i}
                       className="h-28 rounded-xl overflow-hidden border"
