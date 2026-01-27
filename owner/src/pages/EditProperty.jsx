@@ -123,6 +123,7 @@ export default function EditProperty() {
       try {
         const res = await api.get(SummaryApi.getSingleProperty(id).url);
         const p = res.data.data;
+        const { total, ...roomOnly } = p.roomBreakdown;
 
         setForm({
           description: p.description || "",
@@ -130,7 +131,7 @@ export default function EditProperty() {
           weekend: p.pricingPerNightWeekend || "",
           extraAdult: p.extraAdultCharge || "",
           extraChild: p.extraChildCharge || "",
-          room: p.roomBreakdown,
+          room: roomOnly,
           maxGuests: p.maxGuests,
           baseGuests: p.baseGuests,
           checkIn: p.checkInTime,
