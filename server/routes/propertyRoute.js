@@ -45,9 +45,9 @@ router.post(
   ensureMediaFilesPresent, 
   attachPropertyMediaAndFinalize
 );
-
 router.get("/", getAllProperties);
 router.get("/published", getPublishedProperties);
+router.get("/drafts", requireAuth, requireAdmin, getDraftProperties);
 router.get("/:id", getSingleProperty);
 
 function conditionalUpload(req, res, next) {
@@ -78,7 +78,6 @@ router.put("/:id/toggle-featured", requireAuth, requireAdmin, toggleFeaturedProp
 router.put("/:id/toggle-publish", requireAuth, requireAdmin, togglePublishProperty);
 router.get("/:id/blocked-dates", getPropertyBlockedDatesPublic);
 router.delete( "/:id", requireAuth, requireAdmin, deleteProperty);
-router.get("/drafts", requireAuth, requireAdmin, getDraftProperties);
 
 
 export default router;
