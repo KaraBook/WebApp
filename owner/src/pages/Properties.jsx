@@ -252,10 +252,12 @@ export default function Properties() {
 
 
           {/* POLICIES & RULES */}
-          <div className="bg-white rounded-xl p-6 shadow-sm space-y-5">
+          <div className="bg-white rounded-xl p-4 shadow-sm space-y-5">
 
             <div className="flex items-center gap-2">
-              <Badge variant="secondary">Policies & Rules</Badge>
+              <h2 className="uppercase text-[18px] font-[600] tracking-[1.1px]">
+                  Policies and Rules
+              </h2>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
