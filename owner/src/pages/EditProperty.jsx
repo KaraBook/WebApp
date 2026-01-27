@@ -279,7 +279,7 @@ export default function EditProperty() {
                 </Label>
                 <Textarea
                   rows={5}
-                  className="mt-2"
+                  className="mt-2 min-h-full"
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                 />
