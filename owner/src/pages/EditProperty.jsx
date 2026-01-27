@@ -268,7 +268,7 @@ export default function EditProperty() {
         </div>
 
         {/* CARD */}
-        <div className="bg-white rounded-2xl border shadow-sm p-6 space-y-6">
+        <div className="bg-white rounded-2xl border shadow-sm p-2 md:p-6 space-y-6">
 
           {/* DETAILS */}
           {tab === "details" && (
