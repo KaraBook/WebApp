@@ -453,7 +453,7 @@ export default function EditProperty() {
                     Select the amenities available at your property
                   </p>
 
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     {section.items.map((item) => {
                       const Icon = item.icon;
                       const active = form.amenities.includes(item.value);
@@ -494,7 +494,7 @@ export default function EditProperty() {
             <div className="space-y-8">
 
               {/* PET FRIENDLY */}
-              <div className="bg-white rounded-2xl border p-6">
+              <div className="bg-white rounded-2xl border p-4 md:p-6">
                 <h3 className="font-semibold mb-3">Pet Friendly</h3>
                 <div className="flex gap-4">
                   <Button
