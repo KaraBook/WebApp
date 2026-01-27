@@ -20,7 +20,7 @@ const TabButton = ({ active, icon: Icon, label, onClick }) => (
     onClick={onClick}
     className={`flex items-center gap-2 px-12 py-3 rounded-xl text-sm font-medium transition
       ${active
-        ? "bg-white shadow-sm text-[#0f766e]"
+        ? "bg-white shadow-sm text-[#00919e]"
         : "text-gray-500 hover:text-black"}`}
   >
     <Icon size={16} />
@@ -63,7 +63,7 @@ const FoodPill = ({ active, icon: Icon, label, onClick }) => (
     onClick={onClick}
     className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium border transition
       ${active
-        ? "bg-[#00919e] text-white border-[#0f766e]"
+        ? "bg-[#00919e] text-white border-[#00919e]"
         : "bg-white text-gray-700"}`}
   >
     <Icon size={16} />
