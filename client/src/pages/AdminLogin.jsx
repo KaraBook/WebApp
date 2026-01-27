@@ -3,10 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminLogin() {
@@ -36,85 +32,101 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white text-black p-6">
-       <div className="text-center mb-8">
-        <img
-            src="\admin\KarabookLogo.png"
-            alt="BookMyStay"
-            className="h-6 w-auto md:h-14"
-          />
-        <p className="text-sm text-[#0c95a2] font-[600] mt-1">Admin Portal</p>
+    <div className="min-h-screen w-full flex md:flex-row flex-col">
+
+      {/* LEFT IMAGE (Desktop only) */}
+      <div
+        className="flex w-full h-[45vh] md:h-auto md:w-1/2 relative bg-cover bg-center"
+        style={{ backgroundImage: "url('/admin/loginhero.png')" }}
+      >
+        <div className="absolute inset-0 bg-black/30" />
+
+        <div className="relative z-10 text-white p-4 md:p-10 flex flex-col justify-end">
+          <p className="text-xs tracking-widest uppercase opacity-80">WELCOME BACK</p>
+          <h1 className="text-[34px] md:text-[48px] font-sans font-[700]">KaraBook</h1>
+          <p className="mt-0 max-w-md text-[15px] md:text-[18px] opacity-90">
+            Manage your properties, bookings, guests and earnings with ease.
+          </p>
+        </div>
       </div>
 
-      <Card className="w-full max-w-md border border-neutral-200 bg-white shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-center text-neutral-800">
-            Sign in to your account
-          </CardTitle>
-        </CardHeader>
+      {/* RIGHT PANEL */}
+      <div className="w-full md:w-1/2 bg-[#078d9a] flex items-center justify-center p-6">
 
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-3">
-            {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-neutral-700">
-                Email
-              </Label>
-              <Input
-                id="email"
+        {/* CARD */}
+        <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
+
+          {/* LOGO */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <img
+                src="/admin/KarabookLogo.png"
+                alt="KaraBook"
+                className="h-7"
+              />
+             
+            </div>
+            <span className="text-sm font-semibold text-[#078d9a]">
+              Admin Portal
+            </span>
+          </div>
+
+          <h2 className="text-2xl font-semibold mb-1">Sign in</h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Use your admin credentials to continue.
+          </p>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+
+            {/* EMAIL */}
+            <div>
+              <label className="text-sm font-medium">Email</label>
+              <input
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="admin@karabook.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-white h-10 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-neutral-500"
+                className="mt-1 w-full border rounded-lg h-11 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#078d9a]"
               />
             </div>
 
-            {/* Password */}
-            <div className="space-y-2 mb-4 relative">
-              <Label htmlFor="password" className="text-neutral-700">
-                Password
-              </Label>
+            {/* PASSWORD */}
+            <div>
+              <label className="text-sm font-medium">Password</label>
               <div className="relative">
-                <Input
-                  id="password"
+                <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white h-10 border-neutral-300 text-neutral-900 placeholder:text-neutral-400 focus-visible:ring-neutral-500 pr-10"
+                  className="mt-1 w-full border rounded-lg h-11 px-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-[#078d9a]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
-            {/* Submit */}
-            <Button
+            {/* BUTTON */}
+            <button
               type="submit"
-              className="w-full h-10 bg-[#0c95a2] text-white font-semibold hover:bg-[#0c95a2] transition"
+              className="w-full h-11 bg-[#8fd0d7] hover:bg-[#7cc4cc] text-white font-semibold rounded-lg transition"
             >
-              Login
-            </Button>
+              Continue
+            </button>
           </form>
-        </CardContent>
-      </Card>
 
-      {/* Footer */}
-      <p className="text-xs text-neutral-500 mt-8">
-        © {new Date().getFullYear()} KaraBook Admin. All rights reserved.
-      </p>
+          <div className="mt-8 border-t pt-4 text-center text-xs text-gray-400">
+            © {new Date().getFullYear()} Karabook · Secure Admin Access
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

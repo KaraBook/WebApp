@@ -186,48 +186,49 @@ export default function OwnerLogin() {
 
 
   return (
-  <div className="min-h-screen w-full bg-[#f6f7fb] flex">
+  <div className="min-h-screen w-full bg-[#f6f7fb] flex md:flex-row flex-col">
     <div id="recaptcha-container" />
 
     {/* ================= LEFT: HERO IMAGE ================= */}
     <div
       className="
-        hidden lg:flex lg:w-1/2
+        flex lg:w-1/2
         relative overflow-hidden
+        h-[45vh] md:h-auto
       "
     >
       <img
         src="/owner/loginhero.jpg"   
         alt="Karabook Property"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 md:h-full w-full object-cover"
       />
 
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
       {/* Text Overlay */}
-      <div className="relative z-10 p-10 flex flex-col justify-end text-white">
+      <div className="relative z-10 p-4 md:p-10 flex flex-col justify-end text-white">
         <p className="text-xs tracking-widest uppercase opacity-80">
           Welcome Back
         </p>
 
-        <h1 className="text-[48px] font-sans font-[700]">
+        <h1 className="text-[34px] md:text-[48px] font-sans font-[700]">
           KaraBook
         </h1>
 
-        <p className="mt-1 max-w-md text-[18px] opacity-90">
+        <p className="mt-1 max-w-md text-[15px] md:text-[18px] opacity-90">
           Manage your properties, bookings, guests and earnings with ease.
         </p>
       </div>
     </div>
 
     {/* ================= RIGHT: LOGIN FORM ================= */}
-    <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-8">
+    <div className="w-full lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
 
         {/* HEADER */}
         <div className="px-6 pt-8 pb-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3">
             <img
               src="/owner/KarabookLogo.png"
               alt="Karabook"
@@ -275,7 +276,7 @@ export default function OwnerLogin() {
               <Button
                 onClick={startOtpFlow}
                 disabled={loading || mobile10.length !== 10}
-                className="w-full h-11 rounded-lg bg-[#7ec9d3] hover:bg-[#6abdc7]"
+                className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90"
               >
                 {loading ? "Sending OTP..." : "Continue"}
               </Button>
