@@ -24,7 +24,7 @@ function useIsMobile() {
 
 const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
-tomorrow.setHours(0,0,0,0);
+tomorrow.setHours(0, 0, 0, 0);
 
 export default function Checkout() {
     const { propertyId } = useParams();
@@ -264,7 +264,9 @@ export default function Checkout() {
             rzp.open();
         } catch (err) {
             console.error(err);
-            toast.error("Unable to create payment");
+            toast.error(
+                err.response?.data?.message || "Unable to create payment"
+            );
         }
     };
 
