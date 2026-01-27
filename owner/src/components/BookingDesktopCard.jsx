@@ -37,7 +37,7 @@ export default function BookingDesktopCard({
       "
     >
       {/* LEFT */}
-      <div className="flex w-[40%] items-center gap-4 min-w-0">
+      <div className="flex w-[30%] items-center gap-4 min-w-0">
         <div className="
           h-10 w-10 rounded-full
           bg-emerald-100 text-emerald-700
@@ -66,7 +66,7 @@ export default function BookingDesktopCard({
       <div className="hidden lg:block h-10 w-px bg-gray-200" />
 
       {/* MIDDLE */}
-      <div className="hidden w-[50%] lg:flex items-center gap-6 text-[12px] flex-wrap text-gray-600">
+      <div className="hidden w-[60%] lg:flex items-center gap-6 text-[12px] flex-wrap text-gray-600">
         <div className="flex w-[45%] items-center gap-1 text-[14px] font-[700]">
           <Calendar size={14} />
           {formatDate(b.checkIn)} → {formatDate(b.checkOut)}
