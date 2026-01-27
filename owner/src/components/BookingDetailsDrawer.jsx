@@ -242,7 +242,7 @@ function InfoCardBlock({ icon, label, value }) {
 
 function Section({ title, children }) {
     return (
-        <div>
+        <div className="mb-6">
             <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-3">
                 {title}
             </h4>
