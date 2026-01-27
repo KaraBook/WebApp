@@ -189,8 +189,8 @@ export default function Properties() {
                 <div>Base Guests: <strong>{baseGuests}</strong></div>
                 <div>Min Stays: <strong>{minStayNights}</strong></div>
                 <div>Total Rooms: <strong>{roomBreakdown?.total ?? 0}</strong></div>
-                <div>Bedrooms: <strong>{bedrooms}</strong></div>
-                <div>Bathrooms: <strong>{bathrooms}</strong></div>
+                <div>Bedrooms: <strong>{bedrooms ?? 0}</strong></div>
+                <div>Bathrooms: <strong>{bathrooms ?? 0}</strong></div>
               </div>
 
               {/* ROOM BREAKDOWN */}
