@@ -4,7 +4,7 @@ import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, MapPin, IndianRupee, Image as ImageIcon, Utensils, Users, LocationEdit } from "lucide-react";
+import { Loader2, MapPin, IndianRupee, Image as ImageIcon, Utensils, Users, LocationEdit, FileSpreadsheet } from "lucide-react";
 import { amenitiesOptions, foodOptions } from "@/constants/dropdownOptions";
 import { Button } from "@/components/ui/button";
 
@@ -255,6 +255,7 @@ export default function Properties() {
           <div className="bg-white rounded-xl p-4 shadow-sm space-y-5">
 
             <div className="flex items-center gap-2">
+              <FileSpreadsheet className="w-4 h-4" />
               <h2 className="uppercase text-[18px] font-[600] tracking-[1.1px]">
                   Policies and Rules
               </h2>
