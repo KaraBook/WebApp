@@ -175,6 +175,7 @@ function Dot({ color }) {
   const map = {
     green: "bg-green-500",
     yellow: "bg-yellow-400",
+    red: "bg-red-500",     
     gray: "bg-gray-400",
     blue: "bg-blue-500",
   };
@@ -198,11 +199,12 @@ function CalendarLegend() {
 
 function LegendItem({ color, label }) {
   const map = {
-    green: "bg-green-500",
-    yellow: "bg-yellow-400",
-    gray: "bg-gray-400",
-    blue: "bg-blue-500",
-  };
+  green: "bg-green-500",
+  yellow: "bg-yellow-400",
+  red: "bg-red-500",   
+  gray: "bg-gray-400",
+  blue: "bg-blue-500",
+};
 
   return (
     <div className="flex items-center gap-2">
