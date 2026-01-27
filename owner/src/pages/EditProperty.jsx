@@ -28,7 +28,7 @@ import {
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-6 py-2 rounded-xl text-sm font-medium transition
+    className={`flex items-center gap-2 px-12 py-3 rounded-xl text-sm font-medium transition
       ${active
         ? "bg-white shadow-sm text-[#0f766e]"
         : "text-gray-500 hover:text-black"}`}
