@@ -693,7 +693,7 @@ const EditProperty = () => {
                   </span>
                   <input
                     readOnly
-                    className="w-16 text-center border rounded-md py-[5px]"
+                    className="w-14 text-center border rounded-md py-[5px]"
                     value={formData.roomBreakdown.total}
                   />
                 </div>
