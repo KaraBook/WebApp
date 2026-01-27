@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import FullPageLoader from "@/components/FullPageLoader";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Clock } from "lucide-react";
 
 import {
   ArrowLeft,
@@ -81,7 +83,27 @@ const FoodPill = ({ active, icon: Icon, label, onClick }) => (
   </button>
 );
 
-/* ===================================================== */
+
+function TimePicker({ value, onChange }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-start">
+          <Clock className="mr-2 h-4 w-4" />
+          {value || "Select time"}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-48">
+        <Input
+          type="time"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 
 export default function EditProperty() {
   const { id } = useParams();
@@ -165,7 +187,30 @@ export default function EditProperty() {
   const save = async () => {
     try {
       setLoading(true);
-      await api.put(SummaryApi.updateOwnerProperty(id).url, form);
+
+      const payload = {
+        ...form,
+        checkInTime: form.checkIn,
+        checkOutTime: form.checkOut,
+        pricingPerNightWeekdays: form.weekday,
+        pricingPerNightWeekend: form.weekend,
+        extraAdultCharge: form.extraAdult,
+        extraChildCharge: form.extraChild,
+        roomBreakdown: form.room,
+        foodAvailability: form.food,
+      };
+
+      delete payload.checkIn;
+      delete payload.checkOut;
+      delete payload.weekday;
+      delete payload.weekend;
+      delete payload.extraAdult;
+      delete payload.extraChild;
+      delete payload.room;
+      delete payload.food;
+
+      await api.put(SummaryApi.updateOwnerProperty(id).url, payload);
+
       toast.success("Saved");
       navigate(-1);
     } catch {
@@ -340,31 +385,11 @@ export default function EditProperty() {
 
                 <div className="border-t pt-6 grid grid-cols-2 gap-6">
                   <div>
-                    <Label className="flex items-center gap-2 text-sm">
-                      ⏰ Check-In Time
-                    </Label>
-                    <Input
-                      type="time"
-                      className="mt-2"
-                      value={form.checkIn}
-                      onChange={(e) =>
-                        setForm({ ...form, checkIn: e.target.value })
-                      }
-                    />
+                    <TimePicker value={form.checkIn} onChange={(v) => setForm({ ...form, checkIn: v })} />
                   </div>
 
                   <div>
-                    <Label className="flex items-center gap-2 text-sm">
-                      ⏰ Check-Out Time
-                    </Label>
-                    <Input
-                      type="time"
-                      className="mt-2"
-                      value={form.checkOut}
-                      onChange={(e) =>
-                        setForm({ ...form, checkOut: e.target.value })
-                      }
-                    />
+                    <TimePicker value={form.checkOut} onChange={(v) => setForm({ ...form, checkOut: v })} />
                   </div>
                 </div>
               </div>
