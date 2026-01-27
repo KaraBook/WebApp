@@ -18,7 +18,7 @@ import { amenitiesOptions } from "@/constants/dropdownOptions";
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-10 md:px-12 py-3 rounded-xl text-sm font-medium transition
+    className={`flex items-center border-gray gap-2 px-10 md:px-12 py-3 rounded-xl text-sm font-medium transition
       ${active
         ? "bg-white shadow-sm text-[#00919e]"
         : "text-gray-500 hover:text-black"}`}
