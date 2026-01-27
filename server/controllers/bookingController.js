@@ -67,7 +67,7 @@ export const createOrder = async (req, res) => {
     if (!totalNights || totalNights <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Invalid date range",
+        message: "Minimum stay is 1 night. Please select different dates."
       });
     }
 
