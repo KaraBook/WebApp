@@ -372,16 +372,23 @@ export default function Bookings() {
                             </DropdownMenuItem>
 
                             {!b.cancelled && new Date(b.checkIn) > new Date() ? (
-                              <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setCancelBooking(b);
-                                }}
-                              >
-                                <XCircle size={16} />
-                                Cancel Booking
-                              </DropdownMenuItem>
+                              b.isRefundable ? (
+                                <DropdownMenuItem
+                                  className="text-red-600"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCancelBooking(b);
+                                  }}
+                                >
+                                  <XCircle size={16} />
+                                  Cancel Booking
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem disabled className="text-orange-500 cursor-not-allowed">
+                                  <XCircle size={16} />
+                                  Non-refundable
+                                </DropdownMenuItem>
+                              )
                             ) : b.cancelled ? (
                               <DropdownMenuItem disabled className="text-gray-400 cursor-not-allowed">
                                 <XCircle size={16} />

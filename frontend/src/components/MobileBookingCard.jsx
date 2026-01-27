@@ -174,16 +174,26 @@ export default function MobileBookingCard({
               </DropdownMenuItem>
 
               {!booking.cancelled && new Date(booking.checkIn) > new Date() ? (
-                <DropdownMenuItem
-                  className="py-3 gap-3 text-red-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCancel(booking);   // 👈 THIS OPENS MODAL
-                  }}
-                >
-                  <XCircle className="w-4 h-4" />
-                  Cancel Booking
-                </DropdownMenuItem>
+                booking.isRefundable ? (
+                  <DropdownMenuItem
+                    className="py-3 gap-3 text-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCancel(booking);
+                    }}
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Cancel Booking
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    disabled
+                    className="py-3 gap-3 text-orange-500 cursor-not-allowed"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Non-refundable
+                  </DropdownMenuItem>
+                )
               ) : booking.cancelled ? (
                 <DropdownMenuItem
                   disabled

@@ -241,7 +241,7 @@ export default function Dashboard() {
                                 setRateBooking(booking);
                                 setRateDialogOpen(true);
                             }}
-                            onCancel={(booking) => setCancelBookingObj(booking)}   
+                            onCancel={(booking) => setCancelBookingObj(booking)}
                         />
                     ))}
                 </div>
@@ -363,16 +363,26 @@ export default function Dashboard() {
                                                 )}
 
                                                 {/* Cancel */}
+                                                {/* Cancel */}
                                                 {!b.cancelled && new Date(b.checkIn) > new Date() ? (
-                                                    <DropdownMenuItem
-                                                        className="text-red-600"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setCancelBookingObj(b);
-                                                        }}
-                                                    >
-                                                        Cancel Booking
-                                                    </DropdownMenuItem>
+                                                    b.isRefundable ? (
+                                                        <DropdownMenuItem
+                                                            className="text-red-600"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setCancelBookingObj(b);
+                                                            }}
+                                                        >
+                                                            Cancel Booking
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <DropdownMenuItem
+                                                            disabled
+                                                            className="text-orange-500 cursor-not-allowed"
+                                                        >
+                                                            Non-refundable
+                                                        </DropdownMenuItem>
+                                                    )
                                                 ) : b.cancelled ? (
                                                     <DropdownMenuItem
                                                         disabled
