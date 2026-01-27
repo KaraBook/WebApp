@@ -40,23 +40,31 @@ const TabButton = ({ active, icon: Icon, label, onClick }) => (
 
 /* ---------------- QUANTITY ---------------- */
 
-const Stepper = ({ value, onChange }) => (
-  <div className="flex items-center gap-2">
-    <button
-      onClick={() => onChange(Math.max(0, value - 1))}
-      className="w-8 h-8 rounded-lg border text-lg"
-    >
-      –
-    </button>
-    <div className="w-10 text-center font-medium">{value}</div>
-    <button
-      onClick={() => onChange(value + 1)}
-      className="w-8 h-8 rounded-lg border text-lg"
-    >
-      +
-    </button>
-  </div>
-);
+const Stepper = ({ value, onChange }) => {
+  return (
+    <div className="flex items-center gap-2 mt-2">
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(0, value - 1))}
+        className="w-9 h-9 rounded-xl border bg-white text-gray-600 hover:bg-gray-50"
+      >
+        –
+      </button>
+
+      <div className="min-w-[44px] h-9 flex items-center justify-center rounded-xl bg-[#f3f4f6] text-gray-900 font-medium">
+        {value}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onChange(value + 1)}
+        className="w-9 h-9 rounded-xl border bg-white text-gray-600 hover:bg-gray-50"
+      >
+        +
+      </button>
+    </div>
+  );
+};
 
 /* ---------------- FOOD PILL ---------------- */
 
@@ -232,43 +240,112 @@ export default function EditProperty() {
 
           {/* ROOMS */}
           {tab === "rooms" && (
-            <>
-              <div className="grid grid-cols-5 gap-6">
-                {Object.keys(form.room).map((k) => (
-                  <div key={k}>
-                    <Label className="capitalize">{k === "nonAc" ? "Non AC" : k}</Label>
+            <div className="space-y-6">
+
+              {/* ---------------- ROOM CONFIGURATION CARD ---------------- */}
+              <div className="bg-white rounded-2xl border shadow-sm p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h2 className="text-base font-semibold flex items-center gap-2">
+                      <Bed size={18} className="text-[#0f766e]" />
+                      Room Configuration
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      Set the number of rooms by type
+                    </p>
+                  </div>
+
+                  <div className="bg-gray-100 text-sm px-3 py-1 rounded-full">
+                    {Object.values(form.room).reduce((a, b) => a + b, 0)} Total Rooms
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-5 gap-8">
+                  {Object.keys(form.room).map((k) => (
+                    <div key={k}>
+                      <Label className="text-sm text-gray-600">
+                        {k === "nonAc" ? "Non-AC" : k.charAt(0).toUpperCase() + k.slice(1)}
+                      </Label>
+
+                      <Stepper
+                        value={form.room[k]}
+                        onChange={(v) =>
+                          setForm({
+                            ...form,
+                            room: { ...form.room, [k]: v },
+                          })
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ---------------- GUEST CAPACITY & TIMING CARD ---------------- */}
+              <div className="bg-white rounded-2xl border shadow-sm p-6">
+                <div className="mb-6">
+                  <h2 className="text-base font-semibold flex items-center gap-2">
+                    <Sparkles size={18} className="text-[#0f766e]" />
+                    Guest Capacity & Timing
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-2 gap-10 mb-6">
+                  <div>
+                    <Label className="text-sm text-gray-600">
+                      Maximum Guests
+                    </Label>
                     <Stepper
-                      value={form.room[k]}
+                      value={form.maxGuests}
                       onChange={(v) =>
-                        setForm({ ...form, room: { ...form.room, [k]: v } })
+                        setForm({ ...form, maxGuests: v })
                       }
                     />
                   </div>
-                ))}
+
+                  <div>
+                    <Label className="text-sm text-gray-600">
+                      Base Guests
+                    </Label>
+                    <Stepper
+                      value={form.baseGuests}
+                      onChange={(v) =>
+                        setForm({ ...form, baseGuests: v })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t pt-6 grid grid-cols-2 gap-6">
+                  <div>
+                    <Label className="flex items-center gap-2 text-sm">
+                      ⏰ Check-In Time
+                    </Label>
+                    <Input
+                      type="time"
+                      value={form.checkIn}
+                      onChange={(e) =>
+                        setForm({ ...form, checkIn: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label className="flex items-center gap-2 text-sm">
+                      ⏰ Check-Out Time
+                    </Label>
+                    <Input
+                      type="time"
+                      value={form.checkOut}
+                      onChange={(e) =>
+                        setForm({ ...form, checkOut: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <Label>Max Guests</Label>
-                  <Stepper value={form.maxGuests} onChange={(v) => setForm({ ...form, maxGuests: v })} />
-                </div>
-                <div>
-                  <Label>Base Guests</Label>
-                  <Stepper value={form.baseGuests} onChange={(v) => setForm({ ...form, baseGuests: v })} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <Label>Check In</Label>
-                  <Input type="time" value={form.checkIn} onChange={(e) => setForm({ ...form, checkIn: e.target.value })} />
-                </div>
-                <div>
-                  <Label>Check Out</Label>
-                  <Input type="time" value={form.checkOut} onChange={(e) => setForm({ ...form, checkOut: e.target.value })} />
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
           {/* AMENITIES */}
