@@ -264,7 +264,7 @@ function Row({ icon, text, muted }) {
 
 function Key({ label, value, bold, mono }) {
     return (
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-6">
             <span className="text-muted-foreground text-sm">{label}</span>
             <span
                 className={`text-sm ${bold ? "font-semibold" : "font-medium"} ${mono ? "font-mono text-xs" : ""}`}
