@@ -56,23 +56,23 @@ export default function BookingDesktopCard({
             <Phone size={12} /> {phone}
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-gray-500 truncate">
+          <div className="flex items-center gap-2 text-[12px] text-gray-500 truncate">
             <MapPin size={12} /> {property}
           </div>
         </div>
       </div>
 
       {/* DIVIDER */}
-      <div className="hidden lg:block h-10 w-px bg-gray-200" />
+      <div className="hidden lg:block h-12 w-px bg-gray-200" />
 
       {/* MIDDLE */}
-      <div className="hidden w-[60%] lg:flex items-center gap-6 text-[12px] flex-wrap text-gray-600">
-        <div className="flex w-[45%] items-center gap-1 text-[14px] font-[700]">
+      <div className="hidden w-[60%] lg:flex items-center gap-4 text-[12px] flex-wrap text-gray-600">
+        <div className="flex w-[54%] items-center gap-1 text-[14px] font-[700]">
           <Calendar size={14} />
           {formatDate(b.checkIn)} → {formatDate(b.checkOut)}
         </div>
 
-        <div className="flex w-[45%] items-center gap-1 text-[14px]">
+        <div className="flex w-[30%] items-center gap-1 text-[14px]">
           <Moon size={14} />
           {b.totalNights} Nights
         </div>
