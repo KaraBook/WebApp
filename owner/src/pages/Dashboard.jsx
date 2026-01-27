@@ -499,8 +499,8 @@ export default function Dashboard() {
           />
 
           {/* BOOKINGS TABLE */}
-          <div className="hidden md:block lg:col-span-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-4 sm:px-6 pt-5 pb-3">
+          <div className="hidden p-[12px] md:block lg:col-span-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-0 sm:px-0 pt-0 pb-3">
               <h2 className="text-sm font-semibold text-gray-900">Recent bookings</h2>
             </div>
 

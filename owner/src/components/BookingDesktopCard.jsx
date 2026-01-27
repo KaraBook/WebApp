@@ -1,4 +1,4 @@
-import { MoreVertical, Calendar, Moon, Users, Phone} from "lucide-react";
+import { MoreVertical, Calendar, Moon, Users, Phone, MapPin} from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
 
@@ -28,21 +28,29 @@ export default function BookingDesktopCard({
     <div
       onClick={() => onOpen(b)}
       className="
-        bg-white border rounded-xl p-4
+        bg-white border border-gray-200
+        rounded-2xl px-5 py-4
         flex items-center justify-between
-        shadow-sm hover:shadow-md
+        shadow-[0_4px_14px_rgba(0,0,0,0.04)]
+        hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)]
         transition cursor-pointer
       "
     >
       {/* LEFT */}
       <div className="flex items-center gap-4 min-w-0">
-        <div className="h-11 w-11 rounded-full bg-emerald-100 text-emerald-700 
-                        flex items-center justify-center font-semibold">
+        {/* Avatar */}
+        <div className="
+          h-11 w-11 rounded-full
+          bg-emerald-100 text-emerald-700
+          flex items-center justify-center
+          text-sm font-bold
+        ">
           {name?.[0] || "G"}
         </div>
 
-        <div className="space-y-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">
+        {/* Name + meta */}
+        <div className="min-w-0 space-y-[2px]">
+          <p className="font-semibold text-[15px] text-gray-900 truncate">
             {name || "Guest"}
           </p>
 
@@ -51,7 +59,7 @@ export default function BookingDesktopCard({
           </div>
 
           <div className="flex items-center gap-2 text-xs text-gray-500 truncate">
-            📍 {property}
+            <MapPin size={12} /> {property}
           </div>
         </div>
       </div>
@@ -79,9 +87,9 @@ export default function BookingDesktopCard({
       {/* RIGHT */}
       <div
         className="flex items-center gap-4"
-        onClick={(e) => e.stopPropagation()} // important
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-sm font-semibold text-gray-900">
+        <div className="text-[15px] font-bold text-gray-900">
           ₹{b.totalAmount?.toLocaleString("en-IN")}
         </div>
 
@@ -89,7 +97,13 @@ export default function BookingDesktopCard({
 
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <MoreVertical className="text-gray-400 cursor-pointer" />
+            <div className="
+              h-8 w-8 rounded-full
+              flex items-center justify-center
+              hover:bg-gray-100
+            ">
+              <MoreVertical className="text-gray-400" />
+            </div>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-48">
