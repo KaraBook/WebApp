@@ -41,7 +41,7 @@ const Stepper = ({ value, onChange }) => {
         –
       </button>
 
-      <div className="min-w-[75px] h-9 flex items-center justify-center rounded-lg bg-[#f3f4f6] text-gray-900 font-medium">
+      <div className="md:min-w-[75px] min-w-[45px] h-9 flex items-center justify-center rounded-lg bg-[#f3f4f6] text-gray-900 font-medium">
         {value}
       </div>
 
@@ -337,12 +337,12 @@ export default function EditProperty() {
                     </p>
                   </div>
 
-                  <div className="bg-gray-100 text-sm px-3 py-1 rounded-full font-semibold">
+                  <div className="bg-gray-100 text-sm px-3 py-1 md:mt-0 mt-2 rounded-full font-semibold">
                     {totalRooms} Total Rooms
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-8">
                   {Object.keys(form.room).map((k) => (
                     <div key={k}>
                       <Label className="text-sm text-gray-600">
@@ -363,7 +363,7 @@ export default function EditProperty() {
                 </div>
 
                 {/* BEDROOMS & BATHROOMS */}
-                <div className="mt-8 grid grid-cols-5 gap-10">
+                <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-8">
                   <div>
                     <Label className="text-sm text-gray-600">
                       Bedrooms
