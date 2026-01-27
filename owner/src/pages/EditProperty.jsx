@@ -46,19 +46,19 @@ const Stepper = ({ value, onChange }) => {
       <button
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-12 h-9 rounded-xl border bg-white text-gray-600 hover:bg-gray-50"
+        className="w-12 h-9 rounded-l border bg-white text-gray-600 hover:bg-gray-50"
       >
         –
       </button>
 
-      <div className="min-w-[75px] h-9 flex items-center justify-center rounded-xl bg-[#f3f4f6] text-gray-900 font-medium">
+      <div className="min-w-[75px] h-9 flex items-center justify-center rounded-l bg-[#f3f4f6] text-gray-900 font-medium">
         {value}
       </div>
 
       <button
         type="button"
         onClick={() => onChange(value + 1)}
-        className="w-12 h-9 rounded-xl border bg-white text-gray-600 hover:bg-gray-50"
+        className="w-12 h-9 rounded-l border bg-white text-gray-600 hover:bg-gray-50"
       >
         +
       </button>
@@ -323,6 +323,7 @@ export default function EditProperty() {
                     </Label>
                     <Input
                       type="time"
+                      className="mt-1"
                       value={form.checkIn}
                       onChange={(e) =>
                         setForm({ ...form, checkIn: e.target.value })
@@ -336,6 +337,7 @@ export default function EditProperty() {
                     </Label>
                     <Input
                       type="time"
+                      className="mt-1"
                       value={form.checkOut}
                       onChange={(e) =>
                         setForm({ ...form, checkOut: e.target.value })
