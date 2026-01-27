@@ -444,7 +444,7 @@ export default function EditProperty() {
             <div className="space-y-8">
 
               {amenitiesOptions.map((section) => (
-                <div key={section.key} className="bg-white rounded-2xl border p-6">
+                <div key={section.key} className="bg-white rounded-2xl border p-4 md:p-6">
 
                   <h3 className="text-base font-semibold mb-1">
                     {section.label}
@@ -546,7 +546,7 @@ export default function EditProperty() {
                     {/* POLICY RULES */}
                     <div className="mt-6 space-y-3">
                       {form.cancellationPolicy.map((rule, i) => (
-                        <div key={i} className="flex gap-4 items-center">
+                        <div key={i} className="flex flex-wrap md:flex-nowrap gap-4 items-center">
                           <Input
                             type="number"
                             value={rule.minDaysBefore}
