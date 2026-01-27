@@ -36,8 +36,11 @@ const userSchema = new mongoose.Schema({
 
   mobile: {
     type: String,
-    required: true,
+    required: function () {
+      return this.role === "traveller" || this.role === "resortOwner";
+    },
     unique: true,
+    sparse: true,
     match: [mobileRegex, "Invalid mobile number"],
     index: true,
   },
@@ -89,20 +92,20 @@ const userSchema = new mongoose.Schema({
   },
 
   avatarUrl: { type: String, default: "" },
-  
+
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
 
   password: {
-  type: String,
-  minlength: 6,
-  select: false,
-  required: function () {
-    return this.role !== "traveller";
-  }
-},
+    type: String,
+    minlength: 6,
+    select: false,
+    required: function () {
+      return this.role !== "traveller";
+    }
+  },
 
   ownedProperties: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }]
 

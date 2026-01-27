@@ -5,26 +5,50 @@ import User from "../models/User.js";
 
 dotenv.config();
 
-const createAdmin = async () => {
+const admins = [
+  {
+    name: "Admin",
+    email: "admin@resort.com",
+    password: "admin123",
+  },
+  {
+    name: "Karabook Admin",
+    email: "admin@karabook.in",
+    password: "KarabookAdmin@123",
+  },
+];
+
+const createAdmins = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
 
-    const hashedPassword = await bcrypt.hash("admin123", 10);
+    for (const a of admins) {
+      const exists = await User.findOne({ email: a.email });
 
-    const admin = new User({
-      name: "Admin",
-      email: "admin@resort.com",
-      password: hashedPassword,
-      role: "admin",
-    });
+      if (exists) {
+        console.log(`⚠️ Admin already exists: ${a.email}`);
+        continue;
+      }
 
-    await admin.save();
-    console.log("✅ Admin user created successfully");
-    mongoose.disconnect();
+      const hashedPassword = await bcrypt.hash(a.password, 10);
+
+      const admin = new User({
+        name: a.name,
+        email: a.email,
+        password: hashedPassword,
+        role: "admin",
+      });
+
+      await admin.save();
+      console.log(`✅ Created admin: ${a.email}`);
+    }
+
+    await mongoose.disconnect();
+    process.exit(0);
   } catch (error) {
-    console.error("❌ Error creating admin:", error.message);
+    console.error("❌ Error creating admins:", error.message);
     process.exit(1);
   }
 };
 
-createAdmin();
+createAdmins();
