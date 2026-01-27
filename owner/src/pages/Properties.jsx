@@ -291,9 +291,9 @@ export default function Properties() {
 
           {/* GALLERY */}
           {galleryPhotos.length > 0 && (
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="bg-white rounded-xl p-4 shadow-sm">
               <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">
-                <ImageIcon className="w-5 h-5 text-primary" />
+                <ImageIcon className="w-5 h-5" />
                 GALLERY ({galleryPhotos.length})
               </h2>
 
