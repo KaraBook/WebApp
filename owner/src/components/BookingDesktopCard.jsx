@@ -37,7 +37,7 @@ export default function BookingDesktopCard({
       "
     >
       {/* LEFT */}
-      <div className="flex items-center gap-4 min-w-0">
+      <div className="flex w-[40%] items-center gap-4 min-w-0">
         <div className="
           h-10 w-10 rounded-full
           bg-emerald-100 text-emerald-700
@@ -66,7 +66,7 @@ export default function BookingDesktopCard({
       <div className="hidden lg:block h-10 w-px bg-gray-200" />
 
       {/* MIDDLE */}
-      <div className="hidden lg:flex items-center gap-6 text-[12px] flex-wrap text-gray-600">
+      <div className="hidden w-[50%] lg:flex items-center gap-6 text-[12px] flex-wrap text-gray-600">
         <div className="flex w-[45%] items-center gap-1 text-[14px] font-[700]">
           <Calendar size={14} />
           {formatDate(b.checkIn)} → {formatDate(b.checkOut)}
@@ -77,15 +77,19 @@ export default function BookingDesktopCard({
           {b.totalNights} Nights
         </div>
 
-        <div className="flex w-[45%] items-center gap-1">
+        <div className="flex w-[26%] items-center gap-1">
           <Users size={14} />
           {typeof b.guests === "object"
             ? b.guests.adults + b.guests.children
             : b.guests} Guests
         </div>
 
-         <div className="text-[14px] w-[45%] font-semibold text-gray-900">
+         <div className="text-[14px] w-[26%] font-semibold text-gray-900">
           ₹{b.totalAmount?.toLocaleString("en-IN")}
+        </div>
+
+        <div className="w-[26%]">
+            <PaymentChip status={b.paymentStatus} />
         </div>
       </div>
 
@@ -94,8 +98,6 @@ export default function BookingDesktopCard({
         className="flex items-center gap-4"
         onClick={(e) => e.stopPropagation()}
       >
-
-        <PaymentChip status={b.paymentStatus} />
 
         <DropdownMenu>
           <DropdownMenuTrigger>
