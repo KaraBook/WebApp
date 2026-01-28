@@ -186,23 +186,13 @@ const updateSchema = Joi.object({
   ...baseFields,
   cancellationPolicy: Joi.when("isRefundable", {
     is: true,
-    then: Joi.array()
-      .min(1)
-      .items(
-        Joi.object({
-          minDaysBefore: Joi.number().min(0).required(),
-          refundPercent: Joi.number().min(0).max(100).required(),
-        })
-      )
-      .required(),
-    otherwise: Joi.array()
-      .items(
-        Joi.object({
-          minDaysBefore: Joi.number().min(0).required(),
-          refundPercent: Joi.number().min(0).max(100).required(),
-        })
-      )
-      .default([{ minDaysBefore: 0, refundPercent: 0 }]),
+    then: Joi.array().min(1).items(
+      Joi.object({
+        minDaysBefore: Joi.number().min(0).required(),
+        refundPercent: Joi.number().min(0).max(100).required()
+      })
+    ).required(),
+    otherwise: Joi.array().max(0).default([])
   }),
   coverImage: Joi.string().uri().optional(),
   shopAct: Joi.string().uri().optional(),
@@ -371,6 +361,7 @@ export const ensureMediaFilesPresent = async (req, res, next) => {
 };
 
 
+// ✅ ONLY fields owner is allowed to edit
 export const ownerUpdateSchema = Joi.object({
   description: Joi.string().min(30).max(500).optional(),
 
