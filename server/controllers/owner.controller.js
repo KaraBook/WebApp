@@ -249,7 +249,6 @@ export const updateOwnerProperty = async (req, res) => {
       rb.total = rb.ac + rb.nonAc + rb.deluxe + rb.luxury + rb.hall;
 
       updatedData.roomBreakdown = rb;
-      updatedData.totalRooms = rb.total;
     }
 
     const files = req.files || {};
