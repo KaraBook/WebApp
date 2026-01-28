@@ -277,7 +277,7 @@ export default function OwnerUsers() {
   "
                     >
                         <div className="flex gap-3">
-                            <div className="h-11 w-11 rounded-full bg-black text-white flex items-center justify-center font-semibold">
+                            <div className="h-11 w-11 rounded-full bg-[#dbdbdb] text-black flex items-center justify-center font-semibold">
                                 {getFullName(u).charAt(0)}
                             </div>
 
