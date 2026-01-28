@@ -259,8 +259,8 @@ export default function EditProperty() {
 
       toast.success("Saved");
       navigate(-1);
-    } catch {
-      toast.error("Failed");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed");
     } finally {
       setLoading(false);
     }
@@ -286,7 +286,7 @@ export default function EditProperty() {
               {propertyName}
             </h1>
           </div>
-          <Button onClick={save} className="bg-primary hover:bg-[#0d5f59] mt-2 md:mt-0">
+          <Button onClick={save} className="bg-primary hover:bg-primary mt-2 md:mt-0">
             Save Changes
           </Button>
         </div>
