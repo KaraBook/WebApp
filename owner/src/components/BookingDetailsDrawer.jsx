@@ -58,11 +58,22 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
             year: "numeric",
         });
 
-    // Lock body scroll when open
     useEffect(() => {
-        if (open) document.body.style.overflow = "hidden";
-        else document.body.style.overflow = "";
-        return () => (document.body.style.overflow = "");
+        if (open) {
+            document.body.style.overflow = "hidden";
+            document.body.style.touchAction = "none";
+            document.documentElement.style.overscrollBehavior = "none";
+        } else {
+            document.body.style.overflow = "";
+            document.body.style.touchAction = "";
+            document.documentElement.style.overscrollBehavior = "";
+        }
+
+        return () => {
+            document.body.style.overflow = "";
+            document.body.style.touchAction = "";
+            document.documentElement.style.overscrollBehavior = "";
+        };
     }, [open]);
 
 
@@ -99,6 +110,8 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
           bottom-0 left-0 right-0
           h-[70vh]
           rounded-t-2xl
+          overscroll-contain
+          overflow-hidden
 
           /* Desktop (right panel) */
           md:top-0 md:bottom-0 md:right-0 md:left-auto
@@ -117,22 +130,22 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     </h2>
 
                     <div className="flex items-center justify-between">
-                            <Row
-                                icon={<Clock size={14} />}
-                                text={`Booking created on ${formatDate(createdAt)}`}
-                                muted
-                            />
-                            <span
-                        className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-medium capitalize
+                        <Row
+                            icon={<Clock size={14} />}
+                            text={`Booking created on ${formatDate(createdAt)}`}
+                            muted
+                        />
+                        <span
+                            className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-medium capitalize
               ${uiStatus === "confirmed"
-                                ? "bg-emerald-100 text-emerald-700"
-                                : uiStatus === "cancelled"
-                                    ? "bg-gray-100 text-gray-600"
-                                    : "bg-yellow-100 text-yellow-700"}
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : uiStatus === "cancelled"
+                                        ? "bg-gray-100 text-gray-600"
+                                        : "bg-yellow-100 text-yellow-700"}
             `}
-                    >
-                        {uiStatus}
-                    </span>
+                        >
+                            {uiStatus}
+                        </span>
                     </div>
 
                     <button
@@ -144,7 +157,15 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                 </div>
 
                 {/* ================= BODY ================= */}
-                <div className="px-4 py-4 space-y-5 text-sm overflow-y-auto h-[calc(100%-70px)]">
+                <div
+                    className="
+    px-4 py-4 space-y-5 text-sm
+    overflow-y-auto
+    overscroll-contain
+    [-webkit-overflow-scrolling:touch]
+    max-h-[calc(100vh-140px)]
+  "
+                >
 
                     <InfoCardBlock
                         icon={<Home size={16} />}
