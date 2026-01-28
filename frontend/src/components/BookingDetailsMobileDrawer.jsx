@@ -69,7 +69,8 @@ export default function BookingDetailsMobileDrawer({
     transform transition-transform duration-300
     ${visible ? "translate-y-0" : "translate-y-full"}
 
-    max-h-[90vh]
+    md:max-h-[90vh]
+    max-h-[75vh]
     overflow-hidden
   `}
                 >
@@ -77,7 +78,7 @@ export default function BookingDetailsMobileDrawer({
                     <div
                         className="
     overflow-y-auto
-    max-h-[85vh]
+    md:max-h-[85vh]
     overscroll-contain
     [-webkit-overflow-scrolling:touch]
   "
