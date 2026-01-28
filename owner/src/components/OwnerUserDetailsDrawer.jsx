@@ -1,13 +1,5 @@
-import { useEffect } from "react";
-import {
-    X,
-    User,
-    Mail,
-    Phone,
-    MapPin,
-    Calendar,
-    Shield,
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { X, User, Mail, Phone, MapPin, Calendar, Shield } from "lucide-react";
 import { format } from "date-fns";
 
 const formatDate = (d) =>
@@ -16,9 +8,12 @@ const formatDate = (d) =>
 export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
     if (!user) return null;
 
+    const startY = useRef(0);
+    const [dragY, setDragY] = useState(0);
+    const [dragging, setDragging] = useState(false);
+
     const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Guest";
 
-    // lock scroll
     useEffect(() => {
         if (open) document.body.style.overflow = "hidden";
         else document.body.style.overflow = "";
@@ -40,24 +35,46 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
 
             {/* Drawer */}
             <div
+                onTouchStart={(e) => {
+                    startY.current = e.touches[0].clientY;
+                    setDragging(true);
+                }}
+                onTouchMove={(e) => {
+                    if (!dragging) return;
+                    const delta = e.touches[0].clientY - startY.current;
+                    if (delta > 0) setDragY(delta);
+                }}
+                onTouchEnd={() => {
+                    setDragging(false);
+                    if (dragY > 120) {
+                        onClose(); // swipe down to close
+                    }
+                    setDragY(0);
+                }}
                 className={`
-          fixed z-[9999] bg-white shadow-2xl
-          transition-transform duration-300 ease-in-out
+    fixed z-[9999] bg-white shadow-2xl
+    transition-transform duration-300 ease-in-out
 
-          /* Mobile */
-          bottom-0 left-0 right-0
-          h-[85vh]
-          rounded-t-2xl
+    /* Mobile */
+    bottom-0 left-0 right-0
+    h-[calc(100dvh-56px)]
+    rounded-t-2xl
 
-          /* Desktop */
-          md:top-0 md:bottom-0 md:right-0 md:left-auto
-          md:h-full md:w-[420px]
-          md:rounded-none
+    /* Desktop */
+    md:top-0 md:bottom-0 md:right-0 md:left-auto
+    md:h-full md:w-[420px]
+    md:rounded-none
 
-          ${open
-                        ? "translate-y-0 md:translate-x-0 md:translate-y-0"
-                        : "translate-y-full md:translate-x-full md:translate-y-0"}
-        `}
+    ${open
+                        ? "translate-y-0 md:translate-x-0"
+                        : "translate-y-full md:translate-x-full"}
+  `}
+                style={{
+                    transform:
+                        open && dragY
+                            ? `translateY(${dragY}px)`
+                            : undefined,
+                }}
             >
                 {/* HEADER */}
                 <div className="px-4 py-4 border-b relative">
