@@ -70,7 +70,7 @@ export default function BookingDetailsMobileDrawer({
     ${visible ? "translate-y-0" : "translate-y-full"}
 
     md:max-h-[90vh]
-    max-h-[75vh]
+    max-h-[65vh]
     overflow-hidden
   `}
                 >
