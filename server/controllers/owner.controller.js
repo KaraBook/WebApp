@@ -182,6 +182,7 @@ export const updateOwnerProperty = async (req, res) => {
       "checkInTime",
       "checkOutTime",
       "foodAvailability",
+      "minStayNights",
       "amenities",
       "petFriendly",
       "roomBreakdown",
@@ -201,6 +202,10 @@ export const updateOwnerProperty = async (req, res) => {
       }
     });
 
+    if (updatedData.minStayNights === undefined) {
+      updatedData.minStayNights = existingProperty.minStayNights;
+    }
+
     [
       "maxGuests",
       "baseGuests",
@@ -208,6 +213,7 @@ export const updateOwnerProperty = async (req, res) => {
       "pricingPerNightWeekend",
       "extraAdultCharge",
       "extraChildCharge",
+      "minStayNights",
     ].forEach((f) => {
       if (updatedData[f] !== undefined) {
         updatedData[f] = Number(updatedData[f]);
@@ -225,22 +231,17 @@ export const updateOwnerProperty = async (req, res) => {
       });
     }
 
-    if (
-      body["roomBreakdown[ac]"] ||
-      body["roomBreakdown[nonAc]"] ||
-      body["roomBreakdown[deluxe]"] ||
-      body["roomBreakdown[luxury]"] ||
-      body["roomBreakdown[hall]"]
-    ) {
+    if (body.roomBreakdown) {
       const rb = {
-        ac: Number(body["roomBreakdown[ac]"] ?? 0),
-        nonAc: Number(body["roomBreakdown[nonAc]"] ?? 0),
-        deluxe: Number(body["roomBreakdown[deluxe]"] ?? 0),
-        luxury: Number(body["roomBreakdown[luxury]"] ?? 0),
-        hall: Number(body["roomBreakdown[hall]"] ?? 0),
+        ac: Number(body.roomBreakdown.ac || 0),
+        nonAc: Number(body.roomBreakdown.nonAc || 0),
+        deluxe: Number(body.roomBreakdown.deluxe || 0),
+        luxury: Number(body.roomBreakdown.luxury || 0),
+        hall: Number(body.roomBreakdown.hall || 0),
       };
 
       rb.total = rb.ac + rb.nonAc + rb.deluxe + rb.luxury + rb.hall;
+
       updatedData.roomBreakdown = rb;
       updatedData.totalRooms = rb.total;
     }
