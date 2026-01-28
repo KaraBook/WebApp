@@ -97,7 +97,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
 
           /* Mobile (bottom drawer) */
           bottom-0 left-0 right-0
-          h-[85vh]
+          h-[70vh]
           rounded-t-2xl
 
           /* Desktop (right panel) */
