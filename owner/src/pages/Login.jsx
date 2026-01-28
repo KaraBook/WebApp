@@ -194,7 +194,7 @@ export default function OwnerLogin() {
       className="
         flex lg:w-1/2
         relative overflow-hidden
-        h-[45vh] md:h-auto
+        h-[40vh] md:h-auto
       "
     >
       <img
@@ -227,7 +227,7 @@ export default function OwnerLogin() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
 
         {/* HEADER */}
-        <div className="px-6 pt-8 pb-6">
+        <div className="px-4 md:px-6 pt-8 pb-6">
           <div className="flex items-center justify-between gap-3">
             <img
               src="/owner/KarabookLogo.png"
@@ -243,7 +243,7 @@ export default function OwnerLogin() {
             Sign in
           </h2>
 
-          <p className="text-[16px] text-gray-700 mt-1">
+          <p className="text-[14px] md:text-[16px] text-gray-700 mt-1">
             Use your registered <span className="text-primary font-[600]">mobile number</span> to continue.
           </p>
         </div>
