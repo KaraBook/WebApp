@@ -83,7 +83,6 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
 
         <DrawerContent className="h-[75vh] rounded-t-2xl">
           {/* Drag Handle */}
-          <div className="mx-auto mt-2 mb-4 h-1.5 w-10 rounded-full bg-gray-300" />
 
           <Header
             userName={userName}
