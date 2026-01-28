@@ -466,7 +466,7 @@ export default function Dashboard() {
             icon={Clock}
             label="Pending"
             value={stats?.pending}
-            caption="Awaiting confirmation"
+            caption="Awaiting"
             variant="warning"
             onClick={() => navigate("/bookings?status=pending")}
           />
@@ -475,7 +475,7 @@ export default function Dashboard() {
             icon={XCircle}
             label="Cancelled"
             value={stats?.cancelled}
-            caption="Cancelled bookings"
+            caption="Canceled Trips"
             variant="danger"
             onClick={() => navigate("/bookings?status=cancelled")}
           />
