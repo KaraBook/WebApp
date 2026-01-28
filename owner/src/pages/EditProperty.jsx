@@ -196,14 +196,11 @@ export default function EditProperty() {
           petFriendly: p.petFriendly || false,
           isRefundable: p.isRefundable ?? true,
           refundNotes: p.refundNotes || "",
-          cancellationPolicy:
-            Array.isArray(p.cancellationPolicy) && p.cancellationPolicy.length > 0
-              ? p.cancellationPolicy
-              : [
-                { minDaysBefore: 14, refundPercent: 100 },
-                { minDaysBefore: 7, refundPercent: 50 },
-                { minDaysBefore: 0, refundPercent: 0 },
-              ],
+          cancellationPolicy: p.cancellationPolicy || [
+            { minDaysBefore: 14, refundPercent: 100 },
+            { minDaysBefore: 7, refundPercent: 50 },
+            { minDaysBefore: 0, refundPercent: 0 }
+          ],
         });
 
         setCoverImagePreview(p.coverImage || null);
@@ -231,59 +228,39 @@ export default function EditProperty() {
     try {
       setLoading(true);
 
-      const fd = new FormData();
+      const payload = {
+        ...form,
+        checkInTime: form.checkIn,
+        checkOutTime: form.checkOut,
+        pricingPerNightWeekdays: form.weekday,
+        pricingPerNightWeekend: form.weekend,
+        extraAdultCharge: form.extraAdult,
+        extraChildCharge: form.extraChild,
+        roomBreakdown: form.room,
+        foodAvailability: form.food,
+        bedrooms: form.bedrooms,
+        bathrooms: form.bathrooms,
+        petFriendly: form.petFriendly,
+        isRefundable: form.isRefundable,
+        refundNotes: form.refundNotes,
+        cancellationPolicy: form.cancellationPolicy,
+      };
 
-      fd.append("description", form.description);
-      fd.append("pricingPerNightWeekdays", form.weekday);
-      fd.append("pricingPerNightWeekend", form.weekend);
-      fd.append("extraAdultCharge", form.extraAdult);
-      fd.append("extraChildCharge", form.extraChild);
-      fd.append("minStayNights", form.minStayNights);
-      fd.append("maxGuests", form.maxGuests);
-      fd.append("baseGuests", form.baseGuests);
-      fd.append("checkInTime", form.checkIn);
-      fd.append("checkOutTime", form.checkOut);
-      fd.append("petFriendly", form.petFriendly);
-      fd.append("isRefundable", form.isRefundable);
-      fd.append("refundNotes", form.refundNotes);
+      delete payload.checkIn;
+      delete payload.checkOut;
+      delete payload.weekday;
+      delete payload.weekend;
+      delete payload.extraAdult;
+      delete payload.extraChild;
+      delete payload.room;
+      delete payload.food;
 
-      fd.append("roomBreakdown", JSON.stringify(form.room));
-      form.food.forEach((f) => {
-        fd.append("foodAvailability[]", f);
-      });
-      form.amenities.forEach((a) => {
-        fd.append("amenities[]", a);
-      });
-
-      let finalCancellationPolicy = form.cancellationPolicy;
-      if (!form.isRefundable) {
-        finalCancellationPolicy = [
-          { minDaysBefore: 0, refundPercent: 0 },
-        ];
-      }
-      fd.append("cancellationPolicy", JSON.stringify(finalCancellationPolicy));
-
-      removedGalleryImages.forEach((img) =>
-        fd.append("removedGalleryImages[]", img)
-      );
-
-      if (coverImageFile) fd.append("coverImage", coverImageFile);
-      if (shopActFile) fd.append("shopAct", shopActFile);
-
-      galleryImageFiles.forEach((file) =>
-        fd.append("galleryPhotos", file)
-      );
-
-      await api.put(
-        SummaryApi.updateOwnerProperty(id).url,
-        fd,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      await api.put(SummaryApi.updateOwnerProperty(id).url, payload);
 
       toast.success("Saved");
       navigate(-1);
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed");
+    } catch {
+      toast.error("Failed");
     } finally {
       setLoading(false);
     }
