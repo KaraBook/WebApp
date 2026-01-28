@@ -152,9 +152,15 @@ export const updateOwnerProperty = async (req, res) => {
     const ownerId = await getEffectiveOwnerId(req);
     const propertyId = req.params.id;
 
+    const owner = await User.findById(ownerId).select("mobile email");
+
     const existingProperty = await Property.findOne({
       _id: propertyId,
-      ownerUserId: ownerId,
+      $or: [
+        { ownerUserId: ownerId },
+        { "resortOwner.mobile": owner?.mobile },
+        { "resortOwner.email": owner?.email },
+      ],
     });
 
     if (!existingProperty) {
