@@ -129,16 +129,16 @@ function StatCard({
     <div
       onClick={onClick}
       className={`
-        ${s.card}
-        ${fullWidthMobile ? "col-span-2 sm:col-span-1" : ""}
-        rounded-xl
-        px-3 py-3
-        md:px-5 md:py-5
-        cursor-pointer
-        transition
-        hover:scale-[1.01]
-        shadow-[0_10px_25px_rgba(0,0,0,0.08)]
-      `}
+    ${s.card}
+    ${fullWidthMobile ? "col-span-2 sm:col-span-1" : ""}
+    rounded-xl
+    px-3 py-3 h-full
+    md:px-5 md:py-5
+    cursor-pointer
+    transition
+    hover:scale-[1.01]
+    shadow-[0_10px_25px_rgba(0,0,0,0.08)]
+  `}
     >
       <div className="flex justify-between items-start">
         <div>
@@ -432,7 +432,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 items-stretch">
 
           <div className="col-span-2 md:col-span-1">
           <StatCard
