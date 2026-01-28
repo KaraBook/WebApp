@@ -45,7 +45,7 @@ export default function Bookings() {
   const itemsPerPage = 8;
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [ratingBooking, setRatingBooking] = useState(null);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("upcoming");
   const location = useLocation();
   const [cancelBooking, setCancelBooking] = useState(null);
 
@@ -83,16 +83,30 @@ export default function Bookings() {
     return new Date(b.checkOut) < new Date();
   };
 
+  const isUpcomingBooking = (b) => {
+    if (!b?.checkIn) return false;
+    return new Date(b.checkIn) >= new Date() && !b.cancelled;
+  };
+
   const filteredBookings = bookings.filter((b) => {
     if (statusFilter === "all") return true;
+    if (statusFilter === "upcoming") {
+      return isUpcomingBooking(b);
+    }
     if (statusFilter === "past") {
       return isPastBooking(b);
     }
     if (statusFilter === "confirmed") {
-      return resolveBookingStatus(b) === "confirmed" && !isPastBooking(b);
+      return (
+        resolveBookingStatus(b) === "confirmed" &&
+        isUpcomingBooking(b)
+      );
     }
     if (statusFilter === "pending") {
-      return resolveBookingStatus(b) === "pending" && !isPastBooking(b);
+      return (
+        resolveBookingStatus(b) === "pending" &&
+        isUpcomingBooking(b)
+      );
     }
     if (statusFilter === "cancelled") {
       return b.cancelled === true;
@@ -138,13 +152,15 @@ export default function Bookings() {
             <span>
               {statusFilter === "all"
                 ? "All"
-                : statusFilter === "confirmed"
-                  ? "Confirmed"
-                  : statusFilter === "pending"
-                    ? "Pending"
-                    : statusFilter === "cancelled"
-                      ? "Cancelled"
-                      : "Past Bookings"}
+                : statusFilter === "upcoming"
+                  ? "Upcoming"
+                  : statusFilter === "past"
+                    ? "Past Bookings"
+                    : statusFilter === "confirmed"
+                      ? "Confirmed"
+                      : statusFilter === "pending"
+                        ? "Pending"
+                        : "Cancelled"}
             </span>
 
             <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -153,6 +169,9 @@ export default function Bookings() {
           <DropdownMenuContent className="w-[220px]" align="end">
             <DropdownMenuItem onClick={() => setStatusFilter("all")}>
               All
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStatusFilter("upcoming")}>
+              Upcoming
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setStatusFilter("confirmed")}>
               Confirmed
