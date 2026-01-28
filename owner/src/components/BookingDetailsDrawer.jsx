@@ -163,7 +163,8 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     overflow-y-auto
     overscroll-contain
     [-webkit-overflow-scrolling:touch]
-    max-h-[calc(100vh-140px)]
+    max-h-[80%]
+    md:max-h-[calc(100vh-140px)]
   "
                 >
 
