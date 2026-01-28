@@ -434,7 +434,7 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
 
-          <div className="col-span-2">
+          <div className="col-span-2 md:col-span-1">
           <StatCard
             icon={CheckCircle2}
             label="Total Bookings"
@@ -480,6 +480,7 @@ export default function Dashboard() {
             onClick={() => navigate("/bookings?status=cancelled")}
           />
 
+         <div className="col-span-2 md:col-span-1">
           <StatCard
             icon={IndianRupee}
             label="Total Revenue"
@@ -488,6 +489,7 @@ export default function Dashboard() {
             variant="primary"
             onClick={() => navigate("/bookings?time=all&status=confirmed")}
           />
+          </div>
 
         </div>
 
