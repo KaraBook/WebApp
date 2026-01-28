@@ -343,7 +343,7 @@ export const ensureMediaFilesPresent = async (req, res, next) => {
 
   if (!propertyId) return next(); // create flow only
 
-  const property = await Property.findById(propertyId).select("galleryPhotos coverImage");
+  const property = await property.findById(propertyId).select("galleryPhotos coverImage");
 
   const cover =
     req.files?.coverImage?.[0] || property?.coverImage;
