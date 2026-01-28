@@ -285,7 +285,7 @@ export default function EditProperty() {
         </div>
 
         {/* TABS */}
-        <div className="flex bg-[#f3f4f6] justify-between md:justify-start flex-wrap md:flex-nowrap p-1 rounded-xl w-full">
+        <div className="flex bg-[#f3f4f6] justify-between md:justify-start flex-wrap gap-3 md:flex-nowrap p-1 rounded-xl w-full">
           <TabButton icon={FileText} label="Details" active={tab === "details"} onClick={() => setTab("details")} />
           <TabButton icon={IndianRupee} label="Pricing" active={tab === "pricing"} onClick={() => setTab("pricing")} />
           <TabButton icon={Bed} label="Rooms" active={tab === "rooms"} onClick={() => setTab("rooms")} />
