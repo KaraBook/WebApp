@@ -290,7 +290,7 @@ export default function EditProperty() {
           <TabButton icon={IndianRupee} label="Pricing" active={tab === "pricing"} onClick={() => setTab("pricing")} />
           <TabButton icon={Bed} label="Rooms" active={tab === "rooms"} onClick={() => setTab("rooms")} />
           <TabButton icon={Sparkles} label="Amenities" active={tab === "amenities"}
-            onClick={() => setTab("amenities")} compac />
+            onClick={() => setTab("amenities")} compact />
           <TabButton icon={Sparkles} label="Policies" active={tab === "policies"} onClick={() => setTab("policies")} />
           <TabButton icon={ImageIcon} label="Media" active={tab === "media"} onClick={() => setTab("media")} />
         </div>
