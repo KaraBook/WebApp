@@ -97,28 +97,28 @@ function StatCard({
       card: "bg-white",
       iconBg: "bg-emerald-100",
       iconColor: "text-emerald-600",
-      label: "text-black",
+      label: "text-black-700",
       caption: "text-gray-500",
     },
     warning: {
       card: "bg-white",
       iconBg: "bg-amber-100",
       iconColor: "text-amber-600",
-      label: "text-black",
+      label: "text-black-700",
       caption: "text-gray-500",
     },
     danger: {
       card: "bg-white",
       iconBg: "bg-red-100",
       iconColor: "text-red-600",
-      label: "text-black",
+      label: "text-black-700",
       caption: "text-gray-500",
     },
     default: {
       card: "bg-white",
       iconBg: "bg-blue-100",
       iconColor: "text-blue-600",
-      label: "text-blue-500",
+      label: "text-black-700",
       caption: "text-gray-500",
     },
   };
@@ -146,7 +146,7 @@ function StatCard({
             {label}
           </p>
 
-          <p className="text-[32px] font-bold mt-2 leading-none">
+          <p className="text-[32px] font-bold mt-[28px] leading-none">
             {value ?? 0}
           </p>
 
