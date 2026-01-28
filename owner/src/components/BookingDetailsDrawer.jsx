@@ -259,7 +259,6 @@ function Body(props) {
                     text={
                         <a
                             href={`mailto:${userEmail}`}
-                            className="text-primary underline"
                         >
                             {userEmail}
                         </a>
@@ -271,7 +270,6 @@ function Body(props) {
                     text={
                         <a
                             href={`tel:${userPhone}`}
-                            className="text-primary underline"
                         >
                             {userPhone}
                         </a>
