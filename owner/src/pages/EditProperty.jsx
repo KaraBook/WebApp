@@ -306,7 +306,6 @@ export default function EditProperty() {
                   <FileText size={16} /> Property Description
                 </Label>
                 <Textarea
-                  rows={5}
                   className="mt-2"
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
