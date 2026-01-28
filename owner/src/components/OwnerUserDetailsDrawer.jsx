@@ -47,7 +47,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
                 onTouchEnd={() => {
                     setDragging(false);
                     if (dragY > 120) {
-                        onClose(); // swipe down to close
+                        onClose(); 
                     }
                     setDragY(0);
                 }}
@@ -57,6 +57,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
 
     /* Mobile */
     bottom-0 left-0 right-0
+    h-[calc(100dvh-56px)]
     rounded-t-2xl
 
     /* Desktop */
@@ -65,9 +66,9 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
     md:rounded-none
 
     ${open
-                        ? "translate-y-0 md:translate-x-0"
-                        : "translate-y-full md:translate-x-full"}
-  `}
+                        ? "translate-y-0 md:translate-x-0 md:translate-y-0"
+                        : "translate-y-full md:translate-x-full md:translate-y-0"}
+    `}
                 style={{
                     transform:
                         open && dragY
