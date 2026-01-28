@@ -225,58 +225,61 @@ export default function EditProperty() {
   };
 
   const save = async () => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const fd = new FormData();
+      const fd = new FormData();
 
-    // text fields
-    fd.append("description", form.description);
-    fd.append("pricingPerNightWeekdays", form.weekday);
-    fd.append("pricingPerNightWeekend", form.weekend);
-    fd.append("extraAdultCharge", form.extraAdult);
-    fd.append("extraChildCharge", form.extraChild);
-    fd.append("minStayNights", form.minStayNights);
-    fd.append("maxGuests", form.maxGuests);
-    fd.append("baseGuests", form.baseGuests);
-    fd.append("checkInTime", form.checkIn);
-    fd.append("checkOutTime", form.checkOut);
-    fd.append("petFriendly", form.petFriendly);
-    fd.append("isRefundable", form.isRefundable);
-    fd.append("refundNotes", form.refundNotes);
+      fd.append("description", form.description);
+      fd.append("pricingPerNightWeekdays", form.weekday);
+      fd.append("pricingPerNightWeekend", form.weekend);
+      fd.append("extraAdultCharge", form.extraAdult);
+      fd.append("extraChildCharge", form.extraChild);
+      fd.append("minStayNights", form.minStayNights);
+      fd.append("maxGuests", form.maxGuests);
+      fd.append("baseGuests", form.baseGuests);
+      fd.append("checkInTime", form.checkIn);
+      fd.append("checkOutTime", form.checkOut);
+      fd.append("petFriendly", form.petFriendly);
+      fd.append("isRefundable", form.isRefundable);
+      fd.append("refundNotes", form.refundNotes);
 
-    fd.append("roomBreakdown", JSON.stringify(form.room));
-    fd.append("amenities", JSON.stringify(form.amenities));
-    fd.append("foodAvailability", JSON.stringify(form.food));
-    fd.append("cancellationPolicy", JSON.stringify(form.cancellationPolicy));
+      fd.append("roomBreakdown", JSON.stringify(form.room));
+      form.food.forEach((f) => {
+        fd.append("foodAvailability[]", f);
+      });
+      form.amenities.forEach((a) => {
+        fd.append("amenities[]", a);
+      });
+      fd.append("cancellationPolicy", JSON.stringify(form.cancellationPolicy));
 
-    // removed images
-    removedGalleryImages.forEach((img) =>
-      fd.append("removedGalleryImages[]", img)
-    );
+      // removed images
+      removedGalleryImages.forEach((img) =>
+        fd.append("removedGalleryImages[]", img)
+      );
 
-    // files
-    if (coverImageFile) fd.append("coverImage", coverImageFile);
-    if (shopActFile) fd.append("shopAct", shopActFile);
+      // files
+      if (coverImageFile) fd.append("coverImage", coverImageFile);
+      if (shopActFile) fd.append("shopAct", shopActFile);
 
-    galleryImageFiles.forEach((file) =>
-      fd.append("galleryPhotos", file)
-    );
+      galleryImageFiles.forEach((file) =>
+        fd.append("galleryPhotos", file)
+      );
 
-    await api.put(
-      SummaryApi.updateOwnerProperty(id).url,
-      fd,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+      await api.put(
+        SummaryApi.updateOwnerProperty(id).url,
+        fd,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
 
-    toast.success("Saved");
-    navigate(-1);
-  } catch (err) {
-    toast.error(err?.response?.data?.message || "Failed");
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.success("Saved");
+      navigate(-1);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const totalRooms = Object.values(form.room).reduce((a, b) => a + b, 0);
