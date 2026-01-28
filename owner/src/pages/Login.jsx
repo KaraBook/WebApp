@@ -194,7 +194,7 @@ export default function OwnerLogin() {
       className="
         flex lg:w-1/2
         relative overflow-hidden
-        h-[40vh] md:h-auto
+        h-[35vh] md:h-auto
       "
     >
       <img
