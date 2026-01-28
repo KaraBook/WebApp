@@ -78,14 +78,25 @@ export default function Bookings() {
     return user.mobile;
   };
 
+  const isPastBooking = (b) => {
+    if (!b?.checkOut) return false;
+    return new Date(b.checkOut) < new Date();
+  };
+
   const filteredBookings = bookings.filter((b) => {
     if (statusFilter === "all") return true;
-    if (statusFilter === "confirmed")
-      return resolveBookingStatus(b) === "confirmed";
-    if (statusFilter === "pending")
-      return resolveBookingStatus(b) === "pending";
-    if (statusFilter === "cancelled")
+    if (statusFilter === "past") {
+      return isPastBooking(b);
+    }
+    if (statusFilter === "confirmed") {
+      return resolveBookingStatus(b) === "confirmed" && !isPastBooking(b);
+    }
+    if (statusFilter === "pending") {
+      return resolveBookingStatus(b) === "pending" && !isPastBooking(b);
+    }
+    if (statusFilter === "cancelled") {
       return b.cancelled === true;
+    }
     return true;
   });
 
@@ -131,7 +142,9 @@ export default function Bookings() {
                   ? "Confirmed"
                   : statusFilter === "pending"
                     ? "Pending"
-                    : "Cancelled"}
+                    : statusFilter === "cancelled"
+                      ? "Cancelled"
+                      : "Past Bookings"}
             </span>
 
             <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -149,6 +162,9 @@ export default function Bookings() {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setStatusFilter("cancelled")}>
               Cancelled
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setStatusFilter("past")}>
+              Past Bookings
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
