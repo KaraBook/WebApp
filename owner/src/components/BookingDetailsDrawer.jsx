@@ -228,7 +228,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         />
                     </Section>
 
-                    <Separator />
+                    <Separator className="mt-[5px]" />
 
                     <Section title="Payment Information">
                         <Key label="Payment Method" value={paymentMethod} />
