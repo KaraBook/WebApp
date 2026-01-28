@@ -710,7 +710,7 @@ const AddProperty = () => {
                                     </div>
                                 ))}
 
-                                <div className="flex items-center gap-2 md:ml-4 ml-0">
+                                <div className="flex items-center gap-2 md:ml-0 ml-0">
                                     <span className="px-3 py-2 bg-black text-white rounded-md text-sm">
                                         Total
                                     </span>
@@ -724,7 +724,7 @@ const AddProperty = () => {
                         </div>
 
 
-                        <div className="md:w-[16%] w-[100%]">
+                        <div className="md:w-[16%] w-[48%]">
                             <Label htmlFor="minStayNights" className="text-sm">
                                 Minimum Stay (Nights) <span className="text-red-500">*</span>
                             </Label>

@@ -28,7 +28,7 @@ export function QuantityBox({ value = 0, onChange, min = 0, max = 999 }) {
 
   return (
     <div className="flex items-center gap-2">
-      <Button type="button" size="icon" onClick={handleDecrease}>
+      <Button type="button" size="icon" className="bg-transparent hover:bg-transparent text-black" onClick={handleDecrease}>
         −
       </Button>
 
@@ -41,7 +41,7 @@ export function QuantityBox({ value = 0, onChange, min = 0, max = 999 }) {
         className="w-14 h-9 text-center no-spinner"
       />
 
-      <Button type="button" size="icon" onClick={handleIncrease}>
+      <Button type="button" size="icon" className="bg-transparent hover:bg-transparent text-black" onClick={handleIncrease}>
         +
       </Button>
     </div>

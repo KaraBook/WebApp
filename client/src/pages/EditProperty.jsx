@@ -687,7 +687,7 @@ const EditProperty = () => {
                   </div>
                 ))}
 
-                <div className="flex items-center gap-2 ml-0 md:ml-4">
+                <div className="flex items-center gap-2 ml-0 md:ml-0">
                   <span className="px-3 py-2 bg-black text-white rounded-md text-sm">
                     Total
                   </span>
@@ -700,7 +700,7 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <div className="md:w-[16%] w-[100%]">
+            <div className="md:w-[16%] w-[48%]">
               <Label htmlFor="minStayNights" className="text-sm">
                 Minimum Stay (Nights) <span className="text-red-500">*</span>
               </Label>
@@ -715,7 +715,7 @@ const EditProperty = () => {
             </div>
 
 
-            <div className="md:w-[16%] w-[100%]">
+            <div className="md:w-[16%] w-[48%]">
               <Label htmlFor="bedrooms" className="text-sm">
                 Bedrooms <span className="text-red-500">*</span>
               </Label>
@@ -730,7 +730,7 @@ const EditProperty = () => {
             </div>
 
 
-            <div className="md:w-[16%] w-[100%]">
+            <div className="md:w-[16%] w-[48%]">
               <Label htmlFor="bathrooms" className="text-sm">
                 Bathrooms <span className="text-red-500">*</span>
               </Label>
