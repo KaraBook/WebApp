@@ -1,9 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
-import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X} from "lucide-react";
+import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
 
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
     if (!booking) return null;
+
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const startY = useRef(0);
+    const onHeaderTouchStart = (e) => {
+        startY.current = e.touches[0].clientY;
+    };
+    const onHeaderTouchMove = (e) => {
+        const diff = e.touches[0].clientY - startY.current;
+        if (diff > 80) {
+            onClose();
+        }
+    };
 
     const {
         createdAt,
@@ -52,17 +64,14 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     useEffect(() => {
         if (open) {
             document.body.style.overflow = "hidden";
-            document.body.style.touchAction = "none";
             document.documentElement.style.overscrollBehavior = "none";
         } else {
             document.body.style.overflow = "";
-            document.body.style.touchAction = "";
             document.documentElement.style.overscrollBehavior = "";
         }
 
         return () => {
             document.body.style.overflow = "";
-            document.body.style.touchAction = "";
             document.documentElement.style.overscrollBehavior = "";
         };
     }, [open]);
@@ -115,7 +124,11 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         `}
             >
                 {/* ================= HEADER ================= */}
-                <div className="px-4 py-4 border-b relative">
+                <div
+                    className="px-4 py-4 border-b relative"
+                    onTouchStart={isMobile ? onHeaderTouchStart : undefined}
+                    onTouchMove={isMobile ? onHeaderTouchMove : undefined}
+                >
                     <h2 className="text-[17px] font-semibold">
                         {userName || "Guest"}
                     </h2>
