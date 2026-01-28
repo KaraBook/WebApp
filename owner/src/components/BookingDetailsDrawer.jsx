@@ -169,10 +169,9 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     className="
     px-4 py-4 space-y-5 text-sm
     overflow-y-auto
+    flex-1
     overscroll-contain
     [-webkit-overflow-scrolling:touch]
-    max-h-[80%]
-    md:max-h-[calc(100vh-140px)]
   "
                 >
 
