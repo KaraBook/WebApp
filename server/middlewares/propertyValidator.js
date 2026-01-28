@@ -191,7 +191,14 @@ const updateSchema = Joi.object({
         refundPercent: Joi.number().min(0).max(100).required()
       })
     ).required(),
-    otherwise: Joi.array().max(0).default([])
+    otherwise: Joi.array()
+      .items(
+        Joi.object({
+          minDaysBefore: Joi.number().min(0).required(),
+          refundPercent: Joi.number().min(0).max(100).required(),
+        })
+      )
+      .default([])
   }),
   coverImage: Joi.string().uri().optional(),
   shopAct: Joi.string().uri().optional(),
