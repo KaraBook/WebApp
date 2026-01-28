@@ -129,6 +129,10 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     onTouchStart={isMobile ? onHeaderTouchStart : undefined}
                     onTouchMove={isMobile ? onHeaderTouchMove : undefined}
                 >
+
+                    {isMobile && (
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-10 h-1.5 rounded-full bg-gray-300" />
+                    )}
                     <h2 className="text-[17px] font-semibold">
                         {userName || "Guest"}
                     </h2>
