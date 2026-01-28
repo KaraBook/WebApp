@@ -196,11 +196,14 @@ export default function EditProperty() {
           petFriendly: p.petFriendly || false,
           isRefundable: p.isRefundable ?? true,
           refundNotes: p.refundNotes || "",
-          cancellationPolicy: p.cancellationPolicy || [
-            { minDaysBefore: 14, refundPercent: 100 },
-            { minDaysBefore: 7, refundPercent: 50 },
-            { minDaysBefore: 0, refundPercent: 0 }
-          ],
+          cancellationPolicy:
+            Array.isArray(p.cancellationPolicy) && p.cancellationPolicy.length > 0
+              ? p.cancellationPolicy
+              : [
+                { minDaysBefore: 14, refundPercent: 100 },
+                { minDaysBefore: 7, refundPercent: 50 },
+                { minDaysBefore: 0, refundPercent: 0 },
+              ],
         });
 
         setCoverImagePreview(p.coverImage || null);
@@ -251,14 +254,19 @@ export default function EditProperty() {
       form.amenities.forEach((a) => {
         fd.append("amenities[]", a);
       });
-      fd.append("cancellationPolicy", JSON.stringify(form.cancellationPolicy));
 
-      // removed images
+      let finalCancellationPolicy = form.cancellationPolicy;
+      if (!form.isRefundable) {
+        finalCancellationPolicy = [
+          { minDaysBefore: 0, refundPercent: 0 },
+        ];
+      }
+      fd.append("cancellationPolicy", JSON.stringify(finalCancellationPolicy));
+
       removedGalleryImages.forEach((img) =>
         fd.append("removedGalleryImages[]", img)
       );
 
-      // files
       if (coverImageFile) fd.append("coverImage", coverImageFile);
       if (shopActFile) fd.append("shopAct", shopActFile);
 
