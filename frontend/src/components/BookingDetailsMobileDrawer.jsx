@@ -27,6 +27,21 @@ export default function BookingDetailsMobileDrawer({
         }
     }, [open]);
 
+    useEffect(() => {
+        if (open) {
+            document.body.style.overflow = "hidden";
+            document.body.style.touchAction = "none";
+        } else {
+            document.body.style.overflow = "";
+            document.body.style.touchAction = "";
+        }
+
+        return () => {
+            document.body.style.overflow = "";
+            document.body.style.touchAction = "";
+        };
+    }, [open]);
+
     if (!open) return null;
 
     const handleClose = () => {
@@ -50,13 +65,25 @@ export default function BookingDetailsMobileDrawer({
                     onTouchMove={onTouchMove}
                     onClick={(e) => e.stopPropagation()}
                     className={`
-            w-full bg-white rounded-t-2xl shadow-xl
-            transform transition-transform duration-300
-            ${visible ? "translate-y-0" : "translate-y-full"}
-          `}
+    w-full bg-white rounded-t-2xl shadow-xl
+    transform transition-transform duration-300
+    ${visible ? "translate-y-0" : "translate-y-full"}
+
+    max-h-[90vh]
+    overflow-hidden
+  `}
                 >
                     <div className="mx-auto mt-2 mb-1 w-12 h-1.5 rounded-full bg-gray-300" />
-                    {children}
+                    <div
+                        className="
+    overflow-y-auto
+    max-h-[85vh]
+    overscroll-contain
+    [-webkit-overflow-scrolling:touch]
+  "
+                    >
+                        {children}
+                    </div>
                 </div>
             </div>
         </>,
