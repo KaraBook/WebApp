@@ -89,7 +89,7 @@ const generateTimes = (step = 30) => {
 
 
 function TimePicker({ value, onChange }) {
-  const times = generateTimes(30); 
+  const times = generateTimes(30);
 
   return (
     <Popover>
@@ -146,6 +146,7 @@ export default function EditProperty() {
     weekend: "",
     extraAdult: "",
     extraChild: "",
+    minStayNights: 1,
     room: { ac: 4, nonAc: 1, deluxe: 2, luxury: 1, hall: 1 },
     bedrooms: 4,
     bathrooms: 3,
@@ -180,6 +181,7 @@ export default function EditProperty() {
           extraChild: p.extraChildCharge || "",
           bedrooms: p.bedrooms || 0,
           bathrooms: p.bathrooms || 0,
+          minStayNights: p.minStayNights || 1,
           room: roomOnly,
           maxGuests: p.maxGuests,
           baseGuests: p.baseGuests,
@@ -411,6 +413,19 @@ export default function EditProperty() {
                       value={form.bathrooms}
                       onChange={(v) =>
                         setForm({ ...form, bathrooms: v })
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Minimum Stay (Nights)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      className="mt-2"
+                      value={form.minStayNights}
+                      onChange={(e) =>
+                        setForm({ ...form, minStayNights: Number(e.target.value) })
                       }
                     />
                   </div>
