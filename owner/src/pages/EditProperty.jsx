@@ -20,7 +20,7 @@ const TabButton = ({ active, icon: Icon, label, onClick, compact = false }) => (
     onClick={onClick}
     className={`
       flex items-center gap-2 py-3 rounded-xl text-sm font-medium transition border
-      ${compact ? "px-8 md:px-12" : "px-10 md:px-12"}
+      ${compact ? "px-9 md:px-12" : "px-12 md:px-12"}
       ${active
         ? "bg-white shadow-sm text-[#00919e]"
         : "text-gray-500 hover:text-black"}
