@@ -18,7 +18,7 @@ import { amenitiesOptions } from "@/constants/dropdownOptions";
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className={`flex items-center border-gray gap-2 px-10 md:px-12 py-3 rounded-xl text-sm font-medium transition
+    className={`flex items-center border border-gray gap-2 px-10 md:px-12 py-3 rounded-xl text-sm font-medium transition
       ${active
         ? "bg-white shadow-sm text-[#00919e]"
         : "text-gray-500 hover:text-black"}`}
@@ -282,7 +282,7 @@ export default function EditProperty() {
         </div>
 
         {/* TABS */}
-        <div className="flex bg-[#f3f4f6] flex-wrap md:flex-nowrap p-1 rounded-xl w-full">
+        <div className="flex bg-[#f3f4f6] justify-between md:justify-start flex-wrap md:flex-nowrap p-1 rounded-xl w-full">
           <TabButton icon={FileText} label="Details" active={tab === "details"} onClick={() => setTab("details")} />
           <TabButton icon={IndianRupee} label="Pricing" active={tab === "pricing"} onClick={() => setTab("pricing")} />
           <TabButton icon={Bed} label="Rooms" active={tab === "rooms"} onClick={() => setTab("rooms")} />
