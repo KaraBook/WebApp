@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import FullPageLoader from "@/components/FullPageLoader";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Clock } from "lucide-react";
-import { ArrowLeft, FileText, Utensils, Sun, Moon, Coffee, IndianRupee, Bed, Sparkles, ImageIcon } from "lucide-react";
+import { ArrowLeft, FileText, Utensils, Sun, Moon, Coffee, IndianRupee, Bed, Sparkles, ImageIcon, BookOpenText } from "lucide-react";
 import { amenitiesOptions } from "@/constants/dropdownOptions";
 
 /* ---------------- TAB BUTTON ---------------- */
@@ -291,7 +291,7 @@ export default function EditProperty() {
           <TabButton icon={Bed} label="Rooms" active={tab === "rooms"} onClick={() => setTab("rooms")} />
           <TabButton icon={Sparkles} label="Amenities" active={tab === "amenities"}
             onClick={() => setTab("amenities")} compact />
-          <TabButton icon={Sparkles} label="Policies" active={tab === "policies"} onClick={() => setTab("policies")} />
+          <TabButton icon={BookOpenText} label="Policies" active={tab === "policies"} onClick={() => setTab("policies")} />
           <TabButton icon={ImageIcon} label="Media" active={tab === "media"} onClick={() => setTab("media")} />
         </div>
 
