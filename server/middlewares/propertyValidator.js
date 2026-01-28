@@ -185,12 +185,15 @@ const updateSchema = Joi.object({
   ...baseFields,
   cancellationPolicy: Joi.when("isRefundable", {
     is: true,
-    then: Joi.array().min(1).items(
-      Joi.object({
-        minDaysBefore: Joi.number().min(0).required(),
-        refundPercent: Joi.number().min(0).max(100).required()
-      })
-    ).required(),
+    then: Joi.array()
+      .min(1)
+      .items(
+        Joi.object({
+          minDaysBefore: Joi.number().min(0).required(),
+          refundPercent: Joi.number().min(0).max(100).required(),
+        })
+      )
+      .required(),
     otherwise: Joi.array()
       .items(
         Joi.object({
@@ -198,7 +201,7 @@ const updateSchema = Joi.object({
           refundPercent: Joi.number().min(0).max(100).required(),
         })
       )
-      .default([])
+      .default([{ minDaysBefore: 0, refundPercent: 0 }]),
   }),
   coverImage: Joi.string().uri().optional(),
   shopAct: Joi.string().uri().optional(),

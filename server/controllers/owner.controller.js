@@ -331,6 +331,26 @@ export const updateOwnerProperty = async (req, res) => {
       });
     }
 
+
+    if (updatedData.isRefundable === false) {
+      updatedData.refundNotes = "";
+      updatedData.cancellationPolicy = [
+        { minDaysBefore: 0, refundPercent: 0 }
+      ];
+    }
+
+    if (
+      updatedData.isRefundable === true &&
+      (!Array.isArray(updatedData.cancellationPolicy) ||
+        updatedData.cancellationPolicy.length === 0)
+    ) {
+      updatedData.cancellationPolicy = [
+        { minDaysBefore: 14, refundPercent: 100 },
+        { minDaysBefore: 7, refundPercent: 50 },
+        { minDaysBefore: 0, refundPercent: 0 },
+      ];
+    }
+
     let updatedProperty;
 
     await session.withTransaction(async () => {
