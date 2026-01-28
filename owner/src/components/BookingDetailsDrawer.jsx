@@ -1,18 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
-import {
-    Home,
-    Calendar,
-    Moon,
-    Users,
-    Mail,
-    Phone,
-    Clock,
-    X,
-} from "lucide-react";
+import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
 
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
     if (!booking) return null;
+    const startY = useRef(0);
+    const currentY = useRef(0);
+    const contentRef = useRef(null);
 
     const {
         createdAt,
@@ -58,6 +52,19 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
             year: "numeric",
         });
 
+    const onTouchStart = (e) => {
+        startY.current = e.touches[0].clientY;
+    };
+    const onTouchMove = (e) => {
+        if (!contentRef.current) return;
+        const scrollTop = contentRef.current.scrollTop;
+        currentY.current = e.touches[0].clientY;
+        const diff = currentY.current - startY.current;
+        if (scrollTop === 0 && diff > 80) {
+            onClose();
+        }
+    };
+
     useEffect(() => {
         if (open) {
             document.body.style.overflow = "hidden";
@@ -102,26 +109,25 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
 
             {/* Drawer / Panel */}
             <div
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
                 className={`
-          fixed z-[9999] bg-white shadow-2xl
-          transition-transform duration-300 ease-in-out
+    fixed z-[9999] bg-white shadow-2xl
+    transition-transform duration-300 ease-in-out
 
-          /* Mobile (bottom drawer) */
-          bottom-0 left-0 right-0
-          h-[70vh]
-          rounded-t-2xl
-          overscroll-contain
-          overflow-hidden
+    bottom-0 left-0 right-0
+    h-[70vh]
+    rounded-t-2xl
+    overflow-hidden
 
-          /* Desktop (right panel) */
-          md:top-0 md:bottom-0 md:right-0 md:left-auto
-          md:h-full md:w-[420px]
-          md:rounded-none
+    md:top-0 md:bottom-0 md:right-0 md:left-auto
+    md:h-full md:w-[420px]
+    md:rounded-none
 
-          ${open
-                        ? "translate-y-0 md:translate-x-0 md:translate-y-0"
-                        : "translate-y-full md:translate-x-full md:translate-y-0"}
-        `}
+    ${open
+                        ? "translate-y-0 md:translate-x-0"
+                        : "translate-y-full md:translate-x-full"}
+  `}
             >
                 {/* ================= HEADER ================= */}
                 <div className="px-4 py-4 border-b relative">
