@@ -1,4 +1,5 @@
 import Joi from "joi";
+import Property from "../models/Property";
 
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
@@ -343,7 +344,7 @@ export const ensureMediaFilesPresent = async (req, res, next) => {
 
   if (!propertyId) return next(); // create flow only
 
-  const property = await property.findById(propertyId).select("galleryPhotos coverImage");
+  const property = await Property.findById(propertyId).select("galleryPhotos coverImage");
 
   const cover =
     req.files?.coverImage?.[0] || property?.coverImage;
@@ -370,7 +371,6 @@ export const ensureMediaFilesPresent = async (req, res, next) => {
 };
 
 
-// ✅ ONLY fields owner is allowed to edit
 export const ownerUpdateSchema = Joi.object({
   description: Joi.string().min(30).max(500).optional(),
 
