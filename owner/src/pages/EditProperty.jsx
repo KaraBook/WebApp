@@ -15,13 +15,16 @@ import { amenitiesOptions } from "@/constants/dropdownOptions";
 
 /* ---------------- TAB BUTTON ---------------- */
 
-const TabButton = ({ active, icon: Icon, label, onClick }) => (
+const TabButton = ({ active, icon: Icon, label, onClick, compact = false }) => (
   <button
     onClick={onClick}
-    className={`flex items-center border border-gray gap-2 px-10 md:px-12 py-3 rounded-xl text-sm font-medium transition
+    className={`
+      flex items-center gap-2 py-3 rounded-xl text-sm font-medium transition border
+      ${compact ? "px-2" : "px-10 md:px-12"}
       ${active
         ? "bg-white shadow-sm text-[#00919e]"
-        : "text-gray-500 hover:text-black"}`}
+        : "text-gray-500 hover:text-black"}
+    `}
   >
     <Icon size={16} />
     {label}
@@ -286,7 +289,8 @@ export default function EditProperty() {
           <TabButton icon={FileText} label="Details" active={tab === "details"} onClick={() => setTab("details")} />
           <TabButton icon={IndianRupee} label="Pricing" active={tab === "pricing"} onClick={() => setTab("pricing")} />
           <TabButton icon={Bed} label="Rooms" active={tab === "rooms"} onClick={() => setTab("rooms")} />
-          <TabButton icon={Sparkles} label="Amenities" active={tab === "amenities"} onClick={() => setTab("amenities")} />
+          <TabButton icon={Sparkles} label="Amenities" active={tab === "amenities"}
+            onClick={() => setTab("amenities")} compac />
           <TabButton icon={Sparkles} label="Policies" active={tab === "policies"} onClick={() => setTab("policies")} />
           <TabButton icon={ImageIcon} label="Media" active={tab === "media"} onClick={() => setTab("media")} />
         </div>
