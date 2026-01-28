@@ -141,7 +141,7 @@ function StatCard({
   `}
     >
       <div className="flex justify-between items-start">
-        <div>
+        <div className="w-[76%]">
           <p className={`text-xs font-semibold tracking-wider uppercase ${s.label}`}>
             {label}
           </p>
@@ -155,7 +155,7 @@ function StatCard({
           </p>
         </div>
 
-        <div className={`h-10 w-10 rounded-full ${s.iconBg} flex items-center justify-center`}>
+        <div className={`h-10 w-10 md:w-[25%] rounded-full ${s.iconBg} flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${s.iconColor}`} />
         </div>
       </div>
