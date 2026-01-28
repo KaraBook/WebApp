@@ -18,7 +18,6 @@ import {
   getOwnerBookedUsers
 } from "../controllers/owner.controller.js";
 import { getBookingInvoice } from "../controllers/bookingController.js";
-import { validateOwnerPropertyUpdate } from "../middlewares/propertyValidator.js";
 import { createManager } from "../controllers/managerController.js";
 import upload from "../middlewares/multer.js";
 
@@ -36,7 +35,6 @@ router.put(
     { name: "shopAct", maxCount: 1 },
     { name: "galleryPhotos", maxCount: 10 },
   ]),
-  validateOwnerPropertyUpdate, 
   updateOwnerProperty
 );
 router.get("/property/:id/blocked-dates", requireAuth, getPropertyBlockedDates);

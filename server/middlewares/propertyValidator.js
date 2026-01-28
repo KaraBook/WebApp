@@ -1,5 +1,4 @@
 import Joi from "joi";
-import Property from "../models/Property";
 
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
@@ -329,19 +328,9 @@ export const validatePropertyUpdate = (req, res, next) => {
   next();
 };
 
-export const ensureMediaFilesPresent = async (req, res, next) => {
-  const propertyId = req.params.id;
-
-  if (!propertyId) return next(); // create flow only
-
-  const property = await Property.findById(propertyId).select("galleryPhotos coverImage");
-
-  const cover =
-    req.files?.coverImage?.[0] || property?.coverImage;
-
-  const galleryCount =
-    (req.files?.galleryPhotos?.length || 0) +
-    (property?.galleryPhotos?.length || 0);
+export const ensureMediaFilesPresent = (req, res, next) => {
+  const cover = req.files?.coverImage?.[0];
+  const gal = req.files?.galleryPhotos || [];
 
   if (!cover) {
     return res.status(400).json({
@@ -350,103 +339,10 @@ export const ensureMediaFilesPresent = async (req, res, next) => {
     });
   }
 
-  if (galleryCount < 3) {
+  if (gal.length < 3) {
     return res.status(400).json({
       success: false,
-      message: "At least 3 gallery photos are required",
-    });
-  }
-
-  next();
-};
-
-
-// ✅ ONLY fields owner is allowed to edit
-export const ownerUpdateSchema = Joi.object({
-  description: Joi.string().min(30).max(500).optional(),
-
-  pricingPerNightWeekdays: Joi.number().min(10).optional(),
-  pricingPerNightWeekend: Joi.number().min(10).optional(),
-  extraAdultCharge: Joi.number().min(0).optional(),
-  extraChildCharge: Joi.number().min(0).optional(),
-
-  minStayNights: Joi.number().min(1).optional(),
-
-  maxGuests: Joi.number().min(1).optional(),
-  baseGuests: Joi.number().min(1).optional(),
-
-  roomBreakdown: Joi.object({
-    ac: Joi.number().min(0),
-    nonAc: Joi.number().min(0),
-    deluxe: Joi.number().min(0),
-    luxury: Joi.number().min(0),
-    hall: Joi.number().min(0),
-  }).optional(),
-
-  bedrooms: Joi.number().min(0).optional(),
-  bathrooms: Joi.number().min(0).optional(),
-
-  foodAvailability: Joi.array().items(Joi.string()).optional(),
-  amenities: Joi.array().items(Joi.string()).optional(),
-
-  petFriendly: Joi.boolean().optional(),
-
-  isRefundable: Joi.boolean().optional(),
-  refundNotes: Joi.string().allow("").optional(),
-
-  cancellationPolicy: Joi.when("isRefundable", {
-    is: true,
-    then: Joi.array().min(1).required(),
-    otherwise: Joi.array().optional(),
-  }),
-
-  coverImage: Joi.string().uri().optional(),
-  shopAct: Joi.string().uri().optional(),
-  galleryPhotos: Joi.array().items(Joi.string().uri()).optional(),
-}).custom((value, helpers) => {
-  if (
-    value.baseGuests !== undefined &&
-    value.maxGuests !== undefined &&
-    value.baseGuests > value.maxGuests
-  ) {
-    return helpers.message("Base guests cannot be greater than max guests");
-  }
-
-  if (value.isRefundable === true && !value.refundNotes?.trim()) {
-    return helpers.message("Refund notes are required when property is refundable");
-  }
-
-  if (value.isRefundable === false) {
-    value.refundNotes = "";
-  }
-
-  return value;
-});
-
-
-
-export const validateOwnerPropertyUpdate = (req, res, next) => {
-  const payload = { ...req.body };
-
-  if (payload.roomBreakdown && typeof payload.roomBreakdown === "string") {
-    payload.roomBreakdown = JSON.parse(payload.roomBreakdown);
-  }
-
-  if (payload.cancellationPolicy && typeof payload.cancellationPolicy === "string") {
-    payload.cancellationPolicy = JSON.parse(payload.cancellationPolicy);
-  }
-
-  normalizeArraysAndTypes(payload);
-
-  const { error } = ownerUpdateSchema.validate(payload, {
-    allowUnknown: true,
-    stripUnknown: true,
-  });
-
-  if (error) {
-    return res.status(400).json({
-      success: false,
-      message: error.details[0].message,
+      message: "Minimum 3 gallery images are required",
     });
   }
 
