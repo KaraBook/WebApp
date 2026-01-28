@@ -328,9 +328,19 @@ export const validatePropertyUpdate = (req, res, next) => {
   next();
 };
 
-export const ensureMediaFilesPresent = (req, res, next) => {
-  const cover = req.files?.coverImage?.[0];
-  const gal = req.files?.galleryPhotos || [];
+export const ensureMediaFilesPresent = async (req, res, next) => {
+  const propertyId = req.params.id;
+
+  if (!propertyId) return next(); // create flow only
+
+  const property = await Property.findById(propertyId).select("galleryPhotos coverImage");
+
+  const cover =
+    req.files?.coverImage?.[0] || property?.coverImage;
+
+  const galleryCount =
+    (req.files?.galleryPhotos?.length || 0) +
+    (property?.galleryPhotos?.length || 0);
 
   if (!cover) {
     return res.status(400).json({
@@ -339,10 +349,10 @@ export const ensureMediaFilesPresent = (req, res, next) => {
     });
   }
 
-  if (gal.length < 3) {
+  if (galleryCount < 3) {
     return res.status(400).json({
       success: false,
-      message: "Minimum 3 gallery images are required",
+      message: "At least 3 gallery photos are required",
     });
   }
 

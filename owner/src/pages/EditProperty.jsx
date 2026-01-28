@@ -225,46 +225,58 @@ export default function EditProperty() {
   };
 
   const save = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const payload = {
-        ...form,
-        checkInTime: form.checkIn,
-        checkOutTime: form.checkOut,
-        pricingPerNightWeekdays: form.weekday,
-        pricingPerNightWeekend: form.weekend,
-        extraAdultCharge: form.extraAdult,
-        extraChildCharge: form.extraChild,
-        roomBreakdown: form.room,
-        foodAvailability: form.food,
-        bedrooms: form.bedrooms,
-        bathrooms: form.bathrooms,
-        petFriendly: form.petFriendly,
-        isRefundable: form.isRefundable,
-        refundNotes: form.refundNotes,
-        cancellationPolicy: form.cancellationPolicy,
-      };
+    const fd = new FormData();
 
-      delete payload.checkIn;
-      delete payload.checkOut;
-      delete payload.weekday;
-      delete payload.weekend;
-      delete payload.extraAdult;
-      delete payload.extraChild;
-      delete payload.room;
-      delete payload.food;
+    // text fields
+    fd.append("description", form.description);
+    fd.append("pricingPerNightWeekdays", form.weekday);
+    fd.append("pricingPerNightWeekend", form.weekend);
+    fd.append("extraAdultCharge", form.extraAdult);
+    fd.append("extraChildCharge", form.extraChild);
+    fd.append("minStayNights", form.minStayNights);
+    fd.append("maxGuests", form.maxGuests);
+    fd.append("baseGuests", form.baseGuests);
+    fd.append("checkInTime", form.checkIn);
+    fd.append("checkOutTime", form.checkOut);
+    fd.append("petFriendly", form.petFriendly);
+    fd.append("isRefundable", form.isRefundable);
+    fd.append("refundNotes", form.refundNotes);
 
-      await api.put(SummaryApi.updateOwnerProperty(id).url, payload);
+    fd.append("roomBreakdown", JSON.stringify(form.room));
+    fd.append("amenities", JSON.stringify(form.amenities));
+    fd.append("foodAvailability", JSON.stringify(form.food));
+    fd.append("cancellationPolicy", JSON.stringify(form.cancellationPolicy));
 
-      toast.success("Saved");
-      navigate(-1);
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // removed images
+    removedGalleryImages.forEach((img) =>
+      fd.append("removedGalleryImages[]", img)
+    );
+
+    // files
+    if (coverImageFile) fd.append("coverImage", coverImageFile);
+    if (shopActFile) fd.append("shopAct", shopActFile);
+
+    galleryImageFiles.forEach((file) =>
+      fd.append("galleryPhotos", file)
+    );
+
+    await api.put(
+      SummaryApi.updateOwnerProperty(id).url,
+      fd,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+
+    toast.success("Saved");
+    navigate(-1);
+  } catch (err) {
+    toast.error(err?.response?.data?.message || "Failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
 
   const totalRooms = Object.values(form.room).reduce((a, b) => a + b, 0);
