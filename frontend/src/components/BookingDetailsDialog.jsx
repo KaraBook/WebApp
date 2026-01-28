@@ -227,7 +227,7 @@ export default function BookingDetailsDialog({
           </div>
 
           {/* Payment Information */}
-          <div>
+          <div className="pb-[90px] md:pb-0">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
               Payment Information
             </p>
@@ -406,7 +406,7 @@ export default function BookingDetailsDialog({
           </div>
 
           {/* Payment Information */}
-          <div>
+          <div className="pb-[90px] md:pb-0">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
               Payment Information
             </p>
