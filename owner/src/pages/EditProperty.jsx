@@ -140,6 +140,8 @@ export default function EditProperty() {
   const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
   const [removedGalleryImages, setRemovedGalleryImages] = useState([]);
 
+  const [propertyName, setPropertyName] = useState("");
+
   const [form, setForm] = useState({
     description: "",
     weekday: "",
@@ -204,6 +206,7 @@ export default function EditProperty() {
         setCoverImagePreview(p.coverImage || null);
         setShopActPreview(p.shopAct || null);
         setGalleryImagePreviews(p.galleryPhotos || []);
+        setPropertyName(p.propertyName || "");
       } catch {
         toast.error("Failed to load");
       } finally {
@@ -279,7 +282,9 @@ export default function EditProperty() {
               <ArrowLeft onClick={() => navigate(-1)} className="cursor-pointer" />
               Edit Property
             </div>
-            <h1 className="text-2xl font-bold">West Valley Villa Casa East</h1>
+            <h1 className="text-2xl font-bold">
+              {propertyName}
+            </h1>
           </div>
           <Button onClick={save} className="bg-primary hover:bg-[#0d5f59] mt-2 md:mt-0">
             Save Changes
