@@ -82,7 +82,7 @@ export default function MobileBookingsList({
                         <div
                             key={b._id}
                             onClick={() => onOpenBooking?.(b)}
-                            className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 cursor-pointer active:scale-[0.99] transition"
+                            className="bg-white rounded-2xl border border-gray-200 shadow-sm p-3 md:p-4 cursor-pointer active:scale-[0.99] transition"
                         >
 
                             {/* Top Row */}
