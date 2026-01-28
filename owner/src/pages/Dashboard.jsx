@@ -132,7 +132,8 @@ function StatCard({
         ${s.card}
         ${fullWidthMobile ? "col-span-2 sm:col-span-1" : ""}
         rounded-xl
-        px-5 py-5
+        px-2 py-2
+        md:px-5 md:py-5
         cursor-pointer
         transition
         hover:scale-[1.01]

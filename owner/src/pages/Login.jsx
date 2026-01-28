@@ -311,9 +311,6 @@ export default function OwnerLogin() {
                   </button>
                 )}
 
-                <button onClick={changeNumber} className="underline">
-                  Change number
-                </button>
               </div>
 
               <Button
