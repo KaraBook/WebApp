@@ -254,8 +254,29 @@ function Body(props) {
             <Separator />
 
             <Section title="Contact Information">
-                <Row icon={<Mail size={14} />} text={userEmail} />
-                <Row icon={<Phone size={14} />} text={userPhone} />
+                <Row
+                    icon={<Mail size={14} />}
+                    text={
+                        <a
+                            href={`mailto:${userEmail}`}
+                            className="text-primary underline"
+                        >
+                            {userEmail}
+                        </a>
+                    }
+                />
+
+                <Row
+                    icon={<Phone size={14} />}
+                    text={
+                        <a
+                            href={`tel:${userPhone}`}
+                            className="text-primary underline"
+                        >
+                            {userPhone}
+                        </a>
+                    }
+                />
             </Section>
 
             <Separator />
