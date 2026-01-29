@@ -268,7 +268,7 @@ export default function OwnerBookings() {
           </div>
 
           {/* FILTER BAR */}
-          <div className="bg-white flex-col md:flex-row items-start p-2 md:p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
+          <div className="bg-white flex-col md:flex-row items-start p-2 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
             {/* Search */}
             <div className="flex items-center w-full gap-2 md:gap-3 flex-1">
               <div className="flex w-full bg-[#f5f5f5] p-[8px] rounded-[8px] items-center justify-start">
