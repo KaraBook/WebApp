@@ -16,6 +16,23 @@ import {
     X,
 } from "lucide-react";
 
+
+function normalizeBookingStatus(b) {
+  if (b?.cancelled === true) return "cancelled";
+
+  if (
+    b?.paymentStatus === "paid" ||
+    b?.paymentStatus === "captured" ||
+    b?.status === "confirmed" ||
+    b?.status === "paid" ||
+    b?.paymentId
+  ) {
+    return "confirmed";
+  }
+
+  return "pending";
+}
+
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
     if (!booking) return null;
 
@@ -51,12 +68,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         };
     }, [open, isMobile]);
 
-    const uiStatus =
-        paymentStatus === "paid"
-            ? "confirmed"
-            : paymentStatus === "cancelled"
-                ? "cancelled"
-                : "pending";
+    const uiStatus = normalizeBookingStatus(booking);
 
     const adults = guests?.adults || 0;
     const children = guests?.children || 0;
