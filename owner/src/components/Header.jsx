@@ -158,7 +158,7 @@ export default function Header() {
             </span>
 
             {dropdownOpen && (
-              <div className="absolute right-0 top-11 bg-white border border-gray-200 shadow-lg rounded-xl w-44 py-2 z-50">
+              <div className="absolute w-[93vw] -right-[58px] md:w-full md:right-0 top-11 bg-white border border-gray-200 shadow-lg rounded-xl w-44 py-2 z-50">
                 <Link
                   to="/my-profile"
                   className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 text-[14px]"
