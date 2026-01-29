@@ -89,7 +89,7 @@ export default function BookingDesktopCard({
         </div>
 
         <div className="w-[26%]">
-            <PaymentChip status={b.paymentStatus} />
+            <PaymentChip booking={b} />
         </div>
       </div>
 
