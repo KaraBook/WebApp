@@ -304,7 +304,7 @@ export default function OwnerBookings() {
                 <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
                   <SelectValue placeholder="Time" />
                 </SelectTrigger>
-                <SelectContent className="h-12">
+                <SelectContent>
                   <SelectItem value="upcoming">Upcoming</SelectItem>
                   <SelectItem value="past">Past</SelectItem>
                   <SelectItem value="all">All</SelectItem>
@@ -320,7 +320,7 @@ export default function OwnerBookings() {
                 <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
-                <SelectContent className="h-12">
+                <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
