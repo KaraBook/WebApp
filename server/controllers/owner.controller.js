@@ -961,3 +961,71 @@ export const getOwnerBookedUsers = async (req, res) => {
   }
 };
 
+
+export const ownerCancelBooking = async (req, res) => {
+  try {
+    const ownerId = await getEffectiveOwnerId(req);
+    const { bookingId } = req.params;
+    const { reason, notes } = req.body;
+
+    const booking = await Booking.findById(bookingId)
+      .populate("propertyId");
+
+    if (!booking || booking.cancelled) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found or already cancelled"
+      });
+    }
+
+    const property = booking.propertyId;
+
+    if (property.ownerUserId.toString() !== ownerId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to cancel this booking"
+      });
+    }
+
+    if (booking.paymentStatus !== "paid") {
+      return res.status(400).json({
+        success: false,
+        message: "Only paid bookings can be cancelled"
+      });
+    }
+
+    const refundAmount = booking.grandTotal;
+
+    let refund = null;
+    if (booking.paymentId) {
+      refund = await razorpay.payments.refund(
+        booking.paymentId,
+        { amount: refundAmount * 100 }
+      );
+    }
+
+    booking.cancelled = true;
+    booking.cancelledBy = "owner";   
+    booking.cancelReason = reason;
+    booking.cancelNotes = notes;
+    booking.refundAmount = refundAmount;
+    booking.refundId = refund?.id;
+    booking.refundStatus = refund ? "initiated" : "completed";
+    booking.cancelledAt = new Date();
+
+    await booking.save();
+
+    res.json({
+      success: true,
+      refundAmount,
+      message: "Booking cancelled by owner"
+    });
+
+  } catch (err) {
+    console.error("ownerCancelBooking error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Owner cancellation failed"
+    });
+  }
+};

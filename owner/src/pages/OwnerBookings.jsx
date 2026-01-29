@@ -19,12 +19,18 @@ import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
 import BookingDetailsDrawer from "@/components/BookingDetailsDrawer";
 import MobileFiltersDrawer from "@/components/MobileFiltersDrawer";
+import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
 
 
 export default function OwnerBookings() {
   const [bookings, setBookings] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [query, setQuery] = useState("");
+
+  const [cancelDialog, setCancelDialog] = useState({
+    open: false,
+    booking: null,
+  });
 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -272,13 +278,13 @@ export default function OwnerBookings() {
             {/* Search */}
             <div className="flex items-center w-full gap-2 md:gap-3 flex-1">
               <div className="flex w-full bg-[#f5f5f5] md:py-1 md:px-[8px] py-[8px] px-[8px] rounded-[8px] items-center justify-start">
-              <Search className="w-5 h-5 text-gray-500" />
-              <Input
-                placeholder="Search booking, traveller, phone, property"
-                className="bg-transparent shadow-none border-none focus-visible:ring-0 text-[14px] md:text-[18px]"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
+                <Search className="w-5 h-5 text-gray-500" />
+                <Input
+                  placeholder="Search booking, traveller, phone, property"
+                  className="bg-transparent shadow-none border-none focus-visible:ring-0 text-[14px] md:text-[18px]"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
               </div>
 
               {/* Mobile only */}
@@ -472,6 +478,17 @@ export default function OwnerBookings() {
                               Copy Phone
                             </DropdownMenuItem>
 
+                            {b.paymentStatus === "paid" && !b.cancelled && (
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onSelect={() =>
+                                  setCancelDialog({ open: true, booking: b })
+                                }
+                              >
+                                Cancel Booking
+                              </DropdownMenuItem>
+                            )}
+
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>
@@ -569,6 +586,16 @@ export default function OwnerBookings() {
         onApply={() => {
           navigate(`/bookings?time=${timeFilter}&status=${statusFilter}`);
           setMobileFiltersOpen(false);
+        }}
+      />
+
+
+      <OwnerCancelBookingDialog
+        open={cancelDialog.open}
+        booking={cancelDialog.booking}
+        onClose={(refresh) => {
+          setCancelDialog({ open: false, booking: null });
+          if (refresh) fetchBookings();
         }}
       />
 

@@ -15,7 +15,8 @@ import {
   getBookedDates,
   createRazorpayOrder,
   verifyRazorpayPayment,
-  getOwnerBookedUsers
+  getOwnerBookedUsers,
+  ownerCancelBooking
 } from "../controllers/owner.controller.js";
 import { getBookingInvoice } from "../controllers/bookingController.js";
 import { createManager } from "../controllers/managerController.js";
@@ -26,6 +27,7 @@ const router = express.Router();
 router.get("/dashboard", requireAuth, getOwnerDashboard);
 router.get("/my-properties", requireAuth, getOwnerProperties);
 router.get("/bookings", requireAuth, getOwnerBookings);
+router.post("/bookings/cancel/:bookingId", requireAuth, ownerCancelBooking);
 router.get("/property/:id", requireAuth, getSingleOwnerProperty);
 router.put(
   "/property/:id",

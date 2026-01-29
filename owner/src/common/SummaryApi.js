@@ -118,7 +118,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/public/property-cover`,
         method: "GET",
     },
-
+    ownerCancelBooking: {
+        url: (id) => `${BASE_URL}/api/owner/bookings/cancel/${id}`,
+        method: "POST",
+    },
 
 };
 

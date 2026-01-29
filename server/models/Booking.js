@@ -40,6 +40,10 @@ const bookingSchema = new mongoose.Schema(
     },
 
     cancelled: { type: Boolean, default: false },
+    cancelledBy: {
+      type: String,
+      enum: ["traveller", "owner", "admin"],
+    },
     cancelledAt: Date,
     cancelReason: String,
     cancelNotes: String,

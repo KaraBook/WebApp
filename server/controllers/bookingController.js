@@ -573,6 +573,7 @@ export const cancelBooking = async (req, res) => {
     }
 
     booking.cancelled = true;
+    booking.cancelledBy = "traveller"; 
     booking.cancelReason = reason;
     booking.cancelNotes = notes;
     booking.refundAmount = refundAmount;
