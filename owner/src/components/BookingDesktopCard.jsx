@@ -2,6 +2,15 @@ import { MoreVertical, Calendar, Moon, Users, Phone, MapPin } from "lucide-react
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
 
+
+function normalizeBookingStatus(b) {
+  if (b.cancelled) return "cancelled";   
+  if (["paid", "confirmed"].includes(b.paymentStatus))
+    return "confirmed";
+  return "pending";
+}
+
+
 export default function BookingDesktopCard({
   booking,
   onOpen,
