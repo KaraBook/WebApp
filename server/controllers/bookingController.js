@@ -293,7 +293,7 @@ export const getBookedDates = async (req, res) => {
     const bookings = await Booking.find({
       propertyId,
       paymentStatus: "paid",
-      cancelled: false
+      cancelled: { $ne: true }   
     }).select("checkIn checkOut");
 
     const dates = bookings.map((b) => ({
