@@ -1,5 +1,5 @@
-import { MoreVertical, Calendar, Moon, Users, Phone, MapPin} from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
+import { MoreVertical, Calendar, Moon, Users, Phone, MapPin } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
 
 export default function BookingDesktopCard({
@@ -84,12 +84,12 @@ export default function BookingDesktopCard({
             : b.guests} Guests
         </div>
 
-         <div className="text-[14px] w-[26%] font-semibold text-gray-900">
+        <div className="text-[14px] w-[26%] font-semibold text-gray-900">
           ₹{b.totalAmount?.toLocaleString("en-IN")}
         </div>
 
         <div className="w-[26%]">
-            <PaymentChip booking={b} />
+          <PaymentChip booking={b} />
         </div>
       </div>
 
@@ -115,7 +115,7 @@ export default function BookingDesktopCard({
               View Booking
             </DropdownMenuItem>
 
-            {b.paymentStatus === "paid" ? (
+            {normalizeBookingStatus(b) === "confirmed" ? (
               <DropdownMenuItem onSelect={() => onViewInvoice(b)}>
                 View Invoice
               </DropdownMenuItem>
