@@ -89,7 +89,7 @@ export default function MobileFiltersDrawer({
           </Chip>
         </Section>
 
-        <Button className="w-full mt-6 h-12 text-base" onClick={onApply}>
+        <Button className="w-full mt-6 h-12 rounded-[12px] text-base" onClick={onApply}>
           Apply Filters
         </Button>
       </DrawerContent>

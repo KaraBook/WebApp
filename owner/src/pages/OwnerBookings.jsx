@@ -288,44 +288,54 @@ export default function OwnerBookings() {
               </button>
             </div>
 
-            <Select value={timeFilter} onValueChange={(val) => {
-              setTimeFilter(val);
-              navigate(`/bookings?time=${val}&status=${statusFilter}`);
-            }}>
-              <SelectTrigger className="md:w-[160px] w-full bg-gray-50 border-gray-200">
-                <SelectValue placeholder="Time" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="upcoming">Upcoming</SelectItem>
-                <SelectItem value="past">Past</SelectItem>
-                <SelectItem value="all">All</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Desktop only */}
+            <div className="hidden md:block">
+              <Select value={timeFilter} onValueChange={(val) => {
+                setTimeFilter(val);
+                navigate(`/bookings?time=${val}&status=${statusFilter}`);
+              }}>
+                <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+                  <SelectValue placeholder="Time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="upcoming">Upcoming</SelectItem>
+                  <SelectItem value="past">Past</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-            {/* STATUS FILTER */}
-            <Select value={statusFilter} onValueChange={(val) => {
-              setStatusFilter(val);
-              navigate(`/bookings?time=${timeFilter}&status=${val}`);
-            }}>
-              <SelectTrigger className="md:w-[160px] w-full bg-gray-50 border-gray-200">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="hidden md:block">
+              <Select value={statusFilter} onValueChange={(val) => {
+                setStatusFilter(val);
+                navigate(`/bookings?time=${timeFilter}&status=${val}`);
+              }}>
+                <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* TABLE */}
           <div className="block md:hidden">
-            <MobileBookingsList
-              bookings={filtered}
-              onOpenBooking={openBookingDialog}
-              showHeader={false}
-            />
+            {filtered.length === 0 ? (
+              <div className="text-center py-14 text-gray-500">
+                No bookings found.
+              </div>
+            ) : (
+              <MobileBookingsList
+                bookings={filtered}
+                onOpenBooking={openBookingDialog}
+                showHeader={false}
+              />
+            )}
           </div>
           <div className="hidden md:block bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
