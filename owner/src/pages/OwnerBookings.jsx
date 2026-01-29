@@ -141,6 +141,13 @@ export default function OwnerBookings() {
     setPage(1);
   }, [query, timeFilter, statusFilter, bookings]);
 
+  useEffect(() => {
+  const t = searchParams.get("time") || "upcoming";
+  const s = searchParams.get("status") || "all";
+
+  setTimeFilter(t);
+  setStatusFilter(s);
+}, [searchParams]);
 
 
   const totalPages = Math.ceil(filtered.length / pageSize);

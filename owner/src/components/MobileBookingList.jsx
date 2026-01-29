@@ -144,14 +144,22 @@ export default function MobileBookingsList({
                                                 Copy Mobile
                                             </DropdownMenuItem>
 
-                                            {b.cancelled && (
+                                            {/* LAST LINE */}
+                                            {b.cancelled ? (
                                                 <DropdownMenuItem
                                                     disabled
                                                     className="p-[14px] text-[16px] text-gray-400 italic"
                                                 >
                                                     Cancelled
                                                 </DropdownMenuItem>
-                                            )}
+                                            ) : b.paymentStatus === "paid" ? (
+                                                <DropdownMenuItem
+                                                    className="p-[14px] text-[16px] text-red-600"
+                                                    onSelect={() => onCancelBooking?.(b)}
+                                                >
+                                                    Cancel Booking
+                                                </DropdownMenuItem>
+                                            ) : null}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
