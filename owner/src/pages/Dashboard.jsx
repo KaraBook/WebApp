@@ -380,14 +380,15 @@ export default function Dashboard() {
 
   const isDatePending = (date) =>
     bookings?.some(b =>
-      normalizeBookingStatus(b) === "pending" &&
+      b.paymentStatus !== "paid" &&
+      !b.cancelled &&
       date >= new Date(b.checkIn) &&
       date <= new Date(b.checkOut)
     );
 
   const isDateCancelled = (date) =>
     bookings?.some(b =>
-      normalizeBookingStatus(b) === "cancelled" &&
+      b.cancelled &&
       date >= new Date(b.checkIn) &&
       date <= new Date(b.checkOut)
     );
