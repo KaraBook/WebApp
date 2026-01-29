@@ -12,6 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import BookingDesktopCard from "@/components/BookingDesktopCard";
 import PaymentChip from "@/components/PaymentChip";
+import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
 
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
@@ -236,6 +237,8 @@ export default function Dashboard() {
   const [openGuestRow, setOpenGuestRow] = useState(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+
   useEffect(() => {
     (async () => {
       try {
@@ -371,18 +374,18 @@ export default function Dashboard() {
 
 
   const isDatePending = (date) =>
-  bookings?.some(b =>
-    normalizeBookingStatus(b) === "pending" &&
-    date >= new Date(b.checkIn) &&
-    date <= new Date(b.checkOut)
-  );
+    bookings?.some(b =>
+      normalizeBookingStatus(b) === "pending" &&
+      date >= new Date(b.checkIn) &&
+      date <= new Date(b.checkOut)
+    );
 
-const isDateCancelled = (date) =>
-  bookings?.some(b =>
-    normalizeBookingStatus(b) === "cancelled" &&
-    date >= new Date(b.checkIn) &&
-    date <= new Date(b.checkOut)
-  );
+  const isDateCancelled = (date) =>
+    bookings?.some(b =>
+      normalizeBookingStatus(b) === "cancelled" &&
+      date >= new Date(b.checkIn) &&
+      date <= new Date(b.checkOut)
+    );
 
 
   const { stats, bookings } = data || {};
@@ -419,26 +422,10 @@ const isDateCancelled = (date) =>
   }
 
 
-  const handleCancelBooking = async (booking) => {
-  if (!window.confirm("Are you sure you want to cancel this booking?"))
-    return;
-  try {
-    await api.put(
-      SummaryApi.cancelBooking.url(booking._id)
-    );
-    toast.success("Booking cancelled");
-    setData(prev => ({
-      ...prev,
-      bookings: prev.bookings.map(b =>
-        b._id === booking._id
-          ? { ...b, cancelled: true }
-          : b
-      )
-    }));
-  } catch (err) {
-    toast.error("Failed to cancel booking");
-  }
-};
+  const handleCancelBooking = (booking) => {
+    setSelectedBooking(booking);
+    setOpenCancelDialog(true);
+  };
 
 
   return (
@@ -650,6 +637,17 @@ const isDateCancelled = (date) =>
         open={openBookingDialog}
         booking={selectedBooking}
         onClose={() => setOpenBookingDialog(false)}
+      />
+
+      <OwnerCancelBookingDialog
+        open={openCancelDialog}
+        booking={selectedBooking}
+        onClose={(refresh) => {
+          setOpenCancelDialog(false);
+          if (refresh) {
+
+          }
+        }}
       />
 
     </div>
