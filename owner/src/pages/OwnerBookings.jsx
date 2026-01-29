@@ -4,50 +4,29 @@ import SummaryApi from "@/common/SummaryApi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { MoreVertical, Search, IndianRupee, Phone, Filter } from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import {
-  MoreVertical,
-  Search,
-  IndianRupee,
-  Phone,
-} from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogCancel,
-  AlertDialogAction,
+  AlertDialog, AlertDialogContent, AlertDialogHeader,
+  AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogCancel, AlertDialogAction
 } from "@/components/ui/alert-dialog";
 import MobileBookingsList from "@/components/MobileBookingList";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { format } from "date-fns";
 import { toast } from "sonner";
-
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import InvoicePreview from "@/components/InvoicePreview";
 import BookingDetailsDrawer from "@/components/BookingDetailsDrawer";
+import MobileFiltersDrawer from "@/components/MobileFiltersDrawer";
 
 
 export default function OwnerBookings() {
   const [bookings, setBookings] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [query, setQuery] = useState("");
+
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const [searchParams] = useSearchParams();
   const timeFromUrl = searchParams.get("time") || "upcoming";
@@ -291,7 +270,7 @@ export default function OwnerBookings() {
           {/* FILTER BAR */}
           <div className="bg-white flex-col md:flex-row items-start p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
             {/* Search */}
-            <div className="flex items-center w-[100%] md:w-full gap-[1px] md:gap-3 flex-1">
+            <div className="flex items-center w-full gap-2 md:gap-3 flex-1">
               <Search className="w-5 h-5 text-gray-500" />
               <Input
                 placeholder="Search booking, traveller, phone, property"
@@ -299,6 +278,14 @@ export default function OwnerBookings() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
+
+              {/* Mobile only */}
+              <button
+                onClick={() => setMobileFiltersOpen(true)}
+                className="md:hidden p-2 rounded-xl border"
+              >
+                <Filter className="w-4 h-4" />
+              </button>
             </div>
 
             <Select value={timeFilter} onValueChange={(val) => {
@@ -558,6 +545,19 @@ export default function OwnerBookings() {
         open={viewBooking.open}
         booking={viewBooking.booking}
         onClose={closeBookingDialog}
+      />
+
+      <MobileFiltersDrawer
+        open={mobileFiltersOpen}
+        onClose={() => setMobileFiltersOpen(false)}
+        timeFilter={timeFilter}
+        setTimeFilter={setTimeFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        onApply={() => {
+          navigate(`/bookings?time=${timeFilter}&status=${statusFilter}`);
+          setMobileFiltersOpen(false);
+        }}
       />
 
     </>

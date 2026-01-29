@@ -194,7 +194,7 @@ export default function OwnerLogin() {
       className="
         flex lg:w-1/2
         relative overflow-hidden
-        h-[45vh] md:h-auto
+        h-[45dvh] md:h-auto
       "
     >
       <img
@@ -223,7 +223,7 @@ export default function OwnerLogin() {
     </div>
 
 
-    <div className="w-full h-[55vh] md:h-auto lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
+    <div className="w-full h-[55dvh] md:h-auto lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
       <div className="w-full max-w-md bg-white flex flex-col md:items-start items-center h-full md:h-auto rounded-2xl shadow-lg overflow-hidden">
 
         {/* HEADER */}
