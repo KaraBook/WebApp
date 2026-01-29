@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { Link, useLocation } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import BookingDetailsDialog from "../BookingDetailsDialog";
+import BookingDetailsDrawer from "../BookingDetailsDrawer";
 import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
 import CancelBookingDialog from "../CancelBookingModal";
@@ -472,10 +472,10 @@ export default function Bookings() {
 
 
       {/* BOOKING DETAILS */}
-      <BookingDetailsDialog
+      <BookingDetailsDrawer
         open={!!selectedBooking}
         booking={selectedBooking}
-        onOpenChange={(o) => !o && setSelectedBooking(null)}
+        onClose={() => setSelectedBooking(null)}
       />
 
       {/* RATE BOOKING */}
