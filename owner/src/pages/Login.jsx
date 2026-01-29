@@ -224,7 +224,7 @@ export default function OwnerLogin() {
 
 
     <div className="w-full h-[55vh] lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div className="w-full max-w-md bg-white h-full rounded-2xl shadow-lg overflow-hidden">
 
         {/* HEADER */}
         <div className="px-4 md:px-6 pt-4 md:pt-8 pb-2 md:pb-6">
