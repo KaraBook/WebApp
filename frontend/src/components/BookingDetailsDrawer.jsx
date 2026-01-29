@@ -201,7 +201,7 @@ ${
 
       <button
         onClick={onClose}
-        className="absolute top-3 right-3 p-2 rounded-md text-gray-500 hover:bg-gray-100"
+        className="absolute top-2 right-3 p-2 rounded-md text-gray-500 hover:bg-gray-100"
       >
         <span>X</span>
       </button>
