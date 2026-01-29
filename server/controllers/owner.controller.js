@@ -698,10 +698,10 @@ export const createOfflineBooking = async (req, res) => {
       cursor.setDate(cursor.getDate() + 1);
     }
 
-    if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+    if (!booking.grandTotal || booking.grandTotal <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Invalid booking amount",
+        message: "Invalid booking amount"
       });
     }
 
@@ -966,7 +966,19 @@ export const ownerCancelBooking = async (req, res) => {
   try {
     const ownerId = await getEffectiveOwnerId(req);
     const { bookingId } = req.params;
-    const { reason, notes } = req.body;
+    const { reason, notes, refundPercent } = req.body;
+
+    if (
+      refundPercent === undefined ||
+      typeof refundPercent !== "number" ||
+      refundPercent < 0 ||
+      refundPercent > 100
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid refund percentage (0–100 allowed)"
+      });
+    }
 
     const booking = await Booking.findById(bookingId)
       .populate("propertyId");
@@ -994,10 +1006,12 @@ export const ownerCancelBooking = async (req, res) => {
       });
     }
 
-    const refundAmount = booking.grandTotal;
+    const refundAmount = Math.round(
+      (booking.grandTotal * refundPercent) / 100
+    );
 
     let refund = null;
-    if (booking.paymentId) {
+    if (booking.paymentId && refundAmount > 0) {
       refund = await razorpay.payments.refund(
         booking.paymentId,
         { amount: refundAmount * 100 }
@@ -1005,9 +1019,11 @@ export const ownerCancelBooking = async (req, res) => {
     }
 
     booking.cancelled = true;
-    booking.cancelledBy = "owner";   
+    booking.cancelledBy = "owner";
     booking.cancelReason = reason;
     booking.cancelNotes = notes;
+
+    booking.ownerRefundPercent = refundPercent;
     booking.refundAmount = refundAmount;
     booking.refundId = refund?.id;
     booking.refundStatus = refund ? "initiated" : "completed";
@@ -1018,6 +1034,7 @@ export const ownerCancelBooking = async (req, res) => {
     res.json({
       success: true,
       refundAmount,
+      refundPercent,
       message: "Booking cancelled by owner"
     });
 

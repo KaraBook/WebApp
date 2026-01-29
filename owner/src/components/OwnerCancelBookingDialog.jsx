@@ -20,6 +20,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
     const [notes, setNotes] = useState("");
     const [agree, setAgree] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [refundPercent, setRefundPercent] = useState(100);
 
     useEffect(() => {
         if (!booking) return;
@@ -34,7 +35,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
             setLoading(true);
             await api.post(
                 SummaryApi.ownerCancelBooking.url(booking._id),
-                { reason, notes }
+                { reason, notes, refundPercent }
             );
             toast.success("Booking cancelled successfully");
             onClose(true);
@@ -47,7 +48,9 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
 
     if (!booking) return null;
 
-    const refundAmount = booking.grandTotal;
+    const refundAmount = Math.round(
+        (booking.grandTotal * refundPercent) / 100
+    );
 
     return (
         <Dialog open={open} onOpenChange={() => onClose(false)}>
@@ -133,28 +136,40 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
                     {/* ================= STEP 3 ================= */}
                     {step === 2 && (
                         <>
-                            <p className="font-medium">Cancellation Policy</p>
+                            <p className="font-medium">Set Refund Percentage</p>
 
-                            {booking.propertyId?.isRefundable ? (
-                                <div className="border rounded-lg overflow-hidden">
-                                    {booking.propertyId.cancellationPolicy.map((p, i) => (
-                                        <div key={i} className="flex justify-between px-4 py-2 border-b last:border-0">
-                                            <span>{p.minDaysBefore}+ days before check-in</span>
-                                            <span className="font-medium">{p.refundPercent}% refund</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="bg-yellow-50 text-yellow-700 p-3 rounded text-sm">
-                                    This booking is non-refundable.
-                                </div>
-                            )}
+                            <div className="space-y-3">
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    step="10"
+                                    value={refundPercent}
+                                    onChange={(e) => setRefundPercent(Number(e.target.value))}
+                                    className="w-full"
+                                />
 
-                            <ul className="text-xs text-gray-500 mt-2 space-y-1">
-                                <li>• Refund initiated within 24 hours</li>
-                                <li>• Credited to original payment method</li>
-                                <li>• Processing time: 5–7 business days</li>
-                            </ul>
+                                <div className="flex justify-between text-sm">
+                                    <span>0%</span>
+                                    <span className="font-semibold text-primary">
+                                        {refundPercent}% refund
+                                    </span>
+                                    <span>100%</span>
+                                </div>
+
+                                <div className="border rounded-lg p-3 text-sm">
+                                    <div className="flex justify-between">
+                                        <span>Total Paid</span>
+                                        <span>₹{booking.grandTotal}</span>
+                                    </div>
+                                    <div className="flex justify-between text-green-600 font-semibold">
+                                        <span>Refund Amount</span>
+                                        <span>
+                                            ₹{Math.round((booking.grandTotal * refundPercent) / 100)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </>
                     )}
 
@@ -177,7 +192,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
                             </div>
 
                             <div className="bg-green-50 text-green-700 p-3 rounded text-sm">
-                                ✔ Traveller will receive 100% refund
+                                ✔ Traveller will receive {refundPercent}% refund
                             </div>
                         </>
                     )}
@@ -206,7 +221,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
 
                             <label className="flex items-center gap-2 text-sm">
                                 <input type="checkbox" checked={agree} onChange={() => setAgree(!agree)} />
-                                I agree to refund the full amount
+                                I agree to refund {refundPercent}% of the amount
                             </label>
                         </>
                     )}

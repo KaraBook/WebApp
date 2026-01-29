@@ -49,6 +49,7 @@ const bookingSchema = new mongoose.Schema(
     cancelNotes: String,
 
     refundAmount: Number,
+    ownerRefundPercent: Number,
     refundStatus: {
       type: String,
       enum: ["pending", "initiated", "completed", "failed"],
