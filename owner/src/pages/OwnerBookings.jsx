@@ -135,16 +135,6 @@ export default function OwnerBookings() {
       data = data.filter(b => new Date(b.checkOut) < todayStart);
     }
 
-    if (statusFilter !== "all") {
-      data = data.filter(b => {
-        const s = b.paymentStatus;
-        if (statusFilter === "confirmed") return s === "paid";
-        if (statusFilter === "pending") return ["pending", "initiated", "failed"].includes(s);
-        if (statusFilter === "cancelled") return s === "cancelled";
-        return true;
-      });
-    }
-
     data.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 
     setFiltered(data);
@@ -161,31 +151,31 @@ export default function OwnerBookings() {
 
   // STATUS CHIP
   const getStatusChip = (booking) => {
-  const base =
-    "px-3 py-1 rounded-full text-xs font-medium border inline-block";
+    const base =
+      "px-3 py-1 rounded-full text-xs font-medium border inline-block";
 
-  if (booking.cancelled) {
+    if (booking.cancelled) {
+      return (
+        <span className={`${base} bg-red-50 border-red-200 text-red-600`}>
+          Cancelled
+        </span>
+      );
+    }
+
+    if (booking.paymentStatus === "paid") {
+      return (
+        <span className={`${base} bg-green-50 border-green-200 text-green-700`}>
+          Confirmed
+        </span>
+      );
+    }
+
     return (
-      <span className={`${base} bg-red-50 border-red-200 text-red-600`}>
-        Cancelled
+      <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
+        Pending
       </span>
     );
-  }
-
-  if (booking.paymentStatus === "paid") {
-    return (
-      <span className={`${base} bg-green-50 border-green-200 text-green-700`}>
-        Confirmed
-      </span>
-    );
-  }
-
-  return (
-    <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
-      Pending
-    </span>
-  );
-};
+  };
 
   const shortId = (id) => `#${String(id).slice(-6).toUpperCase()}`;
   const formatCurrency = (n) => `₹${Number(n).toLocaleString()}`;
@@ -430,66 +420,70 @@ export default function OwnerBookings() {
                         className="py-3 px-4"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>
-                            <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
-                          </DropdownMenuTrigger>
+                        {b.cancelled ? (
+                          <span className="text-xs text-gray-400 italic">
+                            Cancelled
+                          </span>
+                        ) : (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
+                            </DropdownMenuTrigger>
 
-                          <DropdownMenuContent className="w-48">
-
-                            <DropdownMenuItem onSelect={() => openBookingDialog(b)}>
-                              View Booking
-                            </DropdownMenuItem>
-
-                            {b.paymentStatus === "paid" ? (
-                              <>
-                                <DropdownMenuItem
-                                  onSelect={() => navigate(`/invoice/${b._id}`)}
-                                >
-                                  View Invoice
-                                </DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                  onSelect={() => openConfirm("invoice", b)}
-                                >
-                                  Download Invoice
-                                </DropdownMenuItem>
-                              </>
-                            ) : (
-                              <DropdownMenuItem disabled className="text-gray-400">
-                                Invoice available after payment
+                            <DropdownMenuContent className="w-48">
+                              <DropdownMenuItem onSelect={() => openBookingDialog(b)}>
+                                View Booking
                               </DropdownMenuItem>
-                            )}
 
-                            <DropdownMenuItem
-                              onSelect={() =>
-                                navigator.clipboard.writeText(b.userId.email)
-                              }
-                            >
-                              Copy Email
-                            </DropdownMenuItem>
+                              {b.paymentStatus === "paid" ? (
+                                <>
+                                  <DropdownMenuItem
+                                    onSelect={() => navigate(`/invoice/${b._id}`)}
+                                  >
+                                    View Invoice
+                                  </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                              onSelect={() =>
-                                navigator.clipboard.writeText(b.userId.mobile)
-                              }
-                            >
-                              Copy Phone
-                            </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onSelect={() => openConfirm("invoice", b)}
+                                  >
+                                    Download Invoice
+                                  </DropdownMenuItem>
+                                </>
+                              ) : (
+                                <DropdownMenuItem disabled className="text-gray-400">
+                                  Invoice available after payment
+                                </DropdownMenuItem>
+                              )}
 
-                            {b.paymentStatus === "paid" && !b.cancelled && (
                               <DropdownMenuItem
-                                className="text-red-600"
                                 onSelect={() =>
-                                  setCancelDialog({ open: true, booking: b })
+                                  navigator.clipboard.writeText(b.userId.email)
                                 }
                               >
-                                Cancel Booking
+                                Copy Email
                               </DropdownMenuItem>
-                            )}
 
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  navigator.clipboard.writeText(b.userId.mobile)
+                                }
+                              >
+                                Copy Phone
+                              </DropdownMenuItem>
+
+                              {b.paymentStatus === "paid" && (
+                                <DropdownMenuItem
+                                  className="text-red-600"
+                                  onSelect={() =>
+                                    setCancelDialog({ open: true, booking: b })
+                                  }
+                                >
+                                  Cancel Booking
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </td>
                     </tr>
                   ))}
