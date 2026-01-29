@@ -113,7 +113,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
                                     <div
                                         key={r}
                                         onClick={() => setReason(r)}
-                                        className={`border p-3 rounded cursor-pointer ${reason === r ? "border-primary bg-primary/50" : ""
+                                        className={`border p-3 rounded cursor-pointer ${reason === r ? "border-primary bg-[#028ea10f]" : ""
                                             }`}
                                     >
                                         {r}
@@ -135,8 +135,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
                         <>
                             <p className="font-medium">Cancellation Policy</p>
 
-                            {Array.isArray(booking.propertyId?.cancellationPolicy) &&
-                                booking.propertyId.cancellationPolicy.length > 0 ? (
+                            {booking.propertyId?.isRefundable ? (
                                 <div className="border rounded-lg overflow-hidden">
                                     {booking.propertyId.cancellationPolicy.map((p, i) => (
                                         <div key={i} className="flex justify-between px-4 py-2 border-b last:border-0">
@@ -152,7 +151,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
                             )}
 
                             <ul className="text-xs text-gray-500 mt-2 space-y-1">
-                                <li>• Owner cancellation always gives full refund</li>
+                                <li>• Refund initiated within 24 hours</li>
                                 <li>• Credited to original payment method</li>
                                 <li>• Processing time: 5–7 business days</li>
                             </ul>
