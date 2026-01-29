@@ -1,20 +1,7 @@
 import { useEffect } from "react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerOverlay,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerOverlay} from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import {
-  Home,
-  Calendar,
-  Moon,
-  Users,
-  Mail,
-  Phone,
-  Clock,
-  X,
-} from "lucide-react";
+import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X} from "lucide-react";
 
 
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
@@ -100,7 +87,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
       <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
         <DrawerOverlay className="bg-black/40" />
 
-        <DrawerContent className="h-[75vh] rounded-t-2xl">
+        <DrawerContent className="h-[65vh] rounded-t-2xl">
           <Header
             userName={userName}
             createdAt={createdAt}
@@ -241,7 +228,7 @@ function Body(props) {
   } = props;
 
   return (
-    <div className="px-4 py-4 space-y-5 text-sm overflow-y-auto">
+    <div className="px-4 py-4 space-y-5 text-sm overflow-y-auto mb-[55px] md:mb-[10px]">
       <InfoCardBlock
         icon={<Home size={16} />}
         label="Property"
