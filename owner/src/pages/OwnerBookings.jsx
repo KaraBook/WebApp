@@ -128,9 +128,7 @@ export default function OwnerBookings() {
     }
 
     if (statusFilter === "cancelled") {
-      data = data.filter(b =>
-        b.cancelled || b.paymentStatus === "cancelled"
-      );
+      data = data.filter(b => b.cancelled === true);
     }
 
     if (timeFilter === "past") {
@@ -162,11 +160,19 @@ export default function OwnerBookings() {
   );
 
   // STATUS CHIP
-  const getStatusChip = (status) => {
+  const getStatusChip = (booking) => {
     const base =
       "px-3 py-1 rounded-full text-xs font-medium border inline-block";
 
-    if (status === "paid") {
+    if (booking.cancelled) {
+      return (
+        <span className={`${base} bg-gray-100 border-gray-300 text-gray-600`}>
+          Cancelled
+        </span>
+      );
+    }
+
+    if (booking.paymentStatus === "paid") {
       return (
         <span className={`${base} bg-green-50 border-green-200 text-green-700`}>
           Confirmed
@@ -174,13 +180,6 @@ export default function OwnerBookings() {
       );
     }
 
-    if (status === "cancelled") {
-      return (
-        <span className={`${base} bg-gray-100 border-gray-300 text-gray-600`}>
-          Cancelled
-        </span>
-      );
-    }
     return (
       <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
         Pending
@@ -420,7 +419,7 @@ export default function OwnerBookings() {
                       </td>
 
                       <td className="py-3 px-4">
-                        {getStatusChip(b.paymentStatus)}
+                        {getStatusChip(b)}
                       </td>
 
                       <td className="py-3 px-4 text-xs text-gray-500">
