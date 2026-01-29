@@ -27,6 +27,7 @@ export default function BookingDesktopCard({
   onCopyPhone,
   onWhatsapp,
   onResend,
+  onCancelBooking,
 }) {
   const b = booking;
 
