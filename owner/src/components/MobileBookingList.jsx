@@ -37,6 +37,7 @@ function PaymentChip({ booking }) {
 export default function MobileBookingsList({
     bookings = [],
     onOpenBooking,
+    onCancelBooking,
     showHeader = true,
 }) {
     const navigate = useNavigate();

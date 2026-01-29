@@ -142,12 +142,12 @@ export default function OwnerBookings() {
   }, [query, timeFilter, statusFilter, bookings]);
 
   useEffect(() => {
-  const t = searchParams.get("time") || "upcoming";
-  const s = searchParams.get("status") || "all";
+    const t = searchParams.get("time") || "upcoming";
+    const s = searchParams.get("status") || "all";
 
-  setTimeFilter(t);
-  setStatusFilter(s);
-}, [searchParams]);
+    setTimeFilter(t);
+    setStatusFilter(s);
+  }, [searchParams]);
 
 
   const totalPages = Math.ceil(filtered.length / pageSize);
@@ -337,6 +337,9 @@ export default function OwnerBookings() {
               <MobileBookingsList
                 bookings={filtered}
                 onOpenBooking={openBookingDialog}
+                onCancelBooking={(b) =>
+                  setCancelDialog({ open: true, booking: b })
+                }
                 showHeader={false}
               />
             )}

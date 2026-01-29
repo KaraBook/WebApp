@@ -510,6 +510,7 @@ export default function Dashboard() {
               setSelectedBooking(b);
               setOpenBookingDialog(true);
             }}
+            onCancelBooking={handleCancelBooking}
           />
 
           {/* BOOKINGS TABLE */}
