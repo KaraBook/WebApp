@@ -33,7 +33,7 @@ export const getOwnerDashboard = async (req, res) => {
 
     const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
       .populate("userId", "firstName lastName email mobile")
-      .populate("propertyId", "propertyName");
+      .populate("propertyId", "propertyName isRefundable cancellationPolicy coverImage")
 
     const uniqueUserIds = new Set(
       bookings
@@ -107,7 +107,7 @@ export const getOwnerBookings = async (req, res) => {
     const propertyIds = properties.map((p) => p._id);
 
     const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
-      .populate("propertyId", "propertyName")
+      .populate("propertyId", "propertyName isRefundable cancellationPolicy coverImage")
       .populate("userId", "firstName lastName email mobile");
 
     res.json({ success: true, data: bookings });
