@@ -16,7 +16,6 @@ import {
   X,
 } from "lucide-react";
 
-/* ===================================================== */
 
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
   if (!booking) return null;
@@ -137,7 +136,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
       <div
         onClick={onClose}
         className={`
-fixed inset-0 z-[9998]
+fixed inset-0 z-[9999999]
 bg-black/40 backdrop-blur-sm
 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
 `}
@@ -145,7 +144,7 @@ ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
 
       <div
         className={`
-fixed z-[9999] top-0 right-0 h-full w-[420px]
+fixed z-[9999999] top-0 right-0 h-full w-[420px]
 bg-white shadow-2xl
 transition-transform duration-300
 ${open ? "translate-x-0" : "translate-x-full"}
@@ -217,7 +216,7 @@ ${
         onClick={onClose}
         className="absolute top-3 right-3 p-2 rounded-md text-gray-500 hover:bg-gray-100"
       >
-        <X className="h-4 w-4" />
+        <span>X</span>
       </button>
     </div>
   );
