@@ -53,13 +53,6 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
         <Dialog open={open} onOpenChange={() => onClose(false)}>
             <DialogContent className="max-w-lg p-0 z-[9999999] overflow-hidden">
 
-                <button
-                    onClick={() => onClose(false)}
-                    className="absolute right-4 top-4 text-gray-500 hover:text-black"
-                >
-                    ✕
-                </button>
-
                 <DialogHeader className="px-6 pt-6">
                     <DialogTitle>Cancel Booking</DialogTitle>
                 </DialogHeader>
@@ -69,7 +62,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
                     {[0, 1, 2, 3, 4].map(i => (
                         <div
                             key={i}
-                            className={`w-2 h-2 rounded-full ${step === i ? "bg-red-500" : "bg-gray-300"}`}
+                            className={`w-2 h-2 rounded-full ${step === i ? "bg-primary" : "bg-gray-300"}`}
                         />
                     ))}
                 </div>
@@ -120,7 +113,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
                                     <div
                                         key={r}
                                         onClick={() => setReason(r)}
-                                        className={`border p-3 rounded cursor-pointer ${reason === r ? "border-red-500 bg-red-50" : ""
+                                        className={`border p-3 rounded cursor-pointer ${reason === r ? "border-primary bg-primary/50" : ""
                                             }`}
                                     >
                                         {r}
@@ -226,7 +219,7 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
                         </Button>
 
                         <Button
-                            className="bg-red-600 hover:bg-red-700"
+                            className="bg-primary hover:bg-primary/90"
                             disabled={
                                 (step === 1 && !reason) ||
                                 (step === 4 && !agree) ||
