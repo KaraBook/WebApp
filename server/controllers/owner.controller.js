@@ -867,7 +867,7 @@ export const getBookedDates = async (req, res) => {
     const bookings = await Booking.find({
       propertyId: id,
       paymentStatus: "paid",
-      cancelled: false,
+      cancelled: false,   // 🔥 THIS IS THE MISSING LINE
     }).select("checkIn checkOut");
 
     const formatted = bookings.map((b) => ({
@@ -885,6 +885,7 @@ export const getBookedDates = async (req, res) => {
     });
   }
 };
+
 
 
 export const getOwnerBookedUsers = async (req, res) => {
