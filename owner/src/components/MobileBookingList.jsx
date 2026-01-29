@@ -95,7 +95,10 @@ export default function MobileBookingsList({
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                <div
+                                    className="flex items-center gap-2"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
                                     <PaymentChip booking={b} />
 
                                     {/* 3-dot menu */}
