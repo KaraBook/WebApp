@@ -161,31 +161,31 @@ export default function OwnerBookings() {
 
   // STATUS CHIP
   const getStatusChip = (booking) => {
-    const base =
-      "px-3 py-1 rounded-full text-xs font-medium border inline-block";
+  const base =
+    "px-3 py-1 rounded-full text-xs font-medium border inline-block";
 
-    if (booking.cancelled) {
-      return (
-        <span className={`${base} bg-gray-100 border-gray-300 text-gray-600`}>
-          Cancelled
-        </span>
-      );
-    }
-
-    if (booking.paymentStatus === "paid") {
-      return (
-        <span className={`${base} bg-green-50 border-green-200 text-green-700`}>
-          Confirmed
-        </span>
-      );
-    }
-
+  if (booking.cancelled) {
     return (
-      <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
-        Pending
+      <span className={`${base} bg-red-50 border-red-200 text-red-600`}>
+        Cancelled
       </span>
     );
-  };
+  }
+
+  if (booking.paymentStatus === "paid") {
+    return (
+      <span className={`${base} bg-green-50 border-green-200 text-green-700`}>
+        Confirmed
+      </span>
+    );
+  }
+
+  return (
+    <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
+      Pending
+    </span>
+  );
+};
 
   const shortId = (id) => `#${String(id).slice(-6).toUpperCase()}`;
   const formatCurrency = (n) => `₹${Number(n).toLocaleString()}`;
