@@ -4,9 +4,16 @@ import PaymentChip from "@/components/PaymentChip";
 
 
 function normalizeBookingStatus(b) {
-  if (b.cancelled) return "cancelled";   
-  if (["paid", "confirmed"].includes(b.paymentStatus))
+  if (b.cancelled === true) return "cancelled";
+  if (
+    b.paymentStatus === "paid" ||
+    b.paymentStatus === "captured" ||
+    b.status === "confirmed" ||
+    b.status === "paid" ||
+    b.paymentId
+  ) {
     return "confirmed";
+  }
   return "pending";
 }
 
