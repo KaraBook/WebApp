@@ -867,6 +867,7 @@ export const getBookedDates = async (req, res) => {
     const bookings = await Booking.find({
       propertyId: id,
       paymentStatus: "paid",
+      cancelled: { $ne: true }   // 👈 this is the key line
     }).select("checkIn checkOut");
 
     const formatted = bookings.map((b) => ({
