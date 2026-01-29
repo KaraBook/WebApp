@@ -19,7 +19,7 @@ export default function MobileFiltersDrawer({
     <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
       <DrawerOverlay className="bg-black/40" />
 
-      <DrawerContent className="h-auto max-h-[85vh] rounded-t-2xl px-5 py-5">
+      <DrawerContent className="h-auto max-h-[85vh] rounded-t-2xl px-5 py-0 mb-2">
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-semibold">Filters</h3>
