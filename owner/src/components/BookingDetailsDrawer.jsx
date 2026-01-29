@@ -18,19 +18,19 @@ import {
 
 
 function normalizeBookingStatus(b) {
-  if (b?.cancelled === true) return "cancelled";
+    if (b?.cancelled === true) return "cancelled";
 
-  if (
-    b?.paymentStatus === "paid" ||
-    b?.paymentStatus === "captured" ||
-    b?.status === "confirmed" ||
-    b?.status === "paid" ||
-    b?.paymentId
-  ) {
-    return "confirmed";
-  }
+    if (
+        b?.paymentStatus === "paid" ||
+        b?.paymentStatus === "captured" ||
+        b?.status === "confirmed" ||
+        b?.status === "paid" ||
+        b?.paymentId
+    ) {
+        return "confirmed";
+    }
 
-  return "pending";
+    return "pending";
 }
 
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
@@ -209,7 +209,7 @@ function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
             ${uiStatus === "confirmed"
                             ? "bg-emerald-100 text-emerald-700"
                             : uiStatus === "cancelled"
-                                ? "bg-gray-100 text-gray-600"
+                                ? "bg-red-100 text-red-700"
                                 : "bg-yellow-100 text-yellow-700"}
           `}
                 >
