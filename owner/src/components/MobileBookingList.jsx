@@ -15,20 +15,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 
-function normalizePaymentStatus(status) {
-    if (["paid", "confirmed"].includes(status)) return "confirmed";
-    if (["pending", "initiated", "failed"].includes(status)) return "pending";
-    if (status === "cancelled") return "cancelled";
+function normalizeBookingStatus(booking) {
+    if (booking.cancelled) return "cancelled";
+    if (["paid", "confirmed"].includes(booking.paymentStatus)) return "confirmed";
     return "pending";
 }
 
-function PaymentChip({ status }) {
-    const s = normalizePaymentStatus(status);
+function PaymentChip({ booking }) {
+    const s = normalizeBookingStatus(booking);
     const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
     const map = {
         confirmed: `${base} bg-emerald-50 text-emerald-700`,
         pending: `${base} bg-amber-50 text-amber-700`,
-        cancelled: `${base} bg-gray-100 text-gray-600`,
+        cancelled: `${base} bg-red-50 text-red-600`,
     };
     return <span className={map[s]}>{s}</span>;
 }
@@ -97,7 +96,7 @@ export default function MobileBookingsList({
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <PaymentChip status={b.paymentStatus} />
+                                    <PaymentChip booking={b} />
 
                                     {/* 3-dot menu */}
                                     <DropdownMenu>
@@ -115,7 +114,7 @@ export default function MobileBookingsList({
                                                 View Booking
                                             </DropdownMenuItem>
 
-                                            {normalizePaymentStatus(b.paymentStatus) === "confirmed" ? (
+                                            {normalizeBookingStatus(b) === "confirmed" ? (
                                                 <DropdownMenuItem
                                                     className="p-[14px] text-[16px]"
                                                     onSelect={() => navigate(`/invoice/${b._id}`)}
@@ -133,21 +132,26 @@ export default function MobileBookingsList({
 
                                             <DropdownMenuItem
                                                 className="p-[14px] text-[16px]"
-                                                onSelect={() =>
-                                                    navigator.clipboard.writeText(email)
-                                                }
+                                                onSelect={() => navigator.clipboard.writeText(email)}
                                             >
                                                 Copy Email
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
                                                 className="p-[14px] text-[16px]"
-                                                onSelect={() =>
-                                                    navigator.clipboard.writeText(mobile)
-                                                }
+                                                onSelect={() => navigator.clipboard.writeText(mobile)}
                                             >
                                                 Copy Mobile
                                             </DropdownMenuItem>
+
+                                            {b.cancelled && (
+                                                <DropdownMenuItem
+                                                    disabled
+                                                    className="p-[14px] text-[16px] text-gray-400 italic"
+                                                >
+                                                    Cancelled
+                                                </DropdownMenuItem>
+                                            )}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>

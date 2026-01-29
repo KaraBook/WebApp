@@ -416,62 +416,62 @@ export default function OwnerBookings() {
                         {formatDate(b.createdAt)}
                       </td>
 
-                      <td
-                        className="py-3 px-4"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {b.cancelled ? (
-                          <span className="text-xs text-gray-400 italic">
-                            Cancelled
-                          </span>
-                        ) : (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
-                            </DropdownMenuTrigger>
+                      <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
+                          </DropdownMenuTrigger>
 
-                            <DropdownMenuContent className="w-48">
-                              <DropdownMenuItem onSelect={() => openBookingDialog(b)}>
-                                View Booking
-                              </DropdownMenuItem>
+                          <DropdownMenuContent className="w-48">
+                            <DropdownMenuItem onSelect={() => openBookingDialog(b)}>
+                              View Booking
+                            </DropdownMenuItem>
 
-                              {b.paymentStatus === "paid" ? (
-                                <>
-                                  <DropdownMenuItem
-                                    onSelect={() => navigate(`/invoice/${b._id}`)}
-                                  >
-                                    View Invoice
-                                  </DropdownMenuItem>
-
-                                  <DropdownMenuItem
-                                    onSelect={() => openConfirm("invoice", b)}
-                                  >
-                                    Download Invoice
-                                  </DropdownMenuItem>
-                                </>
-                              ) : (
-                                <DropdownMenuItem disabled className="text-gray-400">
-                                  Invoice available after payment
+                            {b.paymentStatus === "paid" ? (
+                              <>
+                                <DropdownMenuItem
+                                  onSelect={() => navigate(`/invoice/${b._id}`)}
+                                >
+                                  View Invoice
                                 </DropdownMenuItem>
-                              )}
 
-                              <DropdownMenuItem
-                                onSelect={() =>
-                                  navigator.clipboard.writeText(b.userId.email)
-                                }
-                              >
-                                Copy Email
+                                <DropdownMenuItem
+                                  onSelect={() => openConfirm("invoice", b)}
+                                >
+                                  Download Invoice
+                                </DropdownMenuItem>
+                              </>
+                            ) : (
+                              <DropdownMenuItem disabled className="text-gray-400 italic">
+                                Invoice available after payment
                               </DropdownMenuItem>
+                            )}
 
+                            <DropdownMenuItem
+                              onSelect={() =>
+                                navigator.clipboard.writeText(b.userId.email)
+                              }
+                            >
+                              Copy Email
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onSelect={() =>
+                                navigator.clipboard.writeText(b.userId.mobile)
+                              }
+                            >
+                              Copy Phone
+                            </DropdownMenuItem>
+
+                            {b.cancelled ? (
                               <DropdownMenuItem
-                                onSelect={() =>
-                                  navigator.clipboard.writeText(b.userId.mobile)
-                                }
+                                disabled
+                                className="text-gray-400 italic"
                               >
-                                Copy Phone
+                                Cancelled
                               </DropdownMenuItem>
-
-                              {b.paymentStatus === "paid" && (
+                            ) : (
+                              b.paymentStatus === "paid" && (
                                 <DropdownMenuItem
                                   className="text-red-600"
                                   onSelect={() =>
@@ -480,10 +480,10 @@ export default function OwnerBookings() {
                                 >
                                   Cancel Booking
                                 </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
+                              )
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   ))}
