@@ -1,9 +1,5 @@
 import { useEffect } from "react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerOverlay,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerOverlay} from "@/components/ui/drawer";
 import { X, User, Mail, Phone, MapPin, Calendar, Shield } from "lucide-react";
 import { format } from "date-fns";
 
@@ -18,7 +14,6 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
   const fullName =
     `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Guest";
 
-  // Desktop body lock
   useEffect(() => {
     if (!isMobile && open) {
       document.body.style.overflow = "hidden";
@@ -28,7 +23,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
     return () => (document.body.style.overflow = "");
   }, [open, isMobile]);
 
-  /* ================= MOBILE (REAL DRAWER) ================= */
+
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
@@ -42,7 +37,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
     );
   }
 
-  /* ================= DESKTOP PANEL ================= */
+
   return (
     <>
       <div
@@ -73,7 +68,6 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
   );
 }
 
-/* ================= UI ================= */
 
 function Header({ fullName, user, onClose }) {
   return (
@@ -155,7 +149,6 @@ function Body({ user, fullName }) {
   );
 }
 
-/* ---------- UI ---------- */
 
 function InfoCard({ icon, label, value }) {
   return (

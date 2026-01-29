@@ -222,12 +222,12 @@ export default function OwnerLogin() {
       </div>
     </div>
 
-    {/* ================= RIGHT: LOGIN FORM ================= */}
+
     <div className="w-full lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
 
         {/* HEADER */}
-        <div className="px-4 md:px-6 pt-8 pb-6">
+        <div className="px-4 md:px-6 pt-4 md:pt-8 pb-2 md:pb-6">
           <div className="flex items-center justify-between gap-3">
             <img
               src="/owner/KarabookLogo.png"
@@ -239,7 +239,7 @@ export default function OwnerLogin() {
             </span>
           </div>
 
-          <h2 className="text-2xl font-bold mt-6">
+          <h2 className="text-2xl font-bold mt-4 md:mt-6">
             Sign in
           </h2>
 
@@ -249,10 +249,10 @@ export default function OwnerLogin() {
         </div>
 
         {/* FORM CONTENT */}
-        <div className="px-6 pb-8">
+        <div className="px-4 md:px-6 pb-4 md:pb-8">
 
           {phase === "mobile" ? (
-            <div className="space-y-5">
+            <div className="space-y-5 md:mt-0 mt-2">
 
               <div>
                 <Label className="text-sm">Mobile Number</Label>
@@ -324,9 +324,9 @@ export default function OwnerLogin() {
           )}
 
 
-<hr className="mt-8"/>
+<hr className="mt-4 md:mt-8"/>
           {/* FOOTER */}
-          <p className="text-[11px] text-center text-gray-400 mt-6">
+          <p className="text-[11px] text-center text-gray-400 mt-3 md:mt-6">
             © {new Date().getFullYear()} Karabook · Secure Owner Access
           </p>
         </div>
