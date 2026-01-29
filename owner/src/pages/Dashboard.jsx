@@ -419,6 +419,28 @@ const isDateCancelled = (date) =>
   }
 
 
+  const handleCancelBooking = async (booking) => {
+  if (!window.confirm("Are you sure you want to cancel this booking?"))
+    return;
+  try {
+    await api.put(
+      SummaryApi.cancelBooking.url(booking._id)
+    );
+    toast.success("Booking cancelled");
+    setData(prev => ({
+      ...prev,
+      bookings: prev.bookings.map(b =>
+        b._id === booking._id
+          ? { ...b, cancelled: true }
+          : b
+      )
+    }));
+  } catch (err) {
+    toast.error("Failed to cancel booking");
+  }
+};
+
+
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -529,6 +551,7 @@ const isDateCancelled = (date) =>
                     )
                   }
                   onResend={() => toast.success("Resend to traveller triggered")}
+                  onCancelBooking={(b) => handleCancelBooking(b)}
                 />
               ))}
             </div>

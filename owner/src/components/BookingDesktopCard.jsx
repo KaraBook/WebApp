@@ -4,13 +4,14 @@ import PaymentChip from "@/components/PaymentChip";
 
 
 function normalizeBookingStatus(b) {
-  if (b.cancelled === true) return "cancelled";
+  if (b?.cancelled === true) return "cancelled";
+
   if (
-    b.paymentStatus === "paid" ||
-    b.paymentStatus === "captured" ||
-    b.status === "confirmed" ||
-    b.status === "paid" ||
-    b.paymentId
+    b?.paymentStatus === "paid" ||
+    b?.paymentStatus === "captured" ||
+    b?.status === "confirmed" ||
+    b?.status === "paid" ||
+    b?.paymentId
   ) {
     return "confirmed";
   }
@@ -32,6 +33,7 @@ export default function BookingDesktopCard({
   const name = `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim();
   const phone = b.userId?.mobile;
   const property = b.propertyId?.propertyName;
+  const bookingStatus = normalizeBookingStatus(b);
 
   const formatDate = (d) =>
     new Date(d).toLocaleDateString("en-GB", {
@@ -131,13 +133,28 @@ export default function BookingDesktopCard({
               View Booking
             </DropdownMenuItem>
 
-            {normalizeBookingStatus(b) === "confirmed" ? (
+            {/* Invoice logic */}
+            {bookingStatus === "confirmed" ? (
               <DropdownMenuItem onSelect={() => onViewInvoice(b)}>
                 View Invoice
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem disabled className="text-gray-400 italic">
                 Invoice available after payment
+              </DropdownMenuItem>
+            )}
+
+            {/* Cancel logic */}
+            {bookingStatus === "cancelled" ? (
+              <DropdownMenuItem disabled className="text-red-500 italic">
+                Cancelled
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                className="text-red-600 font-medium"
+                onSelect={() => onCancelBooking(b)}
+              >
+                Cancel Booking
               </DropdownMenuItem>
             )}
 
