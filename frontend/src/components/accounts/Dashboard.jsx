@@ -7,7 +7,7 @@ import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
 import { format } from "date-fns";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import BookingDetailsDialog from "@/components/BookingDetailsDialog";
+import BookingDetailsDrawer from "../BookingDetailsDrawer";
 import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
 import CancelBookingDialog from "../CancelBookingModal";
@@ -391,7 +391,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <BookingDetailsDialog
+            <BookingDetailsDrawer
                 open={bookingDialogOpen}
                 onOpenChange={(open) => {
                     setBookingDialogOpen(open);
