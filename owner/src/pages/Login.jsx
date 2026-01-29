@@ -223,11 +223,11 @@ export default function OwnerLogin() {
     </div>
 
 
-    <div className="w-full h-[55vh] lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
-      <div className="w-full max-w-md bg-white h-full rounded-2xl shadow-lg overflow-hidden">
+    <div className="w-full h-[55vh] md:h-auto lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
+      <div className="w-full max-w-md bg-white flex flex-col md:items-start items-center h-full md:h-auto rounded-2xl shadow-lg overflow-hidden">
 
         {/* HEADER */}
-        <div className="px-4 md:px-6 pt-4 md:pt-8 pb-2 md:pb-6">
+        <div className="px-4 w-full md:px-6 pt-4 md:pt-8 pb-2 md:pb-6">
           <div className="flex items-center justify-between gap-3">
             <img
               src="/owner/KarabookLogo.png"
@@ -249,7 +249,7 @@ export default function OwnerLogin() {
         </div>
 
         {/* FORM CONTENT */}
-        <div className="px-4 md:px-6 pb-4 md:pb-8">
+        <div className="px-4 w-full md:px-6 pb-4 md:pb-8">
 
           {phase === "mobile" ? (
             <div className="space-y-5 md:mt-0 mt-2">
