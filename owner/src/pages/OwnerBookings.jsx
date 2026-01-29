@@ -271,7 +271,7 @@ export default function OwnerBookings() {
           <div className="bg-white flex-col md:flex-row items-start p-2 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
             {/* Search */}
             <div className="flex items-center w-full gap-2 md:gap-3 flex-1">
-              <div className="flex w-full bg-[#f5f5f5] md:py-0 md:px-[8px] py-[8px] px-[8px] rounded-[8px] items-center justify-start">
+              <div className="flex w-full bg-[#f5f5f5] md:py-1 md:px-[8px] py-[8px] px-[8px] rounded-[8px] items-center justify-start">
               <Search className="w-5 h-5 text-gray-500" />
               <Input
                 placeholder="Search booking, traveller, phone, property"
