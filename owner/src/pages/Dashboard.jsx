@@ -34,10 +34,10 @@ function Pagination({ currentPage, totalPages, setCurrentPage }) {
 
 
   function normalizeBookingStatus(b) {
-    if (b.cancelled) return "cancelled";
-    if (["paid", "confirmed"].includes(b.paymentStatus)) return "confirmed";
-    return "pending";
-  }
+  if (b.cancelled) return "cancelled";
+  if (["paid", "confirmed"].includes(b.paymentStatus)) return "confirmed";
+  return "pending";
+}
 
   return (
     <div className="flex flex-wrap justify-center md:justify-end items-center gap-2 px-4 sm:px-6 py-4 border-t bg-white rounded-b-xl">
@@ -183,7 +183,7 @@ function Dot({ color }) {
   const map = {
     green: "bg-green-500",
     yellow: "bg-yellow-400",
-    red: "bg-red-500",
+    red: "bg-red-500",     
     gray: "bg-gray-400",
     blue: "bg-blue-500",
   };
@@ -207,12 +207,12 @@ function CalendarLegend() {
 
 function LegendItem({ color, label }) {
   const map = {
-    green: "bg-green-500",
-    yellow: "bg-yellow-400",
-    red: "bg-red-500",
-    gray: "bg-gray-400",
-    blue: "bg-blue-500",
-  };
+  green: "bg-green-500",
+  yellow: "bg-yellow-400",
+  red: "bg-red-500",   
+  gray: "bg-gray-400",
+  blue: "bg-blue-500",
+};
 
   return (
     <div className="flex items-center gap-2">
@@ -269,20 +269,20 @@ export default function Dashboard() {
         const stats = {
           totalBookings: all.length,
 
-          confirmed: all.filter(
-            b => normalizeBookingStatus(b) === "confirmed"
+          confirmed: upcoming.filter(
+            b => b.paymentStatus === "paid" && !b.cancelled
           ).length,
 
-          pending: all.filter(
-            b => normalizeBookingStatus(b) === "pending"
+          pending: upcoming.filter(
+            b => ["pending", "initiated", "failed"].includes(b.paymentStatus)
           ).length,
 
           cancelled: all.filter(
-            b => normalizeBookingStatus(b) === "cancelled"
+            b => b.cancelled || b.paymentStatus === "cancelled"
           ).length,
 
           totalRevenue: all
-            .filter(b => normalizeBookingStatus(b) === "confirmed")
+            .filter(b => b.paymentStatus === "paid" && !b.cancelled)
             .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
 
           totalUsers: new Set(
@@ -442,14 +442,14 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 items-stretch">
 
           <div className="col-span-2 md:col-span-1">
-            <StatCard
-              icon={CheckCircle2}
-              label="Total Bookings"
-              value={stats?.totalBookings}
-              caption="All bookings so far"
-              variant="primary"
-              onClick={() => navigate("/bookings?time=all&status=all")}
-            />
+          <StatCard
+            icon={CheckCircle2}
+            label="Total Bookings"
+            value={stats?.totalBookings}
+            caption="All bookings so far"
+            variant="primary"
+            onClick={() => navigate("/bookings?time=all&status=all")}
+          />
           </div>
 
           <StatCard
@@ -487,15 +487,15 @@ export default function Dashboard() {
             onClick={() => navigate("/bookings?status=cancelled")}
           />
 
-          <div className="col-span-2 md:col-span-1">
-            <StatCard
-              icon={IndianRupee}
-              label="Total Revenue"
-              value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
-              caption="From all bookings"
-              variant="primary"
-              onClick={() => navigate("/bookings?time=all&status=confirmed")}
-            />
+         <div className="col-span-2 md:col-span-1">
+          <StatCard
+            icon={IndianRupee}
+            label="Total Revenue"
+            value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
+            caption="From all bookings"
+            variant="primary"
+            onClick={() => navigate("/bookings?time=all&status=confirmed")}
+          />
           </div>
 
         </div>
