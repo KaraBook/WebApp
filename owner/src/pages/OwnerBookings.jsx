@@ -259,7 +259,7 @@ export default function OwnerBookings() {
 
   return (
     <>
-      <div className="bg-[#f5f5f7] min-h-screen md:px-8 px-4 py-6">
+      <div className="bg-[#f5f5f7] min-h-screen md:px-8 px-2 py-4 md:py-6">
         <div className="max-w-7xl mx-auto md:space-y-4 space-y-4">
 
           {/* PAGE HEADER */}
@@ -268,9 +268,10 @@ export default function OwnerBookings() {
           </div>
 
           {/* FILTER BAR */}
-          <div className="bg-white flex-col md:flex-row items-start p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
+          <div className="bg-white flex-col md:flex-row items-start p-2 md:p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-wrap gap-4 items-center">
             {/* Search */}
             <div className="flex items-center w-full gap-2 md:gap-3 flex-1">
+              <div className="flex items-center justify-start">
               <Search className="w-5 h-5 text-gray-500" />
               <Input
                 placeholder="Search booking, traveller, phone, property"
@@ -278,11 +279,12 @@ export default function OwnerBookings() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
+              </div>
 
               {/* Mobile only */}
               <button
                 onClick={() => setMobileFiltersOpen(true)}
-                className="md:hidden p-2 rounded-xl border"
+                className="md:hidden p-3 bg-[#e9e9e9] rounded-xl border"
               >
                 <Filter className="w-4 h-4" />
               </button>
