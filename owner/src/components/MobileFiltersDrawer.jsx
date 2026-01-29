@@ -4,7 +4,7 @@ import {
   DrawerOverlay,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Check } from "lucide-react";
 
 export default function MobileFiltersDrawer({
   open,
@@ -19,13 +19,24 @@ export default function MobileFiltersDrawer({
     <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
       <DrawerOverlay className="bg-black/40" />
 
-      <DrawerContent className="h-[70vh] rounded-t-2xl px-4 py-4">
+      <DrawerContent className="h-auto max-h-[85vh] rounded-t-2xl px-5 py-5">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-semibold">Filters</h3>
-          <button onClick={onClose}>
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setTimeFilter("upcoming");
+                setStatusFilter("all");
+              }}
+              className="text-sm text-primary font-medium"
+            >
+              Reset
+            </button>
+            <button onClick={onClose}>
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
         </div>
 
         {/* Time */}
@@ -78,7 +89,7 @@ export default function MobileFiltersDrawer({
           </Chip>
         </Section>
 
-        <Button className="w-full mt-8" onClick={onApply}>
+        <Button className="w-full mt-6 h-12 text-base" onClick={onApply}>
           Apply Filters
         </Button>
       </DrawerContent>
@@ -91,8 +102,12 @@ export default function MobileFiltersDrawer({
 function Section({ title, children }) {
   return (
     <div className="mb-6">
-      <p className="text-sm font-medium mb-2">{title}</p>
-      <div className="flex gap-2 flex-wrap">{children}</div>
+      <p className="text-sm font-medium mb-3 text-gray-600">
+        {title}
+      </p>
+      <div className="flex gap-3 flex-wrap">
+        {children}
+      </div>
     </div>
   );
 }
@@ -102,12 +117,15 @@ function Chip({ children, active, onClick }) {
     <button
       onClick={onClick}
       className={`
+        flex items-center gap-2
         px-4 py-2 rounded-full text-sm border
+        transition
         ${active
-          ? "bg-emerald-600 text-white border-emerald-600"
-          : "bg-white text-gray-700"}
+          ? "bg-primary text-white border-primary"
+          : "bg-white text-gray-700 border-gray-200"}
       `}
     >
+      {active && <Check className="w-4 h-4" />}
       {children}
     </button>
   );
