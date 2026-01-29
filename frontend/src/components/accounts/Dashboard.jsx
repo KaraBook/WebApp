@@ -241,7 +241,7 @@ export default function Dashboard() {
                                 setRateBooking(booking);
                                 setRateDialogOpen(true);
                             }}
-                            onCancel={(booking) => setCancelBookingObj(booking)}   
+                            onCancel={(booking) => setCancelBookingObj(booking)}
                         />
                     ))}
                 </div>
@@ -393,11 +393,11 @@ export default function Dashboard() {
 
             <BookingDetailsDrawer
                 open={bookingDialogOpen}
-                onOpenChange={(open) => {
-                    setBookingDialogOpen(open);
-                    if (!open) setSelectedBooking(null);
-                }}
                 booking={selectedBooking}
+                onClose={() => {
+                    setBookingDialogOpen(false);
+                    setSelectedBooking(null);
+                }}
             />
 
             <RateBookingDialog
