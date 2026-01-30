@@ -25,6 +25,8 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         window.matchMedia("(max-width: 767px)").matches
       );
 
+    if (!booking) return null; 
+
     const {
         createdAt,
         userId,
@@ -53,8 +55,6 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
             document.body.style.overflow = "";
         };
     }, [open]);
-
-    if (!booking) return null;
 
     const uiStatus = normalizeBookingStatus(booking);
 
