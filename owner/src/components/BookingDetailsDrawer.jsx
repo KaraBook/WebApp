@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Drawer, DrawerContent, DrawerOverlay} from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerOverlay } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X} from "lucide-react";
+import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
 
 
 function normalizeBookingStatus(b) {
@@ -23,9 +23,20 @@ function normalizeBookingStatus(b) {
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
     const [isMobile, setIsMobile] = useState(
         window.matchMedia("(max-width: 767px)").matches
-      );
+    );
 
-    if (!booking) return null; 
+    useEffect(() => {
+        if (!open) {
+            document.body.style.overflow = "";
+            return;
+        }
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [open]);
+
+    if (!booking) return null;
 
     const {
         createdAt,
@@ -44,17 +55,6 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         contactNumber,
         contactEmail,
     } = booking;
-
-    useEffect(() => {
-        if (!open) {
-            document.body.style.overflow = "";
-            return;
-        }
-        document.body.style.overflow = "hidden";
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [open]);
 
     const uiStatus = normalizeBookingStatus(booking);
 
