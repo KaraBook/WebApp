@@ -57,7 +57,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     const userName =
         `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
         user?.name ||
-        "Guest";
+        "Traveller";
 
     const userEmail =
         user?.email || contactEmail || "—";

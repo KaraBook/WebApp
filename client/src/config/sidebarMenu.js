@@ -3,13 +3,15 @@ import { Home, LayoutDashboard, Calendar, Users } from "lucide-react";
 const sidebarMenu = [
   {
     label: "Dashboard",
-    icon: LayoutDashboard, 
+    icon: LayoutDashboard,
     path: "/dashboard",
+    roles: ["admin"],            
   },
   {
     label: "Properties",
     icon: Home,
     path: "/properties",
+    roles: ["admin", "property_admin"], 
     children: [
       { label: "All Properties", path: "/properties" },
       { label: "Blocked Properties", path: "/properties/blocked" },
@@ -21,11 +23,13 @@ const sidebarMenu = [
     label: "Bookings",
     icon: Calendar,
     path: "/bookings",
+    roles: ["admin"],             
   },
   {
     label: "Users",
     icon: Users,
     path: "/users",
+    roles: ["admin"],             
   },
 ];
 

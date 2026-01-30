@@ -55,10 +55,14 @@ export const login = async (req, res) => {
     const { accessToken, refreshToken } = issueTokens(user);
 
     return res.json({
-      accessToken,
-      refreshToken,
-      user: publicUser(user),
+      data: {
+        accessToken,
+        refreshToken,
+        role: user.role,
+        user: publicUser(user),
+      }
     });
+
   } catch (err) {
     console.error("Login error:", err);
     return res.status(500).json({ message: "Login failed" });

@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoute.js";
 import propertyRoutes from "./routes/propertyRoute.js";

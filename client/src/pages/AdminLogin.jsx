@@ -20,12 +20,19 @@ export default function AdminLogin() {
         data: { email, password },
       });
 
-      const { accessToken, refreshToken } = response.data;
+      const { accessToken, refreshToken, role } = response.data.data;
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("role", role);
+
 
       toast.success("Logged in successfully!");
-      navigate("/dashboard");
+      if (role === "property_admin") {
+        navigate("/properties");
+      } else {
+        navigate("/dashboard");
+      }
+
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
     }
@@ -64,7 +71,7 @@ export default function AdminLogin() {
                 alt="KaraBook"
                 className="h-7"
               />
-             
+
             </div>
             <span className="text-sm font-semibold text-[#078d9a]">
               Admin Portal

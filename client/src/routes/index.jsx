@@ -140,13 +140,17 @@ function AppRoutes() {
   return (
     <BrowserRouter basename="/admin">
       <Routes>
-        {/* Public Login Route */}
+        {/* Public */}
         <Route path="/login" element={<AdminLogin />} />
 
-        {/* Protected Admin Routes */}
-        <Route element={<ProtectedAdminRoute />}>
+        {/* Layout wrapper */}
+        <Route element={<ProtectedAdminRoute allowPropertyAdmin />}>
           <Route path="/" element={<AdminLayout />}>
+
+            {/* Shared */}
             <Route path="dashboard" element={<AdminDashboard />} />
+
+            {/* PROPERTY ADMIN + ADMIN */}
             <Route path="properties" element={<PropertiesPage />} />
             <Route path="properties/blocked" element={<BlockedProperties />} />
             <Route path="add-property" element={<AddProperty />} />
@@ -154,15 +158,23 @@ function AppRoutes() {
             <Route path="view-property/:id" element={<ViewProperty />} />
             <Route path="properties/drafts" element={<DraftPropertiesPage />} />
             <Route path="properties/:id/media" element={<FinalizeMedia />} />
+
+          </Route>
+        </Route>
+
+        {/* ADMIN ONLY */}
+        <Route element={<ProtectedAdminRoute />}>
+          <Route path="/" element={<AdminLayout />}>
             <Route path="bookings" element={<BookingsPage />} />
             <Route path="users" element={<UsersPage />} />
-
             <Route path="invoice/:bookingId" element={<InvoicePreviewWrapper />} />
           </Route>
         </Route>
+
       </Routes>
     </BrowserRouter>
   );
 }
+
 
 export default AppRoutes;

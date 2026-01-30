@@ -14,7 +14,7 @@ import {
   deleteProperty,
   getDraftProperties
 } from "../controllers/propertyController.js";
-import { requireAuth, requireAdmin } from "../middlewares/requireAuth.js";
+import { requireAuth, requirePropertyAdmin } from "../middlewares/requireAuth.js";
 import upload from "../middlewares/multer.js";
 import {
   validatePropertyDraft,
@@ -27,7 +27,7 @@ const router = express.Router();
 router.post(
   "/draft",
   requireAuth,
-  requireAdmin,
+  requirePropertyAdmin,
   upload.none(),
   validatePropertyDraft,
   createPropertyDraft
@@ -36,7 +36,7 @@ router.post(
 router.post(
   "/:id/media",
   requireAuth,
-  requireAdmin,
+  requirePropertyAdmin,
   upload.fields([
     { name: "coverImage", maxCount: 1 },
     { name: "shopAct", maxCount: 1 },
@@ -47,7 +47,7 @@ router.post(
 );
 router.get("/", getAllProperties);
 router.get("/published", getPublishedProperties);
-router.get("/drafts", requireAuth, requireAdmin, getDraftProperties);
+router.get("/drafts", requireAuth, requirePropertyAdmin, getDraftProperties);
 router.get("/:id", getSingleProperty);
 
 function conditionalUpload(req, res, next) {
@@ -65,19 +65,19 @@ function conditionalUpload(req, res, next) {
 router.put(
   "/:id",
   requireAuth,
-  requireAdmin,
+  requirePropertyAdmin,
   conditionalUpload,
   validatePropertyUpdate,
   updateProperty
 );
 
 
-router.put("/:id/block", requireAuth, requireAdmin, blockProperty);
-router.put("/:id/unblock", requireAuth, requireAdmin, unblockProperty);
-router.put("/:id/toggle-featured", requireAuth, requireAdmin, toggleFeaturedProperty);
-router.put("/:id/toggle-publish", requireAuth, requireAdmin, togglePublishProperty);
+router.put("/:id/block", requireAuth, requirePropertyAdmin, blockProperty);
+router.put("/:id/unblock", requireAuth, requirePropertyAdmin, unblockProperty);
+router.put("/:id/toggle-featured", requireAuth, requirePropertyAdmin, toggleFeaturedProperty);
+router.put("/:id/toggle-publish", requireAuth, requirePropertyAdmin, togglePublishProperty);
 router.get("/:id/blocked-dates", getPropertyBlockedDatesPublic);
-router.delete( "/:id", requireAuth, requireAdmin, deleteProperty);
+router.delete( "/:id", requireAuth, requirePropertyAdmin, deleteProperty);
 
 
 export default router;

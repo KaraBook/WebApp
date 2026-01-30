@@ -15,7 +15,12 @@ export const requireAuth = async (req, res, next) => {
     const user = await User.findById(payload.id);
     if (!user) return res.status(401).json({ message: "Invalid token" });
 
-    req.user = { id: user._id, role: user.role, isAdmin: user.role === "admin" };
+    req.user = {
+      id: user._id,
+      role: user.role,
+      isAdmin: user.role === "admin",
+      isPropertyAdmin: user.role === "property_admin"
+    };
     next();
   } catch (err) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -28,6 +33,18 @@ export const requireAdmin = (req, res, next) => {
   }
   next();
 };
+
+
+export const requirePropertyAdmin = (req, res, next) => {
+  if (
+    req.user.role !== "admin" &&
+    req.user.role !== "property_admin"
+  ) {
+    return res.status(403).json({ message: "Property admins only" });
+  }
+  next();
+};
+
 
 
 

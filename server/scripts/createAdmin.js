@@ -10,11 +10,13 @@ const admins = [
     name: "Admin",
     email: "admin@resort.com",
     password: "admin123",
+    role: "admin"
   },
   {
     name: "Karabook Admin",
     email: "admin@karabook.in",
     password: "KarabookAdmin@123",
+    role: "property_admin"
   },
 ];
 
@@ -36,7 +38,7 @@ const createAdmins = async () => {
         name: a.name,
         email: a.email,
         password: hashedPassword,
-        role: "admin",
+        role: a.role,
       });
 
       await admin.save();

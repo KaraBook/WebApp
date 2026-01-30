@@ -10,6 +10,7 @@ function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const role = localStorage.getItem("role");
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
@@ -26,7 +27,7 @@ function Sidebar() {
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[#a7a7a7]">
-        {!collapsed && <span className="text-xl font-semibold text-primary"><img src="/admin/KarabookLogo.png" className="h-9"/></span>}
+        {!collapsed && <span className="text-xl font-semibold text-primary"><img src="/admin/KarabookLogo.png" className="h-9" /></span>}
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-primary hover:bg-hoverbg/80">
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </Button>
@@ -34,33 +35,36 @@ function Sidebar() {
 
       {/* Menu */}
       <nav className="flex-1 p-2 space-y-2">
-        {sidebarMenu.map((item, index) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
+        {sidebarMenu
+          .filter(item => !item.roles || item.roles.includes(role))
+          .map((item, index) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
 
-          return (
-            <div key={index}>
-              {item.children ? (
-                <SubMenu
-                  item={item}
-                  collapsed={collapsed}
-                  location={location}
-                  navigate={navigate}
-                />
+            return (
+              <div key={index}>
+                {item.children ? (
+                  <SubMenu
+                    item={item}
+                    collapsed={collapsed}
+                    location={location}
+                    navigate={navigate}
+                    role={role}
+                  />
 
-              ) : (
-                <Link
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 text-primary py-2 rounded-md hover:bg-hoverbg/80 text-sm font-medium transition-colors ${isActive ? "bg-hoverbg/80 text-primary" : "text-primary hover:text-primary"
-                    }`}
-                >
-                  <Icon size={18} />
-                  {!collapsed && <span>{item.label}</span>}
-                </Link>
-              )}
-            </div>
-          );
-        })}
+                ) : (
+                  <Link
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 text-primary py-2 rounded-md hover:bg-hoverbg/80 text-sm font-medium transition-colors ${isActive ? "bg-hoverbg/80 text-primary" : "text-primary hover:text-primary"
+                      }`}
+                  >
+                    <Icon size={18} />
+                    {!collapsed && <span>{item.label}</span>}
+                  </Link>
+                )}
+              </div>
+            );
+          })}
       </nav>
 
       <Separator className="my-2 bg-[#a7a7a7]" />
@@ -80,18 +84,22 @@ function Sidebar() {
   );
 }
 
-function SubMenu({ item, collapsed, location, navigate }) {
-  const [open, setOpen] = useState(false);
+function SubMenu({ item, collapsed, location, navigate, role }) {
   const Icon = item.icon;
 
   const isActive = item.children.some((c) =>
     location.pathname.startsWith(c.path)
   );
 
+  // 👇 Auto open if property_admin or already inside properties
+  const [open, setOpen] = useState(
+    role === "property_admin" || isActive
+  );
+
   const handleParentClick = () => {
     setOpen((prev) => !prev);
 
-    // 👉 Redirect to first child (All Properties)
+    // redirect to first child
     if (item.children?.length) {
       navigate(item.children[0].path);
     }
@@ -102,8 +110,9 @@ function SubMenu({ item, collapsed, location, navigate }) {
       <button
         type="button"
         onClick={handleParentClick}
-        className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium hover:bg-hoverbg/80 transition-colors ${isActive ? "bg-hoverbg/80 text-primary" : "text-primary"
-          }`}
+        className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium hover:bg-hoverbg/80 transition-colors ${
+          isActive ? "bg-hoverbg/80 text-primary" : "text-primary"
+        }`}
       >
         <div className="flex items-center gap-3">
           <Icon size={18} />
@@ -123,10 +132,11 @@ function SubMenu({ item, collapsed, location, navigate }) {
               <li key={idx}>
                 <Link
                   to={sub.path}
-                  className={`block px-2 py-1 text-sm rounded-md transition-colors hover:bg-hoverbg/80 ${isSubActive
+                  className={`block px-2 py-1 text-sm rounded-md transition-colors hover:bg-hoverbg/80 ${
+                    isSubActive
                       ? "bg-hoverbg/80 text-primary"
                       : "text-primary"
-                    }`}
+                  }`}
                 >
                   {sub.label}
                 </Link>
