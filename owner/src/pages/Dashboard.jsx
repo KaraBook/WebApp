@@ -475,7 +475,7 @@ export default function Dashboard() {
             value={stats?.pending}
             caption="Awaiting"
             variant="warning"
-            onClick={() => navigate("/bookings?status=pending")}
+            onClick={() => navigate("/bookings?time=all&status=pending")}
           />
 
           <StatCard
