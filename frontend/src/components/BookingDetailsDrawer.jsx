@@ -1,13 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Drawer, DrawerContent, DrawerOverlay } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
 
 
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
-    if (!booking) return null;
+    const [isMobile, setIsMobile] = useState(
+        window.matchMedia("(max-width: 767px)").matches
+    );
 
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    useEffect(() => {
+    if (!open) {
+      document.body.style.overflow = "";
+      return;
+    }
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  if (!open || !booking) return null;
 
     const {
         createdAt,
@@ -28,18 +41,6 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         cancelled,
         paymentId,
     } = booking;
-
-    useEffect(() => {
-        if (!isMobile && open) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
-        }
-
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [open, isMobile]);
 
     const uiStatus =
         cancelled
