@@ -1,20 +1,7 @@
-import { useEffect } from "react";
-import {
-    Drawer,
-    DrawerContent,
-    DrawerOverlay,
-} from "@/components/ui/drawer";
+import { useEffect, useState } from "react";
+import { Drawer, DrawerContent, DrawerOverlay} from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import {
-    Home,
-    Calendar,
-    Moon,
-    Users,
-    Mail,
-    Phone,
-    Clock,
-    X,
-} from "lucide-react";
+import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X} from "lucide-react";
 
 
 function normalizeBookingStatus(b) {
