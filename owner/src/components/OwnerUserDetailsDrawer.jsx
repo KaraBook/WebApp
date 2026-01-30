@@ -99,7 +99,7 @@ function Body({ user, fullName }) {
             className="w-28 h-28 rounded-xl object-cover"
           />
         ) : (
-          <div className="w-28 h-28 rounded-xl bg-black text-white flex items-center justify-center text-3xl font-semibold">
+          <div className="w-28 h-28 rounded-xl bg-primary text-white flex items-center justify-center text-3xl font-semibold">
             {fullName[0]}
           </div>
         )}
