@@ -112,7 +112,7 @@ function Body({ user, fullName }) {
           icon={<Mail size={14} />}
           text={
             user.email ? (
-              <a href={`mailto:${user.email}`} className="text-primary underline">
+              <a href={`mailto:${user.email}`} >
                 {user.email}
               </a>
             ) : "—"
@@ -123,7 +123,7 @@ function Body({ user, fullName }) {
           icon={<Phone size={14} />}
           text={
             user.mobile ? (
-              <a href={`tel:${user.mobile}`} className="text-primary underline">
+              <a href={`tel:${user.mobile}`} >
                 {user.mobile}
               </a>
             ) : "—"

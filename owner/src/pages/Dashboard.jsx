@@ -484,7 +484,7 @@ export default function Dashboard() {
             value={stats?.cancelled}
             caption="Canceled Trips"
             variant="danger"
-            onClick={() => navigate("/bookings?status=cancelled")}
+            onClick={() => navigate("/bookings?time=all&status=cancelled")}
           />
 
           <div className="col-span-2 md:col-span-1">
