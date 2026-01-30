@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -13,7 +11,7 @@ import { HiDotsVertical } from "react-icons/hi";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
-import UserDetailsDialog from "@/components/UserDetailsDialog";
+import UserDetailsDrawer from "@/components/UserDetailsDrawer";
 import MobileUserCard from "@/components/MobileUserCard";
 
 const filterOptions = [
@@ -385,10 +383,10 @@ const UsersPage = () => {
       </div>
 
       {/* User Popup */}
-      <UserDetailsDialog
+      <UserDetailsDrawer
         open={viewUser.open}
-        onClose={closeView}
         user={viewUser.data}
+        onClose={closeView}
       />
     </>
   );

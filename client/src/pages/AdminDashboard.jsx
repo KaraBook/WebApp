@@ -5,7 +5,7 @@ import SummaryApi from "../common/SummaryApi";
 import { Button } from "@/components/ui/button";
 import { Loader2, Users, CalendarCheck, Clock, Wallet, Home } from "lucide-react";
 import { Link } from "react-router-dom";
-import BookingDetailsDialog from "@/components/BookingDetailsDialog";
+import BookingDetailsDialog from "@/components/BookingDetailsDrawer";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -49,9 +49,18 @@ const DashboardPage = () => {
       const users = usersRes?.data?.data || [];
       const properties = propertiesRes?.data?.data || [];
 
-      const confirmed = bookings.filter((b) => b.paymentStatus === "paid");
-      const pending = bookings.filter((b) => b.paymentStatus === "pending");
-      const failed = bookings.filter((b) => b.paymentStatus === "failed");
+      const confirmed = bookings.filter(
+        (b) => b.paymentStatus === "paid" && b.cancelled !== true
+      );
+
+      const pending = bookings.filter(
+        (b) => b.paymentStatus === "initiated" && b.cancelled !== true
+      );
+
+      const cancelled = bookings.filter(
+        (b) => b.cancelled === true
+      );
+
 
       const totalRevenue = confirmed.reduce(
         (acc, b) => acc + (b.totalAmount || 0),
@@ -120,7 +129,7 @@ const DashboardPage = () => {
         totalBookings: bookings.length,
         confirmed: confirmed.length,
         pending: pending.length,
-        failed: failed.length,
+        cancelled: cancelled.length,
         totalUsers: users.length,
         totalProperties: properties.length,
 
@@ -173,7 +182,7 @@ const DashboardPage = () => {
     if (bookingFilter === "all") return true;
     if (bookingFilter === "confirmed") return b.paymentStatus === "paid";
     if (bookingFilter === "initiated") return b.paymentStatus === "initiated";
-    if (bookingFilter === "cancelled") return b.paymentStatus === "failed";
+    if (bookingFilter === "cancelled") return b.cancelled === true;
     return true;
   });
 
@@ -254,7 +263,7 @@ const DashboardPage = () => {
         <Link to="/bookings?status=cancelled">
           <StatCard
             title="Cancelled"
-            value={stats.failed}
+            value={stats.cancelled}
             icon={Clock}
             dotColor="bg-red-500"
           />
@@ -391,7 +400,9 @@ const DashboardPage = () => {
 
                 {/* Status */}
                 <td className="px-4 py-4">
-                  <StatusPill status={b.paymentStatus} />
+                  <StatusPill
+                    status={b.cancelled ? "cancelled" : b.paymentStatus}
+                  />
                 </td>
 
                 {/* Created */}

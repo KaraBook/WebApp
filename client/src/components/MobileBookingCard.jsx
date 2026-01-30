@@ -1,27 +1,19 @@
-import {
-  Calendar,
-  Moon,
-  Users,
-  MoreVertical,
-} from "lucide-react";
+import { Calendar, Moon, Users, MoreVertical} from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
 
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 
-/* ---------- STATUS PILL (EXACT STYLE) ---------- */
 function StatusPill({ status }) {
-  const normalizedStatus =
-    status === "initiated" ? "pending" : status;
+  const normalized =
+    status === "initiated"
+      ? "pending"
+      : status === "paid"
+        ? "confirmed"
+        : status;
 
   const map = {
     confirmed: "border-green-300 text-green-600 bg-green-50",
-    paid: "border-green-300 text-green-600 bg-green-50",
     pending: "border-orange-300 text-orange-600 bg-orange-50",
-    failed: "border-red-300 text-red-600 bg-red-50",
+    cancelled: "border-red-300 text-red-600 bg-red-50",
   };
 
   return (
@@ -33,21 +25,18 @@ function StatusPill({ status }) {
         font-medium
         capitalize
         border
-        ${map[normalizedStatus] || "border-neutral-300 text-neutral-600"}
+        ${map[normalized] || "border-neutral-300 text-neutral-600"}
       `}
     >
-      {normalizedStatus}
+      {normalized}
     </span>
   );
 }
 
 
-/* ---------- MOBILE CARD ---------- */
-export default function MobileBookingCard({
-  booking,
-  onView,
-  onInvoice,
-}) {
+
+
+export default function MobileBookingCard({ booking, onView, onInvoice }) {
   if (!booking) return null;
 
   const {
@@ -69,8 +58,11 @@ export default function MobileBookingCard({
     });
 
   return (
-    <div className="md:hidden bg-white border rounded-xl p-4 shadow-sm space-y-3">
-      {/* ---------- HEADER ---------- */}
+    <div
+      className="md:hidden bg-white border rounded-xl p-4 shadow-sm space-y-3 cursor-pointer hover:bg-neutral-50 transition"
+      onClick={() => onView?.(booking)}
+    >
+      {/* HEADER */}
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-semibold text-sm text-neutral-900">
@@ -82,33 +74,51 @@ export default function MobileBookingCard({
         </div>
 
         <div className="flex items-center gap-2">
-          <StatusPill status={paymentStatus} />
+          <StatusPill status={booking.cancelled ? "cancelled" : paymentStatus} />
 
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <button className="p-1 rounded-full hover:bg-neutral-100">
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="p-1 rounded-full hover:bg-neutral-100"
+              >
                 <MoreVertical className="w-4 h-4 text-neutral-600" />
               </button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-48 py-2 ">
-              <DropdownMenuItem onClick={() => onView?.(booking)} className="mb-1">
+            <DropdownMenuContent align="end" className="w-48 py-2">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onView?.(booking);
+                }}
+              >
                 View Booking
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={onInvoice} className="mb-1"> 
+
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onInvoice?.();
+                }}
+              >
                 View Invoice
               </DropdownMenuItem>
-              <DropdownMenuItem className="mb-1"
-                onClick={() =>
-                  navigator.clipboard.writeText(userId?.email || "")
-                }
+
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(userId?.email || "");
+                }}
               >
                 Copy Email
               </DropdownMenuItem>
+
               <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(userId?.mobile || "")
-                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(userId?.mobile || "");
+                }}
               >
                 Copy Mobile
               </DropdownMenuItem>
@@ -117,12 +127,12 @@ export default function MobileBookingCard({
         </div>
       </div>
 
-      {/* ---------- PROPERTY PILL ---------- */}
+      {/* PROPERTY */}
       <div className="bg-neutral-50 rounded-lg px-3 py-2 text-sm font-medium text-neutral-800">
         {propertyId?.propertyName}
       </div>
 
-      {/* ---------- META ROW ---------- */}
+      {/* META */}
       <div className="flex items-center gap-5 text-sm text-neutral-600">
         <div className="flex items-center gap-2 text-[12px]">
           <Calendar className="w-4 h-4" />

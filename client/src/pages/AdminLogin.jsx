@@ -51,10 +51,10 @@ export default function AdminLogin() {
       </div>
 
       {/* RIGHT PANEL */}
-      <div className="w-full md:w-1/2 bg-[#078d9a] flex items-center justify-center p-6">
+      <div className="w-full md:w-1/2 bg-[#078d9a] flex items-center justify-center p-4 md:p-6">
 
         {/* CARD */}
-        <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
+        <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-4 md:p-8">
 
           {/* LOGO */}
           <div className="flex items-center justify-between mb-6">
@@ -122,7 +122,7 @@ export default function AdminLogin() {
             </button>
           </form>
 
-          <div className="mt-8 border-t pt-4 text-center text-xs text-gray-400">
+          <div className="mt-4 md:mt-8 border-t pt-2 md:pt-4 text-center text-xs text-gray-400">
             © {new Date().getFullYear()} Karabook · Secure Admin Access
           </div>
         </div>

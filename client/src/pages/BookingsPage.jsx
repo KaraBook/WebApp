@@ -9,8 +9,8 @@ import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import BookingDetailsDialog from "@/components/BookingDetailsDialog";
 import { IoIosArrowDropdown } from "react-icons/io";
+import BookingDetailsDrawer from "@/components/BookingDetailsDrawer";
 import { HiDotsVertical } from "react-icons/hi";
 import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
@@ -31,7 +31,8 @@ const BookingsPage = () => {
     const [search, setSearch] = useState("");
     const [openDropdownId, setOpenDropdownId] = useState(null);
     const [confirm, setConfirm] = useState({ open: false, type: null, booking: null });
-    const [viewBooking, setViewBooking] = useState({ open: false, data: null });
+    const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+    const [selectedBooking, setSelectedBooking] = useState(null);
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -74,17 +75,23 @@ const BookingsPage = () => {
     const bookingCounts = useMemo(() => {
         return {
             all: bookings.length,
-            paid: bookings.filter(b => b.paymentStatus === "paid").length,
-            pending: bookings.filter(b => b.paymentStatus === "pending").length,
-            failed: bookings.filter(b => b.paymentStatus === "failed").length,
+            confirmed: bookings.filter(
+                b => b.paymentStatus === "paid" && b.cancelled !== true
+            ).length,
+            pending: bookings.filter(
+                b => b.paymentStatus === "initiated" && b.cancelled !== true
+            ).length,
+            cancelled: bookings.filter(
+                b => b.cancelled === true
+            ).length,
         };
     }, [bookings]);
 
     const filterOptions = useMemo(() => [
         { label: `All Bookings (${bookingCounts.all})`, value: "all" },
-        { label: `Paid (${bookingCounts.paid})`, value: "paid" },
+        { label: `Confirmed (${bookingCounts.confirmed})`, value: "confirmed" },
         { label: `Pending (${bookingCounts.pending})`, value: "pending" },
-        { label: `Failed (${bookingCounts.failed})`, value: "failed" },
+        { label: `Cancelled (${bookingCounts.cancelled})`, value: "cancelled" },
         { label: "Upcoming", value: "upcoming" },
         { label: "Past", value: "past" },
     ], [bookingCounts]);
@@ -97,9 +104,9 @@ const BookingsPage = () => {
 
     const openView = (booking) => {
         setOpenDropdownId(null);
-        setViewBooking({ open: true, data: booking });
+        setSelectedBooking(booking);
+        setBookingDialogOpen(true);
     };
-    const closeView = () => setViewBooking({ open: false, data: null });
 
     const fetchBookings = async () => {
         try {
@@ -125,7 +132,7 @@ const BookingsPage = () => {
         const params = new URLSearchParams(location.search);
         const status = params.get("status");
 
-        if (status && ["paid", "pending", "failed"].includes(status)) {
+        if (status && ["confirmed", "pending", "cancelled"].includes(status)) {
             setSelectedFilter(status);
         } else {
             setSelectedFilter("all");
@@ -160,15 +167,16 @@ const BookingsPage = () => {
 
     const statusBadge = (rawStatus) => {
         const status =
-            rawStatus === "initiated" || rawStatus === "pending"
+            rawStatus === "initiated"
                 ? "pending"
-                : rawStatus;
+                : rawStatus === "paid"
+                    ? "confirmed"
+                    : rawStatus;
 
         const map = {
-            paid: "border-green-300 text-green-600 bg-green-50",
             confirmed: "border-green-300 text-green-600 bg-green-50",
             pending: "border-orange-300 text-orange-600 bg-orange-50",
-            failed: "border-red-300 text-red-600 bg-red-50",
+            cancelled: "border-red-300 text-red-600 bg-red-50",
         };
 
         return (
@@ -188,13 +196,22 @@ const BookingsPage = () => {
         );
     };
 
+
     const statusDot = (status) => {
         let color = "bg-gray-400";
-        if (status === "paid") color = "bg-green-300";
-        if (status === "failed") color = "bg-red-300";
-        if (status === "pending") color = "bg-yellow-300";
+
+        if (status === "paid" || status === "confirmed")
+            color = "bg-green-300";
+
+        if (status === "cancelled")
+            color = "bg-red-300";
+
+        if (status === "pending" || status === "initiated")
+            color = "bg-yellow-300";
+
         return <span className={`inline-block w-3 h-3 rounded-full ${color}`} />;
     };
+
 
     const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const isUpcoming = (b) => (b?.checkIn ? new Date(b.checkIn) >= startOfDay(new Date()) : false);
@@ -203,9 +220,15 @@ const BookingsPage = () => {
     const filtered = useMemo(() => {
         const base = bookings
             .filter((b) => {
-                if (selectedFilter === "paid") return b.paymentStatus === "paid";
-                if (selectedFilter === "pending") return b.paymentStatus === "pending";
-                if (selectedFilter === "failed") return b.paymentStatus === "failed";
+                if (selectedFilter === "confirmed")
+                    return b.paymentStatus === "paid" && b.cancelled !== true;
+
+                if (selectedFilter === "pending")
+                    return b.paymentStatus === "initiated" && b.cancelled !== true;
+
+                if (selectedFilter === "cancelled")
+                    return b.cancelled === true;
+
                 if (selectedFilter === "upcoming") return isUpcoming(b);
                 if (selectedFilter === "past") return isPast(b);
                 return true;
@@ -391,7 +414,7 @@ const BookingsPage = () => {
                         placeholder="Search: booking id / traveller / property / email / phone"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="bg-white text-[14px] h-10"
+                        className="bg-white text-[14px] h-10 md:w-[395px]"
                     />
 
                     <DropdownMenu>
@@ -401,9 +424,10 @@ const BookingsPage = () => {
                                 <IoIosArrowDropdown className="ml-2" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 ">
+                        <DropdownMenuContent className="w-[89vw] md:w-56 ">
                             {filterOptions.map((option) => (
                                 <DropdownMenuItem
+                                className="py-2"
                                     key={option.value}
                                     onSelect={() => setSelectedFilter(option.value)}
                                 >
@@ -456,15 +480,16 @@ const BookingsPage = () => {
                                             <TableRow
                                                 key={b._id}
                                                 className="cursor-pointer hover:bg-muted/40 transition-colors"
-                                                onClickCapture={() => openView(b)}
+                                                onClick={() => openView(b)}
                                             >
+
                                                 <TableCell className="text-center">
                                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                                 </TableCell>
 
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
-                                                        {statusDot(b.paymentStatus)}
+                                                        {statusDot(b.cancelled ? "cancelled" : b.paymentStatus)}
 
                                                         <button
                                                             type="button"
@@ -512,7 +537,7 @@ const BookingsPage = () => {
                                                 <TableCell>{formatCurrency(b.totalAmount)}</TableCell>
 
                                                 <TableCell>
-                                                    {statusBadge(b.paymentStatus)}
+                                                    {statusBadge(b.cancelled ? "cancelled" : b.paymentStatus)}
                                                 </TableCell>
 
                                                 <TableCell>{formatDate(b.createdAt)}</TableCell>
@@ -667,7 +692,15 @@ const BookingsPage = () => {
             </div>
 
             {/* Booking Details Dialog */}
-            <BookingDetailsDialog open={viewBooking.open} onClose={closeView} booking={viewBooking.data} />
+            <BookingDetailsDrawer
+                open={bookingDialogOpen}
+                booking={selectedBooking}
+                onClose={() => {
+                    setBookingDialogOpen(false);
+                    setSelectedBooking(null);
+                }}
+            />
+
 
             {/* Confirm Dialog */}
             <AlertDialog
