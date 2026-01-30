@@ -56,6 +56,18 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         contactEmail,
     } = booking;
 
+    useEffect(() => {
+        if (!open) {
+            document.body.style.overflow = "";
+            return;
+        }
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [open]);
+
+
     const uiStatus = normalizeBookingStatus(booking);
 
     const adults = guests?.adults || 0;
