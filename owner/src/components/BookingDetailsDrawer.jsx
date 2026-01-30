@@ -34,9 +34,9 @@ function normalizeBookingStatus(b) {
 }
 
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
-    if (!booking) return null;
-
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const [isMobile, setIsMobile] = useState(
+        window.matchMedia("(max-width: 767px)").matches
+      );
 
     const {
         createdAt,
@@ -67,6 +67,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         };
     }, [open]);
 
+    if (!booking) return null;
 
     const uiStatus = normalizeBookingStatus(booking);
 
