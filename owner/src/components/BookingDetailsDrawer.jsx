@@ -57,16 +57,16 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     } = booking;
 
     useEffect(() => {
-        if (!isMobile && open) {
+        if (open) {
             document.body.style.overflow = "hidden";
         } else {
-            document.body.style.overflow = "";
+            document.body.style.overflow = "auto";
         }
 
         return () => {
-            document.body.style.overflow = "";
+            document.body.style.overflow = "auto";
         };
-    }, [open, isMobile]);
+    }, [open]);
 
     const uiStatus = normalizeBookingStatus(booking);
 
