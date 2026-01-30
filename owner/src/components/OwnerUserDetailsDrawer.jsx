@@ -22,7 +22,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
     };
   }, [open]);
 
-  if (!booking) return null;
+  if (!user) return null;
 
   const fullName =
     `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Guest";
