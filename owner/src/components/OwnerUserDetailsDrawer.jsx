@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Drawer, DrawerContent, DrawerOverlay} from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerOverlay } from "@/components/ui/drawer";
 import { X, User, Mail, Phone, MapPin, Calendar, Shield } from "lucide-react";
 import { format } from "date-fns";
 
@@ -7,21 +7,25 @@ const formatDate = (d) =>
   d ? format(new Date(d), "dd MMM, yyyy") : "—";
 
 export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
-  if (!user) return null;
+  const [isMobile, setIsMobile] = useState(
+    window.matchMedia("(max-width: 767px)").matches
+  );
 
-  const isMobile = window.matchMedia("(max-width: 767px)").matches;
+  useEffect(() => {
+    if (!open) {
+      document.body.style.overflow = "";
+      return;
+    }
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  if (!booking) return null;
 
   const fullName =
     `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Guest";
-
-  useEffect(() => {
-    if (!isMobile && open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => (document.body.style.overflow = "");
-  }, [open, isMobile]);
 
 
   if (isMobile) {
