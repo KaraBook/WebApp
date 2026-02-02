@@ -138,7 +138,7 @@ ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
 
 
             <div
-  className={`
+                className={`
 fixed z-[9999]
 inset-0 md:inset-auto
 md:top-1/2 md:left-1/2
@@ -150,12 +150,12 @@ h-full md:max-h-[85vh]
 bg-white shadow-2xl md:rounded-xl
 transition-all duration-300
 
-${open 
-  ? "translate-x-0 opacity-100" 
-  : "translate-x-full md:translate-x-0 opacity-0 pointer-events-none"
-}
+${open
+                        ? "translate-x-0 opacity-100"
+                        : "translate-x-full md:translate-x-0 opacity-0 pointer-events-none"
+                    }
 `}
->
+            >
                 <div className="flex flex-col h-full">
                     <Header
                         userName={userName}
@@ -245,21 +245,15 @@ function Body(props) {
 
     return (
         <div className="px-4 py-4 space-y-5 text-sm overflow-y-auto">
-            <InfoCardBlock
-                icon={<Home size={16} />}
-                label="Property"
-                value={propertyId?.propertyName || "—"}
+
+            <BookingSummaryBlock
+                checkIn={checkIn}
+                checkOut={checkOut}
+                totalNights={totalNights}
+                adults={adults}
+                children={children}
+                formatDate={formatDate}
             />
-
-            <div className="grid grid-cols-2 gap-4">
-                <InfoCard icon={<Calendar size={16} />} label="Check-in" value={formatDate(checkIn)} />
-                <InfoCard icon={<Calendar size={16} />} label="Check-out" value={formatDate(checkOut)} />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-                <InfoCard icon={<Moon size={16} />} label="Nights" value={totalNights} />
-                <InfoCard icon={<Users size={16} />} label="Guests" value={`${adults} Adults, ${children} Children`} />
-            </div>
 
             <Separator />
 
@@ -356,4 +350,42 @@ function Key({ label, value, bold, mono }) {
     );
 }
 
+function BookingSummaryBlock({
+    checkIn,
+    checkOut,
+    totalNights,
+    adults,
+    children,
+    formatDate,
+}) {
+    return (
+        <div className="rounded-xl border bg-gray-50 px-4 py-3 space-y-3">
+            <div className="text-[11px] font-semibold uppercase text-muted-foreground">
+                Check-in – Check-out
+            </div>
+
+            <div className="flex items-start gap-3">
+                <Calendar size={18} className="mt-0.5 text-muted-foreground" />
+                <div>
+                    <p className="font-medium">
+                        {formatDate(checkIn)} – {formatDate(checkOut)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        {totalNights} night(s)
+                    </p>
+                </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+                <Users size={18} className="mt-0.5 text-muted-foreground" />
+                <div>
+                    <p className="font-medium">{adults + children} Guests</p>
+                    <p className="text-xs text-muted-foreground">
+                        Adults: {adults} · Children: {children}
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
 
