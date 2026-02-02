@@ -244,7 +244,7 @@ function Body(props) {
     } = props;
 
     return (
-        <div className="px-4 py-4 space-y-5 text-sm overflow-y-auto">
+        <div className="px-4 py-4 space-y-4 text-sm overflow-y-auto">
 
             <BookingSummaryBlock
                 checkIn={checkIn}
