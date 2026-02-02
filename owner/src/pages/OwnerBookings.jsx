@@ -188,7 +188,6 @@ export default function OwnerBookings() {
   const formatCurrency = (n) => `₹${Number(n).toLocaleString()}`;
   const formatDate = (d) => format(new Date(d), "dd MMM yyyy");
 
-  // 🧾 DOWNLOAD INVOICE FUNCTION
   const downloadInvoicePDF = async (booking) => {
     try {
       if (booking.paymentStatus !== "paid") {
@@ -207,7 +206,6 @@ export default function OwnerBookings() {
 
       setInvoiceData(res.data.data);
 
-      // Wait for the preview to render
       await new Promise((r) => setTimeout(r, 250));
 
       const element = invoiceRef.current;
@@ -411,7 +409,7 @@ export default function OwnerBookings() {
                       <td className="py-3 px-4">
                         {typeof b.guests === "number"
                           ? `${b.guests} Guests`
-                          : `${b.guests.adults + b.guests.children} Guests`}
+                          : `${b.guests.adults + b.guests.children}`}
                       </td>
 
                       <td className="py-3 px-4 font-medium">
