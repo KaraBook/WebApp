@@ -129,19 +129,21 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     return (
         <>
             <div
+                onClick={onClose}
                 className={`
-fixed inset-0 z-[9999]
-flex items-center justify-center
-transition-opacity duration-300
+fixed inset-0 z-[9998]
+bg-black/40 backdrop-blur-sm
 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
 `}
-            >
+            />
+
+
             <div
                 className={`
-bg-white shadow-2xl rounded-xl
-w-[420px] max-h-[85vh]
-transition-all duration-300
-${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}
+fixed z-[9999] top-0 right-0 h-full w-[420px]
+bg-white shadow-2xl
+transition-transform duration-300
+${open ? "translate-x-0" : "translate-x-full"}
 `}
             >
                 <div className="flex flex-col h-full">
@@ -171,7 +173,6 @@ ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}
                         />
                     </div>
                 </div>
-            </div>
             </div>
         </>
     );
@@ -286,7 +287,6 @@ function Body(props) {
                 <Key label="Order ID" value={orderId} mono />
             </Section>
         </div>
-    
     );
 }
 
@@ -345,3 +345,5 @@ function Key({ label, value, bold, mono }) {
         </div>
     );
 }
+
+
