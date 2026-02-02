@@ -383,13 +383,17 @@ function BookingSummaryBlock({
                 {veg + nonVeg > 0 && (
                     <div className="text-left">
                         <p className="font-medium">Meals</p>
-                        <div className="flex items-center gap-2">
-                        <p className="text-xs text-muted-foreground">
-                            🟢 Veg: {veg}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                            🔴 Non-veg: {nonVeg}
-                        </p>
+
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/70" />
+                                <span>Veg: {veg}</span>
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                                <span className="w-2.5 h-2.5 rounded-full bg-rose-400/70" />
+                                <span>Non-veg: {nonVeg}</span>
+                            </div>
                         </div>
                     </div>
                 )}
