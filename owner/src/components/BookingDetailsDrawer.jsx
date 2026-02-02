@@ -381,14 +381,16 @@ function BookingSummaryBlock({
 
                 {/* Right: Meals */}
                 {veg + nonVeg > 0 && (
-                    <div className="text-right">
+                    <div className="text-left">
                         <p className="font-medium">Meals</p>
+                        <div className="flex items-center gap-2">
                         <p className="text-xs text-muted-foreground">
                             🟢 Veg: {veg}
                         </p>
                         <p className="text-xs text-muted-foreground">
                             🔴 Non-veg: {nonVeg}
                         </p>
+                        </div>
                     </div>
                 )}
             </div>
