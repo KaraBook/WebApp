@@ -135,7 +135,7 @@ flex items-center justify-center
 transition-opacity duration-300
 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
 `}
-            />
+            >
             <div
                 className={`
 bg-white shadow-2xl rounded-xl
@@ -171,6 +171,7 @@ ${open ? "scale-100 opacity-100" : "scale-95 opacity-0"}
                         />
                     </div>
                 </div>
+            </div>
             </div>
         </>
     );
@@ -285,6 +286,7 @@ function Body(props) {
                 <Key label="Order ID" value={orderId} mono />
             </Section>
         </div>
+    
     );
 }
 
