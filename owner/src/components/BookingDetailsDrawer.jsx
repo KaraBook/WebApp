@@ -140,7 +140,7 @@ ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
 
             <div
                 className={`
-fixed z-[9999] top-0 right-0 h-full w-[420px]
+fixed z-[9999] top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 h-full w-[420px]
 bg-white shadow-2xl
 transition-transform duration-300
 ${open ? "translate-x-0" : "translate-x-full"}
