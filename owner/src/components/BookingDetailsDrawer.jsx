@@ -125,7 +125,6 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         );
     }
 
-    /* ================= DESKTOP PANEL (UNCHANGED) ================= */
     return (
         <>
             <div
@@ -139,13 +138,24 @@ ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
 
 
             <div
-                className={`
-fixed z-[9999] top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 h-full w-[420px]
-bg-white shadow-2xl
-transition-transform duration-300
-${open ? "translate-x-0" : "translate-x-full"}
+  className={`
+fixed z-[9999]
+inset-0 md:inset-auto
+md:top-1/2 md:left-1/2
+md:-translate-x-1/2 md:-translate-y-1/2
+
+w-full md:w-[420px]
+h-full md:max-h-[85vh]
+
+bg-white shadow-2xl md:rounded-xl
+transition-all duration-300
+
+${open 
+  ? "translate-x-0 opacity-100" 
+  : "translate-x-full md:translate-x-0 opacity-0 pointer-events-none"
+}
 `}
-            >
+>
                 <div className="flex flex-col h-full">
                     <Header
                         userName={userName}
