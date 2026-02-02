@@ -284,7 +284,6 @@ function Body(props) {
             <Separator />
 
             <Section title="Payment Information">
-                <Key label="Payment Method" value={paymentMethod} />
                 <Key label="Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
                 <Key label="Tax" value={`₹${safeTax.toLocaleString("en-IN")}`} />
                 <Key label="Grand Total" value={`₹${safeGrandTotal.toLocaleString("en-IN")}`} bold />
@@ -294,30 +293,6 @@ function Body(props) {
     );
 }
 
-/* ================= SMALL UI BLOCKS ================= */
-
-function InfoCard({ icon, label, value }) {
-    return (
-        <div className="rounded-xl border bg-gray-50 px-4 py-3">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                {icon} {label}
-            </div>
-            <div className="mt-1 font-medium">{value}</div>
-        </div>
-    );
-}
-
-function InfoCardBlock({ icon, label, value }) {
-    return (
-        <div className="rounded-xl border px-4 py-3 flex items-center gap-3">
-            {icon}
-            <div>
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="font-medium">{value}</p>
-            </div>
-        </div>
-    );
-}
 
 function Section({ title, children }) {
     return (
