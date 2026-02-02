@@ -61,6 +61,9 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     const adults = guests?.adults || 0;
     const children = guests?.children || 0;
 
+    const veg = booking?.meals?.veg || 0;
+    const nonVeg = booking?.meals?.nonVeg || 0;
+
     const userName =
         `${userId?.firstName || ""} ${userId?.lastName || ""}`.trim() || "Guest";
 
@@ -328,64 +331,64 @@ function Key({ label, value, bold, mono }) {
 }
 
 function BookingSummaryBlock({
-  checkIn,
-  checkOut,
-  totalNights,
-  adults,
-  children,
-  veg,
-  nonVeg,
-  formatDate,
+    checkIn,
+    checkOut,
+    totalNights,
+    adults,
+    children,
+    veg,
+    nonVeg,
+    formatDate,
 }) {
-  const totalGuests = adults + children;
+    const totalGuests = adults + children;
 
-  return (
-    <div className="rounded-xl border bg-gray-50 px-4 py-3 space-y-3">
-      <div className="text-[11px] font-semibold uppercase text-muted-foreground">
-        Check-in – Check-out
-      </div>
+    return (
+        <div className="rounded-xl border bg-gray-50 px-4 py-3 space-y-3">
+            <div className="text-[11px] font-semibold uppercase text-muted-foreground">
+                Check-in – Check-out
+            </div>
 
-      {/* Dates */}
-      <div className="flex items-start gap-3">
-        <Calendar size={18} className="mt-0.5 text-muted-foreground" />
-        <div>
-          <p className="font-medium">
-            {formatDate(checkIn)} – {formatDate(checkOut)}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {totalNights} night(s)
-          </p>
+            {/* Dates */}
+            <div className="flex items-start gap-3">
+                <Calendar size={18} className="mt-0.5 text-muted-foreground" />
+                <div>
+                    <p className="font-medium">
+                        {formatDate(checkIn)} – {formatDate(checkOut)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                        {totalNights} night(s)
+                    </p>
+                </div>
+            </div>
+
+            {/* Guests + Meals */}
+            <div className="flex items-start justify-between">
+                {/* Left: Guests */}
+                <div className="flex items-start gap-3">
+                    <Users size={18} className="mt-0.5 text-muted-foreground" />
+                    <div>
+                        <p className="font-medium">{totalGuests} Guests</p>
+                        <p className="text-xs text-muted-foreground">
+                            Adults: {adults} · Children: {children}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Right: Meals */}
+                {veg + nonVeg > 0 && (
+                    <div className="text-right">
+                        <p className="font-medium">Meals</p>
+                        <p className="text-xs text-muted-foreground">
+                            🟢 Veg: {veg}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                            🔴 Non-veg: {nonVeg}
+                        </p>
+                    </div>
+                )}
+            </div>
         </div>
-      </div>
-
-      {/* Guests + Meals */}
-      <div className="flex items-start justify-between">
-        {/* Left: Guests */}
-        <div className="flex items-start gap-3">
-          <Users size={18} className="mt-0.5 text-muted-foreground" />
-          <div>
-            <p className="font-medium">{totalGuests} Guests</p>
-            <p className="text-xs text-muted-foreground">
-              Adults: {adults} · Children: {children}
-            </p>
-          </div>
-        </div>
-
-        {/* Right: Meals */}
-        {veg + nonVeg > 0 && (
-          <div className="text-right">
-            <p className="font-medium">Meals</p>
-            <p className="text-xs text-muted-foreground">
-              🟢 Veg: {veg}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              🔴 Non-veg: {nonVeg}
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    );
 }
 
 
