@@ -114,6 +114,8 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         totalNights={totalNights}
                         adults={adults}
                         children={children}
+                        veg={veg}
+                        nonVeg={nonVeg}
                         userEmail={userEmail}
                         userPhone={userPhone}
                         paymentMethod={paymentMethod}
@@ -175,6 +177,8 @@ ${open
                             totalNights={totalNights}
                             adults={adults}
                             children={children}
+                            veg={veg}
+                            nonVeg={nonVeg}
                             userEmail={userEmail}
                             userPhone={userPhone}
                             paymentMethod={paymentMethod}
@@ -235,6 +239,8 @@ function Body(props) {
         checkOut,
         totalNights,
         adults,
+        veg,
+        nonVeg,
         children,
         userEmail,
         userPhone,
@@ -255,11 +261,10 @@ function Body(props) {
                 totalNights={totalNights}
                 adults={adults}
                 children={children}
-                veg={booking?.meals?.veg || 0}
-                nonVeg={booking?.meals?.nonVeg || 0}
+                veg={veg}
+                nonVeg={nonVeg}
                 formatDate={formatDate}
             />
-
             <Separator />
 
             <Section title="Contact Information">
