@@ -96,14 +96,14 @@ export default function OwnerUsers() {
         );
     }
 
-    const roleLabel = {
+    const getRoleLabel = (role) => ({
         traveller: "Traveller",
         owner: "Owner",
         resortOwner: "Owner",
         propertyOwner: "Owner",
         manager: "Manager",
         admin: "Admin",
-    }[u.role] || "User";
+    }[role] || "User");
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -224,7 +224,9 @@ export default function OwnerUsers() {
                                         </div>
                                         <div>
                                             <p className="font-medium">{getFullName(u)}</p>
-                                            <p className="text-xs text-gray-500">{roleLabel}</p>
+                                            <p className="text-xs text-gray-500">
+                                                {getRoleLabel(u.role)}
+                                            </p>
                                         </div>
                                     </div>
                                 </td>
