@@ -261,29 +261,15 @@ export default function Dashboard() {
           return checkOut < today;
         });
 
-        const stats = {
-          totalBookings: all.length,
+        const dashboardData = res.data?.data;
 
-          confirmed: all.filter(
-            b => normalizeBookingStatus(b) === "confirmed"
-          ).length,
+        setData({
+          stats: dashboardData.stats,
+          bookings: upcoming.sort(
+            (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
+          )
+        });
 
-          pending: all.filter(
-            b => normalizeBookingStatus(b) === "pending"
-          ).length,
-
-          cancelled: all.filter(
-            b => normalizeBookingStatus(b) === "cancelled"
-          ).length,
-
-          totalRevenue: all
-            .filter(b => normalizeBookingStatus(b) === "confirmed")
-            .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
-
-          totalUsers: new Set(
-            all.map(b => b.userId?._id)
-          ).size
-        };
 
         setData({
           stats,
