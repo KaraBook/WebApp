@@ -11,6 +11,8 @@ import { getEffectiveOwnerId } from "../utils/getEffectiveOwner.js";
 
 const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
+const ALLOWED_BOOKING_USER_ROLES = ["traveller"];
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -923,18 +925,18 @@ export const getOwnerBookedUsers = async (req, res) => {
     const ownerId = await getEffectiveOwnerId(req);
     const owner = await User.findById(ownerId).select("mobile email");
 
-    // 1️⃣ Owner properties
+    /* 1️⃣ Owner properties ONLY */
     const properties = await Property.find({
       $or: [
         { ownerUserId: ownerId },
         { "resortOwner.mobile": owner?.mobile },
         { "resortOwner.email": owner?.email },
       ],
-    }).select("_id propertyName");
+    }).select("_id");
 
-    const propertyIds = properties.map((p) => p._id);
+    const propertyIds = properties.map(p => p._id);
 
-    // 2️⃣ Users from bookings (travellers + owners)
+    /* 2️⃣ Bookings for owner properties */
     const bookings = await Booking.find({
       propertyId: { $in: propertyIds },
       paymentStatus: { $in: ["paid", "initiated"] },
@@ -945,8 +947,12 @@ export const getOwnerBookedUsers = async (req, res) => {
 
     const usersMap = {};
 
+    /* 3️⃣ ONLY TRAVELLERS FROM BOOKINGS */
     bookings.forEach((b) => {
       if (!b.userId) return;
+
+      // 🚫 HARD BLOCK: prevent owners/admins leaking
+      if (b.userId.role !== "traveller") return;
 
       const uid = b.userId._id.toString();
 
@@ -959,7 +965,7 @@ export const getOwnerBookedUsers = async (req, res) => {
           mobile: b.userId.mobile,
           city: b.userId.city,
           state: b.userId.state,
-          role: b.userId.role || "traveller",
+          role: "traveller",
           createdAt: b.userId.createdAt,
           totalBookings: 0,
           lastBookingDate: b.createdAt,
@@ -978,7 +984,7 @@ export const getOwnerBookedUsers = async (req, res) => {
       }
     });
 
-    // 3️⃣ Fetch managers created by this owner
+    /* 4️⃣ Managers created by THIS owner ONLY */
     const managers = await User.find({
       role: "manager",
       createdBy: ownerId,
@@ -990,7 +996,7 @@ export const getOwnerBookedUsers = async (req, res) => {
       if (!usersMap[uid]) {
         usersMap[uid] = {
           userId: m._id,
-          firstName: m.name,   // manager has only `name`
+          firstName: m.name,
           lastName: "",
           email: m.email,
           mobile: m.mobile,
@@ -1005,20 +1011,22 @@ export const getOwnerBookedUsers = async (req, res) => {
       }
     });
 
+    /* 5️⃣ Final response */
     const users = Object.values(usersMap).map((u) => ({
       ...u,
       properties: Array.from(u.properties || []),
     }));
 
-    res.json({
+    return res.json({
       success: true,
       data: users,
     });
+
   } catch (err) {
     console.error("getOwnerBookedUsers error:", err);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Failed to load booked users",
+      message: "Failed to load users",
     });
   }
 };
