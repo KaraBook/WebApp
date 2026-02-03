@@ -21,41 +21,58 @@ export const getOwnerDashboard = async (req, res) => {
     const ownerId = await getEffectiveOwnerId(req);
     const owner = await User.findById(ownerId).select("mobile email");
 
+    /* ------------------ OWNER PROPERTIES ------------------ */
     const properties = await Property.find({
       $or: [
         { ownerUserId: ownerId },
         { "resortOwner.mobile": owner?.mobile },
         { "resortOwner.email": owner?.email },
       ],
-    });
+    }).select("_id propertyName");
 
     const propertyIds = properties.map((p) => p._id);
 
-    const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
-      .populate("userId", "firstName lastName email mobile")
+    /* ------------------ BOOKINGS ------------------ */
+    const bookings = await Booking.find({
+      propertyId: { $in: propertyIds },
+    })
+      .populate("userId", "firstName lastName email mobile role")
       .populate("propertyId", "propertyName isRefundable cancellationPolicy coverImage")
+      .lean();
+
+    /* ------------------ USER COUNT (ONLY TRAVELLER + MANAGER) ------------------ */
+    const validUserRoles = ["traveller", "manager"];
 
     const uniqueUserIds = new Set(
       bookings
-        .map((b) => b.userId?._id?.toString())
-        .filter(Boolean)
+        .map((b) => b.userId)
+        .filter(
+          (u) =>
+            u &&
+            validUserRoles.includes(u.role) &&   // ONLY traveller + manager
+            u._id.toString() !== ownerId.toString() // exclude owner himself
+        )
+        .map((u) => u._id.toString())
     );
 
+    /* ------------------ STATUS HELPERS ------------------ */
     const isConfirmed = (b) =>
       b.paymentStatus === "paid" ||
       b.status === "confirmed" ||
-      b.paymentId;
+      Boolean(b.paymentId);
 
     const isPending = (b) =>
       !isConfirmed(b) && b.status !== "cancelled";
 
     const isCancelled = (b) =>
-      b.status === "cancelled";
+      b.status === "cancelled" || b.cancelled === true;
 
+    /* ------------------ STATS ------------------ */
     const stats = {
       totalProperties: properties.length,
       totalBookings: bookings.length,
-      totalUsers: uniqueUserIds.size,
+
+      totalUsers: uniqueUserIds.size, // ✅ CORRECT COUNT
 
       confirmed: bookings.filter(isConfirmed).length,
       pending: bookings.filter(isPending).length,
@@ -63,15 +80,29 @@ export const getOwnerDashboard = async (req, res) => {
 
       totalRevenue: bookings
         .filter(isConfirmed)
-        .reduce((sum, b) => sum + (b.totalAmount || 0), 0),
+        .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
     };
 
-    res.json({ success: true, data: { stats, properties, bookings } });
+    /* ------------------ RESPONSE ------------------ */
+    return res.json({
+      success: true,
+      data: {
+        stats,
+        properties,
+        bookings,
+      },
+    });
+
   } catch (err) {
     console.error("getOwnerDashboard error:", err);
-    res.status(500).json({ success: false, message: "Failed to load dashboard" });
+    return res.status(500).json({
+      success: false,
+      message: "Failed to load dashboard",
+    });
   }
 };
+
+
 
 export const getOwnerProperties = async (req, res) => {
   try {
