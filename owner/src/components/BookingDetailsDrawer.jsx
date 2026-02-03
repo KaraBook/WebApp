@@ -90,7 +90,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
             ? grandTotal
             : (totalAmount || 0) + safeTax;
 
-    /* ================= MOBILE DRAWER ================= */
+
     if (isMobile) {
         return (
             <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
@@ -195,7 +195,6 @@ ${open
     );
 }
 
-/* ================= SHARED UI ================= */
 
 function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
     return (

@@ -892,6 +892,7 @@ export const getOwnerBookedUsers = async (req, res) => {
     const ownerId = await getEffectiveOwnerId(req);
     const owner = await User.findById(ownerId).select("mobile email");
 
+    // 1️⃣ Owner properties
     const properties = await Property.find({
       $or: [
         { ownerUserId: ownerId },
@@ -902,6 +903,7 @@ export const getOwnerBookedUsers = async (req, res) => {
 
     const propertyIds = properties.map((p) => p._id);
 
+    // 2️⃣ Users from bookings (travellers + owners)
     const bookings = await Booking.find({
       propertyId: { $in: propertyIds },
       paymentStatus: { $in: ["paid", "initiated"] },
@@ -926,7 +928,7 @@ export const getOwnerBookedUsers = async (req, res) => {
           mobile: b.userId.mobile,
           city: b.userId.city,
           state: b.userId.state,
-          role: b.userId.role,
+          role: b.userId.role || "traveller",
           createdAt: b.userId.createdAt,
           totalBookings: 0,
           lastBookingDate: b.createdAt,
@@ -944,9 +946,37 @@ export const getOwnerBookedUsers = async (req, res) => {
         usersMap[uid].lastBookingDate = b.createdAt;
       }
     });
+
+    // 3️⃣ Fetch managers created by this owner
+    const managers = await User.find({
+      role: "manager",
+      createdBy: ownerId,
+    }).lean();
+
+    managers.forEach((m) => {
+      const uid = m._id.toString();
+
+      if (!usersMap[uid]) {
+        usersMap[uid] = {
+          userId: m._id,
+          firstName: m.name,   // manager has only `name`
+          lastName: "",
+          email: m.email,
+          mobile: m.mobile,
+          city: m.city,
+          state: m.state,
+          role: "manager",
+          createdAt: m.createdAt,
+          totalBookings: 0,
+          lastBookingDate: null,
+          properties: [],
+        };
+      }
+    });
+
     const users = Object.values(usersMap).map((u) => ({
       ...u,
-      properties: Array.from(u.properties),
+      properties: Array.from(u.properties || []),
     }));
 
     res.json({
@@ -961,6 +991,7 @@ export const getOwnerBookedUsers = async (req, res) => {
     });
   }
 };
+
 
 
 export const ownerCancelBooking = async (req, res) => {

@@ -466,7 +466,7 @@ export default function Dashboard() {
             value={stats?.confirmed}
             caption="Ready to check-in"
             variant="success"
-            onClick={() => navigate("/bookings?status=confirmed")}
+            onClick={() => navigate("/bookings?time=all&status=confirmed")}
           />
 
           <StatCard

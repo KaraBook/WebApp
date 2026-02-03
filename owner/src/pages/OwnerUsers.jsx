@@ -65,7 +65,8 @@ export default function OwnerUsers() {
             const matchesRole =
                 roleFilter === "all" ||
                 (roleFilter === "traveller" && role === "traveller") ||
-                (roleFilter === "owner" && role !== "traveller");
+                (roleFilter === "owner" && ["owner", "resortOwner", "propertyOwner"].includes(role)) ||
+                (roleFilter === "manager" && role === "manager");
 
             return matchesSearch && matchesRole;
         });
@@ -94,6 +95,15 @@ export default function OwnerUsers() {
             </div>
         );
     }
+
+    const roleLabel = {
+        traveller: "Traveller",
+        owner: "Owner",
+        resortOwner: "Owner",
+        propertyOwner: "Owner",
+        manager: "Manager",
+        admin: "Admin",
+    }[u.role] || "User";
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -141,7 +151,9 @@ export default function OwnerUsers() {
                                         ? "All Users"
                                         : roleFilter === "traveller"
                                             ? "Traveller"
-                                            : "Resort Owner"}
+                                            : roleFilter === "owner"
+                                                ? "Resort Owner"
+                                                : "Manager"}
                                 </span>
                             </div>
 
@@ -161,26 +173,22 @@ export default function OwnerUsers() {
       p-1
     "
                     >
-                        <DropdownMenuItem
-                            onClick={() => setRoleFilter("all")}
-                            className="cursor-pointer rounded-md px-3 py-2 text-sm"
-                        >
+                        <DropdownMenuItem onClick={() => setRoleFilter("all")}>
                             All Users
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem
-                            onClick={() => setRoleFilter("traveller")}
-                            className="cursor-pointer rounded-md px-3 py-2 text-sm"
-                        >
+                        <DropdownMenuItem onClick={() => setRoleFilter("traveller")}>
                             Traveller
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem
-                            onClick={() => setRoleFilter("owner")}
-                            className="cursor-pointer rounded-md px-3 py-2 text-sm"
-                        >
+                        <DropdownMenuItem onClick={() => setRoleFilter("owner")}>
                             Resort Owner
                         </DropdownMenuItem>
+
+                        <DropdownMenuItem onClick={() => setRoleFilter("manager")}>
+                            Manager
+                        </DropdownMenuItem>
+
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -216,9 +224,7 @@ export default function OwnerUsers() {
                                         </div>
                                         <div>
                                             <p className="font-medium">{getFullName(u)}</p>
-                                            <p className="text-xs text-gray-500">
-                                                {u.role || "Traveller"}
-                                            </p>
+                                            <p className="text-xs text-gray-500">{roleLabel}</p>
                                         </div>
                                     </div>
                                 </td>
