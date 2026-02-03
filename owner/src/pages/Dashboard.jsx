@@ -240,51 +240,38 @@ export default function Dashboard() {
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await api.get(SummaryApi.getOwnerDashboard.url);
+  (async () => {
+    try {
+      const res = await api.get(SummaryApi.getOwnerDashboard.url);
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-        const all = res.data?.data?.bookings || [];
+      const all = res.data?.data?.bookings || [];
 
-        const upcoming = all.filter(b => {
-          const checkOut = new Date(b.checkOut);
-          checkOut.setHours(0, 0, 0, 0);
-          return checkOut >= today;
-        });
+      const upcoming = all.filter(b => {
+        const checkOut = new Date(b.checkOut);
+        checkOut.setHours(0, 0, 0, 0);
+        return checkOut >= today;
+      });
 
-        const past = all.filter(b => {
-          const checkOut = new Date(b.checkOut);
-          checkOut.setHours(0, 0, 0, 0);
-          return checkOut < today;
-        });
+      const dashboardData = res.data?.data;
 
-        const dashboardData = res.data?.data;
+      setData({
+        stats: dashboardData.stats,   // ✅ BACKEND STATS ONLY
+        bookings: upcoming.sort(
+          (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
+        ),
+      });
 
-        setData({
-          stats: dashboardData.stats,
-          bookings: upcoming.sort(
-            (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
-          )
-        });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingDashboard(false);
+    }
+  })();
+}, []);
 
-
-        setData({
-          stats,
-          bookings: upcoming.sort(
-            (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
-          )
-        });
-
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingDashboard(false);
-      }
-    })();
-  }, []);
 
   useEffect(() => {
     (async () => {
