@@ -776,40 +776,6 @@ const EditProperty = () => {
             </div>
 
             <div className="md:w-[22%] w-[100%]">
-              <Label className="text-sm">
-                Extra Adult Charge (₹ / night)
-              </Label>
-              <div className="mt-2">
-                <Input
-                  value={formData.extraAdultCharge}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    if (/^\d{0,5}$/.test(v)) {
-                      setFormData((p) => ({ ...p, extraAdultCharge: v }));
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="md:w-[22%] w-[100%]">
-              <Label className="text-sm">
-                Extra Child Charge (₹ / night)
-              </Label>
-              <div className="mt-2">
-                <Input
-                  value={formData.extraChildCharge}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    if (/^\d{0,5}$/.test(v)) {
-                      setFormData((p) => ({ ...p, extraChildCharge: v }));
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="md:w-[22%] w-[100%]">
               <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
                 Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
               </Label>
@@ -851,6 +817,40 @@ const EditProperty = () => {
                     }
                   }}
                   required
+                />
+              </div>
+            </div>
+
+            <div className="md:w-[22%] w-[100%]">
+              <Label className="text-sm">
+                Extra Adult Charge (₹ / night)
+              </Label>
+              <div className="mt-2">
+                <Input
+                  value={formData.extraAdultCharge}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (/^\d{0,5}$/.test(v)) {
+                      setFormData((p) => ({ ...p, extraAdultCharge: v }));
+                    }
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="md:w-[22%] w-[100%]">
+              <Label className="text-sm">
+                Extra Child Charge (₹ / night)
+              </Label>
+              <div className="mt-2">
+                <Input
+                  value={formData.extraChildCharge}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (/^\d{0,5}$/.test(v)) {
+                      setFormData((p) => ({ ...p, extraChildCharge: v }));
+                    }
+                  }}
                 />
               </div>
             </div>

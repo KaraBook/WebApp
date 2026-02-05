@@ -56,7 +56,8 @@ const AddProperty = () => {
             email: "",
             mobile: "",
             resortEmail: "",
-            resortMobile: ""
+            resortMobile: "",
+            password: ""
         },
         propertyType: "",
         description: "",
@@ -133,6 +134,7 @@ const AddProperty = () => {
                 mobile: formData.resortOwner.mobile?.trim(),
                 resortEmail: formData.resortOwner.resortEmail?.trim(),
                 resortMobile: formData.resortOwner.resortMobile?.trim(),
+                password: formData.resortOwner.password
             },
             propertyType: formData.propertyType,
             description: formData.description,
@@ -449,6 +451,31 @@ const AddProperty = () => {
                             />
                         </div>
 
+                        <div className="md:w-[48%] w-[100%] flex justify-between ">
+
+                        <div className="md:w-[48%] w-[100%]">
+                            <Label className="text-sm">
+                                Owner Password <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                type="password"
+                                className="mt-2"
+                                value={formData.resortOwner.password}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        resortOwner: {
+                                            ...prev.resortOwner,
+                                            password: e.target.value,
+                                        },
+                                    }))
+                                }
+                                minLength={6}
+                                required
+                            />
+                        </div>
+
+
                         {/* Mobile Number */}
                         <div className="md:w-[48%] w-[100%]">
                             <Label htmlFor="resortOwnerMobile" className="text-sm">
@@ -472,6 +499,7 @@ const AddProperty = () => {
                                 maxLength={10}
                                 required
                             />
+                        </div>
                         </div>
 
                         {/* Resort Email */}
@@ -805,6 +833,51 @@ const AddProperty = () => {
                         </div>
 
                         <div className="md:w-[22%] w-[100%]">
+                            <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
+                                Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
+                            </Label>
+                            <div className="mt-2">
+                                <Input
+                                    id="pricingPerNightWeekdays" name="pricingPerNightWeekdays" type="text" inputMode="numeric" className="mt-2"
+                                    value={formData.pricingPerNightWeekdays}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (/^\d{0,6}$/.test(value)) {
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                pricingPerNightWeekdays: value,
+                                            }));
+                                        }
+                                    }}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+
+                        <div className="md:w-[22%] w-[100%]">
+                            <Label htmlFor="pricingPerNightWeekend" className="block font-medium mt-2">
+                                Price Per Night (Weekend) (₹) <span className="text-red-500">*</span>
+                            </Label>
+                            <div className="mt-2">
+                                <Input
+                                    id="pricingPerNightWeekend" name="pricingPerNightWeekend" type="text" inputMode="numeric" className="mt-2"
+                                    value={formData.pricingPerNightWeekend}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (/^\d{0,6}$/.test(value)) {
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                pricingPerNightWeekend: value,
+                                            }));
+                                        }
+                                    }}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:w-[22%] w-[100%]">
                             <Label className="text-sm">
                                 Extra Adult Charge (₹ / night)
                             </Label>
@@ -834,51 +907,6 @@ const AddProperty = () => {
                                             setFormData((p) => ({ ...p, extraChildCharge: v }));
                                         }
                                     }}
-                                />
-                            </div>
-                        </div>
-
-
-                        <div className="md:w-[22%] w-[100%]">
-                            <Label htmlFor="pricingPerNightWeekdays" className="block font-medium mt-2">
-                                Price Per Night (Weekdays) (₹) <span className="text-red-500">*</span>
-                            </Label>
-                            <div className="mt-2">
-                                <Input
-                                    id="pricingPerNightWeekdays" name="pricingPerNightWeekdays" type="text" inputMode="numeric" className="mt-2"
-                                    value={formData.pricingPerNightWeekdays}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (/^\d{0,6}$/.test(value)) {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                pricingPerNightWeekdays: value,
-                                            }));
-                                        }
-                                    }}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="md:w-[22%] w-[100%]">
-                            <Label htmlFor="pricingPerNightWeekend" className="block font-medium mt-2">
-                                Price Per Night (Weekend) (₹) <span className="text-red-500">*</span>
-                            </Label>
-                            <div className="mt-2">
-                                <Input
-                                    id="pricingPerNightWeekend" name="pricingPerNightWeekend" type="text" inputMode="numeric" className="mt-2"
-                                    value={formData.pricingPerNightWeekend}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (/^\d{0,6}$/.test(value)) {
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                pricingPerNightWeekend: value,
-                                            }));
-                                        }
-                                    }}
-                                    required
                                 />
                             </div>
                         </div>

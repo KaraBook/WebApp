@@ -25,7 +25,6 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       ? `${toWords(grandTotal)} rupees `
       : "—";
 
-
   return (
     <div
       ref={ref}

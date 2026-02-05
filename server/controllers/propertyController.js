@@ -21,6 +21,7 @@ function parseResortOwner(body) {
           resortEmail: (v.resortEmail ?? "").trim(),
           mobile: (v.mobile ?? "").trim(),
           resortMobile: (v.resortMobile ?? "").trim(),
+          password: (v.password ?? "").trim(),
         };
       }
     } catch (_) { }
@@ -41,6 +42,7 @@ function parseResortOwner(body) {
     resortEmail: first("resortOwner[resortEmail]", "resortOwner.resortEmail", "resortOwnerResortEmail", "resortEmail"),
     mobile: first("resortOwner[mobile]", "resortOwner.mobile", "resortOwnerMobile", "mobile"),
     resortMobile: first("resortOwner[resortMobile]", "resortOwner.resortMobile", "resortOwnerResortMobile", "resortMobile"),
+    password: first("resortOwner[password]", "resortOwner.password", "ownerPassword"),
   };
 }
 const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
@@ -125,8 +127,13 @@ export const createPropertyDraft = async (req, res) => {
 
       if (!user) {
         createdNewUser = true;
-        tempPassword = genTempPassword();
-        const hash = await bcrypt.hash(tempPassword, 10);
+
+        if (!owner.password || owner.password.length < 6) {
+          throw new Error("Owner password must be at least 6 characters");
+        }
+
+        const hash = await bcrypt.hash(owner.password, 10);
+
         user = (await User.create([{
           name: `${owner.firstName} ${owner.lastName}`.trim(),
           firstName: owner.firstName,
@@ -142,9 +149,8 @@ export const createPropertyDraft = async (req, res) => {
         user.lastName = owner.lastName || user.lastName;
         user.mobile = owner.mobile || user.mobile;
         if (user.role !== "admin") user.role = "resortOwner";
-        if (!user.password) {
-          tempPassword = genTempPassword();
-          user.password = await bcrypt.hash(tempPassword, 10);
+        if (owner.password) {
+          user.password = await bcrypt.hash(owner.password, 10);
         }
         await user.save({ session });
       }
@@ -210,7 +216,6 @@ export const createPropertyDraft = async (req, res) => {
         _id: propertyDoc.ownerUserId,
         email: owner.email.toLowerCase(),
         createdNewUser,
-        ...(tempPassword ? { tempPassword } : {}),
       },
     });
   } catch (err) {
