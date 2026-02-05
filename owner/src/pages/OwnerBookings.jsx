@@ -347,6 +347,7 @@ export default function OwnerBookings() {
               <table className="md:min-w-full min-w-[1200px] text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
+                    <th className="py-3 px-4 text-left w-[60px]">S.No.</th>
                     <th className="py-3 px-4 text-left">Booking ID</th>
                     <th className="py-3 px-4 text-left">Traveller</th>
                     <th className="py-3 px-4 text-left">Check-in</th>
@@ -361,7 +362,8 @@ export default function OwnerBookings() {
                 </thead>
 
                 <tbody>
-                  {paginatedData.map((b) => (
+                  {paginatedData.map((b, index) => (
+
                     <tr
                       key={b._id}
                       onClick={() => openBookingDialog(b)}
@@ -372,6 +374,9 @@ export default function OwnerBookings() {
     cursor-pointer
   "
                     >
+                      <td className="py-3 px-4 text-gray-500 font-medium">
+                        {(page - 1) * pageSize + index + 1}
+                      </td>
 
                       <td className="py-3 px-4">
                         <button
