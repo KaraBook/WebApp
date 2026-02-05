@@ -1,4 +1,4 @@
-import { MoreVertical, Calendar, Moon, Users, Phone, MapPin, MailCheck } from "lucide-react";
+import { MoreVertical, Calendar, Moon, Users, Phone, Mail, MailCheck } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
 
@@ -77,7 +77,7 @@ export default function BookingDesktopCard({
           </div>
 
           <div className="flex items-center gap-2 text-[12px] text-gray-500 truncate">
-            <MailCheck size={12} /> {email}
+            <Mail size={12} /> {email}
           </div>
         </div>
       </div>
