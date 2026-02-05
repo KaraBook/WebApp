@@ -408,7 +408,7 @@ export default function OwnerBookings() {
 
                       <td className="py-3 px-4">
                         {typeof b.guests === "number"
-                          ? `${b.guests} Guests`
+                          ? `${b.guests}`
                           : `${b.guests.adults + b.guests.children}`}
                       </td>
 
