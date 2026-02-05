@@ -15,9 +15,10 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
   const nights = invoice.nights || 0;
   const rate = nights ? invoice.totalAmount / nights : 0;
 
-  const grandTotal = Number(
-    String(invoice.grandTotal || 0).replace(/,/g, "")
-  );
+  const totalAmount = Number(invoice.totalAmount || 0);
+  const taxAmount = Number(invoice.taxAmount || 0);
+
+  const grandTotal = totalAmount + taxAmount;
 
   const amountInWords =
     grandTotal > 0
