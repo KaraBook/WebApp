@@ -1,5 +1,6 @@
 import React, { forwardRef } from "react";
 import { format } from "date-fns";
+import { toWords } from "number-to-words";
 
 const InvoicePreview = forwardRef(({ invoice }, ref) => {
   if (!invoice) return null;
@@ -14,13 +15,20 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
   const nights = invoice.nights || 0;
   const rate = nights ? invoice.totalAmount / nights : 0;
 
+  const grandTotal = invoice.grandTotal || 0;
+
+  const amountInWords =
+    grandTotal > 0
+      ? `${toWords(grandTotal)} rupees only`
+      : "—";
+
+
   return (
     <div
       ref={ref}
       className="bg-white max-w-4xl mx-auto border rounded-lg px-4 sm:px-8 py-6 sm:py-10 text-sm text-gray-800"
       style={{ fontFamily: "Inter, sans-serif" }}
     >
-      {/* ================= HEADER ================= */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 sm:gap-0">
         <div className="flex gap-3">
           <div className="h-10 w-10 text-[20px] rounded-md bg-primary grid place-items-center text-white font-semibold uppercase leading-none">
@@ -43,7 +51,6 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
 
       <hr className="my-6" />
 
-      {/* ================= BILL TO + META ================= */}
       <div className="flex flex-col sm:flex-row justify-between gap-6 sm:gap-0">
         <div>
           <p className="text-xs text-gray-500 mb-1">BILL TO</p>
@@ -72,7 +79,6 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
         </div>
       </div>
 
-      {/* ================= BOOKING DETAILS BOX ================= */}
       <div className="mt-6 bg-[#f9f9f9] border rounded-lg p-4 grid grid-cols-1 sm:grid-cols-5 gap-4 text-xs">
         <p className="col-span-full text-xs font-semibold text-gray-600 mb-1">
           BOOKING DETAILS
@@ -115,7 +121,6 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
 
       </div>
 
-      {/* ================= TABLE ================= */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] md:min-w-full mt-8 text-xs border-t">
           <thead>
@@ -146,7 +151,6 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
         </table>
       </div>
 
-      {/* ================= TOTALS ================= */}
       <div className="flex justify-end mt-6">
         <div className="w-full sm:w-72 text-s space-y-2">
           <div className="flex justify-between">
@@ -166,15 +170,13 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
         </div>
       </div>
 
-      {/* ================= AMOUNT IN WORDS ================= */}
       <p className="mt-6 text-xs">
         <span className="text-gray-500">Amount in Words:</span>{" "}
-        <strong>{invoice.amountInWords}</strong>
+        <strong className="capitalize">{amountInWords}</strong>
       </p>
 
       <hr className="my-6" />
 
-      {/* ================= PAYMENT + SIGN ================= */}
       <div className="flex flex-col sm:flex-row justify-between gap-6 sm:gap-0 text-xs">
         <div className="space-y-1">
           <p className="text-gray-500">PAYMENT INFORMATION</p>
@@ -193,7 +195,6 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
 
       <hr className="my-6" />
 
-      {/* ================= TERMS ================= */}
       <div className="text-xs text-gray-500 space-y-1">
         <p>• This is a computer-generated invoice and does not require a physical signature.</p>
         <p>• Check-in and check-out times are subject to property policies.</p>
