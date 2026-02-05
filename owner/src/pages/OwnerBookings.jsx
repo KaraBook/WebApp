@@ -349,7 +349,6 @@ export default function OwnerBookings() {
                   <tr>
                     <th className="py-3 px-4 text-left">Booking ID</th>
                     <th className="py-3 px-4 text-left">Traveller</th>
-                    <th className="py-3 px-4 text-left">Property</th>
                     <th className="py-3 px-4 text-left">Check-in</th>
                     <th className="py-3 px-4 text-left">Check-out</th>
                     <th className="py-3 px-4 text-left">Nights</th>
@@ -396,9 +395,6 @@ export default function OwnerBookings() {
                           <Phone size={12} /> {b?.userId?.mobile}
                         </div>
                       </td>
-
-                      {/* Property */}
-                      <td className="py-3 px-4">{b.propertyId?.propertyName}</td>
 
                       {/* Dates */}
                       <td className="py-3 px-4">{formatDate(b.checkIn)}</td>

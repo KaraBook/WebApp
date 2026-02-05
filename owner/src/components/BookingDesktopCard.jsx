@@ -1,4 +1,4 @@
-import { MoreVertical, Calendar, Moon, Users, Phone, MapPin } from "lucide-react";
+import { MoreVertical, Calendar, Moon, Users, Phone, MapPin, MailCheck } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
 
@@ -33,6 +33,7 @@ export default function BookingDesktopCard({
 
   const name = `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim();
   const phone = b.userId?.mobile;
+  const email = b.userId?.email;
   const property = b.propertyId?.propertyName;
   const bookingStatus = normalizeBookingStatus(b);
 
@@ -76,7 +77,7 @@ export default function BookingDesktopCard({
           </div>
 
           <div className="flex items-center gap-2 text-[12px] text-gray-500 truncate">
-            <MapPin size={12} /> {property}
+            <MailCheck size={12} /> {email}
           </div>
         </div>
       </div>
