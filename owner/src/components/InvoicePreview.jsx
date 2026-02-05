@@ -22,7 +22,7 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
 
   const amountInWords =
     grandTotal > 0
-      ? `${toWords(grandTotal)} rupees only`
+      ? `${toWords(grandTotal)} rupees `
       : "—";
 
 
@@ -174,11 +174,11 @@ const InvoicePreview = forwardRef(({ invoice }, ref) => {
       </div>
 
       <p className="mt-6 text-xs">
-        <span className="text-gray-500">Amount in Words:</span>{" "}
+        <span className="text-gray-500">Amount in Words:</span>{" "}<br></br>
         <strong className="capitalize">{amountInWords}</strong>
       </p>
 
-      <hr className="my-6" />
+      <hr className="my-3" />
 
       <div className="flex flex-col sm:flex-row justify-between gap-6 sm:gap-0 text-xs">
         <div className="space-y-1">
