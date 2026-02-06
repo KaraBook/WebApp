@@ -1149,24 +1149,8 @@ const EditProperty = () => {
 
         {currentStep === 6 && (
           <>
-            <FileUploadsSection
-              setCoverImageFile={setCoverImageFile}
-              coverImageFile={coverImageFile}
-              coverImagePreview={coverImagePreview}
-              setCoverImagePreview={setCoverImagePreview}
 
-              existingGallery={existingGallery}
-              setExistingGallery={setExistingGallery}
-              newGalleryFiles={newGalleryFiles}
-              setNewGalleryFiles={setNewGalleryFiles}
-              newGalleryPreviews={newGalleryPreviews}
-              setNewGalleryPreviews={setNewGalleryPreviews}
-
-              showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
-            />
-
-
-            <div className="md:w-[48%] w-[100%] -mt-2">
+          <div className="md:w-[48%] w-[100%] -mt-2">
               <FileUploadsSection
                 setShopActFile={setShopActFile}
                 shopActFile={shopActFile}
@@ -1185,6 +1169,23 @@ const EditProperty = () => {
                 placeholder="Select Publish Status"
               />
             </div>
+
+            
+            <FileUploadsSection
+              setCoverImageFile={setCoverImageFile}
+              coverImageFile={coverImageFile}
+              coverImagePreview={coverImagePreview}
+              setCoverImagePreview={setCoverImagePreview}
+
+              existingGallery={existingGallery}
+              setExistingGallery={setExistingGallery}
+              newGalleryFiles={newGalleryFiles}
+              setNewGalleryFiles={setNewGalleryFiles}
+              newGalleryPreviews={newGalleryPreviews}
+              setNewGalleryPreviews={setNewGalleryPreviews}
+
+              showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+            />
 
           </>
         )}
