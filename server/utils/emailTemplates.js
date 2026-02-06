@@ -1,50 +1,51 @@
 export function propertyCreatedTemplate({
   ownerFirstName,
+  ownerEmail,
+  ownerPassword,
   propertyName,
   createdNewUser,
-  tempPassword,
   portalUrl,
 }) {
   const greeting = ownerFirstName ? `Hi ${ownerFirstName},` : "Hi,";
 
-  const newUserBlock = createdNewUser
+  const credentialsBlock = createdNewUser
     ? `
       <p><strong>Your owner account has been created.</strong></p>
       <ul>
-        <li><strong>Registered mobile:</strong> (use OTP on login)</li>
-        ${tempPassword ? `<li><strong>Temporary password:</strong> ${tempPassword}</li>` : ""}
+        <li><strong>Username:</strong> ${ownerEmail}</li>
+        <li><strong>Password:</strong> ${ownerPassword}</li>
       </ul>
+      <p>Please login and change your password after first login.</p>
     `
     : `<p>Your owner account is already active.</p>`;
 
   return {
-    subject: `Your property “${propertyName}” has been added`,
+    subject: `Your property "${propertyName}" has been added`,
     html: `
       <div style="font-family: Inter, Arial, sans-serif; line-height:1.6; color:#111">
-        <h2 style="margin:0 0 12px">Property added successfully</h2>
+        <h2>Property added successfully</h2>
         <p>${greeting}</p>
         <p>Your property <strong>${propertyName}</strong> has been created in BookMyStay.</p>
-        ${newUserBlock}
-        <p>You can manage your listing here:</p>
+        ${credentialsBlock}
         <p>
           <a href="${portalUrl}" 
              style="display:inline-block;background:#111;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">
-            Open Owner Dashboard
+            Login to Owner Dashboard
           </a>
         </p>
-        <p style="margin-top:24px;color:#555;">If you did not request this, please ignore this email.</p>
       </div>
     `,
     text:
       `Property added successfully\n\n` +
       `${greeting}\n\n` +
-      `Your property "${propertyName}" has been created.\n` +
+      `Property: ${propertyName}\n\n` +
       (createdNewUser
-        ? `An owner account was created for you.${tempPassword ? ` Temporary password: ${tempPassword}` : ""}\n`
-        : `Your owner account is already active.\n`) +
-      `Open Owner Dashboard: ${portalUrl}\n`,
+        ? `Username: ${ownerEmail}\nPassword: ${ownerPassword}\n\n`
+        : "") +
+      `Login: ${portalUrl}`,
   };
 }
+
 
 
 export function bookingConfirmationTemplate({

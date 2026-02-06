@@ -259,24 +259,20 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     const BASE_URL = process.env.BACKEND_BASE_URL || "";
 
-    /* ================= COVER ================= */
     if (coverFile) {
       prop.coverImage = `${BASE_URL}/${coverFile.path.replace(/\\/g, "/")}`;
     } else if (prop.coverImage?.startsWith("/uploads/")) {
       prop.coverImage = `${BASE_URL}${prop.coverImage}`;
     }
 
-    /* ================= SHOP ACT ================= */
     if (shopActFile) {
       prop.shopAct = `${BASE_URL}/${shopActFile.path.replace(/\\/g, "/")}`;
     } else if (prop.shopAct?.startsWith("/uploads/")) {
       prop.shopAct = `${BASE_URL}${prop.shopAct}`;
     }
 
-    /* ================= GALLERY (FIXED) ================= */
     let finalGallery = [];
 
-    // ✅ 1. existingGallery from frontend
     if (req.body.existingGallery) {
       try {
         finalGallery = JSON.parse(req.body.existingGallery);
@@ -303,7 +299,6 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
       finalGallery.push(...newGalleryUrls);
     }
 
-    // ✅ 3. validate minimum gallery count
     if (finalGallery.length < 3) {
       return res.status(400).json({
         success: false,
@@ -313,7 +308,6 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     prop.galleryPhotos = finalGallery;
 
-    /* ================= PUBLISH ================= */
     if (typeof req.body.publishNow !== "undefined") {
       prop.publishNow = ["true", "1", "yes", "on"].includes(
         String(req.body.publishNow).toLowerCase()
@@ -325,24 +319,32 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     await prop.save();
 
-    /* ================= EMAIL ================= */
+    /* ================= GENERATE LOGIN + EMAIL ================= */
     try {
+      const owner = await User.findById(prop.ownerUserId).select("+password");
+
+      if (!owner) throw new Error("Owner not found");
+
+      const tempPassword = genTempPassword();
+
+      owner.password = await bcrypt.hash(tempPassword, 10);
+      await owner.save();
+
       const mailData = propertyCreatedTemplate({
-        ownerFirstName: prop.resortOwner?.firstName,
+        ownerFirstName: owner.firstName,
+        ownerEmail: owner.email,
+        ownerPassword: tempPassword,
         propertyName: prop.propertyName,
-        createdNewUser: false,
-        tempPassword: null,
-        portalUrl: `${process.env.PORTAL_URL}/owner/properties/${prop._id}`,
+        createdNewUser: true,
+        portalUrl: `${process.env.PORTAL_URL}/owner/login`,
       });
 
-      if (prop.resortOwner?.email) {
-        await sendMail({
-          to: prop.resortOwner.email,
-          subject: mailData.subject,
-          text: mailData.text,
-          html: mailData.html,
-        });
-      }
+      await sendMail({
+        to: owner.email,
+        subject: mailData.subject,
+        text: mailData.text,
+        html: mailData.html,
+      });
     } catch (mailErr) {
       console.error("Email error:", mailErr);
     }
