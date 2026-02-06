@@ -112,15 +112,15 @@ const propertySchema = new mongoose.Schema({
     },
   },
 
-cancellationPolicy: {
-  type: [
-    {
-      minDaysBefore: { type: Number, required: true },
-      refundPercent: { type: Number, required: true }
-    }
-  ],
-  default: []
-},
+  cancellationPolicy: {
+    type: [
+      {
+        minDaysBefore: { type: Number, required: true },
+        refundPercent: { type: Number, required: true }
+      }
+    ],
+    default: []
+  },
 
   kycVerified: { type: Boolean, required: true },
   publishNow: { type: Boolean },
@@ -134,6 +134,11 @@ cancellationPolicy: {
     at: { type: Date }
   },
   internalNotes: String,
+
+  ownerWelcomeEmailSent: {
+    type: Boolean,
+    default: false,
+  },
 
   coverImage: {
     type: String,

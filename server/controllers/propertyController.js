@@ -11,35 +11,41 @@ import get from "lodash.get";
 
 
 
-async function sendOwnerCreationEmail(prop) {
+async function sendOwnerCreationEmail(prop, { forceCredentials = false } = {}) {
   try {
     const owner = await User.findById(prop.ownerUserId).select("+password");
     if (!owner) return;
+
     let password = null;
-    if (!owner.password) {
+
+    if (forceCredentials) {
       password = genTempPassword();
       owner.password = await bcrypt.hash(password, 10);
       await owner.save();
     }
+
     const mailData = propertyCreatedTemplate({
       ownerFirstName: owner.firstName,
       ownerEmail: owner.email,
-      ownerPassword: password, 
+      ownerPassword: password,
       propertyName: prop.propertyName,
       createdNewUser: !!password,
       portalUrl: `${process.env.PORTAL_URL}/owner/login`,
     });
+
     await sendMail({
       to: owner.email,
       subject: mailData.subject,
       text: mailData.text,
       html: mailData.html,
     });
+
     console.log("✅ Owner email sent");
   } catch (err) {
     console.error("❌ Email failed:", err);
   }
 }
+
 
 
 
@@ -354,7 +360,11 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     await prop.save();
 
     /* ================= EMAIL ================= */
-    await sendOwnerCreationEmail(prop);
+    if (!prop.ownerWelcomeEmailSent) {
+      await sendOwnerCreationEmail(prop, { forceCredentials: true });
+      prop.ownerWelcomeEmailSent = true;
+      await prop.save();
+    }
 
     return res.status(200).json({
       success: true,
