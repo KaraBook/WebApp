@@ -9,6 +9,40 @@ import { sendMail } from "../utils/mailer.js";
 import { propertyCreatedTemplate } from "../utils/emailTemplates.js";
 import get from "lodash.get";
 
+
+
+async function sendOwnerCreationEmail(prop) {
+  try {
+    const owner = await User.findById(prop.ownerUserId).select("+password");
+    if (!owner) return;
+    let password = null;
+    if (!owner.password) {
+      password = genTempPassword();
+      owner.password = await bcrypt.hash(password, 10);
+      await owner.save();
+    }
+    const mailData = propertyCreatedTemplate({
+      ownerFirstName: owner.firstName,
+      ownerEmail: owner.email,
+      ownerPassword: password, 
+      propertyName: prop.propertyName,
+      createdNewUser: !!password,
+      portalUrl: `${process.env.PORTAL_URL}/owner/login`,
+    });
+    await sendMail({
+      to: owner.email,
+      subject: mailData.subject,
+      text: mailData.text,
+      html: mailData.html,
+    });
+    console.log("✅ Owner email sent");
+  } catch (err) {
+    console.error("❌ Email failed:", err);
+  }
+}
+
+
+
 function parseResortOwner(body) {
   if (body.resortOwner) {
     try {
@@ -320,42 +354,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     await prop.save();
 
     /* ================= EMAIL ================= */
-    try {
-      const owner = await User.findById(prop.ownerUserId);
-
-      if (!owner) throw new Error("Owner not found");
-
-      let originalPassword = prop.resortOwner?.password;
-
-      if (!originalPassword) {
-        console.log("⚠️ Password missing → generating temp password");
-
-        originalPassword = genTempPassword();
-        owner.password = await bcrypt.hash(originalPassword, 10);
-        await owner.save();
-      }
-
-      const mailData = propertyCreatedTemplate({
-        ownerFirstName: owner.firstName,
-        ownerEmail: owner.email,
-        ownerPassword: originalPassword,
-        propertyName: prop.propertyName,
-        createdNewUser: true,
-        portalUrl: `${process.env.PORTAL_URL}/owner/login`,
-      });
-
-      await sendMail({
-        to: owner.email,
-        subject: mailData.subject,
-        text: mailData.text,
-        html: mailData.html,
-      });
-
-      console.log("✅ Email sent successfully");
-    } catch (mailErr) {
-      console.error("❌ Email error:", mailErr);
-    }
-
+    await sendOwnerCreationEmail(prop);
 
     return res.status(200).json({
       success: true,
@@ -633,6 +632,8 @@ export const updateProperty = async (req, res) => {
 
     let updatedProperty;
 
+    let shouldSendEmail = false;
+
     await session.withTransaction(async () => {
       if (updatedData.resortOwner?.email && updatedData.resortOwner?.mobile) {
         const incomingOwner = updatedData.resortOwner;
@@ -713,6 +714,14 @@ export const updateProperty = async (req, res) => {
         { new: true, runValidators: true, session }
       );
 
+      const wasDraft = existingProperty.isDraft;
+      const nowPublished =
+        updatedData.isDraft === false || updatedData.publishNow === true;
+
+      if (wasDraft && nowPublished) {
+        shouldSendEmail = true;
+      }
+
       if (updatedData.ownerUserId) {
         const owner = await User.findById(updatedData.ownerUserId).session(session);
         if (
@@ -726,6 +735,11 @@ export const updateProperty = async (req, res) => {
         }
       }
     });
+
+
+    if (shouldSendEmail && updatedProperty) {
+      await sendOwnerCreationEmail(updatedProperty);
+    }
 
     res.status(200).json({
       success: true,

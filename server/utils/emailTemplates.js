@@ -25,7 +25,7 @@ export function propertyCreatedTemplate({
       <div style="font-family: Inter, Arial, sans-serif; line-height:1.6; color:#111">
         <h2>Property added successfully</h2>
         <p>${greeting}</p>
-        <p>Your property <strong>${propertyName}</strong> has been created in BookMyStay.</p>
+        <p>Your property <strong>${propertyName}</strong> has been created in Karabook.</p>
         ${credentialsBlock}
         <p>
           <a href="${portalUrl}" 
