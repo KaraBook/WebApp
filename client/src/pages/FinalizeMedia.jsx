@@ -147,26 +147,6 @@ export default function FinalizeMedia() {
 
       <form onSubmit={onSubmit} className="flex flex-wrap gap-4">
 
-        {/* Cover + Gallery */}
-        <div className="w-full">
-          <FileUploadsSection
-            coverImageFile={coverImageFile}
-            setCoverImageFile={setCoverImageFile}
-            coverImagePreview={coverImagePreview}
-            setCoverImagePreview={setCoverImagePreview}
-
-            existingGallery={existingGallery}
-            setExistingGallery={setExistingGallery}
-
-            newGalleryFiles={newGalleryFiles}
-            setNewGalleryFiles={setNewGalleryFiles}
-            newGalleryPreviews={newGalleryPreviews}
-            setNewGalleryPreviews={setNewGalleryPreviews}
-
-            showFields={{ coverImage: true, galleryPhotos: true }}
-          />
-        </div>
-
         {/* Shop Act */}
         <div className="w-[48%] min-w-[320px]">
           <FileUploadsSection
@@ -185,6 +165,26 @@ export default function FinalizeMedia() {
             value={publishNow}
             options={publishNowOptions}
             onChange={setPublishNow}
+          />
+        </div>
+
+        {/* Cover + Gallery */}
+        <div className="w-full">
+          <FileUploadsSection
+            coverImageFile={coverImageFile}
+            setCoverImageFile={setCoverImageFile}
+            coverImagePreview={coverImagePreview}
+            setCoverImagePreview={setCoverImagePreview}
+
+            existingGallery={existingGallery}
+            setExistingGallery={setExistingGallery}
+
+            newGalleryFiles={newGalleryFiles}
+            setNewGalleryFiles={setNewGalleryFiles}
+            newGalleryPreviews={newGalleryPreviews}
+            setNewGalleryPreviews={setNewGalleryPreviews}
+
+            showFields={{ coverImage: true, galleryPhotos: true }}
           />
         </div>
 
