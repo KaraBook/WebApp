@@ -11,18 +11,12 @@ import get from "lodash.get";
 
 
 
-async function sendOwnerCreationEmail(prop, { forceCredentials = false } = {}) {
+async function sendOwnerCreationEmail(prop, { password = null } = {}) {
   try {
     const owner = await User.findById(prop.ownerUserId).select("+password");
     if (!owner) return;
 
-    let password = null;
-
-    if (forceCredentials) {
-      password = genTempPassword();
-      owner.password = await bcrypt.hash(password, 10);
-      await owner.save();
-    }
+    const password = options?.password || null;
 
     const mailData = propertyCreatedTemplate({
       ownerFirstName: owner.firstName,
@@ -369,7 +363,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     /* ================= EMAIL ================= */
     if (wasDraft && prop.ownerWelcomeEmailSent !== true) {
-      await sendOwnerCreationEmail(prop, { forceCredentials: true });
+      await sendOwnerCreationEmail(prop);
       prop.ownerWelcomeEmailSent = true;
       await prop.save();
     }
