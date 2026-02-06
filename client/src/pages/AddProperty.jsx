@@ -15,7 +15,7 @@ import SingleSelectButtons from "@/components/SingleSelectButtons";
 import MultiSelectButtons from "../components/MultiSelectButtons";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { QuantityBox } from "@/components/QuantityBox";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Eye, EyeOff } from "lucide-react";
 import { propertyTypeOptions, foodOptions, amenitiesCategories, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions, petFriendlyOptions } from "../constants/dropdownOptions";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -40,6 +40,7 @@ const AddProperty = () => {
 
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const [propertyId, setPropertyId] = useState(null);
 
@@ -453,53 +454,62 @@ const AddProperty = () => {
 
                         <div className="md:w-[48%] w-[100%] flex justify-between ">
 
-                        <div className="md:w-[48%] w-[100%]">
-                            <Label className="text-sm">
-                                Owner Password <span className="text-red-500">*</span>
-                            </Label>
-                            <Input
-                                type="password"
-                                className="mt-2"
-                                value={formData.resortOwner.password}
-                                onChange={(e) =>
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        resortOwner: {
-                                            ...prev.resortOwner,
-                                            password: e.target.value,
-                                        },
-                                    }))
-                                }
-                                minLength={6}
-                                required
-                            />
-                        </div>
+                            <div className="md:w-[48%] w-[100%] relative">
+                                <Label className="text-sm">
+                                    Owner Password <span className="text-red-500">*</span>
+                                </Label>
 
-
-                        {/* Mobile Number */}
-                        <div className="md:w-[48%] w-[100%]">
-                            <Label htmlFor="resortOwnerMobile" className="text-sm">
-                                Resort Owner Mobile Number <span className="text-red-500">*</span>
-                            </Label>
-                            <Input id="resortOwnerMobile" name="resortOwnerMobile" type="tel"
-                                className="mt-2"
-                                value={formData.resortOwner.mobile}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (/^\d*$/.test(value)) {
+                                <Input
+                                    type={showPassword ? "text" : "password"}
+                                    className="mt-2 pr-10"
+                                    value={formData.resortOwner.password}
+                                    onChange={(e) =>
                                         setFormData((prev) => ({
                                             ...prev,
                                             resortOwner: {
                                                 ...prev.resortOwner,
-                                                mobile: value,
+                                                password: e.target.value,
                                             },
-                                        }));
+                                        }))
                                     }
-                                }}
-                                maxLength={10}
-                                required
-                            />
-                        </div>
+                                    minLength={6}
+                                    required
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-[38px] text-gray-500 hover:text-black"
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+
+
+                            {/* Mobile Number */}
+                            <div className="md:w-[48%] w-[100%]">
+                                <Label htmlFor="resortOwnerMobile" className="text-sm">
+                                    Resort Owner Mobile Number <span className="text-red-500">*</span>
+                                </Label>
+                                <Input id="resortOwnerMobile" name="resortOwnerMobile" type="tel"
+                                    className="mt-2"
+                                    value={formData.resortOwner.mobile}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (/^\d*$/.test(value)) {
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                resortOwner: {
+                                                    ...prev.resortOwner,
+                                                    mobile: value,
+                                                },
+                                            }));
+                                        }
+                                    }}
+                                    maxLength={10}
+                                    required
+                                />
+                            </div>
                         </div>
 
                         {/* Resort Email */}
