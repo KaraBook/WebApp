@@ -13,10 +13,8 @@ import get from "lodash.get";
 
 async function sendOwnerCreationEmail(prop, { password = null } = {}) {
   try {
-    const owner = await User.findById(prop.ownerUserId).select("+password");
+    const owner = await User.findById(prop.ownerUserId);
     if (!owner) return;
-
-    const password = options?.password || null;
 
     const mailData = propertyCreatedTemplate({
       ownerFirstName: owner.firstName,
@@ -241,6 +239,12 @@ export const createPropertyDraft = async (req, res) => {
         await user.save({ session });
       }
     });
+
+    if (createdNewUser && propertyDoc) {
+      await sendOwnerCreationEmail(propertyDoc, {
+        password: owner.password,
+      });
+    }
 
     return res.status(201).json({
       success: true,
@@ -751,7 +755,7 @@ export const updateProperty = async (req, res) => {
 
 
     if (shouldSendEmail && updatedProperty) {
-      await sendOwnerCreationEmail(updatedProperty, { forceCredentials: true });
+      await sendOwnerCreationEmail(updatedProperty);
     }
 
     res.status(200).json({
