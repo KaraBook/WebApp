@@ -223,242 +223,218 @@ export default function OwnerLogin() {
 
 
   return (
-  <div className="min-h-screen flex bg-[#f6f7fb]">
-
+  <div className="min-h-screen bg-[#f2f4f8] flex items-center justify-center px-4">
     <div id="recaptcha-container" />
 
-    {/* ================= LEFT HERO ================= */}
-    <div className="hidden lg:flex lg:w-1/2 relative">
+    <div className="w-full max-w-[1120px] bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col lg:flex-row">
 
-      <img
-        src="/owner/loginhero.jpg"
-        alt="Karabook"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
+      {/* ================= LEFT IMAGE (DESKTOP) ================= */}
+      <div className="hidden lg:flex lg:w-1/2 relative">
+        <img
+          src="/owner/loginhero.jpg"
+          alt="Karabook"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/45" />
 
-      <div className="absolute inset-0 bg-black/50" />
-
-      <div className="relative z-10 p-12 flex flex-col justify-end text-white">
-        <p className="text-xs tracking-widest uppercase opacity-80">
-          Welcome Back
-        </p>
-
-        <h1 className="text-5xl font-bold mt-2">
-          KaraBook
-        </h1>
-
-        <p className="mt-3 text-lg opacity-90 max-w-md">
-          Manage your properties, bookings, guests and earnings with ease.
-        </p>
+        <div className="relative z-10 p-12 flex flex-col justify-end text-white">
+          <span className="text-xs tracking-widest uppercase opacity-80">
+            Welcome Back
+          </span>
+          <h1 className="text-[48px] font-bold mt-2">
+            KaraBook
+          </h1>
+          <p className="mt-3 text-[17px] max-w-md opacity-90">
+            Manage your properties, bookings, guests and earnings with ease.
+          </p>
+        </div>
       </div>
-    </div>
 
-    {/* ================= RIGHT LOGIN ================= */}
-    <div className="w-full lg:w-1/2 flex items-center justify-center px-4 py-8 overflow-y-auto">
+      {/* ================= RIGHT PANEL ================= */}
+      <div className="w-full lg:w-1/2 flex flex-col">
 
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl">
-
-        {/* MOBILE HERO */}
-        <div className="lg:hidden relative h-40 overflow-hidden rounded-t-2xl">
+        {/* ========== MOBILE HERO ========== */}
+        <div className="lg:hidden relative h-44">
           <img
             src="/owner/loginhero.jpg"
             alt="Karabook"
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/50" />
-          <div className="relative z-10 p-4 text-white">
-            <h1 className="text-2xl font-bold">KaraBook</h1>
+          <div className="absolute inset-0 bg-black/45" />
+          <div className="relative z-10 h-full flex flex-col justify-end p-5 text-white">
+            <h2 className="text-2xl font-bold">KaraBook</h2>
             <p className="text-sm opacity-90">Owner Portal</p>
           </div>
         </div>
 
-        {/* HEADER */}
-        <div className="px-6 pt-6">
+        {/* ================= FORM ================= */}
+        <div className="flex-1 px-6 sm:px-10 py-8 flex flex-col justify-center">
 
-          <div className="hidden lg:flex items-center gap-3">
-            <img
-              src="/owner/KarabookLogo.png"
-              alt="Karabook"
-              className="h-9"
-            />
-            <span className="font-bold text-primary">
+          {/* HEADER */}
+          <div className="hidden lg:flex items-center gap-3 mb-8">
+            <img src="/owner/KarabookLogo.png" className="h-9" />
+            <span className="text-sm font-semibold text-gray-700">
               Owner Portal
             </span>
           </div>
 
-          <h2 className="text-2xl font-bold mt-6">
+          <h2 className="text-2xl font-semibold text-gray-900">
             Sign in
           </h2>
 
-          <p className="text-gray-600 mt-1">
+          <p className="text-sm text-gray-600 mt-1">
             {mode === "otp"
-              ? <>Use your registered <span className="font-semibold text-primary">mobile number</span>.</>
-              : <>Login using <span className="font-semibold text-primary">username & password</span>.</>
-            }
+              ? "Use your registered mobile number to continue."
+              : "Login using your username & password."}
           </p>
-        </div>
 
-        {/* ================= FORM ================= */}
-        <div className="px-6 py-6">
+          {/* ================= OTP LOGIN ================= */}
+          {mode === "otp" && (
+            <div className="mt-6 space-y-5">
 
-          {mode === "otp" ? (
+              {phase === "mobile" && (
+                <>
+                  <div>
+                    <label className="text-sm text-gray-700">
+                      Mobile Number
+                    </label>
 
-            phase === "mobile" ? (
+                    <div className="mt-2 flex gap-2">
+                      <div className="w-[72px] h-11 flex items-center justify-center border rounded-lg bg-gray-50 text-sm">
+                        +91
+                      </div>
 
-              <div className="space-y-5">
-
-                <div>
-                  <Label className="text-sm">Mobile Number</Label>
-
-                  <div className="flex gap-2 mt-2">
-                    <div className="w-[70px] flex items-center justify-center rounded-lg border bg-gray-50 text-sm">
-                      +91
+                      <input
+                        value={mobile10}
+                        onChange={(e) => setMobile(e.target.value)}
+                        inputMode="numeric"
+                        maxLength={10}
+                        placeholder="Enter number"
+                        className="flex-1 h-11 rounded-lg border px-3 text-sm focus:ring-2 focus:ring-primary/30"
+                      />
                     </div>
+                  </div>
 
-                    <Input
-                      value={mobile10}
-                      onChange={(e) => setMobile(e.target.value)}
+                  <button
+                    onClick={startOtpFlow}
+                    disabled={loading || mobile10.length !== 10}
+                    className="w-full h-11 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 disabled:opacity-50"
+                  >
+                    {loading ? "Sending OTP..." : "Continue"}
+                  </button>
+
+                  <button
+                    onClick={() => setMode("password")}
+                    className="w-full text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    Login with username & password
+                  </button>
+                </>
+              )}
+
+              {phase === "otp" && (
+                <>
+                  <div>
+                    <label className="text-sm text-gray-700">
+                      One-Time Password
+                    </label>
+                    <input
+                      ref={otpInputRef}
+                      value={otp}
+                      onChange={(e) => onOtpChange(e.target.value)}
                       inputMode="numeric"
-                      placeholder="Enter registered number"
-                      maxLength={10}
-                      className="h-11 rounded-lg"
+                      maxLength={OTP_LEN}
+                      placeholder="••••••"
+                      className="mt-2 h-11 w-full rounded-lg border text-center tracking-[0.35em] font-semibold"
                     />
                   </div>
-                </div>
 
-                <Button
-                  onClick={startOtpFlow}
-                  disabled={loading || mobile10.length !== 10}
-                  className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90"
-                >
-                  {loading ? "Sending OTP..." : "Continue"}
-                </Button>
+                  <div className="flex justify-between text-xs text-gray-500">
+                    {secondsLeft > 0 ? (
+                      <span>Resend in {formatTimer(secondsLeft)}</span>
+                    ) : (
+                      <button onClick={resendOtp} className="underline">
+                        Resend OTP
+                      </button>
+                    )}
+                  </div>
 
-                <Button
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => setMode("password")}
-                >
-                  Login with username & password
-                </Button>
+                  <button
+                    onClick={() => verifyOtp(otp)}
+                    disabled={otp.length !== OTP_LEN || verifying}
+                    className="w-full h-11 rounded-lg bg-primary text-white font-medium disabled:opacity-50"
+                  >
+                    {verifying ? "Verifying..." : "Verify & Continue"}
+                  </button>
 
-              </div>
+                  <button
+                    onClick={() => setMode("password")}
+                    className="w-full text-sm text-gray-600"
+                  >
+                    Login with password instead
+                  </button>
+                </>
+              )}
+            </div>
+          )}
 
-            ) : (
-
-              <div className="space-y-5">
-
-                <p className="text-sm text-gray-600">
-                  Enter the OTP sent to your mobile number
-                </p>
-
-                <div>
-                  <Label>One-Time Password</Label>
-                  <Input
-                    ref={otpInputRef}
-                    value={otp}
-                    onChange={(e) => onOtpChange(e.target.value)}
-                    inputMode="numeric"
-                    maxLength={OTP_LEN}
-                    placeholder="••••••"
-                    className="h-11 text-center tracking-[0.35em] mt-1 font-semibold rounded-lg"
-                    disabled={verifying}
-                  />
-                </div>
-
-                <div className="flex justify-between text-xs text-gray-500">
-                  {secondsLeft > 0 ? (
-                    <span>Resend in {formatTimer(secondsLeft)}</span>
-                  ) : (
-                    <button onClick={resendOtp} className="underline">
-                      Resend OTP
-                    </button>
-                  )}
-                </div>
-
-                <Button
-                  onClick={() => verifyOtp(otp)}
-                  disabled={otp.length !== OTP_LEN || verifying}
-                  className="w-full h-11 rounded-lg bg-[#7ec9d3] hover:bg-[#6abdc7]"
-                >
-                  {verifying ? "Verifying..." : "Verify & Continue"}
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  className="w-full"
-                  onClick={() => setMode("password")}
-                >
-                  Login with password instead
-                </Button>
-
-              </div>
-
-            )
-
-          ) : (
-
-            <div className="space-y-3">
-
+          {/* ================= PASSWORD LOGIN ================= */}
+          {mode === "password" && (
+            <div className="mt-6 space-y-4">
               <div>
-                <Label>Username / Email</Label>
-                <Input
+                <label className="text-sm text-gray-700">
+                  Username / Email
+                </label>
+                <input
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="Enter username or email"
-                  className="h-11 mt-2"
+                  className="mt-2 h-11 w-full rounded-lg border px-3 text-sm"
                 />
               </div>
 
               <div>
-                <Label>Password</Label>
-
+                <label className="text-sm text-gray-700">
+                  Password
+                </label>
                 <div className="relative mt-2">
-                  <Input
+                  <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="h-11 pr-10"
+                    className="h-11 w-full rounded-lg border px-3 pr-10 text-sm"
                   />
-
                   <button
                     type="button"
                     onClick={() => setShowPassword((p) => !p)}
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
 
-              <Button
+              <button
                 onClick={passwordLogin}
                 disabled={loading}
-                className="w-full h-11 mt-2"
+                className="w-full h-11 rounded-lg bg-primary text-white font-medium"
               >
                 {loading ? "Signing in..." : "Login"}
-              </Button>
+              </button>
 
-              <Button
-                variant="ghost"
-                className="w-full"
+              <button
                 onClick={() => setMode("otp")}
+                className="w-full text-sm text-gray-600"
               >
                 ← Back to OTP login
-              </Button>
-
+              </button>
             </div>
-
           )}
-
         </div>
 
         {/* FOOTER */}
-        <div className="border-t px-6 py-4 text-center text-xs text-gray-400">
+        <div className="border-t py-4 text-center text-xs text-gray-400">
           © {new Date().getFullYear()} Karabook · Secure Owner Access
         </div>
-
       </div>
     </div>
   </div>
