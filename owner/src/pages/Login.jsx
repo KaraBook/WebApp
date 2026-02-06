@@ -25,7 +25,7 @@ function formatTimer(sec) {
 export default function OwnerLogin() {
   const navigate = useNavigate();
 
-  const [phase, setPhase] = useState("mobile"); 
+  const [phase, setPhase] = useState("mobile");
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [confirmRes, setConfirmRes] = useState(null);
@@ -33,6 +33,11 @@ export default function OwnerLogin() {
 
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
+
+  const [mode, setMode] = useState("otp");
+
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
 
   const [secondsLeft, setSecondsLeft] = useState(60);
 
@@ -62,17 +67,17 @@ export default function OwnerLogin() {
   };
 
   const backendOwnerLogin = async (firebaseIdToken) => {
-  const { url, method } = SummaryApi.ownerLogin;
-  const res = await api.request({
-    url,
-    method,
-    headers: {
-      Authorization: `Bearer ${firebaseIdToken}`,
-      "x-firebase-auth": "true", 
-    },
-  });
-  return res.data;
-};
+    const { url, method } = SummaryApi.ownerLogin;
+    const res = await api.request({
+      url,
+      method,
+      headers: {
+        Authorization: `Bearer ${firebaseIdToken}`,
+        "x-firebase-auth": "true",
+      },
+    });
+    return res.data;
+  };
 
   const startOtpFlow = async () => {
     if (mobile10.length !== 10) {
@@ -175,7 +180,6 @@ export default function OwnerLogin() {
     }
   };
 
-
   const changeNumber = () => {
     setPhase("mobile");
     setOtp("");
@@ -185,153 +189,255 @@ export default function OwnerLogin() {
   };
 
 
-  return (
-  <div className="min-h-screen w-full bg-[#f6f7fb] flex md:flex-row flex-col">
-    <div id="recaptcha-container" />
+  const passwordLogin = async () => {
+    if (!identifier || !password) {
+      toast.error("Enter username/email and password");
+      return;
+    }
+    setLoading(true);
+    try {
+      const { url, method } = SummaryApi.ownerPasswordLogin;
+      const res = await api.request({
+        url,
+        method,
+        data: {
+          identifier,
+          password,
+        },
+      });
+      loginWithTokens(res.data);
+      toast.success("Login successful");
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message ||
+        "Login failed"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    {/* ================= LEFT: HERO IMAGE ================= */}
-    <div
-      className="
+
+
+  return (
+    <div className="min-h-screen w-full bg-[#f6f7fb] flex md:flex-row flex-col">
+      <div id="recaptcha-container" />
+
+      {/* ================= LEFT: HERO IMAGE ================= */}
+      <div
+        className="
         flex lg:w-1/2
         relative overflow-hidden
         h-[45dvh] md:h-auto
       "
-    >
-      <img
-        src="/owner/loginhero.jpg"   
-        alt="Karabook Property"
-        className="absolute inset-0 md:h-full w-full object-cover"
-      />
+      >
+        <img
+          src="/owner/loginhero.jpg"
+          alt="Karabook Property"
+          className="absolute inset-0 md:h-full w-full object-cover"
+        />
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/50" />
 
-      {/* Text Overlay */}
-      <div className="relative z-10 p-4 md:p-10 flex flex-col justify-end text-white">
-        <p className="text-xs tracking-widest uppercase opacity-80">
-          Welcome Back
-        </p>
+        {/* Text Overlay */}
+        <div className="relative z-10 p-4 md:p-10 flex flex-col justify-end text-white">
+          <p className="text-xs tracking-widest uppercase opacity-80">
+            Welcome Back
+          </p>
 
-        <h1 className="text-[34px] md:text-[48px] font-sans font-[700]">
-          KaraBook
-        </h1>
+          <h1 className="text-[34px] md:text-[48px] font-sans font-[700]">
+            KaraBook
+          </h1>
 
-        <p className="mt-1 max-w-md text-[15px] md:text-[18px] opacity-90">
-          Manage your properties, bookings, guests and earnings with ease.
-        </p>
+          <p className="mt-1 max-w-md text-[15px] md:text-[18px] opacity-90">
+            Manage your properties, bookings, guests and earnings with ease.
+          </p>
+        </div>
       </div>
-    </div>
 
 
-    <div className="w-full h-[55dvh] md:h-auto lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
-      <div className="w-full max-w-md bg-white flex flex-col md:items-start items-center h-full md:h-auto rounded-2xl shadow-lg overflow-hidden">
+      <div className="w-full h-[55dvh] md:h-auto lg:w-1/2 flex items-center bg-primary justify-center px-4 py-4 sm:px-8">
+        <div className="w-full max-w-md bg-white flex flex-col md:items-start items-center h-full md:h-auto rounded-2xl shadow-lg overflow-hidden">
 
-        {/* HEADER */}
-        <div className="px-4 w-full md:px-6 pt-4 md:pt-8 pb-2 md:pb-6">
-          <div className="flex items-center justify-between gap-3">
-            <img
-              src="/owner/KarabookLogo.png"
-              alt="Karabook"
-              className="h-9"
-            />
-            <span className="text-[16px] font-bold text-primary">
-              Owner Portal
-            </span>
+          {/* HEADER */}
+          <div className="px-4 w-full md:px-6 pt-4 md:pt-8 pb-2 md:pb-6">
+            <div className="flex items-center justify-between gap-3">
+              <img
+                src="/owner/KarabookLogo.png"
+                alt="Karabook"
+                className="h-9"
+              />
+              <span className="text-[16px] font-bold text-primary">
+                Owner Portal
+              </span>
+            </div>
+
+            <h2 className="text-2xl font-bold mt-4 md:mt-6">
+              Sign in
+            </h2>
+
+            <p className="text-[14px] md:text-[16px] text-gray-700 mt-1">
+              {mode === "otp"
+                ? <>Use your registered <span className="text-primary font-[600]">mobile number</span> to continue.</>
+                : <>Login using your <span className="text-primary font-[600]">username & password</span>.</>
+              }
+            </p>
+
           </div>
 
-          <h2 className="text-2xl font-bold mt-4 md:mt-6">
-            Sign in
-          </h2>
+          {/* FORM CONTENT */}
+          <div className="px-4 w-full md:px-6 pb-4 md:pb-8">
 
-          <p className="text-[14px] md:text-[16px] text-gray-700 mt-1">
-            Use your registered <span className="text-primary font-[600]">mobile number</span> to continue.
-          </p>
-        </div>
+            {mode === "otp" ? (
 
-        {/* FORM CONTENT */}
-        <div className="px-4 w-full md:px-6 pb-4 md:pb-8">
+              phase === "mobile" ? (
 
-          {phase === "mobile" ? (
-            <div className="space-y-5 md:mt-0 mt-2">
+                <div className="space-y-5 md:mt-0 mt-2">
 
-              <div>
-                <Label className="text-sm">Mobile Number</Label>
+                  <div>
+                    <Label className="text-sm">Mobile Number</Label>
 
-                <div className="flex gap-2 mt-2">
-                  <div className="w-[70px] flex items-center justify-center rounded-lg border bg-gray-50 text-sm">
-                    +91
+                    <div className="flex gap-2 mt-2">
+                      <div className="w-[70px] flex items-center justify-center rounded-lg border bg-gray-50 text-sm">
+                        +91
+                      </div>
+
+                      <Input
+                        value={mobile10}
+                        onChange={(e) => setMobile(e.target.value)}
+                        inputMode="numeric"
+                        placeholder="Enter registered number"
+                        maxLength={10}
+                        className="h-11 rounded-lg"
+                      />
+                    </div>
                   </div>
 
+                  <Button
+                    onClick={startOtpFlow}
+                    disabled={loading || mobile10.length !== 10}
+                    className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90"
+                  >
+                    {loading ? "Sending OTP..." : "Continue"}
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => setMode("password")}
+                  >
+                    Login with username & password
+                  </Button>
+
+                </div>
+
+              ) : (
+
+                <div className="space-y-5">
+
+                  <p className="text-sm text-left text-gray-600">
+                    Enter the OTP sent to your mobile number
+                  </p>
+
+                  <div>
+                    <Label>One-Time Password</Label>
+                    <Input
+                      ref={otpInputRef}
+                      value={otp}
+                      onChange={(e) => onOtpChange(e.target.value)}
+                      inputMode="numeric"
+                      maxLength={OTP_LEN}
+                      placeholder="••••••"
+                      className="h-11 text-center tracking-[0.35em] mt-1 font-semibold rounded-lg"
+                      disabled={verifying}
+                    />
+                  </div>
+
+                  <div className="flex justify-between text-xs text-gray-500">
+                    {secondsLeft > 0 ? (
+                      <span>Resend in {formatTimer(secondsLeft)}</span>
+                    ) : (
+                      <button onClick={resendOtp} className="underline">
+                        Resend OTP
+                      </button>
+                    )}
+                  </div>
+
+                  <Button
+                    onClick={() => verifyOtp(otp)}
+                    disabled={otp.length !== OTP_LEN || verifying}
+                    className="w-full h-11 rounded-lg bg-[#7ec9d3] hover:bg-[#6abdc7]"
+                  >
+                    {verifying ? "Verifying..." : "Verify & Continue"}
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => setMode("password")}
+                  >
+                    Login with password instead
+                  </Button>
+
+                </div>
+
+              )
+
+            ) : (
+
+              <div className="space-y-5">
+
+                <div>
+                  <Label>Username / Email</Label>
                   <Input
-                    value={mobile10}
-                    onChange={(e) => setMobile(e.target.value)}
-                    inputMode="numeric"
-                    placeholder="Enter registered number"
-                    maxLength={10}
-                    className="h-11 rounded-lg"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="Enter username or email"
+                    className="h-11"
                   />
                 </div>
-              </div>
 
-              <Button
-                onClick={startOtpFlow}
-                disabled={loading || mobile10.length !== 10}
-                className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90"
-              >
-                {loading ? "Sending OTP..." : "Continue"}
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-5">
+                <div>
+                  <Label>Password</Label>
+                  <Input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    className="h-11"
+                  />
+                </div>
 
-              <p className="text-sm text-left text-gray-600">
-                Enter the OTP sent to your mobile number
-              </p>
+                <Button
+                  onClick={passwordLogin}
+                  disabled={loading}
+                  className="w-full h-11"
+                >
+                  {loading ? "Signing in..." : "Login"}
+                </Button>
 
-              <div>
-                <Label>One-Time Password</Label>
-                <Input
-                  ref={otpInputRef}
-                  value={otp}
-                  onChange={(e) => onOtpChange(e.target.value)}
-                  inputMode="numeric"
-                  maxLength={OTP_LEN}
-                  placeholder="••••••"
-                  className="h-11 text-center tracking-[0.35em] mt-1 font-semibold rounded-lg"
-                  disabled={verifying}
-                />
-              </div>
-
-              <div className="flex justify-between text-xs text-gray-500">
-                {secondsLeft > 0 ? (
-                  <span>Resend in {formatTimer(secondsLeft)}</span>
-                ) : (
-                  <button onClick={resendOtp} className="underline">
-                    Resend OTP
-                  </button>
-                )}
+                <Button
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => setMode("otp")}
+                >
+                  ← Back to OTP login
+                </Button>
 
               </div>
 
-              <Button
-                onClick={() => verifyOtp(otp)}
-                disabled={otp.length !== OTP_LEN || verifying}
-                className="w-full h-11 rounded-lg bg-[#7ec9d3] hover:bg-[#6abdc7]"
-              >
-                {verifying ? "Verifying..." : "Verify & Continue"}
-              </Button>
-            </div>
-          )}
+            )}
 
-
-<hr className="mt-4 md:mt-8"/>
-          {/* FOOTER */}
-          <p className="text-[11px] text-center text-gray-400 mt-3 md:mt-6">
-            © {new Date().getFullYear()} Karabook · Secure Owner Access
-          </p>
+            <hr className="mt-4 md:mt-8" />
+            {/* FOOTER */}
+            <p className="text-[11px] text-center text-gray-400 mt-3 md:mt-6">
+              © {new Date().getFullYear()} Karabook · Secure Owner Access
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 }

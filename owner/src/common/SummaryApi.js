@@ -9,6 +9,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/auth/resort-owner/login`,
         method: "POST",
     },
+    ownerPasswordLogin: {
+        url: `${BASE_URL}/api/auth/resort-owner/password-login`,
+        method: "POST",
+    },
     ownerLogout: {
         url: `${BASE_URL}/api/auth/resort-owner/logout`,
         method: "POST",

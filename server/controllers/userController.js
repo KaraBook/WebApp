@@ -441,6 +441,52 @@ export const resortOwnerLogin = async (req, res) => {
 };
 
 
+
+export const resortOwnerPasswordLogin = async (req, res) => {
+  try {
+    const { identifier, password } = req.body;
+
+    if (!identifier || !password) {
+      return res.status(400).json({
+        message: "Username/email and password are required",
+      });
+    }
+    const user = await User.findOne({
+      $or: [
+        { email: identifier.toLowerCase() },
+        { username: identifier },
+      ],
+    }).select("+password");
+
+    if (!user || !user.password) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    if (!["resortOwner", "manager", "admin"].includes(user.role)) {
+      return res.status(403).json({
+        message: "Access denied. Only owners/managers/admins allowed.",
+      });
+    }
+
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    const { accessToken, refreshToken } = issueTokens(user);
+    return res.json({
+      accessToken,
+      refreshToken,
+      user: publicUser(user),
+    });
+  } catch (err) {
+    console.error("Owner password login error:", err);
+    return res.status(500).json({
+      message: "Login failed. Try again later.",
+    });
+  }
+};
+
+
+
 export const updateOwnerProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);

@@ -360,7 +360,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     if (prop.publishNow) {
       prop.status = "published";
-    } else {
+    } else { 
       prop.status = "unpublished";
     }
 
