@@ -66,7 +66,7 @@ router.delete(
 router.put("/traveller/mobile", requireAuth, verifyFirebaseToken, updateTravellerMobile);
 router.post("/resort-owner/precheck", checkResortOwnerNumber);
 router.post("/resort-owner/login", verifyFirebaseToken, resortOwnerLogin);
-router.post("/owner/password-login", verifyFirebaseToken, resortOwnerPasswordLogin);
+router.post("/resort-owner/password-login", resortOwnerPasswordLogin);
 
 router.post("/manager/precheck", managerPrecheck);
 router.post("/manager/login", verifyFirebaseToken, managerLogin);
