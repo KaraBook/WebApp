@@ -223,21 +223,22 @@ export default function OwnerLogin() {
 
 
   return (
-  <div className="min-h-screen bg-[#f6f7fb] grid lg:grid-cols-2">
+  <div className="min-h-screen flex bg-[#f6f7fb]">
 
     <div id="recaptcha-container" />
 
-    {/* ================= LEFT HERO (DESKTOP) ================= */}
-    <div className="hidden lg:flex relative overflow-hidden">
+    {/* ================= LEFT HERO ================= */}
+    <div className="hidden lg:flex lg:w-1/2 relative">
+
       <img
         src="/owner/loginhero.jpg"
-        alt="Karabook Property"
+        alt="Karabook"
         className="absolute inset-0 w-full h-full object-cover"
       />
 
       <div className="absolute inset-0 bg-black/50" />
 
-      <div className="relative z-10 p-12 flex flex-col justify-end text-white max-w-xl">
+      <div className="relative z-10 p-12 flex flex-col justify-end text-white">
         <p className="text-xs tracking-widest uppercase opacity-80">
           Welcome Back
         </p>
@@ -246,19 +247,19 @@ export default function OwnerLogin() {
           KaraBook
         </h1>
 
-        <p className="mt-3 text-lg opacity-90">
+        <p className="mt-3 text-lg opacity-90 max-w-md">
           Manage your properties, bookings, guests and earnings with ease.
         </p>
       </div>
     </div>
 
-    {/* ================= RIGHT LOGIN PANEL ================= */}
-    <div className="flex items-center justify-center px-4 py-8">
+    {/* ================= RIGHT LOGIN ================= */}
+    <div className="w-full lg:w-1/2 flex items-center justify-center px-4 py-8 overflow-y-auto">
 
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl">
 
         {/* MOBILE HERO */}
-        <div className="lg:hidden relative h-40 overflow-hidden">
+        <div className="lg:hidden relative h-40 overflow-hidden rounded-t-2xl">
           <img
             src="/owner/loginhero.jpg"
             alt="Karabook"
@@ -462,4 +463,5 @@ export default function OwnerLogin() {
     </div>
   </div>
 );
+
 }
