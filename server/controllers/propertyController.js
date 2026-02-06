@@ -273,6 +273,7 @@ export const createPropertyDraft = async (req, res) => {
 export const attachPropertyMediaAndFinalize = async (req, res) => {
   try {
     const { id } = req.params;
+    const wasDraft = prop.isDraft;
 
     const prop = await Property.findById(id).populate(
       "ownerUserId",
@@ -366,11 +367,12 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     await prop.save();
 
     /* ================= EMAIL ================= */
-    if (prop.isDraft === false && !prop.ownerWelcomeEmailSent) {
+    if (wasDraft && !prop.ownerWelcomeEmailSent) {
       await sendOwnerCreationEmail(prop, { forceCredentials: true });
       prop.ownerWelcomeEmailSent = true;
       await prop.save();
     }
+
 
     return res.status(200).json({
       success: true,
@@ -754,7 +756,7 @@ export const updateProperty = async (req, res) => {
 
 
     if (shouldSendEmail && updatedProperty) {
-      await sendOwnerCreationEmail(updatedProperty);
+      await sendOwnerCreationEmail(updatedProperty, { forceCredentials: true });
     }
 
     res.status(200).json({
