@@ -325,7 +325,15 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
       if (!owner) throw new Error("Owner not found");
 
-      const originalPassword = prop.resortOwner?.password;
+      let originalPassword = prop.resortOwner?.password;
+
+      if (!originalPassword) {
+        console.log("⚠️ Password missing → generating temp password");
+
+        originalPassword = genTempPassword();
+        owner.password = await bcrypt.hash(originalPassword, 10);
+        await owner.save();
+      }
 
       const mailData = propertyCreatedTemplate({
         ownerFirstName: owner.firstName,
@@ -342,8 +350,10 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
         text: mailData.text,
         html: mailData.html,
       });
+
+      console.log("✅ Email sent successfully");
     } catch (mailErr) {
-      console.error("Email error:", mailErr);
+      console.error("❌ Email error:", mailErr);
     }
 
 
