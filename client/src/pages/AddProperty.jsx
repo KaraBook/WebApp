@@ -1251,6 +1251,7 @@ const AddProperty = () => {
 
                         <div className="md:w-[48%] w-[100%]">
                             <SingleSelectDropdown
+                                className="mt-2"
                                 label="Publish Now"
                                 value={formData.publishNow}
                                 options={publishNowOptions}

@@ -1162,6 +1162,7 @@ const EditProperty = () => {
 
             <div className="md:w-[48%] w-[100%]">
               <SingleSelectDropdown
+                className="mt-2"
                 label="Publish Now"
                 value={formData.publishNow}
                 options={publishNowOptions}
@@ -1170,7 +1171,7 @@ const EditProperty = () => {
               />
             </div>
 
-            
+
             <FileUploadsSection
               setCoverImageFile={setCoverImageFile}
               coverImageFile={coverImageFile}
