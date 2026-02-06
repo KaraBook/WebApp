@@ -29,7 +29,7 @@ export function propertyCreatedTemplate({
         ${credentialsBlock}
         <p>
           <a href="${portalUrl}" 
-             style="display:inline-block;background:#111;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">
+             style="display:inline-block;background:#0694a0;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">
             Login to Owner Dashboard
           </a>
         </p>

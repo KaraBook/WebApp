@@ -319,21 +319,18 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     await prop.save();
 
-    /* ================= GENERATE LOGIN + EMAIL ================= */
+    /* ================= EMAIL ================= */
     try {
-      const owner = await User.findById(prop.ownerUserId).select("+password");
+      const owner = await User.findById(prop.ownerUserId);
 
       if (!owner) throw new Error("Owner not found");
 
-      const tempPassword = genTempPassword();
-
-      owner.password = await bcrypt.hash(tempPassword, 10);
-      await owner.save();
+      const originalPassword = prop.resortOwner?.password;
 
       const mailData = propertyCreatedTemplate({
         ownerFirstName: owner.firstName,
         ownerEmail: owner.email,
-        ownerPassword: tempPassword,
+        ownerPassword: originalPassword,
         propertyName: prop.propertyName,
         createdNewUser: true,
         portalUrl: `${process.env.PORTAL_URL}/owner/login`,
@@ -348,6 +345,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     } catch (mailErr) {
       console.error("Email error:", mailErr);
     }
+
 
     return res.status(200).json({
       success: true,
