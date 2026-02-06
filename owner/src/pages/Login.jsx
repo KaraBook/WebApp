@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 
 const OTP_LEN = 6;
 
@@ -30,6 +31,7 @@ export default function OwnerLogin() {
   const [otp, setOtp] = useState("");
   const [confirmRes, setConfirmRes] = useState(null);
   const { loginWithTokens } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -387,7 +389,7 @@ export default function OwnerLogin() {
 
             ) : (
 
-              <div className="space-y-5">
+              <div className="space-y-3">
 
                 <div>
                   <Label>Username / Email</Label>
@@ -395,25 +397,36 @@ export default function OwnerLogin() {
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="Enter username or email"
-                    className="h-11"
+                    className="h-11 mt-2"
                   />
                 </div>
 
                 <div>
                   <Label>Password</Label>
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="h-11"
-                  />
+
+                  <div className="relative mt-2">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter password"
+                      className="h-11 pr-10"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((p) => !p)}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
 
                 <Button
                   onClick={passwordLogin}
                   disabled={loading}
-                  className="w-full h-11"
+                  className="w-full h-11 mt-2"
                 >
                   {loading ? "Signing in..." : "Login"}
                 </Button>
@@ -430,9 +443,9 @@ export default function OwnerLogin() {
 
             )}
 
-            <hr className="mt-4 md:mt-8" />
+            <hr className="mt-4 md:mt-4" />
             {/* FOOTER */}
-            <p className="text-[11px] text-center text-gray-400 mt-3 md:mt-6">
+            <p className="text-[11px] text-center text-gray-400 mt-3 md:mt-4">
               © {new Date().getFullYear()} Karabook · Secure Owner Access
             </p>
           </div>
