@@ -355,12 +355,18 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     }
 
     prop.isDraft = false;
-    prop.status = "published";
+
+    if (prop.publishNow) {
+      prop.status = "published";
+    } else {
+      prop.status = "unpublished";
+    }
+
 
     await prop.save();
 
     /* ================= EMAIL ================= */
-    if (!prop.ownerWelcomeEmailSent) {
+    if (prop.isDraft === false && !prop.ownerWelcomeEmailSent) {
       await sendOwnerCreationEmail(prop, { forceCredentials: true });
       prop.ownerWelcomeEmailSent = true;
       await prop.save();
