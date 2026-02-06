@@ -638,7 +638,7 @@ const AddProperty = () => {
                                 value={formData.city}
                                 onValueChange={(value) => handleChange({ target: { name: "city", value } })}
                             >
-                                <SelectTrigger className="w-full border p-2 rounded mt-1">
+                                <SelectTrigger className="w-full border p-2 rounded mt-2">
                                     <SelectValue placeholder="Select City" />
                                 </SelectTrigger>
                                 <SelectContent>

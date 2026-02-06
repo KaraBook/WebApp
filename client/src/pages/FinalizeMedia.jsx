@@ -146,26 +146,6 @@ export default function FinalizeMedia() {
       </h1>
 
       <form onSubmit={onSubmit} className="flex flex-wrap gap-4">
-        {/* Shop Act */}
-        <div className="w-[48%] min-w-[320px]">
-          <FileUploadsSection
-            shopActFile={shopActFile}
-            setShopActFile={setShopActFile}
-            shopActPreview={shopActPreview}
-            setShopActPreview={setShopActPreview}
-            showFields={{ shopAct: true }}
-          />
-        </div>
-
-        {/* Publish */}
-        <div className="w-[48%] min-w-[320px] mt-4">
-          <SingleSelectDropdown
-            label="Publish Now"
-            value={publishNow}
-            options={publishNowOptions}
-            onChange={setPublishNow}
-          />
-        </div>
 
         {/* Cover + Gallery */}
         <div className="w-full">
@@ -184,6 +164,27 @@ export default function FinalizeMedia() {
             setNewGalleryPreviews={setNewGalleryPreviews}
 
             showFields={{ coverImage: true, galleryPhotos: true }}
+          />
+        </div>
+
+        {/* Shop Act */}
+        <div className="w-[48%] min-w-[320px]">
+          <FileUploadsSection
+            shopActFile={shopActFile}
+            setShopActFile={setShopActFile}
+            shopActPreview={shopActPreview}
+            setShopActPreview={setShopActPreview}
+            showFields={{ shopAct: true }}
+          />
+        </div>
+
+        {/* Publish */}
+        <div className="w-[48%] min-w-[320px] mt-4">
+          <SingleSelectDropdown
+            label="Publish Now"
+            value={publishNow}
+            options={publishNowOptions}
+            onChange={setPublishNow}
           />
         </div>
 
