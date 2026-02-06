@@ -273,7 +273,6 @@ export const createPropertyDraft = async (req, res) => {
 export const attachPropertyMediaAndFinalize = async (req, res) => {
   try {
     const { id } = req.params;
-    const wasDraft = prop.isDraft;
 
     const prop = await Property.findById(id).populate(
       "ownerUserId",
@@ -286,6 +285,8 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
         message: "Property not found",
       });
     }
+
+    const wasDraft = prop.isDraft;
 
     if (prop.isBlocked) {
       return res.status(403).json({
@@ -367,7 +368,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     await prop.save();
 
     /* ================= EMAIL ================= */
-    if (wasDraft && !prop.ownerWelcomeEmailSent) {
+    if (wasDraft && prop.ownerWelcomeEmailSent !== true) {
       await sendOwnerCreationEmail(prop, { forceCredentials: true });
       prop.ownerWelcomeEmailSent = true;
       await prop.save();
