@@ -223,13 +223,13 @@ export default function OwnerLogin() {
 
 
   return (
-  <div className="min-h-screen bg-[#f2f4f8] flex items-center justify-center px-4">
+  <div className="min-h-screen bg-[#f2f4f8] flex items-center justify-center px-0">
     <div id="recaptcha-container" />
 
-    <div className="w-full max-w-[1120px] bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col lg:flex-row">
+    <div className="w-full max-w-full bg-white shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col lg:flex-row">
 
       {/* ================= LEFT IMAGE (DESKTOP) ================= */}
-      <div className="hidden lg:flex lg:w-1/2 relative">
+      <div className="hidden lg:flex lg:w-1/2 relative h-[100vh]">
         <img
           src="/owner/loginhero.jpg"
           alt="Karabook"
@@ -254,7 +254,7 @@ export default function OwnerLogin() {
       <div className="w-full lg:w-1/2 flex flex-col">
 
         {/* ========== MOBILE HERO ========== */}
-        <div className="lg:hidden relative h-44">
+        <div className="lg:hidden relative h-full">
           <img
             src="/owner/loginhero.jpg"
             alt="Karabook"
@@ -439,5 +439,4 @@ export default function OwnerLogin() {
     </div>
   </div>
 );
-
 }

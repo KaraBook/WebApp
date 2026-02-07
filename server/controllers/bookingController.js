@@ -211,6 +211,7 @@ export const verifyPayment = async (req, res) => {
         "propertyId",
         "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
       )
+      .populate("userId", "firstName lastName email mobile")
       .populate("propertyId", "propertyName city state address");
 
     if (!booking) {
