@@ -63,8 +63,16 @@ export function bookingConfirmationTemplate({
   orderId,
   portalUrl
 }) {
-  const formattedCheckIn = new Date(checkIn).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-  const formattedCheckOut = new Date(checkOut).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  const formatIndiaDate = (date) =>
+    new Date(date).toLocaleDateString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+  const formattedCheckIn = formatIndiaDate(checkIn);
+  const formattedCheckOut = formatIndiaDate(checkOut);
   const formattedSubtotal = `₹${Number(subtotal).toLocaleString("en-IN")}`;
   const formattedTax = `₹${Number(taxAmount).toLocaleString("en-IN")}`;
   const formattedTotal = `₹${Number(grandTotal).toLocaleString("en-IN")}`;
