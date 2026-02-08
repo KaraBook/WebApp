@@ -21,6 +21,7 @@ import {
   travellerCheckGoogle,
   travellerLoginGoogle,
   resortOwnerPasswordLogin,
+  updateOwnerPassword,
 } from "../controllers/userController.js";
 import { verifyFirebaseToken } from "../middlewares/verifyFirebaseToken.js";
 import { requireAuth } from "../middlewares/requireAuth.js";
@@ -50,23 +51,18 @@ router.delete(
 
 router.put("/owner/profile", requireAuth, updateOwnerProfile);
 
-router.post(
-  "/owner/avatar",
-  requireAuth,
+router.post( "/owner/avatar", requireAuth,
   upload.single("image"),
   uploadOwnerAvatar
 );
 
-router.delete(
-  "/owner/avatar",
-  requireAuth,
-  removeOwnerAvatar
-);
+router.delete("/owner/avatar", requireAuth, removeOwnerAvatar);
 
 router.put("/traveller/mobile", requireAuth, verifyFirebaseToken, updateTravellerMobile);
 router.post("/resort-owner/precheck", checkResortOwnerNumber);
 router.post("/resort-owner/login", verifyFirebaseToken, resortOwnerLogin);
 router.post("/resort-owner/password-login", resortOwnerPasswordLogin);
+router.put( "/owner/password", requireAuth, updateOwnerPassword);
 
 router.post("/manager/precheck", managerPrecheck);
 router.post("/manager/login", verifyFirebaseToken, managerLogin);

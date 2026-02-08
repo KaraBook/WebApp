@@ -16,6 +16,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import api from "../api/axios";
+import { Eye, EyeOff, Lock } from "lucide-react";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
@@ -30,6 +31,17 @@ export default function MyProfile() {
   const [states] = useState(getIndianStates());
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
+  const [passwordData, setPasswordData] = useState({
+    current: "",
+    new: "",
+    confirm: "",
+  });
+
+  const [showPass, setShowPass] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
 
   const [user, setUser] = useState({
     firstName: "",
@@ -153,6 +165,36 @@ export default function MyProfile() {
       toast.error("Failed to remove avatar");
     }
   };
+
+  const handlePasswordUpdate = async () => {
+    if (!passwordData.current || !passwordData.new || !passwordData.confirm) {
+      toast.error("All password fields are required");
+      return;
+    }
+    if (passwordData.new.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+    if (passwordData.new !== passwordData.confirm) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    try {
+      await api.put(SummaryApi.updateOwnerPassword.url, {
+        currentPassword: passwordData.current,
+        newPassword: passwordData.new,
+      });
+      toast.success("Password updated successfully");
+      setPasswordData({
+        current: "",
+        new: "",
+        confirm: "",
+      });
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Password update failed");
+    }
+  };
+
 
   /* ---------------- INITIALS ---------------- */
   const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""
@@ -344,6 +386,67 @@ export default function MyProfile() {
             </div>
           </div>
 
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lock className="w-5 h-5" />
+                Change Password
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+
+              {/* Current Password */}
+              <PasswordField
+                label="Current Password"
+                value={passwordData.current}
+                show={showPass.current}
+                onToggle={() =>
+                  setShowPass(p => ({ ...p, current: !p.current }))
+                }
+                onChange={v =>
+                  setPasswordData(p => ({ ...p, current: v }))
+                }
+              />
+
+              {/* New Password */}
+              <PasswordField
+                label="New Password"
+                value={passwordData.new}
+                show={showPass.new}
+                onToggle={() =>
+                  setShowPass(p => ({ ...p, new: !p.new }))
+                }
+                onChange={v =>
+                  setPasswordData(p => ({ ...p, new: v }))
+                }
+              />
+
+              {/* Confirm Password */}
+              <PasswordField
+                label="Confirm Password"
+                value={passwordData.confirm}
+                show={showPass.confirm}
+                onToggle={() =>
+                  setShowPass(p => ({ ...p, confirm: !p.confirm }))
+                }
+                onChange={v =>
+                  setPasswordData(p => ({ ...p, confirm: v }))
+                }
+              />
+
+              <Button
+                variant="outline"
+                onClick={handlePasswordUpdate}
+                className="w-full"
+              >
+                Update Password
+              </Button>
+
+            </CardContent>
+          </Card>
+
+
           {/* Save */}
           <div className="pt-4">
             <Button
@@ -374,6 +477,42 @@ function Field({ label, value, onChange, error, type = "text" }) {
       {error && (
         <p className="text-xs text-red-500 mt-1">{error}</p>
       )}
+    </div>
+  );
+}
+
+
+function PasswordField({
+  label,
+  value,
+  onChange,
+  show,
+  onToggle,
+}) {
+  return (
+    <div>
+      <Label>{label}</Label>
+
+      <div className="relative mt-1">
+        <Input
+          type={show ? "text" : "password"}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="pr-10"
+        />
+
+        <button
+          type="button"
+          onClick={onToggle}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+        >
+          {show ? (
+            <EyeOff className="w-4 h-4" />
+          ) : (
+            <Eye className="w-4 h-4" />
+          )}
+        </button>
+      </div>
     </div>
   );
 }

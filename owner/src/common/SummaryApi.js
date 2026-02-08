@@ -110,6 +110,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/auth/owner/profile`,
         method: "PUT",
     },
+    updateOwnerPassword: {
+        url: `${BASE_URL}/api/auth/owner/password`,
+        method: "PUT",
+    },
     uploadOwnerAvatar: {
         url: `${BASE_URL}/api/auth/owner/avatar`,
         method: "POST",
