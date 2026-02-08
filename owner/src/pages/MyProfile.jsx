@@ -20,6 +20,7 @@ import { Eye, EyeOff, Lock } from "lucide-react";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
+import { sendOtp } from "@/firebase";
 
 export default function MyProfile() {
   const fileRef = useRef(null);
