@@ -17,7 +17,7 @@ export default function PropertyTopFilters({ total, value, onChange }) {
           <FilterDropdown
             full
             label={value.type}
-            options={["All Types", "villa", "tent", "cottage", "hotel"]}
+            options={["All Types", "Villa", "Tent", "Cottage", "Hotel", "Apartment"]}
             onSelect={(v) => onChange({ ...value, type: v })}
           />
 
