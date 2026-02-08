@@ -45,6 +45,9 @@ export default function MyProfile() {
   });
   const [mobileEdit, setMobileEdit] = useState(false);
   const [newMobile, setNewMobile] = useState("");
+  const OTP_DURATION = 60;
+  const [otpTimer, setOtpTimer] = useState(0);
+  const [resending, setResending] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [confirmRes, setConfirmRes] = useState(null);
   const [otpCode, setOtpCode] = useState("");
@@ -90,6 +93,17 @@ export default function MyProfile() {
       }
     })();
   }, []);
+
+
+  useEffect(() => {
+    if (otpTimer <= 0) return;
+
+    const interval = setInterval(() => {
+      setOtpTimer((t) => t - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [otpTimer]);
 
   /* ---------------- STATE CHANGE ---------------- */
   const handleStateChange = (code) => {
@@ -224,6 +238,7 @@ export default function MyProfile() {
 
       setOtpSent(true);
       setConfirmRes(confirmation);
+      setOtpTimer(OTP_DURATION);
 
       toast.success("OTP sent");
 
@@ -271,6 +286,27 @@ export default function MyProfile() {
 
     } catch (err) {
       toast.error(err?.message || "Verification failed");
+    }
+  };
+
+
+  const resendOtp = async () => {
+    if (otpTimer > 0) return;
+
+    try {
+      setResending(true);
+
+      const formatted = `+91${newMobile}`;
+      const confirmation = await sendOtp(formatted);
+
+      setConfirmRes(confirmation);
+      setOtpTimer(OTP_DURATION);
+
+      toast.success("OTP resent");
+    } catch (err) {
+      toast.error("Failed to resend OTP");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -397,7 +433,10 @@ export default function MyProfile() {
                   />
 
                   {!otpSent ? (
-                    <Button onClick={sendOtpForOwner}>
+                    <Button
+                      disabled={newMobile.length !== 10}
+                      onClick={sendOtpForOwner}
+                    >
                       Send OTP
                     </Button>
                   ) : (
@@ -405,15 +444,39 @@ export default function MyProfile() {
                       <p className="text-sm text-gray-500">
                         OTP sent. Verify to update.
                       </p>
+
                       <Input
-                        placeholder="Enter OTP"
+                        placeholder="Enter 6-digit OTP"
                         value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value)}
+                        maxLength={6}
+                        inputMode="numeric"
+                        onChange={(e) =>
+                          setOtpCode(e.target.value.replace(/\D/g, ""))
+                        }
                       />
 
-                      <Button onClick={() => verifyOwnerOtp(otpCode)}>
-                        Verify OTP
-                      </Button>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          disabled={otpCode.length !== 6}
+                          onClick={() => verifyOwnerOtp(otpCode)}
+                        >
+                          Verify OTP
+                        </Button>
+
+                        {otpTimer > 0 ? (
+                          <span className="text-sm text-gray-500">
+                            Resend in {otpTimer}s
+                          </span>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            disabled={resending}
+                            onClick={resendOtp}
+                          >
+                            Resend OTP
+                          </Button>
+                        )}
+                      </div>
                     </>
                   )}
 
