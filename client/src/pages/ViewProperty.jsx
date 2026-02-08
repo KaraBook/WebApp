@@ -97,6 +97,7 @@ export default function ViewProperty() {
     (async () => {
       try {
         const res = await Axios.get(SummaryApi.getSingleProperty(id).url);
+        console.log("API food:", res.data?.data?.foodAvailability);
         setProperty(res.data?.data);
       } catch {
         errorToast("Failed to load property");
@@ -132,7 +133,6 @@ export default function ViewProperty() {
     isRefundable,
     roomBreakdown,
     refundNotes,
-    foodAvailability,
     amenities,
     pan,
     gstin,
@@ -145,6 +145,8 @@ export default function ViewProperty() {
     galleryPhotos = [],
     cancellationPolicy = [],
   } = property;
+
+  const normalizedFood = property?.foodAvailability ?? [];
 
   return (
     <div className="md:p-4 p-0 max-w-[1400px] mx-auto space-y-6">
@@ -383,10 +385,10 @@ export default function ViewProperty() {
 
                           <span
                             className={`font-semibold ${rule.refundPercent === 100
-                                ? "text-emerald-600"
-                                : rule.refundPercent === 0
-                                  ? "text-red-500"
-                                  : "text-amber-600"
+                              ? "text-emerald-600"
+                              : rule.refundPercent === 0
+                                ? "text-red-500"
+                                : "text-amber-600"
                               }`}
                           >
                             {rule.refundPercent}% refund
@@ -405,15 +407,20 @@ export default function ViewProperty() {
               <p className="text-sm text-muted-foreground">Food Availability</p>
 
               <div className="flex flex-wrap gap-4">
-                {foodAvailability?.map((food) => (
-                  <div
-                    key={food}
-                    className="flex items-center gap-2 text-sm font-medium"
-                  >
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                    <span className="capitalize">{food}</span>
-                  </div>
-                ))}
+                {normalizedFood?.length ? (
+                  normalizedFood.map((food) => (
+                    <div
+                      key={food}
+                      className="flex items-center gap-2 text-sm font-medium"
+                    >
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      <span className="capitalize">{food}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No food options listed</p>
+                )}
+
               </div>
             </div>
 
