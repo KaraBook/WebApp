@@ -46,6 +46,7 @@ export default function MyProfile() {
   const [mobileEdit, setMobileEdit] = useState(false);
   const [newMobile, setNewMobile] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [confirmRes, setConfirmRes] = useState(null);
 
   const [user, setUser] = useState({
     firstName: "",
@@ -209,7 +210,7 @@ export default function MyProfile() {
 
       setLoading(true);
 
-      const { url, method } = SummaryApi.ownerPrecheck;
+      const { url, method } = SummaryApi.checkMobileAvailability;
 
       await api.request({
         url,

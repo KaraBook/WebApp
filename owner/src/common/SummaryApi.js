@@ -17,6 +17,10 @@ const SummaryApi = {
         url: `${BASE_URL}/api/auth/owner/mobile`,
         method: "PUT",
     },
+    checkMobileAvailability: {
+        url: `${BASE_URL}/api/auth/mobile/check`,
+        method: "POST",
+    },
     ownerLogout: {
         url: `${BASE_URL}/api/auth/resort-owner/logout`,
         method: "POST",

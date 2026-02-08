@@ -686,6 +686,52 @@ export const updateOwnerMobile = async (req, res) => {
   }
 };
 
+export const checkMobileAvailability = async (req, res) => {
+  try {
+    const { mobile } = req.body;
+    const normalized = normalizeMobile(mobile);
+
+    if (!normalized || normalized.length !== 10) {
+      return res.status(400).json({
+        message: "Invalid mobile number",
+      });
+    }
+
+    const exists = await User.findOne({ mobile: normalized }).select("role");
+
+    if (exists) {
+      let message = "This mobile number is already in use.";
+
+      if (exists.role === "traveller") {
+        message = "This number belongs to a Traveller account.";
+      }
+
+      if (exists.role === "resortOwner") {
+        message = "This number belongs to another Resort Owner account.";
+      }
+
+      if (exists.role === "manager") {
+        message = "This number belongs to a Manager account.";
+      }
+
+      if (exists.role === "admin") {
+        message = "This number belongs to an Admin account.";
+      }
+
+      return res.status(409).json({ message });
+    }
+
+    return res.json({
+      success: true,
+      message: "Mobile number available",
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to check number",
+    });
+  }
+};
 
 
 export const removeOwnerAvatar = async (req, res) => {
