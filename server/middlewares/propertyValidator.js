@@ -39,7 +39,7 @@ const baseFields = {
     resortMobile: Joi.string().pattern(/^[6-9]\d{9}$/).required(),
   }).required(),
 
-  propertyType: Joi.string().valid("villa", "tent", "cottage", "hotel").required(),
+  propertyType: Joi.string().valid("villa", "tent", "cottage", "hotel", "apartment").required(),
 
   description: Joi.string().min(30).max(500).required(),
 

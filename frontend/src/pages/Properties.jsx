@@ -14,6 +14,7 @@ const PROPERTY_TYPE_LABELS = {
   tent: "Tent",
   cottage: "Cottage",
   hotel: "Hotel",
+  apartment: "Apartment",
 };
 
 
