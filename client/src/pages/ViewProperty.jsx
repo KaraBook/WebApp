@@ -228,7 +228,7 @@ export default function ViewProperty() {
           <SectionCard icon={IndianRupee} title="Pricing">
             <div className="grid grid-cols-2 gap-4">
               <InfoRow label="Weekday Price" value={`₹${pricingPerNightWeekdays}/night`} />
-              <InfoRow label="Weekend Price" value={`₹${pricingPerNightWeekend}/nights`} />
+              <InfoRow label="Weekend Price" value={`₹${pricingPerNightWeekend}/night`} />
               <InfoRow label="Extra Guest" value={`₹${extraAdultCharge}`} />
               <InfoRow label="Extra Child" value={`₹${extraChildCharge}`} />
             </div>
