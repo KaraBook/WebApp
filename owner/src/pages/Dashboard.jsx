@@ -343,7 +343,7 @@ export default function Dashboard() {
   const getDateStatus = (date) => {
     if (!bookings) return null;
 
-    const match = bookings.find((b) => {
+    const matches = bookings.filter((b) => {
       const start = new Date(b.checkIn);
       const end = new Date(b.checkOut);
 
@@ -353,8 +353,20 @@ export default function Dashboard() {
       return date >= start && date <= end;
     });
 
-    return match ? normalizeBookingStatus(match) : null;
+    if (!matches.length) return null;
+
+    if (matches.some(b => normalizeBookingStatus(b) === "confirmed"))
+      return "confirmed";
+
+    if (matches.some(b => normalizeBookingStatus(b) === "pending"))
+      return "pending";
+
+    if (matches.some(b => normalizeBookingStatus(b) === "cancelled"))
+      return "cancelled";
+
+    return null;
   };
+
 
   const totalPages = Math.ceil((bookings?.length || 0) / rowsPerPage);
 

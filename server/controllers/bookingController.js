@@ -131,6 +131,15 @@ export const createOrder = async (req, res) => {
       });
     }
 
+    const existingPending = await Booking.findOne({
+      userId,
+      propertyId,
+      checkIn,
+      checkOut,
+      paymentStatus: "initiated",
+      cancelled: { $ne: true }
+    });
+
     console.log("🧾 Creating Razorpay order for:", grandTotal);
 
     const order = await razorpay.orders.create({
@@ -142,6 +151,27 @@ export const createOrder = async (req, res) => {
     if (!order?.id) {
       throw new Error("Razorpay order creation failed");
     }
+
+    if (existingPending) {
+      console.log("♻️ Reusing existing pending booking");
+
+      existingPending.orderId = order.id;
+      existingPending.totalAmount = subtotal;
+      existingPending.taxAmount = tax;
+      existingPending.grandTotal = grandTotal;
+      existingPending.contactNumber = contactNumber;
+      existingPending.guests = { adults, children };
+
+      await existingPending.save();
+
+      return res.status(200).json({
+        success: true,
+        order,
+        booking: existingPending,
+        pricing
+      });
+    }
+
 
     const booking = await Booking.create({
       userId,
@@ -223,6 +253,25 @@ export const verifyPayment = async (req, res) => {
     }
 
     console.log("✅ Payment verified for:", booking._id);
+
+    await Booking.updateMany(
+      {
+        userId: booking.userId?._id || booking.userId,
+        propertyId: booking.propertyId?._id || booking.propertyId,
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        _id: { $ne: booking._id },
+        paymentStatus: "initiated"
+      },
+      {
+        $set: {
+          status: "cancelled",
+          cancelled: true,
+          cancelledBy: "system",
+          cancelReason: "Duplicate pending booking auto-closed"
+        }
+      }
+    );
 
     if (booking.userId?.email) {
       const mailData = bookingConfirmationTemplate({
