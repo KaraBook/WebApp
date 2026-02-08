@@ -649,13 +649,25 @@ export const updateOwnerMobile = async (req, res) => {
     const exists = await User.findOne({
       mobile: newMobile,
       _id: { $ne: userId },
-    });
+    }).select("role");
 
     if (exists) {
-      return res.status(409).json({
-        message: "Mobile already in use",
-      });
+      let message = "This mobile number is already in use.";
+      if (exists.role === "traveller") {
+        message =
+          "This number belongs to a Traveller account. Please use a different number.";
+      }
+      if (exists.role === "resortOwner") {
+        message =
+          "This number belongs to another Resort Owner account.";
+      }
+      if (exists.role === "manager") {
+        message =
+          "This number belongs to a Manager account.";
+      }
+      return res.status(409).json({ message });
     }
+
 
     user.mobile = newMobile;
     await user.save();
