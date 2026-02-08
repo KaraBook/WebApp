@@ -438,7 +438,7 @@ export default function MyProfile() {
               <Button
                 variant="outline"
                 onClick={handlePasswordUpdate}
-                className="w-full mt-2"
+                className="w-full mt-4"
               >
                 Update Password
               </Button>
@@ -490,7 +490,7 @@ function PasswordField({
   onToggle,
 }) {
   return (
-    <div>
+    <div className="w-full md:w-auto">
       <Label>{label}</Label>
 
       <div className="relative mt-1">
