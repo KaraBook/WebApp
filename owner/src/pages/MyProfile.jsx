@@ -240,7 +240,13 @@ export default function MyProfile() {
 
 
   const verifyOwnerOtp = async (code) => {
-    if (!confirmRes) return toast.error("Request OTP first");
+    if (!confirmRes) {
+      return toast.error("Request OTP first");
+    }
+
+    if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+      return toast.error("Enter valid 6-digit OTP");
+    }
 
     try {
       const cred = await confirmRes.confirm(code);
