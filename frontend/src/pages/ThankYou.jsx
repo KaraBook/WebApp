@@ -51,6 +51,7 @@ export default function ThankYou() {
         bookingCode,
     } = booking;
 
+    const checkInTime = property?.checkInTime || "2:00 PM";
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-10">
@@ -150,7 +151,7 @@ export default function ThankYou() {
 
                         <Step
                             icon={<Clock />}
-                            title="Check-in time: 2:00 PM"
+                            title={`Check-in time: ${checkInTime}`}
                             desc="Early check-in available upon request"
                         />
 
