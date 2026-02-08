@@ -130,8 +130,6 @@ const baseFields = {
 
   extraGuestCharge: Joi.number().min(0).max(9999).optional(),
 
-  petFriendly: Joi.boolean().required(),
-
   checkInTime: Joi.string().required(),
   checkOutTime: Joi.string().required(),
 

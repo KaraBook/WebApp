@@ -65,7 +65,6 @@ const EditProperty = () => {
     area: "",
     addressLine2: "",
     state: "",
-    petFriendly: false,
     city: "",
     pinCode: "",
     locationLink: "",
@@ -154,7 +153,6 @@ const EditProperty = () => {
           area: prop.area || "",
           addressLine2: prop.addressLine2 || "",
           state: prop.state || "",
-          petFriendly: !!prop.petFriendly,
           city: prop.city || "",
           pinCode: prop.pinCode || "",
           locationLink: prop.locationLink || "",
@@ -853,24 +851,6 @@ const EditProperty = () => {
                   }}
                 />
               </div>
-            </div>
-
-            <div className="md:w-[32%] w-[100%]">
-              <SingleSelectDropdown
-                label="Is this property Pet Friendly?"
-                value={formData.petFriendly}
-                options={[
-                  { label: "Yes", value: true },
-                  { label: "No", value: false },
-                ]}
-                onChange={(val) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    petFriendly: val,
-                  }))
-                }
-                placeholder="Select Option"
-              />
             </div>
 
             <CustomTimePicker

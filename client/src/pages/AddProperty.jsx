@@ -16,7 +16,7 @@ import MultiSelectButtons from "../components/MultiSelectButtons";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { QuantityBox } from "@/components/QuantityBox";
 import { Check, ChevronDown, Eye, EyeOff } from "lucide-react";
-import { propertyTypeOptions, foodOptions, amenitiesCategories, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions, petFriendlyOptions } from "../constants/dropdownOptions";
+import { propertyTypeOptions, foodOptions, amenitiesCategories, kycVerifiedOptions, formSteps, approvalStatusOptions, featuredOptions, publishNowOptions } from "../constants/dropdownOptions";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
@@ -87,7 +87,6 @@ const AddProperty = () => {
         gstin: "",
         kycVerified: false,
         featured: false,
-        petFriendly: false,
         approvalStatus: "pending",
         publishNow: false,
         internalNotes: "",
@@ -179,7 +178,6 @@ const AddProperty = () => {
             gstin: formData.gstin ? formData.gstin.toUpperCase().trim() : "",
             kycVerified: !!formData.kycVerified,
             publishNow: !!formData.publishNow,
-            petFriendly: !!formData.petFriendly,
             featured: !!formData.featured,
             approvalStatus: formData.approvalStatus,
             internalNotes: formData.internalNotes,
@@ -919,24 +917,6 @@ const AddProperty = () => {
                                     }}
                                 />
                             </div>
-                        </div>
-
-
-                        <div className="md:w-[32%] w-[100%] flex flex-col gap-2">
-                            <Label htmlFor="minStayNights" className="text-sm pb-2!important">
-                                Is this proprty Pet Friendly?<span className="text-red-500">*</span>
-                            </Label>
-                            <SingleSelectDropdown
-                                value={formData.petFriendly}
-                                options={petFriendlyOptions}
-                                onChange={(val) =>
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        petFriendly: val,
-                                    }))
-                                }
-                                placeholder="Select Option"
-                            />
                         </div>
 
 

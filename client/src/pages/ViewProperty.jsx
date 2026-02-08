@@ -129,7 +129,6 @@ export default function ViewProperty() {
     minStayNights,
     checkInTime,
     checkOutTime,
-    petFriendly,
     isRefundable,
     roomBreakdown,
     refundNotes,
@@ -329,20 +328,8 @@ export default function ViewProperty() {
               </div>
             </div>
 
-            {/* Pet Friendly & Refundable */}
+            {/* Refundable */}
             <div className="mt-4 space-y-3">
-              {/* Pet Friendly */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <Users className="h-4 w-4 text-slate-600" />
-                  <span>Pet Friendly</span>
-                </div>
-
-                <div className="flex items-center gap-1 text-emerald-600 text-sm font-medium">
-                  <CheckCircle2 className="h-4 w-4" />
-                  {petFriendly ? "Yes" : "No"}
-                </div>
-              </div>
 
               {/* Refundable */}
               <div className="flex items-center justify-between">

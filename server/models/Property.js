@@ -79,7 +79,6 @@ const propertySchema = new mongoose.Schema({
   },
   bedrooms: { type: Number, required: true, min: 0, max: 100 },
   bathrooms: { type: Number, required: true, min: 0, max: 100 },
-  petFriendly: { type: Boolean, required: true, default: false },
   maxGuests: { type: Number, required: true },
   baseGuests: { type: Number, required: true },
   pricingPerNightWeekdays: { type: Number, required: true },

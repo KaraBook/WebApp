@@ -223,7 +223,6 @@ export const updateOwnerProperty = async (req, res) => {
       "foodAvailability",
       "minStayNights",
       "amenities",
-      "petFriendly",
       "roomBreakdown",
       "bedrooms",
       "bathrooms",
