@@ -622,6 +622,59 @@ export const updateOwnerPassword = async (req, res) => {
 
 
 
+export const updateOwnerMobile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const newMobile = normalizeMobile(req.firebaseUser?.phone_number);
+
+    if (!newMobile || newMobile.length !== 10) {
+      return res.status(400).json({ message: "Invalid phone token" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!["resortOwner", "manager", "admin"].includes(user.role)) {
+      return res.status(403).json({
+        message: "Only owners/managers/admins can update mobile",
+      });
+    }
+
+    if (user.mobile === newMobile) {
+      return res.status(400).json({
+        message: "New mobile is same as current",
+      });
+    }
+
+    const exists = await User.findOne({
+      mobile: newMobile,
+      _id: { $ne: userId },
+    });
+
+    if (exists) {
+      return res.status(409).json({
+        message: "Mobile already in use",
+      });
+    }
+
+    user.mobile = newMobile;
+    await user.save();
+
+    res.status(200).json({
+      message: "Mobile updated",
+      mobile: newMobile,
+    });
+
+  } catch (err) {
+    console.error("Owner mobile update error:", err);
+    res.status(500).json({
+      message: "Update failed",
+      error: err.message,
+    });
+  }
+};
+
+
 
 export const removeOwnerAvatar = async (req, res) => {
   const user = await User.findById(req.user.id);

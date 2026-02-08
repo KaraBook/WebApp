@@ -42,6 +42,9 @@ export default function MyProfile() {
     new: false,
     confirm: false,
   });
+  const [mobileEdit, setMobileEdit] = useState(false);
+  const [newMobile, setNewMobile] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
 
   const [user, setUser] = useState({
     firstName: "",
@@ -196,6 +199,39 @@ export default function MyProfile() {
   };
 
 
+  const sendOtpForOwner = async () => {
+    try {
+      await sendOtp(newMobile); 
+      setOtpSent(true);
+      toast.success("OTP sent");
+    } catch {
+      toast.error("Failed to send OTP");
+    }
+  };
+
+  const verifyOwnerOtp = async () => {
+    try {
+      await api.put(SummaryApi.updateOwnerMobile.url);
+
+      setUser(p => ({
+        ...p,
+        mobile: newMobile,
+      }));
+
+      setMobileEdit(false);
+      setOtpSent(false);
+      setNewMobile("");
+
+      toast.success("Mobile updated");
+
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Verification failed"
+      );
+    }
+  };
+
+
   /* ---------------- INITIALS ---------------- */
   const initials = `${user.firstName?.[0] || ""}${user.lastName?.[0] || ""
     }`.toUpperCase();
@@ -291,13 +327,58 @@ export default function MyProfile() {
               onChange={(v) => setUser({ ...user, email: v })}
             />
             <div>
-              <Label>Mobile</Label>
-              <Input
-                value={user.mobile}
-                disabled
-                className="mt-1 bg-gray-100"
-              />
+              <Label>Mobile Number</Label>
+
+              {!mobileEdit ? (
+                <div className="flex gap-2 mt-1">
+                  <Input value={user.mobile} disabled />
+                  <Button
+                    variant="outline"
+                    onClick={() => setMobileEdit(true)}
+                  >
+                    Change
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3 mt-1">
+
+                  <Input
+                    placeholder="Enter new mobile"
+                    value={newMobile}
+                    onChange={(e) =>
+                      setNewMobile(e.target.value.replace(/\D/g, ""))
+                    }
+                  />
+
+                  {!otpSent ? (
+                    <Button onClick={sendOtpForOwner}>
+                      Send OTP
+                    </Button>
+                  ) : (
+                    <>
+                      <p className="text-sm text-gray-500">
+                        OTP sent. Verify to update.
+                      </p>
+                      <Button onClick={verifyOwnerOtp}>
+                        Verify OTP
+                      </Button>
+                    </>
+                  )}
+
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setMobileEdit(false);
+                      setOtpSent(false);
+                      setNewMobile("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
             </div>
+
           </div>
 
           {/* DOB / PIN */}
