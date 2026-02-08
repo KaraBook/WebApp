@@ -8,6 +8,7 @@ export const propertyTypeOptions = [
   { label: "Tent", value: "tent" },
   { label: "Cottage", value: "cottage" },
   { label: "Apartment", value: "apartment" },
+  { label: "Hotel", value: "hotel" },
 ];
 
 export const foodOptions = [
@@ -147,7 +148,3 @@ export const formSteps = [
   { id: 5, title: "Media Uploads" }
 ];
 
-export const petFriendlyOptions = [
-  { label: "Yes", value: true },
-  { label: "No", value: false },
-];

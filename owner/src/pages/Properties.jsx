@@ -60,7 +60,6 @@ export default function Properties() {
     foodAvailability = [],
     bedrooms,
     bathrooms,
-    petFriendly,
     isRefundable,
     refundNotes,
     cancellationPolicy,
@@ -262,12 +261,6 @@ export default function Properties() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                Pet Friendly:{" "}
-                <strong className={petFriendly ? "text-emerald-600" : "text-red-600"}>
-                  {petFriendly ? "Yes" : "No"}
-                </strong>
-              </div>
 
               <div>
                 Refundable:{" "}

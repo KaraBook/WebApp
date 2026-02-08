@@ -158,7 +158,6 @@ export default function EditProperty() {
     checkOut: "23:30",
     food: [],
     amenities: [],
-    petFriendly: false,
     isRefundable: true,
     refundNotes: "",
     cancellationPolicy: [
@@ -193,7 +192,6 @@ export default function EditProperty() {
             f.trim().toLowerCase().replace(/^\w/, c => c.toUpperCase())
           ),
           amenities: p.amenities || [],
-          petFriendly: p.petFriendly || false,
           isRefundable: p.isRefundable ?? true,
           refundNotes: p.refundNotes || "",
           cancellationPolicy: p.cancellationPolicy || [
@@ -240,7 +238,6 @@ export default function EditProperty() {
         foodAvailability: form.food,
         bedrooms: form.bedrooms,
         bathrooms: form.bathrooms,
-        petFriendly: form.petFriendly,
         isRefundable: form.isRefundable,
         refundNotes: form.refundNotes,
         cancellationPolicy: form.cancellationPolicy,
@@ -539,25 +536,6 @@ export default function EditProperty() {
 
           {tab === "policies" && (
             <div className="space-y-8">
-
-              {/* PET FRIENDLY */}
-              <div className="bg-white rounded-2xl border p-4 md:p-6">
-                <h3 className="font-semibold mb-3">Pet Friendly</h3>
-                <div className="flex gap-4">
-                  <Button
-                    variant={form.petFriendly ? "default" : "outline"}
-                    onClick={() => setForm({ ...form, petFriendly: true })}
-                  >
-                    Yes
-                  </Button>
-                  <Button
-                    variant={!form.petFriendly ? "default" : "outline"}
-                    onClick={() => setForm({ ...form, petFriendly: false })}
-                  >
-                    No
-                  </Button>
-                </div>
-              </div>
 
               {/* REFUNDABLE */}
               <div className="bg-white rounded-2xl border p-4 md:p-6">
