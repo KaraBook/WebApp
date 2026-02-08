@@ -201,13 +201,23 @@ export default function MyProfile() {
 
   const sendOtpForOwner = async () => {
     try {
-      await sendOtp(newMobile); 
+      if (newMobile.length !== 10) {
+        toast.error("Enter valid 10-digit mobile number");
+        return;
+      }
+
+      const formatted = `+91${newMobile}`;
+      await sendOtp(formatted);
+
       setOtpSent(true);
       toast.success("OTP sent");
-    } catch {
+
+    } catch (err) {
+      console.error(err);
       toast.error("Failed to send OTP");
     }
   };
+
 
   const verifyOwnerOtp = async () => {
     try {
@@ -345,9 +355,12 @@ export default function MyProfile() {
                   <Input
                     placeholder="Enter new mobile"
                     value={newMobile}
-                    onChange={(e) =>
-                      setNewMobile(e.target.value.replace(/\D/g, ""))
-                    }
+                    maxLength={10}
+                    inputMode="numeric"
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                      setNewMobile(value);
+                    }}
                   />
 
                   {!otpSent ? (
