@@ -22,6 +22,15 @@ import { toast } from "sonner";
 import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 import { sendOtp } from "@/firebase";
 
+
+const formatIndianMobile = (mobile) => {
+  const digits = String(mobile || "").replace(/\D/g, "");
+  if (digits.length !== 10) return null;
+  return `+91${digits}`;
+};
+
+
+
 export default function MyProfile() {
   const fileRef = useRef(null);
 
@@ -233,7 +242,12 @@ export default function MyProfile() {
         data: { mobile: newMobile },
       });
 
-      const formatted = `+91${newMobile}`;
+      const formatted = formatIndianMobile(newMobile);
+      if (!formatted) {
+        toast.error("Invalid mobile number");
+        return;
+      }
+      console.log("Sending OTP to:", formatted);
       const confirmation = await sendOtp(formatted);
 
       setOtpSent(true);
@@ -296,7 +310,7 @@ export default function MyProfile() {
     try {
       setResending(true);
 
-      const formatted = `+91${newMobile}`;
+      const formatted = formatIndianMobile(newMobile);
       const confirmation = await sendOtp(formatted);
 
       setConfirmRes(confirmation);
@@ -434,7 +448,7 @@ export default function MyProfile() {
 
                   {!otpSent ? (
                     <Button
-                      disabled={newMobile.length !== 10}
+                      disabled={!formatIndianMobile(newMobile)}
                       onClick={sendOtpForOwner}
                     >
                       Send OTP
