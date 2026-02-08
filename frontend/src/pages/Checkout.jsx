@@ -41,6 +41,12 @@ export default function Checkout() {
     const isMobile = useIsMobile();
     const [pricing, setPricing] = useState(null);
 
+    const hasFood =
+        property?.foodAvailability &&
+        (property.foodAvailability.breakfast ||
+            property.foodAvailability.lunch ||
+            property.foodAvailability.dinner);
+
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
         nonVeg: 0,
@@ -517,58 +523,60 @@ export default function Checkout() {
                 </div>
 
                 {/* MEALS */}
-                <div className="border rounded-[12px] p-5 mb-6">
-                    <h3 className="font-semibold mb-3 text-lg">Meals</h3>
+                {hasFood && (
+                    <div className="border rounded-[12px] p-5 mb-6">
+                        <h3 className="font-semibold mb-3 text-lg">Meals</h3>
 
-                    <label className="flex items-center gap-3 mb-4 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={includeMeals}
-                            onChange={(e) => {
-                                setIncludeMeals(e.target.checked);
-                                if (!e.target.checked) {
-                                    setMealCounts({ veg: 0, nonVeg: 0 });
-                                }
-                            }}
-                        />
-                        <span className="text-sm font-medium">Include Meals</span>
-                    </label>
-
-                    {includeMeals && (
-                        <div className="space-y-4">
-
-                            {/* Veg */}
-                            <MealCounter
-                                label="Veg Guests"
-                                value={mealCounts.veg}
-                                onChange={(val) =>
-                                    setMealCounts((prev) => ({
-                                        ...prev,
-                                        veg: val,
-                                    }))
-                                }
-                                max={totalGuests - mealCounts.nonVeg}
+                        <label className="flex items-center gap-3 mb-4 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={includeMeals}
+                                onChange={(e) => {
+                                    setIncludeMeals(e.target.checked);
+                                    if (!e.target.checked) {
+                                        setMealCounts({ veg: 0, nonVeg: 0 });
+                                    }
+                                }}
                             />
+                            <span className="text-sm font-medium">Include Meals</span>
+                        </label>
 
-                            {/* Non-Veg */}
-                            <MealCounter
-                                label="Non-Veg Guests"
-                                value={mealCounts.nonVeg}
-                                onChange={(val) =>
-                                    setMealCounts((prev) => ({
-                                        ...prev,
-                                        nonVeg: val,
-                                    }))
-                                }
-                                max={totalGuests - mealCounts.veg}
-                            />
+                        {includeMeals && (
+                            <div className="space-y-4">
 
-                            <p className="text-xs text-gray-500">
-                                Select meals for 1 to {totalGuests} guests
-                            </p>
-                        </div>
-                    )}
-                </div>
+                                {/* Veg */}
+                                <MealCounter
+                                    label="Veg Guests"
+                                    value={mealCounts.veg}
+                                    onChange={(val) =>
+                                        setMealCounts((prev) => ({
+                                            ...prev,
+                                            veg: val,
+                                        }))
+                                    }
+                                    max={totalGuests - mealCounts.nonVeg}
+                                />
+
+                                {/* Non-Veg */}
+                                <MealCounter
+                                    label="Non-Veg Guests"
+                                    value={mealCounts.nonVeg}
+                                    onChange={(val) =>
+                                        setMealCounts((prev) => ({
+                                            ...prev,
+                                            nonVeg: val,
+                                        }))
+                                    }
+                                    max={totalGuests - mealCounts.veg}
+                                />
+
+                                <p className="text-xs text-gray-500">
+                                    Select meals for 1 to {totalGuests} guests
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Contact */}
                 <div className="border rounded-[12px] p-5 mb-6">

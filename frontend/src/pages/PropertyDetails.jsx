@@ -44,7 +44,7 @@ function useIsDesktop() {
 
 const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
-tomorrow.setHours(0,0,0,0);
+tomorrow.setHours(0, 0, 0, 0);
 
 
 export default function PropertyDetails() {
@@ -83,6 +83,12 @@ export default function PropertyDetails() {
 
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+
+  const hasFood =
+    property?.foodAvailability &&
+    (property.foodAvailability.breakfast ||
+      property.foodAvailability.lunch ||
+      property.foodAvailability.dinner);
 
   const [dateRange, setDateRange] = useState([
     {
@@ -676,7 +682,10 @@ export default function PropertyDetails() {
                 </div>
               </div>
 
-              <p className="text-[12px] text-[#616161]">Base includes {property.baseGuests || 0} guests (Adults + Kids), Food included</p>
+              <p className="text-[12px] text-[#616161]">
+                Base includes {property.baseGuests || 0} guests (Adults + Kids)
+                {hasFood ? ", Food available" : ""}
+              </p>
 
               <div className="mt-5 relative" ref={calendarRef}>
 
