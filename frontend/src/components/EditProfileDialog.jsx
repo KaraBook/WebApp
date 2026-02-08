@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Axios from "@/utils/Axios"; 
+import Axios from "@/utils/Axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { toast } from "sonner";
 import { sendOtp as firebaseSendOtp } from "/firebase";
@@ -78,7 +78,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                 { mobile }
             );
 
-           const confirmation = await firebaseSendOtp(`+91${mobile}`);
+            const confirmation = await firebaseSendOtp(`+91${mobile}`);
 
             setConfirmResult(confirmation);
             setTimer(60);
@@ -233,28 +233,41 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                                     />
                                 )}
 
-                                <div className="text-sm text-gray-600">
-                                    {timer > 0 ? `Resend OTP in ${timer}s` : (
-                                        <button className="underline" onClick={handleSendOtp}>Resend OTP</button>
-                                    )}
-                                </div>
-
+                                {confirmResult && (
+                                    <div className="text-sm text-gray-600">
+                                        {timer > 0 ? (
+                                            <span>Resend OTP in {timer}s</span>
+                                        ) : (
+                                            <button
+                                                className="underline text-primary"
+                                                onClick={handleSendOtp}
+                                            >
+                                                Resend OTP
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                                 <div className="flex gap-2">
-                                    {!confirmResult ? (
-                                        <Button size="sm" onClick={handleSendOtp} disabled={sending || mobile.length !== 10}>
+                                    {!confirmResult && (
+                                        <Button
+                                            size="sm"
+                                            onClick={handleSendOtp}
+                                            disabled={sending || mobile.length !== 10}
+                                        >
                                             {sending ? "Sending..." : "Send OTP"}
                                         </Button>
-                                    ) : (
-                                        <Button size="sm" disabled>
-                                            {verifying ? "Verifying..." : "Waiting for OTP"}
-                                        </Button>
                                     )}
 
-                                    <Button size="sm" variant="ghost" onClick={() => {
-                                        setEditingMobile(false);
-                                        setOtp("");
-                                        setConfirmResult(null);
-                                    }}>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => {
+                                            setEditingMobile(false);
+                                            setOtp("");
+                                            setConfirmResult(null);
+                                            setTimer(0);
+                                        }}
+                                    >
                                         Cancel
                                     </Button>
                                 </div>
