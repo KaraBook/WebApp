@@ -207,27 +207,51 @@ export default function MyProfile() {
         return;
       }
 
+      setLoading(true);
+
+      const { url, method } = SummaryApi.ownerPrecheck;
+
+      await api.request({
+        url,
+        method,
+        data: { mobile: newMobile },
+      });
+
       const formatted = `+91${newMobile}`;
-      await sendOtp(formatted);
+      const confirmation = await sendOtp(formatted);
 
       setOtpSent(true);
+      setConfirmRes(confirmation);
+
       toast.success("OTP sent");
 
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to send OTP");
+      toast.error(
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to send OTP"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
 
-  const verifyOwnerOtp = async () => {
-    try {
-      await api.put(SummaryApi.updateOwnerMobile.url);
+  const verifyOwnerOtp = async (code) => {
+    if (!confirmRes) return toast.error("Request OTP first");
 
-      setUser(p => ({
-        ...p,
-        mobile: newMobile,
-      }));
+    try {
+      const cred = await confirmRes.confirm(code);
+      const idToken = await cred.user.getIdToken(true);
+
+      await api.put(SummaryApi.updateOwnerMobile.url, {}, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "x-firebase-auth": "true",
+        },
+      });
+
+      setUser(p => ({ ...p, mobile: newMobile }));
 
       setMobileEdit(false);
       setOtpSent(false);
@@ -236,9 +260,7 @@ export default function MyProfile() {
       toast.success("Mobile updated");
 
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Verification failed"
-      );
+      toast.error(err?.message || "Verification failed");
     }
   };
 
