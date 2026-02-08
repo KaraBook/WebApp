@@ -47,6 +47,7 @@ export default function MyProfile() {
   const [newMobile, setNewMobile] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [confirmRes, setConfirmRes] = useState(null);
+  const [otpCode, setOtpCode] = useState("");
 
   const [user, setUser] = useState({
     firstName: "",
@@ -257,6 +258,8 @@ export default function MyProfile() {
       setMobileEdit(false);
       setOtpSent(false);
       setNewMobile("");
+      setOtpCode("");
+      setConfirmRes(null);
 
       toast.success("Mobile updated");
 
@@ -396,7 +399,13 @@ export default function MyProfile() {
                       <p className="text-sm text-gray-500">
                         OTP sent. Verify to update.
                       </p>
-                      <Button onClick={verifyOwnerOtp}>
+                      <Input
+                        placeholder="Enter OTP"
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value)}
+                      />
+
+                      <Button onClick={() => verifyOwnerOtp(otpCode)}>
                         Verify OTP
                       </Button>
                     </>

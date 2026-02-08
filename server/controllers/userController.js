@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { normalizeMobile } from "../utils/phone.js";
+import fs from "fs";
+import path from "path";
 
 const issueTokens = (user) => {
   const accessToken = jwt.sign(
@@ -111,7 +113,9 @@ export const travellerLogin = async (req, res) => {
       return res.status(400).json({ message: "Invalid phone token" });
     }
 
-    const user = await User.findOne({ mobile: normalized });
+    const user = await User.findOne({
+      mobile: normalized.trim(),
+    });
     if (!user) {
       return res.status(404).json({ message: "User not found. Please sign up first." });
     }
@@ -155,7 +159,9 @@ export const travellerCheck = async (req, res) => {
   if (!mobile || mobile.length !== 10) {
     return res.status(400).json({ message: "Invalid phone token" });
   }
-  const exists = !!(await User.findOne({ mobile }).select("_id"));
+  const exists = !!(
+    await User.findOne({ mobile: mobile.trim() }).select("_id")
+  );
   return res.status(200).json({ exists, mobile });
 };
 
@@ -168,7 +174,9 @@ export const travellerPrecheck = async (req, res) => {
     return res.status(400).json({ message: "Invalid mobile number" });
   }
 
-  const user = await User.findOne({ mobile: normalized });
+  const user = await User.findOne({
+    mobile: normalized.trim(),
+  });
 
   if (user && user.role !== "traveller") {
     return res.status(403).json({
@@ -203,7 +211,7 @@ export const travellerSignup = async (req, res) => {
       return res.status(400).json({ message: "Invalid phone token" });
     }
 
-    const existingAnyRole = await User.findOne({ mobile }).select("role");
+    const existingAnyRole = await User.findOne({ mobile: mobile.trim() }).select("role");
     if (existingAnyRole && existingAnyRole.role !== "traveller") {
       return res.status(403).json({
         message:
@@ -402,7 +410,7 @@ export const resortOwnerLogin = async (req, res) => {
       return res.status(400).json({ message: "Invalid phone verification token" });
     }
 
-    const user = await User.findOne({ mobile });
+    const user = await User.findOne({ mobile: mobile.trim() });
     if (!user) {
       return res.status(404).json({
         message:
@@ -647,7 +655,7 @@ export const updateOwnerMobile = async (req, res) => {
     }
 
     const exists = await User.findOne({
-      mobile: newMobile,
+      mobile: newMobile.trim(),
       _id: { $ne: userId },
     }).select("role");
 
@@ -697,7 +705,9 @@ export const checkMobileAvailability = async (req, res) => {
       });
     }
 
-    const exists = await User.findOne({ mobile: normalized }).select("role");
+    const exists = await User.findOne({
+      mobile: normalized.trim(),
+    }).select("role");
 
     if (exists) {
       let message = "This mobile number is already in use.";
@@ -755,7 +765,9 @@ export const checkResortOwnerNumber = async (req, res) => {
       return res.status(400).json({ message: "Please enter a valid 10-digit mobile number." });
     }
 
-    const user = await User.findOne({ mobile: normalized });
+    const user = await User.findOne({
+      mobile: normalized.trim(),
+    });
 
     if (!user) {
       return res.status(404).json({
@@ -794,7 +806,6 @@ export const checkResortOwnerNumber = async (req, res) => {
 };
 
 
-
 export const me = async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) return res.status(404).json({ message: "User not found" });
@@ -811,22 +822,24 @@ export const managerPrecheck = async (req, res) => {
 
 
 export const managerLogin = async (req, res) => {
-  const firebaseUser = req.user;
-  const mobile = firebaseUser.phone_number.replace("+91", "");
-
-  const user = await User.findOne({ mobile, role: "manager" });
-  if (!user)
+  const firebaseUser = req.firebaseUser;
+  const mobile = normalizeMobile(firebaseUser?.phone_number);
+  if (!mobile) {
+    return res.status(400).json({ message: "Invalid phone token" });
+  }
+  const user = await User.findOne({
+    mobile: mobile.trim(),
+    role: "manager",
+  });
+  if (!user) {
     return res.status(401).json({ message: "Not authorized as manager" });
-
+  }
   const { accessToken, refreshToken } = issueTokens(user);
-
-  res.json({
+  return res.json({
     accessToken,
     refreshToken,
     user: publicUser(user),
   });
-
-  res.json(tokens);
 };
 
 
