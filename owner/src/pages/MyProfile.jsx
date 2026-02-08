@@ -394,7 +394,7 @@ export default function MyProfile() {
               </CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 flex justify-between">
 
               {/* Current Password */}
               <PasswordField
