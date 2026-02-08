@@ -613,6 +613,7 @@ export const verifyRazorpayPayment = async (req, res) => {
 
     booking.paymentMethod = "razorpay";
     booking.paymentStatus = "paid";
+    booking.status = "confirmed";
     booking.paymentId = paymentId;
     booking.orderId = orderId;
 

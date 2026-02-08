@@ -204,7 +204,11 @@ export const verifyPayment = async (req, res) => {
 
     const booking = await Booking.findOneAndUpdate(
       { orderId: razorpay_order_id },
-      { paymentStatus: "paid", paymentId: razorpay_payment_id },
+      {
+        paymentStatus: "paid",
+        paymentId: razorpay_payment_id,
+        status: "confirmed",
+      },
       { new: true }
     )
       .populate(
@@ -294,7 +298,7 @@ export const getBookedDates = async (req, res) => {
     const bookings = await Booking.find({
       propertyId,
       paymentStatus: "paid",
-      cancelled: { $ne: true }   
+      cancelled: { $ne: true }
     }).select("checkIn checkOut");
 
     const dates = bookings.map((b) => ({
@@ -574,7 +578,7 @@ export const cancelBooking = async (req, res) => {
     }
 
     booking.cancelled = true;
-    booking.cancelledBy = "traveller"; 
+    booking.cancelledBy = "traveller";
     booking.cancelReason = reason;
     booking.cancelNotes = notes;
     booking.refundAmount = refundAmount;

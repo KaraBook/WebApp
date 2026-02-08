@@ -166,10 +166,17 @@ function StatCard({
 }
 
 function normalizeBookingStatus(b) {
-  if (b.cancelled) return "cancelled";
-  if (["paid", "confirmed"].includes(b.paymentStatus)) return "confirmed";
+  if (b.cancelled || b.status === "cancelled") return "cancelled";
+  if (
+    b.paymentStatus === "paid" ||
+    b.status === "confirmed" ||
+    Boolean(b.paymentId)
+  ) {
+    return "confirmed";
+  }
   return "pending";
 }
+
 
 
 function Dot({ color }) {
@@ -229,7 +236,6 @@ export default function Dashboard() {
   const [propertyId, setPropertyId] = useState(null);
 
   const [blockedDates, setBlockedDates] = useState([]);
-  const [bookedDates, setBookedDates] = useState([]);
 
   const rowsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
@@ -240,37 +246,37 @@ export default function Dashboard() {
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
 
   useEffect(() => {
-  (async () => {
-    try {
-      const res = await api.get(SummaryApi.getOwnerDashboard.url);
+    (async () => {
+      try {
+        const res = await api.get(SummaryApi.getOwnerDashboard.url);
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-      const all = res.data?.data?.bookings || [];
+        const all = res.data?.data?.bookings || [];
 
-      const upcoming = all.filter(b => {
-        const checkOut = new Date(b.checkOut);
-        checkOut.setHours(0, 0, 0, 0);
-        return checkOut >= today;
-      });
+        const upcoming = all.filter(b => {
+          const checkOut = new Date(b.checkOut);
+          checkOut.setHours(0, 0, 0, 0);
+          return checkOut >= today;
+        });
 
-      const dashboardData = res.data?.data;
+        const dashboardData = res.data?.data;
 
-      setData({
-        stats: dashboardData.stats,   // ✅ BACKEND STATS ONLY
-        bookings: upcoming.sort(
-          (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
-        ),
-      });
+        setData({
+          stats: dashboardData.stats,   // ✅ BACKEND STATS ONLY
+          bookings: upcoming.sort(
+            (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
+          ),
+        });
 
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingDashboard(false);
-    }
-  })();
-}, []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingDashboard(false);
+      }
+    })();
+  }, []);
 
 
   useEffect(() => {
@@ -305,13 +311,8 @@ export default function Dashboard() {
     (async () => {
       try {
         const res = await api.get(SummaryApi.getPropertyBlockedDates.url(propertyId));
-        const booked = await api.get(SummaryApi.getBookedDates.url(propertyId));
-
-        setBookedDates(booked.data?.dates || []);
         setBlockedDates(res.data?.dates || []);
-      } catch {
-        // optionally toast error
-      }
+      } catch { }
     })();
   }, [propertyId]);
 
@@ -321,29 +322,6 @@ export default function Dashboard() {
       const end = new Date(range.end);
       return date >= start && date <= end;
     });
-
-  const isDateBooked = (date) => {
-    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-
-    return bookedDates.some((range) => {
-      if (!range.start || !range.end) return false;
-
-      const startLocal = new Date(range.start);
-      const endLocal = new Date(range.end);
-
-      const start = new Date(startLocal.getFullYear(), startLocal.getMonth(), startLocal.getDate());
-      const end = new Date(endLocal.getFullYear(), endLocal.getMonth(), endLocal.getDate());
-
-      let current = new Date(start);
-
-      while (current.getTime() <= end.getTime()) {
-        if (current.getTime() === target) return true;
-        current.setDate(current.getDate() + 1);
-      }
-
-      return false;
-    });
-  };
 
 
   const isDatePending = (date) =>
@@ -362,6 +340,22 @@ export default function Dashboard() {
 
 
   const { stats, bookings } = data || {};
+  const getDateStatus = (date) => {
+    if (!bookings) return null;
+
+    const match = bookings.find((b) => {
+      const start = new Date(b.checkIn);
+      const end = new Date(b.checkOut);
+
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+
+      return date >= start && date <= end;
+    });
+
+    return match ? normalizeBookingStatus(match) : null;
+  };
+
   const totalPages = Math.ceil((bookings?.length || 0) / rowsPerPage);
 
   const paginatedRows = useMemo(() => {
@@ -540,13 +534,13 @@ export default function Dashboard() {
                 fromDate={new Date()}
                 className="rounded-xl border"
                 modifiers={{
-                  booked: isDateBooked,
+                  confirmed: (d) => getDateStatus(d) === "confirmed",
+                  pending: (d) => getDateStatus(d) === "pending",
+                  cancelled: (d) => getDateStatus(d) === "cancelled",
                   blocked: isDateBlocked,
-                  pending: isDatePending,
-                  cancelled: isDateCancelled,
                 }}
                 modifiersClassNames={{
-                  booked: "bg-green-100 rounded-md text-green-800",
+                  confirmed: "bg-green-100 rounded-md text-green-800",
                   blocked: "bg-blue-100 rounded-md text-blue-800",
                   pending: "bg-yellow-100 rounded-md text-yellow-800",
                   cancelled: "bg-red-200 rounded-md text-red-600",
@@ -558,9 +552,9 @@ export default function Dashboard() {
 
                       {/* status dot */}
                       <div className="absolute bottom-1 flex gap-[2px]">
-                        {isDateBooked(date) && <Dot color="green" />}
-                        {isDatePending(date) && <Dot color="yellow" />}
-                        {isDateCancelled(date) && <Dot color="red" />}
+                        {getDateStatus(date) === "confirmed" && <Dot color="green" />}
+                        {getDateStatus(date) === "pending" && <Dot color="yellow" />}
+                        {getDateStatus(date) === "cancelled" && <Dot color="red" />}
                         {isDateBlocked(date) && <Dot color="blue" />}
                       </div>
                     </div>
