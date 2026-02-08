@@ -438,7 +438,7 @@ export default function MyProfile() {
               <Button
                 variant="outline"
                 onClick={handlePasswordUpdate}
-                className="w-full"
+                className="w-full mt-2"
               >
                 Update Password
               </Button>
