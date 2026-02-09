@@ -168,26 +168,33 @@ export default function Checkout() {
     useEffect(() => {
         if (!property || !startDate || !endDate) return;
 
-        const toDateString = (date) => {
+        const toLocalYMD = (date) => {
             const d = new Date(date);
-            d.setHours(0, 0, 0, 0);
-            return d.toISOString().slice(0, 10);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, "0");
+            const day = String(d.getDate()).padStart(2, "0");
+            return `${y}-${m}-${day}`;
         };
-
         const fetchPricing = async () => {
-            const res = await Axios.post(
-                SummaryApi.previewPricing.url,
-                {
-                    propertyId,
-                    checkIn: toDateString(startDate),
-                    checkOut: toDateString(endDate),
-                    guests: guestData,
-                    meals: includeMeals ? mealCounts : null
-                }
-            );
+            try {
+                const res = await Axios.post(
+                    SummaryApi.previewPricing.url,
+                    {
+                        propertyId,
+                        checkIn: toLocalYMD(startDate),
+                        checkOut: toLocalYMD(endDate),
+                        guests: guestData,
+                        meals: includeMeals ? mealCounts : null,
+                    }
+                );
 
-            setPricing(res.data.pricing);
+                setPricing(res.data.pricing);
+            } catch (err) {
+                console.error("Pricing error:", err);
+                setPricing(null);
+            }
         };
+
 
         fetchPricing();
     }, [property, startDate, endDate, guestData, mealCounts, includeMeals]);
@@ -220,17 +227,23 @@ export default function Checkout() {
         }
 
         try {
+            const toLocalYMD = (date) => {
+                const d = new Date(date);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, "0");
+                const day = String(d.getDate()).padStart(2, "0");
+                return `${y}-${m}-${day}`;
+            };
+
             const res = await Axios.post(
                 SummaryApi.createBookingOrder.url,
                 {
                     propertyId,
-                    checkIn: startDate,
-                    checkOut: endDate,
+                    checkIn: toLocalYMD(startDate),
+                    checkOut: toLocalYMD(endDate),
                     guests: guestData,
                     contactNumber: contact,
-                    meals: includeMeals
-                        ? mealCounts
-                        : null,
+                    meals: includeMeals ? mealCounts : null,
                 },
                 {
                     headers: {
@@ -640,6 +653,7 @@ export default function Checkout() {
                     <hr />
 
                     {/* Room Charges */}
+                    {pricing && (
                     <div className="text-sm space-y-2">
                         <p className="font-medium">Room charges</p>
 
@@ -648,7 +662,7 @@ export default function Checkout() {
                                 <span>
                                     Weekdays ({pricing.room.weekdayNights} nights × ₹{pricing.room.weekdayRate})
                                 </span>
-                                <span>₹{pricing.room.roomWeekdayAmount.toLocaleString()}</span>
+                                <span>₹{pricing?.room?.roomWeekdayAmount?.toLocaleString?.() ?? "0"}</span>
                             </div>
                         )}
 
@@ -657,11 +671,12 @@ export default function Checkout() {
                                 <span>
                                     Weekend ({pricing.room.weekendNights} nights × ₹{pricing.room.weekendRate})
                                 </span>
-                                <span>₹{pricing.room.roomWeekendAmount.toLocaleString()}</span>
+                                <span>₹{pricing?.room?.roomWeekendAmount?.toLocaleString?.() ?? "0"}</span>
                             </div>
                         )}
 
                     </div>
+                    )}
 
                     {/* Extra Guests */}
                     {(extraAdults > 0 || extraChildren > 0) && (
@@ -715,17 +730,17 @@ export default function Checkout() {
                     <div className="text-sm space-y-2">
                         <div className="flex justify-between">
                             <span>Subtotal</span>
-                            <span>₹{pricing?.subtotal.toLocaleString()}</span>
+                            <span>₹{pricing?.subtotal?.toLocaleString?.() ?? "0"}</span>
                         </div>
 
                         <div className="flex justify-between">
                             <span>Taxes (10%)</span>
-                            <span>₹{pricing?.tax.toLocaleString()}</span>
+                            <span>₹{pricing?.tax?.toLocaleString?.() ?? "0"}</span>
                         </div>
 
                         <div className="flex justify-between font-semibold">
                             <span>Total payable</span>
-                            <span>₹{pricing?.grandTotal.toLocaleString()}</span>
+                            <span>₹{pricing?.grandTotal?.toLocaleString?.() ?? "0"}</span>
                         </div>
                     </div>
                 </div>

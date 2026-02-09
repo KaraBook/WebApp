@@ -11,6 +11,24 @@ import Review from "../models/Review.js";
 import { computeRefund } from "../utils/cancellation.js";
 
 
+const parseLocalDate = (v) => {
+  if (!v) return null;
+  if (v instanceof Date) {
+    return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+  }
+  if (typeof v === "string" && v.includes("T")) {
+    const d = new Date(v);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+  if (typeof v === "string") {
+    const [y, m, d] = v.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  const d = new Date(v);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+};
+
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
