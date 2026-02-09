@@ -168,13 +168,19 @@ export default function Checkout() {
     useEffect(() => {
         if (!property || !startDate || !endDate) return;
 
+        const toDateString = (date) => {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            return d.toISOString().slice(0, 10);
+        };
+
         const fetchPricing = async () => {
             const res = await Axios.post(
                 SummaryApi.previewPricing.url,
                 {
                     propertyId,
-                    checkIn: startDate,
-                    checkOut: endDate,
+                    checkIn: toDateString(startDate),
+                    checkOut: toDateString(endDate),
                     guests: guestData,
                     meals: includeMeals ? mealCounts : null
                 }
