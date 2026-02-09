@@ -272,7 +272,11 @@ const EditProperty = () => {
           return;
         }
 
-        data.append(key, value);
+        if (typeof value === "boolean") {
+          data.append(key, value ? "true" : "false");
+        } else {
+          data.append(key, value);
+        }
       });
       if (coverImageFile) {
         data.append("coverImage", coverImageFile);
@@ -1130,7 +1134,7 @@ const EditProperty = () => {
         {currentStep === 6 && (
           <>
 
-          <div className="md:w-[48%] w-[100%] -mt-2">
+            <div className="md:w-[48%] w-[100%] -mt-2">
               <FileUploadsSection
                 setShopActFile={setShopActFile}
                 shopActFile={shopActFile}

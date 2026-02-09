@@ -99,13 +99,12 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
             const credential = await confirmResult.confirm(code);
             const idToken = await credential.user.getIdToken(true);
 
-            // 🔥 RAW AXIOS (NOT Axios)
-            const res = await axios.put(
-                baseURL + SummaryApi.updateTravellerMobile.url,
+            const res = await Axios.put(
+                SummaryApi.updateTravellerMobile.url,
                 {},
                 {
                     headers: {
-                        Authorization: `Bearer ${idToken}`,
+                        "X-Firebase-Token": idToken,
                     },
                 }
             );

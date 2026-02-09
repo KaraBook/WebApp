@@ -265,8 +265,13 @@ function normalizeArraysAndTypes(body) {
   });
 
   ["kycVerified", "publishNow", "featured", "isRefundable"].forEach((b) => {
-    if (body[b] === "true") body[b] = true;
-    if (body[b] === "false") body[b] = false;
+    if (body[b] !== undefined) {
+      body[b] =
+        body[b] === true ||
+        body[b] === "true" ||
+        body[b] === "1" ||
+        body[b] === 1;
+    }
   });
 }
 
@@ -323,6 +328,7 @@ export const validatePropertyUpdate = (req, res, next) => {
     return res.status(400).json({ success: false, message: error.details[0].message });
   }
 
+  req.body = payload;
   next();
 };
 

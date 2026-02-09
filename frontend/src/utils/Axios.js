@@ -37,8 +37,6 @@ Axios.interceptors.response.use(
           accessToken: newAccess,
           refreshToken: newRefresh,
         });
-
-        setTokens({ accessToken: newAccess });
         original.headers.Authorization = `Bearer ${newAccess}`;
         return Axios(original);
       } catch {
