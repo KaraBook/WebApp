@@ -66,7 +66,13 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const totalNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    let totalNights = 0;
+    let cursor = new Date(start);
+
+    while (cursor < end) {
+      totalNights++;
+      cursor = new Date(cursor.getTime() + 24 * 60 * 60 * 1000);
+    }
 
     if (!totalNights || totalNights <= 0) {
       return res.status(400).json({

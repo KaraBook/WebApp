@@ -2,15 +2,24 @@ export function computePricing(booking, property) {
   const start = new Date(booking.checkIn);
   const end = new Date(booking.checkOut);
 
+  start.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+
   let weekdayNights = 0;
   let weekendNights = 0;
-  let d = new Date(start);
 
-  while (d < end) {
-    const day = d.getDay();
-    if (day === 0 || day === 6) weekendNights++;
-    else weekdayNights++;
-    d.setDate(d.getDate() + 1);
+  let cursor = new Date(start);
+
+  while (cursor < end) {
+    const day = cursor.getDay();
+
+    if (day === 0 || day === 6) {
+      weekendNights++;
+    } else {
+      weekdayNights++;
+    }
+
+    cursor = new Date(cursor.getTime() + 24 * 60 * 60 * 1000);
   }
 
   const adults = booking.guests.adults || 0;
