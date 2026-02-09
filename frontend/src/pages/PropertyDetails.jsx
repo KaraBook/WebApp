@@ -116,6 +116,20 @@ export default function PropertyDetails() {
     return day === 0 || day === 6;
   };
 
+  const getNightBreakdown = () => {
+    let weekdayNights = 0;
+    let weekendNights = 0;
+    let d = new Date(dateRange[0].startDate);
+    const end = new Date(dateRange[0].endDate);
+    while (d < end) {
+      if (isWeekend(d)) weekendNights++;
+      else weekdayNights++;
+      d.setDate(d.getDate() + 1);
+    }
+    return { weekdayNights, weekendNights };
+  };
+
+
   const calculateBasePrice = () => {
     let total = 0;
     let d = new Date(dateRange[0].startDate);
@@ -131,6 +145,7 @@ export default function PropertyDetails() {
   };
 
   const baseNightPrice = property?.pricingPerNightWeekdays || 0;
+  const { weekdayNights, weekendNights } = getNightBreakdown();
   const basePriceTotal = calculateBasePrice();
 
 
@@ -912,19 +927,28 @@ export default function PropertyDetails() {
 
 
               <div className="mt-6 text-sm text-gray-700">
-                <div className="flex justify-between mb-1">
-                  <span>
-                    ₹{baseNightPrice} × {nights} nights
-                    {baseGuests > 0 && (
-                      <span className="block text-xs text-gray-500">
-                        Includes {baseGuests} guests
-                      </span>
-                    )}
-                  </span>
-                  <span className="font-medium text-gray-900">
-                    ₹{basePriceTotal}
-                  </span>
-                </div>
+                {weekdayNights > 0 && (
+                  <div className="flex justify-between mb-1">
+                    <span>
+                      Weekdays ({weekdayNights} × ₹{property.pricingPerNightWeekdays})
+                    </span>
+                    <span>
+                      ₹{weekdayNights * property.pricingPerNightWeekdays}
+                    </span>
+                  </div>
+                )}
+
+                {weekendNights > 0 && (
+                  <div className="flex justify-between mb-1">
+                    <span>
+                      Weekend ({weekendNights} × ₹{property.pricingPerNightWeekend || property.pricingPerNightWeekdays})
+                    </span>
+                    <span>
+                      ₹{weekendNights * (property.pricingPerNightWeekend || property.pricingPerNightWeekdays)}
+                    </span>
+                  </div>
+                )}
+
 
                 {extraAdults > 0 && (
                   <div className="flex justify-between mb-1">
