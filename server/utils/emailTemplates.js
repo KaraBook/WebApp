@@ -4,7 +4,7 @@ export function propertyCreatedTemplate({
   ownerPassword,
   propertyName,
   createdNewUser,
-  portalUrl,
+  portalUrl = "https://karabookdev.cloud/owner/login",
 }) {
   const greeting = ownerFirstName ? `Hi ${ownerFirstName},` : "Hi,";
 
@@ -61,7 +61,7 @@ export function bookingConfirmationTemplate({
   grandTotal,
   paymentMethod,
   orderId,
-  portalUrl
+  portalUrl = "https://karabookdev.cloud",
 }) {
   const formatIndiaDate = (date) =>
     new Date(date).toLocaleDateString("en-IN", {
