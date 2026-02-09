@@ -1,6 +1,11 @@
 export function computePricing(booking, property) {
-  const start = new Date(booking.checkIn);
-  const end = new Date(booking.checkOut);
+  const parseLocalDate = (dateStr) => {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d); // LOCAL date
+  };
+
+  const start = parseLocalDate(booking.checkIn);
+  const end = parseLocalDate(booking.checkOut);
 
   start.setHours(0, 0, 0, 0);
   end.setHours(0, 0, 0, 0);

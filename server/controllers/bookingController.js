@@ -44,8 +44,8 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
+    const start = parseLocalDate(checkIn);
+    const end = parseLocalDate(checkOut);
     const today = new Date();
 
     const startDateOnly = start.toISOString().slice(0, 10);
@@ -554,8 +554,8 @@ export const previewPricing = async (req, res) => {
       return res.status(404).json({ success: false, message: "Property not found" });
     }
 
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
+    const start = parseLocalDate(checkIn);
+    const end = parseLocalDate(checkOut);
 
     start.setHours(0, 0, 0, 0);
     end.setHours(0, 0, 0, 0);
