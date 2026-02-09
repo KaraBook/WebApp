@@ -111,7 +111,7 @@ export const createOrder = async (req, res) => {
     }
 
     // Meal validations
-    if (meals?.includeMeals) {
+    if (meals && (meals.veg > 0 || meals.nonVeg > 0)){
       const totalMeals =
         Number(meals.veg || 0) +
         Number(meals.nonVeg || 0);

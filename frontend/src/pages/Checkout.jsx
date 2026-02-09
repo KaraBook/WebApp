@@ -562,7 +562,7 @@ export default function Checkout() {
                             <span className="text-sm font-medium">Include Meals</span>
                         </label>
 
-                        {includeMeals && pricing?.meals && (
+                        {includeMeals && (
                             <div className="space-y-4">
 
                                 {/* Veg */}
