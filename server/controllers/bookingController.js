@@ -243,7 +243,19 @@ export const verifyPayment = async (req, res) => {
     )
       .populate(
         "propertyId",
-        "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
+        `
+  propertyName
+  city
+  state
+  addressLine1
+  coverImage
+  contactNumber
+  checkInTime
+  checkOutTime
+  isRefundable
+  cancellationPolicy
+  refundNotes
+  `
       )
       .populate("userId", "firstName lastName email mobile")
       .populate("propertyId", "propertyName city state address");
@@ -490,7 +502,19 @@ export const getBookingById = async (req, res) => {
     })
       .populate(
         "propertyId",
-        "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
+        `
+        propertyName
+        city
+        state
+        addressLine1
+        coverImage
+        contactNumber
+        checkInTime
+        checkOutTime
+        isRefundable
+        cancellationPolicy
+        refundNotes
+        `
       )
       .populate("userId", "firstName lastName email mobile");
 
@@ -502,6 +526,7 @@ export const getBookingById = async (req, res) => {
     }
 
     res.json({ success: true, data: booking });
+
   } catch (err) {
     console.error("getBookingById error:", err);
     res.status(500).json({
@@ -510,6 +535,7 @@ export const getBookingById = async (req, res) => {
     });
   }
 };
+
 
 
 
