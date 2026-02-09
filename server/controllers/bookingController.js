@@ -556,7 +556,17 @@ export const previewPricing = async (req, res) => {
 
     const start = new Date(checkIn);
     const end = new Date(checkOut);
-    const totalNights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    let totalNights = 0;
+    let cursor = new Date(start);
+
+    while (cursor < end) {
+      totalNights++;
+      cursor = new Date(cursor.getTime() + 24 * 60 * 60 * 1000);
+    }
 
     const pricing = computePricing(
       {

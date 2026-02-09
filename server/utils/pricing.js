@@ -65,8 +65,10 @@ export function computePricing(booking, property) {
   const tax = Math.round(subtotal * 0.1);
   const grandTotal = subtotal + tax;
 
+  const totalNights = weekdayNights + weekendNights;
+
   return {
-    totalNights: booking.totalNights,
+    totalNights,
     room: {
       weekdayNights,
       weekendNights,
