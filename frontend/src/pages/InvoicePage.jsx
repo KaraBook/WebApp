@@ -128,6 +128,9 @@ export default function InvoicePage() {
     pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
   };
 
+  const taxPercent = subtotal > 0
+    ? Math.round((tax / subtotal) * 100)
+    : 0;
 
 
   return (
@@ -203,8 +206,14 @@ export default function InvoicePage() {
               Booking Details
             </p>
             <div className={`booking-details-grid grid grid-cols-2 ${hasMeals ? "sm:grid-cols-5" : "sm:grid-cols-4"} gap-4 text-sm`}>
-              <BD label="Check-in" value="27 Nov 2025" />
-              <BD label="Check-out" value="30 Nov 2025" />
+              <BD
+                label="Check-in"
+                value={format(new Date(invoice.checkIn), "dd MMM yyyy")}
+              />
+              <BD
+                label="Check-out"
+                value={format(new Date(invoice.checkOut), "dd MMM yyyy")}
+              />
               <BD label="Duration" value={`${invoice.nights} Nights`} />
               <BD
                 label="Guests"
@@ -297,7 +306,10 @@ export default function InvoicePage() {
           <div className="flex justify-end mt-4 text-sm">
             <div className="w-1/2 space-y-2">
               <KV label="Sub Total" value={`₹${subtotal.toLocaleString("en-IN")}`} />
-              <KV label="Tax (0%)" value={`₹${tax.toLocaleString("en-IN")}`} />
+              <KV
+                label={`Tax (${taxPercent}%)`}
+                value={`₹${tax.toLocaleString("en-IN")}`}
+              />
               <KV
                 label="Grand Total"
                 value={`₹${grandTotal.toLocaleString("en-IN")}`}
