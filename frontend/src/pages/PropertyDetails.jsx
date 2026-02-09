@@ -85,10 +85,8 @@ export default function PropertyDetails() {
   const [showCalendar, setShowCalendar] = useState(false);
 
   const hasFood =
-    property?.foodAvailability &&
-    (property.foodAvailability.breakfast ||
-      property.foodAvailability.lunch ||
-      property.foodAvailability.dinner);
+    Array.isArray(property?.foodAvailability) &&
+    property.foodAvailability.length > 0;
 
   const [dateRange, setDateRange] = useState([
     {
@@ -697,9 +695,15 @@ export default function PropertyDetails() {
                 </div>
               </div>
 
-              <p className="text-[12px] text-[#616161]">
-                Base includes {property.baseGuests || 0} guests (Adults + Kids)
-                {hasFood ? ", Food available" : ""}
+              <p className="text-[12px] text-[#616161] leading-relaxed">
+                Base includes <b>{property.baseGuests}</b> guests ·
+                Max capacity <b>{property.maxGuests}</b> guests
+                {hasFood && (
+                  <>
+                    <br />
+                    🍽 Food: {property.foodAvailability.join(", ")}
+                  </>
+                )}
               </p>
 
               <div className="mt-5 relative" ref={calendarRef}>
