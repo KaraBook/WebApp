@@ -42,10 +42,8 @@ export default function Checkout() {
     const [pricing, setPricing] = useState(null);
 
     const hasFood =
-        property?.foodAvailability &&
-        (property.foodAvailability.breakfast ||
-            property.foodAvailability.lunch ||
-            property.foodAvailability.dinner);
+        Array.isArray(property?.foodAvailability) &&
+        property.foodAvailability.length > 0;
 
     const [mealCounts, setMealCounts] = useState({
         veg: 0,
@@ -544,7 +542,11 @@ export default function Checkout() {
                 {/* MEALS */}
                 {hasFood && (
                     <div className="border rounded-[12px] p-5 mb-6">
-                        <h3 className="font-semibold mb-3 text-lg">Meals</h3>
+                        <h3 className="font-semibold mb-1 text-lg">Meals</h3>
+
+                        <p className="text-xs text-gray-500 mb-3">
+                            Available: {property.foodAvailability.join(", ")}
+                        </p>
 
                         <label className="flex items-center gap-3 mb-4 cursor-pointer">
                             <input
@@ -560,7 +562,7 @@ export default function Checkout() {
                             <span className="text-sm font-medium">Include Meals</span>
                         </label>
 
-                        {includeMeals && (
+                        {includeMeals && pricing?.meals && (
                             <div className="space-y-4">
 
                                 {/* Veg */}
@@ -654,28 +656,28 @@ export default function Checkout() {
 
                     {/* Room Charges */}
                     {pricing && (
-                    <div className="text-sm space-y-2">
-                        <p className="font-medium">Room charges</p>
+                        <div className="text-sm space-y-2">
+                            <p className="font-medium">Room charges</p>
 
-                        {pricing?.room.weekdayNights > 0 && (
-                            <div className="flex justify-between">
-                                <span>
-                                    Weekdays ({pricing.room.weekdayNights} nights × ₹{pricing.room.weekdayRate})
-                                </span>
-                                <span>₹{pricing?.room?.roomWeekdayAmount?.toLocaleString?.() ?? "0"}</span>
-                            </div>
-                        )}
+                            {pricing?.room.weekdayNights > 0 && (
+                                <div className="flex justify-between">
+                                    <span>
+                                        Weekdays ({pricing.room.weekdayNights} nights × ₹{pricing.room.weekdayRate})
+                                    </span>
+                                    <span>₹{pricing?.room?.roomWeekdayAmount?.toLocaleString?.() ?? "0"}</span>
+                                </div>
+                            )}
 
-                        {pricing?.room.weekendNights > 0 && (
-                            <div className="flex justify-between">
-                                <span>
-                                    Weekend ({pricing.room.weekendNights} nights × ₹{pricing.room.weekendRate})
-                                </span>
-                                <span>₹{pricing?.room?.roomWeekendAmount?.toLocaleString?.() ?? "0"}</span>
-                            </div>
-                        )}
+                            {pricing?.room.weekendNights > 0 && (
+                                <div className="flex justify-between">
+                                    <span>
+                                        Weekend ({pricing.room.weekendNights} nights × ₹{pricing.room.weekendRate})
+                                    </span>
+                                    <span>₹{pricing?.room?.roomWeekendAmount?.toLocaleString?.() ?? "0"}</span>
+                                </div>
+                            )}
 
-                    </div>
+                        </div>
                     )}
 
                     {/* Extra Guests */}
@@ -752,7 +754,7 @@ export default function Checkout() {
                     <div>
                         <p className="text-xs text-gray-500">Total payable</p>
                         <p className="text-lg font-bold">
-                            ₹{pricing?.grandTotal.toLocaleString()}
+                            ₹{pricing?.grandTotal?.toLocaleString?.() ?? "0"}
                         </p>
                     </div>
 
