@@ -138,7 +138,7 @@ const InvoicePreviewWrapper = () => {
 
 function AppRoutes() {
   return (
-    <BrowserRouter basename="/admin">
+    <BrowserRouter>
       <Routes>
         {/* Public */}
         <Route path="/login" element={<AdminLogin />} />
