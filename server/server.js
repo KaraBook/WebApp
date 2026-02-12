@@ -20,26 +20,31 @@ connectDB();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const allowedOrigin = [
+const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
-  "https://karabookfrontend.netlify.app",
-  "http://88.222.244.26/admin",
-  "http://88.222.244.26",
+
   "https://karabookdev.cloud",
-  "https://karabookdev.cloud/admin",
+  "https://admin.karabookdev.cloud",
+  "https://owner.karabookdev.cloud",
+
+  "https://karabook.in",
+  "https://admin.karabook.in",
+  "https://owner.karabook.in",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigin.includes(origin)) callback(null, true);
-      else callback(new Error("Not allowed by CORS"));
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
     },
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
