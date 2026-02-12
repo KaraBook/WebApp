@@ -242,11 +242,13 @@ const EditProperty = () => {
         Number(rb.deluxe || 0) +
         Number(rb.luxury || 0);
 
-      formData.roomBreakdown = { ...rb, total };
-      formData.totalRooms = total;
-      Object.entries(formData).forEach(([key, value]) => {
+      const payloadData = {
+        ...formData,
+        roomBreakdown: { ...rb, total },
+        totalRooms: total,
+      };
+      Object.entries(payloadData).forEach(([key, value]) => {
 
-        // 1️⃣ Always handle complex JSON FIRST
         if (key === "cancellationPolicy") {
           data.append("cancellationPolicy", JSON.stringify(value));
           return;
@@ -888,6 +890,7 @@ const EditProperty = () => {
                     ...prev,
                     isRefundable: boolVal,
                     refundNotes: boolVal ? prev.refundNotes : "",
+                    cancellationPolicy: boolVal ? prev.cancellationPolicy : [],
                   }));
                 }}
                 placeholder="Select Option"

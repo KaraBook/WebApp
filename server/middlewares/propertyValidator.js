@@ -118,6 +118,13 @@ const baseFields = {
     .allow("")
     .optional(),
 
+  cancellationPolicy: Joi.array().items(
+    Joi.object({
+      minDaysBefore: Joi.number().min(0).required(),
+      refundPercent: Joi.number().min(0).max(100).required(),
+    })
+  ).default([]),
+
   extraAdultCharge: Joi.number()
     .min(0)
     .max(99999)

@@ -185,6 +185,17 @@ const AddProperty = () => {
             refundNotes: formData.isRefundable ? formData.refundNotes?.trim() : "",
             cancellationPolicy: formData.isRefundable
                 ? formData.cancellationPolicy
+                    .filter(r =>
+                        r &&
+                        r.minDaysBefore !== "" &&
+                        r.refundPercent !== "" &&
+                        !isNaN(r.minDaysBefore) &&
+                        !isNaN(r.refundPercent)
+                    )
+                    .map(r => ({
+                        minDaysBefore: Number(r.minDaysBefore),
+                        refundPercent: Number(r.refundPercent),
+                    }))
                 : [],
         };
         return payload;
@@ -192,15 +203,24 @@ const AddProperty = () => {
 
 
     const createDraft = async () => {
-        if (
-            formData.isRefundable &&
-            (!formData.cancellationPolicy.length ||
-                formData.cancellationPolicy.some(r =>
-                    r.minDaysBefore === undefined || r.refundPercent === undefined))
-        ) {
-            toast.error("Please complete cancellation rules");
-            return;
+
+        if (formData.isRefundable) {
+            const isInvalid = formData.cancellationPolicy.some(r => {
+                return (
+                    r == null ||
+                    r.minDaysBefore === "" ||
+                    r.refundPercent === "" ||
+                    isNaN(Number(r.minDaysBefore)) ||
+                    isNaN(Number(r.refundPercent))
+                );
+            });
+
+            if (isInvalid || formData.cancellationPolicy.length === 0) {
+                toast.error("Please complete cancellation rules");
+                return;
+            }
         }
+
         if (
             formData.gstin &&
             !GSTIN_REGEX.test(formData.gstin.toUpperCase())
@@ -210,13 +230,17 @@ const AddProperty = () => {
         }
 
         setLoading(true);
+
         try {
             const payload = buildDraftPayload();
-            const resp = await Axios.post(SummaryApi.createPropertyDraft.url, payload, {
-                headers: { "Content-Type": "application/json" },
-            });
+            const resp = await Axios.post(
+                SummaryApi.createPropertyDraft.url,
+                payload,
+                { headers: { "Content-Type": "application/json" } }
+            );
 
             const created = resp?.data?.data || resp?.data;
+
             if (!created?._id) {
                 toast.error("Draft saved but no ID in response");
                 return;
@@ -225,13 +249,14 @@ const AddProperty = () => {
             setPropertyId(created._id);
             toast.success("Draft saved. Continue to upload media.");
             setCurrentStep(6);
+
         } catch (err) {
-            const msg = err?.response?.data?.message || "Failed to create draft";
-            toast.error(msg);
+            toast.error(err?.response?.data?.message || "Failed to create draft");
         } finally {
             setLoading(false);
         }
     };
+
 
     useEffect(() => {
         if (
@@ -991,12 +1016,15 @@ const AddProperty = () => {
                                         <Input
                                             placeholder="Min days"
                                             type="number"
-                                            value={formData.cancellationPolicy[i]?.minDaysBefore || ""}
+                                            value={formData.cancellationPolicy[i]?.minDaysBefore ?? ""}
                                             onChange={(e) => {
                                                 const arr = [...formData.cancellationPolicy];
                                                 arr[i] = {
                                                     ...arr[i],
-                                                    minDaysBefore: Number(e.target.value),
+                                                    minDaysBefore:
+                                                        e.target.value === ""
+                                                            ? ""
+                                                            : Number(e.target.value),
                                                 };
                                                 setFormData(p => ({ ...p, cancellationPolicy: arr }));
                                             }}
@@ -1005,12 +1033,15 @@ const AddProperty = () => {
                                         <Input
                                             placeholder="Refund %"
                                             type="number"
-                                            value={formData.cancellationPolicy[i]?.refundPercent || ""}
+                                            value={formData.cancellationPolicy[i]?.refundPercent ?? ""}
                                             onChange={(e) => {
                                                 const arr = [...formData.cancellationPolicy];
                                                 arr[i] = {
                                                     ...arr[i],
-                                                    refundPercent: Number(e.target.value),
+                                                    refundPercent:
+                                                        e.target.value === ""
+                                                            ? ""
+                                                            : Number(e.target.value),
                                                 };
                                                 setFormData(p => ({ ...p, cancellationPolicy: arr }));
                                             }}

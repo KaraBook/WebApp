@@ -44,7 +44,7 @@ export default function AdminLogin() {
       {/* LEFT IMAGE (Desktop only) */}
       <div
         className="flex w-full h-[45vh] md:h-auto md:w-1/2 relative bg-cover bg-center"
-        style={{ backgroundImage: "url('/admin/loginhero.png')" }}
+        style={{ backgroundImage: "url('/loginhero.png')" }}
       >
         <div className="absolute inset-0 bg-black/30" />
 
@@ -67,7 +67,7 @@ export default function AdminLogin() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <img
-                src="/admin/KarabookLogo.png"
+                src="/KarabookLogo.png"
                 alt="KaraBook"
                 className="h-7"
               />

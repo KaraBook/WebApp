@@ -27,7 +27,7 @@ function Sidebar() {
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[#a7a7a7]">
-        {!collapsed && <span className="text-xl font-semibold text-primary"><img src="/admin/KarabookLogo.png" className="h-9" /></span>}
+        {!collapsed && <span className="text-xl font-semibold text-primary"><img src="/KarabookLogo.png" className="h-9" /></span>}
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-primary hover:bg-hoverbg/80">
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </Button>
