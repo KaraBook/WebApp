@@ -138,7 +138,7 @@ const InvoicePreviewWrapper = () => {
 
 function AppRoutes() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.VITE_BASENAME || "/"}>
       <Routes>
         {/* Public */}
         <Route path="/login" element={<AdminLogin />} />
