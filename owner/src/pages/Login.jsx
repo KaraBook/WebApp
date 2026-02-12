@@ -232,7 +232,7 @@ export default function OwnerLogin() {
         <div className="hidden lg:flex lg:w-1/2 relative h-screen">
 
           <img
-            src="/owner/loginhero.jpg"
+            src="/loginhero.jpg"
             alt="Karabook"
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -258,7 +258,7 @@ export default function OwnerLogin() {
 
             {/* Image */}
             <img
-              src="/owner/loginhero.jpg"
+              src="/loginhero.jpg"
               alt="Karabook"
               className="absolute inset-0 w-full h-full object-cover z-0"
             />
