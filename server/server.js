@@ -51,16 +51,20 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+const UPLOADS_PATH = path.join(process.cwd(), "server", "uploads");
+
 app.use(
   "/uploads",
-  express.static(path.join(__dirname, "uploads"), {
-    setHeaders: (res, filePath) => {
+  express.static(UPLOADS_PATH, {
+    setHeaders: (res) => {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
       res.setHeader("Cache-Control", "public, max-age=31536000");
     },
   })
 );
+
+console.log("Serving uploads from:", UPLOADS_PATH);
 
 app.get("/", (_req, res) => res.send("API is up"));
 
