@@ -51,7 +51,7 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-const UPLOADS_PATH = path.join(process.cwd(), "server", "uploads");
+const UPLOADS_PATH = path.join(__dirname, "uploads");
 
 app.use(
   "/uploads",
