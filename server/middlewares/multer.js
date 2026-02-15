@@ -2,7 +2,7 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 
-const UPLOAD_BASE = "uploads";
+const UPLOAD_BASE = path.join(process.cwd(), "uploads");
 
 const ensureDir = (dirPath) => {
   if (!fs.existsSync(dirPath)) {

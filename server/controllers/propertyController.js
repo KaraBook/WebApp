@@ -297,18 +297,12 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     const shopActFile = req.files?.shopAct?.[0];
     const galleryFiles = req.files?.galleryPhotos || [];
 
-    const BASE_URL = process.env.BACKEND_BASE_URL || "";
-
     if (coverFile) {
-      prop.coverImage = `${BASE_URL}/${coverFile.path.replace(/\\/g, "/")}`;
-    } else if (prop.coverImage?.startsWith("/uploads/")) {
-      prop.coverImage = `${BASE_URL}${prop.coverImage}`;
+      prop.coverImage = `/${coverFile.path.replace(/\\/g, "/")}`;
     }
 
     if (shopActFile) {
-      prop.shopAct = `${BASE_URL}/${shopActFile.path.replace(/\\/g, "/")}`;
-    } else if (prop.shopAct?.startsWith("/uploads/")) {
-      prop.shopAct = `${BASE_URL}${prop.shopAct}`;
+      prop.shopAct = `/${shopActFile.path.replace(/\\/g, "/")}`;
     }
 
     let finalGallery = [];
@@ -326,15 +320,11 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
       finalGallery = prop.galleryPhotos;
     }
 
-    finalGallery = finalGallery
-      .map((url) =>
-        url.startsWith("/uploads/") ? `${BASE_URL}${url}` : url
-      )
-      .filter((url) => !isShopActImage(url));
+    finalGallery = finalGallery.filter((url) => !isShopActImage(url));
 
     if (galleryFiles.length > 0) {
       const newGalleryUrls = galleryFiles.map(
-        (file) => `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
+        (file) => `/${file.path.replace(/\\/g, "/")}`
       );
       finalGallery.push(...newGalleryUrls);
     }
@@ -358,7 +348,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     if (prop.publishNow) {
       prop.status = "published";
-    } else { 
+    } else {
       prop.status = "unpublished";
     }
 
@@ -458,11 +448,21 @@ export const updateProperty = async (req, res) => {
 
     const updatedData = {};
     const files = req.files || {};
-    const BASE_URL = process.env.BACKEND_BASE_URL || "";
-
 
     if (req.is("application/json")) {
       Object.assign(updatedData, req.body);
+
+      if (req.body.foodAvailability && typeof req.body.foodAvailability === "string") {
+        try {
+          updatedData.foodAvailability = JSON.parse(req.body.foodAvailability);
+        } catch { }
+      }
+
+      if (req.body.amenities && typeof req.body.amenities === "string") {
+        try {
+          updatedData.amenities = JSON.parse(req.body.amenities);
+        } catch { }
+      }
 
       [
         "maxGuests",
@@ -578,28 +578,18 @@ export const updateProperty = async (req, res) => {
       const galleryFiles = files.galleryPhotos || [];
 
       if (coverImageFile) {
-        updatedData.coverImage = `${BASE_URL}/${coverImageFile.path.replace(/\\/g, "/")}`;
+        updatedData.coverImage = `/${coverImageFile.path.replace(/\\/g, "/")}`;
       }
 
       if (shopActFile) {
-        updatedData.shopAct = `${BASE_URL}/${shopActFile.path.replace(/\\/g, "/")}`;
+        updatedData.shopAct = `/${shopActFile.path.replace(/\\/g, "/")}`;
       }
 
-      let finalGallery = (existingProperty.galleryPhotos || []).map((url) => {
-        if (url.startsWith("/uploads/")) {
-          return `${BASE_URL}${url}`;
-        }
-        return url;
-      });
+      let finalGallery = [...(existingProperty.galleryPhotos || [])];
 
       if (req.body.existingGallery) {
         try {
-          finalGallery = JSON.parse(req.body.existingGallery).map((url) => {
-            if (url.startsWith("/uploads/")) {
-              return `${BASE_URL}${url}`;
-            }
-            return url;
-          });
+          finalGallery = JSON.parse(req.body.existingGallery);
         } catch (e) {
           console.log("JSON parse error (existingGallery)", e);
         }
@@ -607,7 +597,7 @@ export const updateProperty = async (req, res) => {
 
       if (galleryFiles.length > 0) {
         const newGalleryUrls = galleryFiles.map(
-          (file) => `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
+          (file) => `/${file.path.replace(/\\/g, "/")}`
         );
         finalGallery.push(...newGalleryUrls);
       }

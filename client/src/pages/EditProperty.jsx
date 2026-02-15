@@ -265,7 +265,7 @@ const EditProperty = () => {
         }
 
         if (Array.isArray(value)) {
-          value.forEach(v => data.append(`${key}[]`, v));
+          data.append(key, JSON.stringify(value));
           return;
         }
 

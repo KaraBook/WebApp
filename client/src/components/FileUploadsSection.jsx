@@ -5,19 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const FileUploadsSection = ({
-  // cover
   setCoverImageFile,
   coverImageFile,
   coverImagePreview,
   setCoverImagePreview,
 
-  // shop act
   setShopActFile,
   shopActFile,
   shopActPreview,
   setShopActPreview,
 
-  // gallery (with safe defaults so shop-act-only usage doesn't break)
   existingGallery = [],
   setExistingGallery = () => {},
   newGalleryFiles = [],
@@ -25,10 +22,8 @@ const FileUploadsSection = ({
   newGalleryPreviews = [],
   setNewGalleryPreviews = () => {},
 
-  // visibility
   showFields = { coverImage: true, shopAct: true, galleryPhotos: true },
 
-  // constraints
   minGallery = 3,
   maxGallery = 10,
 }) => {

@@ -198,9 +198,9 @@ const updateSchema = Joi.object({
     ).required(),
     otherwise: Joi.array().max(0).default([])
   }),
-  coverImage: Joi.string().uri().optional(),
-  shopAct: Joi.string().uri().optional(),
-  galleryPhotos: Joi.array().items(Joi.string().uri()).optional(),
+  galleryPhotos: Joi.array().items(Joi.string()).optional(),
+  coverImage: Joi.string().optional(),
+  shopAct: Joi.string().optional(),
 }).custom((value, helpers) => {
   if (value.baseGuests > value.maxGuests) {
     return helpers.message("Base guests cannot be greater than max guests");
