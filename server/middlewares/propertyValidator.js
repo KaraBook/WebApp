@@ -142,7 +142,7 @@ const baseFields = {
 
   minStayNights: Joi.number().min(1).max(999).required(),
 
-  foodAvailability: Joi.array().items(Joi.string()),
+  foodAvailability: Joi.array().items(Joi.string()).default([]),
   amenities: Joi.array().items(Joi.string().trim().min(1).max(50)).default([]),
 
   pan: Joi.string().length(10).optional().allow("")
@@ -251,7 +251,24 @@ function normalizeArraysAndTypes(body) {
         : [body[`${key}[]`]];
       delete body[`${key}[]`];
     }
+
+    if (body[key] === "" || body[key] === undefined) {
+      body[key] = [];
+    }
+
+    if (typeof body[key] === "string") {
+      try {
+        body[key] = JSON.parse(body[key]);
+      } catch {
+        body[key] = [body[key]];
+      }
+    }
+
+    if (!Array.isArray(body[key])) {
+      body[key] = [];
+    }
   });
+
 
   [
     "totalRooms",
