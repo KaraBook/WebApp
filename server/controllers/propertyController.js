@@ -10,6 +10,14 @@ import { propertyCreatedTemplate } from "../utils/emailTemplates.js";
 import get from "lodash.get";
 
 
+const toPublicPath = (filePath) => {
+  if (!filePath) return null;
+  const normalized = filePath.replace(/\\/g, "/");
+  const index = normalized.indexOf("/uploads/");
+  if (index === -1) return null;
+  return normalized.substring(index);
+};
+
 
 async function sendOwnerCreationEmail(prop, { password = null } = {}) {
   try {
@@ -298,11 +306,11 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
     const galleryFiles = req.files?.galleryPhotos || [];
 
     if (coverFile) {
-      prop.coverImage = `/${coverFile.path.replace(/\\/g, "/")}`;
+      prop.coverImage = toPublicPath(coverFile.path);
     }
 
     if (shopActFile) {
-      prop.shopAct = `/${shopActFile.path.replace(/\\/g, "/")}`;
+      prop.shopAct = toPublicPath(shopActFile.path);
     }
 
     let finalGallery = [];
@@ -324,7 +332,7 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     if (galleryFiles.length > 0) {
       const newGalleryUrls = galleryFiles.map(
-        (file) => `/${file.path.replace(/\\/g, "/")}`
+        (file) => toPublicPath(file.path)
       );
       finalGallery.push(...newGalleryUrls);
     }
@@ -578,11 +586,11 @@ export const updateProperty = async (req, res) => {
       const galleryFiles = files.galleryPhotos || [];
 
       if (coverImageFile) {
-        updatedData.coverImage = `/${coverImageFile.path.replace(/\\/g, "/")}`;
+        updatedData.coverImage = toPublicPath(coverImageFile.path);
       }
 
       if (shopActFile) {
-        updatedData.shopAct = `/${shopActFile.path.replace(/\\/g, "/")}`;
+        updatedData.shopAct = toPublicPath(shopActFile.path);
       }
 
       let finalGallery = [...(existingProperty.galleryPhotos || [])];
@@ -597,7 +605,7 @@ export const updateProperty = async (req, res) => {
 
       if (galleryFiles.length > 0) {
         const newGalleryUrls = galleryFiles.map(
-          (file) => `/${file.path.replace(/\\/g, "/")}`
+          (file) => toPublicPath(file.path)
         );
         finalGallery.push(...newGalleryUrls);
       }
