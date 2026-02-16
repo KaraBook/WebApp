@@ -46,10 +46,17 @@ export default function ThankYou() {
         totalNights,
         grandTotal,
         taxAmount,
+        cgstAmount,
+        sgstAmount,
         totalAmount,
         createdAt,
         bookingCode,
     } = booking;
+
+    const cgst = Number(cgstAmount || 0);
+    const sgst = Number(sgstAmount || 0);
+    const totalTax = cgst + sgst;
+    const hasTax = totalTax > 0;
 
     const checkInTime = property?.checkInTime || "2:00 PM";
 
@@ -121,14 +128,25 @@ export default function ThankYou() {
                         {/* PRICE BREAKDOWN */}
                         <div className="text-sm space-y-2">
                             <div className="flex justify-between">
-                                <span>Room charges</span>
+                                <span>
+                                    Room charges ({totalNights} {totalNights > 1 ? "nights" : "night"})
+                                </span>
                                 <span className="font-bold">₹{totalAmount.toLocaleString()}</span>
                             </div>
 
-                            <div className="flex justify-between">
-                                <span>Taxes (10%)</span>
-                                <span>₹{taxAmount.toLocaleString()}</span>
-                            </div>
+                            {hasTax && (
+                                <>
+                                    <div className="flex justify-between">
+                                        <span>CGST (9%)</span>
+                                        <span>₹{cgst.toLocaleString()}</span>
+                                    </div>
+
+                                    <div className="flex justify-between">
+                                        <span>SGST (9%)</span>
+                                        <span>₹{sgst.toLocaleString()}</span>
+                                    </div>
+                                </>
+                            )}
 
                             <div className="flex justify-between font-semibold border-t pt-2">
                                 <span>Total paid</span>
@@ -136,6 +154,11 @@ export default function ThankYou() {
                                     ₹{grandTotal.toLocaleString()}
                                 </span>
                             </div>
+                            {hasTax && (
+                                <p className="text-xs text-gray-500 text-right">
+                                    (Inclusive of GST)
+                                </p>
+                            )}
                         </div>
                     </div>
 

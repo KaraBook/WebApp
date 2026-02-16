@@ -40,6 +40,10 @@ export default function Checkout() {
     const [includeMeals, setIncludeMeals] = useState(false);
     const isMobile = useIsMobile();
     const [pricing, setPricing] = useState(null);
+    const [creatingOrder, setCreatingOrder] = useState(false);
+    const [openingRazorpay, setOpeningRazorpay] = useState(false);
+    const [verifyingPayment, setVerifyingPayment] = useState(false);
+    const showFullLoader = creatingOrder || openingRazorpay || verifyingPayment;
 
     const hasFood =
         Array.isArray(property?.foodAvailability) &&
@@ -207,6 +211,7 @@ export default function Checkout() {
     };
 
     const handlePayment = async () => {
+        if (creatingOrder || openingRazorpay || verifyingPayment) return;
         if (contact.length !== 10) {
             toast.error("Enter a valid 10-digit mobile number");
             return;
@@ -225,6 +230,7 @@ export default function Checkout() {
         }
 
         try {
+            setCreatingOrder(true);
             const toLocalYMD = (date) => {
                 const d = new Date(date);
                 const y = d.getFullYear();
@@ -252,8 +258,19 @@ export default function Checkout() {
 
             const { order, pricing } = res.data;
             setPricing(pricing);
+            setCreatingOrder(false);
             const loaded = await loadRazorpayScript();
-            if (!loaded) return toast.error("Razorpay SDK failed to load");
+            if (!loaded) {
+                setOpeningRazorpay(false);
+                return toast.error("Razorpay SDK failed to load");
+            }
+            setOpeningRazorpay(true);
+
+
+            if (!loaded) {
+                setOpeningRazorpay(false);
+                return toast.error("Razorpay SDK failed to load");
+            }
 
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -264,17 +281,17 @@ export default function Checkout() {
                 order_id: order.id,
                 handler: async (response) => {
                     try {
+                        setOpeningRazorpay(false);
+                        setVerifyingPayment(true);
                         const verifyRes = await Axios.post(
                             SummaryApi.verifyBookingPayment.url,
                             response
                         );
-
                         const bookingId = verifyRes.data.booking._id;
-
                         toast.success("Payment successful!");
                         navigate(`/thank-you/${bookingId}`, { replace: true });
-
                     } catch (err) {
+                        setVerifyingPayment(false);
                         toast.error("Payment verified but redirect failed");
                     }
                 },
@@ -284,8 +301,23 @@ export default function Checkout() {
             };
 
             const rzp = new window.Razorpay(options);
+            rzp.on("modal.closed", function () {
+                setOpeningRazorpay(false);
+                setCreatingOrder(false);
+                setVerifyingPayment(false);
+            });
+            rzp.on("payment.failed", function () {
+                setOpeningRazorpay(false);
+                setCreatingOrder(false);
+                setVerifyingPayment(false);
+                toast.error("Payment failed. Please try again.");
+            });
             rzp.open();
         } catch (err) {
+            setCreatingOrder(false);
+            setOpeningRazorpay(false);
+            setVerifyingPayment(false);
+
             console.error(err);
             toast.error(
                 err.response?.data?.message || "Unable to create payment"
@@ -324,6 +356,20 @@ export default function Checkout() {
 
     return (
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-0 md:gap-10 px-4 py-10 pb-28 md:pb-10">
+            {showFullLoader && (
+                <div className="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-sm flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="w-14 h-14 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+
+                        <p className="text-sm font-medium text-gray-700">
+                            {creatingOrder && "Preparing your booking..."}
+                            {openingRazorpay && "Opening secure payment..."}
+                            {verifyingPayment && "Confirming your payment..."}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {/* LEFT SECTION */}
             <div>
                 <button
@@ -617,10 +663,22 @@ export default function Checkout() {
                 <div className="hidden md:block">
                     <Button
                         onClick={handlePayment}
-                        disabled={!pricing || contact.length !== 10}
+                        disabled={
+                            !pricing ||
+                            contact.length !== 10 ||
+                            creatingOrder ||
+                            openingRazorpay ||
+                            verifyingPayment
+                        }
                         className="w-full bg-primary text-white rounded-[10px] py-6 text-lg hover:bg-primary"
                     >
-                        Pay Now
+                        {creatingOrder
+                            ? "Preparing payment..."
+                            : openingRazorpay
+                                ? "Opening payment gateway..."
+                                : verifyingPayment
+                                    ? "Confirming payment..."
+                                    : "Pay Now"}
                     </Button>
                 </div>
             </div>
@@ -716,11 +774,11 @@ export default function Checkout() {
                             <div className="text-sm">
                                 <p className="font-medium">Meals selected</p>
                                 {pricing?.meals.veg > 0 && (
-                                    <p>Veg: {pricing.meals.veg} (₹{pricing.meals.vegAmount})</p>
+                                    <p>Veg: {pricing.meals.veg}</p>
                                 )}
 
                                 {pricing?.meals.nonVeg > 0 && (
-                                    <p>Non-veg: {pricing.meals.nonVeg} (₹{pricing.meals.nonVegAmount})</p>
+                                    <p>Non-veg: {pricing.meals.nonVeg}</p>
                                 )}
                             </div>
                         </>
@@ -769,10 +827,22 @@ export default function Checkout() {
 
                     <Button
                         onClick={handlePayment}
-                        disabled={!pricing || contact.length !== 10}
+                        disabled={
+                            !pricing ||
+                            contact.length !== 10 ||
+                            creatingOrder ||
+                            openingRazorpay ||
+                            verifyingPayment
+                        }
                         className="bg-primary text-white rounded-[10px] px-12 py-6 text-base"
                     >
-                        Pay Now →
+                        {creatingOrder
+                            ? "Preparing payment..."
+                            : openingRazorpay
+                                ? "Opening payment gateway..."
+                                : verifyingPayment
+                                    ? "Confirming payment..."
+                                    : "Pay Now"}
                     </Button>
                 </div>
             </div>
