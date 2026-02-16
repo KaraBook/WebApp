@@ -279,7 +279,7 @@ export default function OwnerLogin() {
 
             {/* HEADER */}
             <div className="flex items-center gap-3 md:mb-8 mb-6">
-              <img src="/owner/KarabookLogo.png" className="h-9" />
+              <img src="/KarabookLogo.png" className="h-9" />
               <span className="text-sm font-semibold text-gray-700">
                 Owner Portal
               </span>
