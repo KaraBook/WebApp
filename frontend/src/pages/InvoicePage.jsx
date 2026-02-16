@@ -83,12 +83,16 @@ export default function InvoicePage() {
   }
 
   const subtotal = Number(invoice.totalAmount || 0);
-  const tax = Number(invoice.taxAmount || 0);
+  const cgst = Number(invoice.cgstAmount || 0);
+  const sgst = Number(invoice.sgstAmount || 0);
+  const tax = cgst + sgst;
   const grandTotal = Number(invoice.grandTotal || subtotal + tax);
 
+  const roundedTotal = Math.round(grandTotal);
+
   const amountInWords =
-    grandTotal > 0
-      ? `${numberToWords(grandTotal)} Rupees Only`
+    roundedTotal > 0
+      ? `${numberToWords(roundedTotal)} Rupees Only`
       : "—";
 
   const downloadPDF = async () => {
@@ -96,8 +100,6 @@ export default function InvoicePage() {
     if (!original) return;
 
     const clone = original.cloneNode(true);
-
-    // 🔒 FORCE DESKTOP PDF MODE
     clone.classList.add("pdf-desktop");
     clone.querySelector(".invoice-pdf")?.classList.add("pdf-layout");
 
@@ -127,10 +129,6 @@ export default function InvoicePage() {
     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
     pdf.save(`Invoice_${invoice.invoiceNumber}.pdf`);
   };
-
-  const taxPercent = subtotal > 0
-    ? Math.round((tax / subtotal) * 100)
-    : 0;
 
 
   return (
@@ -172,6 +170,12 @@ export default function InvoicePage() {
                 <p className="text-xs text-muted-foreground">
                   {invoice.propertyAddress}
                 </p>
+
+                {invoice.propertyGSTIN && (
+                  <p className="text-xs mt-1">
+                    GSTIN: <span className="font-medium">{invoice.propertyGSTIN}</span>
+                  </p>
+                )}
               </div>
             </div>
             <p className="font-semibold text-sm tracking-wide">INVOICE</p>
@@ -306,10 +310,18 @@ export default function InvoicePage() {
           <div className="flex justify-end mt-4 text-sm">
             <div className="w-1/2 space-y-2">
               <KV label="Sub Total" value={`₹${subtotal.toLocaleString("en-IN")}`} />
-              <KV
-                label={`Tax (${taxPercent}%)`}
-                value={`₹${tax.toLocaleString("en-IN")}`}
-              />
+              {tax > 0 && (
+                <>
+                  <KV
+                    label="CGST (9%)"
+                    value={`₹${cgst.toLocaleString("en-IN")}`}
+                  />
+                  <KV
+                    label="SGST (9%)"
+                    value={`₹${sgst.toLocaleString("en-IN")}`}
+                  />
+                </>
+              )}
               <KV
                 label="Grand Total"
                 value={`₹${grandTotal.toLocaleString("en-IN")}`}

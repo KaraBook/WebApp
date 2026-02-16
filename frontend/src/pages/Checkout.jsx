@@ -735,10 +735,19 @@ export default function Checkout() {
                             <span>₹{pricing?.subtotal?.toLocaleString?.() ?? "0"}</span>
                         </div>
 
-                        <div className="flex justify-between">
-                            <span>Taxes (10%)</span>
-                            <span>₹{pricing?.tax?.toLocaleString?.() ?? "0"}</span>
-                        </div>
+                        {pricing?.tax > 0 && (
+                            <>
+                                <div className="flex justify-between">
+                                    <span>CGST (9%)</span>
+                                    <span>₹{pricing?.cgst?.toLocaleString?.() ?? "0"}</span>
+                                </div>
+
+                                <div className="flex justify-between">
+                                    <span>SGST (9%)</span>
+                                    <span>₹{pricing?.sgst?.toLocaleString?.() ?? "0"}</span>
+                                </div>
+                            </>
+                        )}
 
                         <div className="flex justify-between font-semibold">
                             <span>Total payable</span>

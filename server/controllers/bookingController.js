@@ -111,7 +111,7 @@ export const createOrder = async (req, res) => {
     }
 
     // Meal validations
-    if (meals && (meals.veg > 0 || meals.nonVeg > 0)){
+    if (meals && (meals.veg > 0 || meals.nonVeg > 0)) {
       const totalMeals =
         Number(meals.veg || 0) +
         Number(meals.nonVeg || 0);
@@ -145,7 +145,7 @@ export const createOrder = async (req, res) => {
       property
     );
 
-    const { subtotal, tax, grandTotal } = pricing;
+    const { subtotal, tax, cgst, sgst, grandTotal } = pricing;
 
     if (!Number.isFinite(grandTotal) || grandTotal <= 0) {
       console.error("❌ Invalid pricing", pricing);
@@ -216,6 +216,8 @@ export const createOrder = async (req, res) => {
       refundNotes: property.refundNotes,
       totalAmount: subtotal,
       taxAmount: tax,
+      cgstAmount: cgst,
+      sgstAmount: sgst,
       grandTotal,
       orderId: order.id,
       contactNumber,
@@ -481,6 +483,8 @@ export const getBookingInvoice = async (req, res) => {
       meals: booking.meals,
 
       totalAmount: subtotal,
+      cgstAmount: booking.cgstAmount,
+      sgstAmount: booking.sgstAmount,
       taxAmount,
       grandTotal,
 

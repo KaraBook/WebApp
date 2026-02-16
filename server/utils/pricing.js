@@ -1,7 +1,7 @@
 export function computePricing(booking, property) {
   const parseLocalDate = (dateStr) => {
     const [y, m, d] = dateStr.split("-").map(Number);
-    return new Date(y, m - 1, d); // LOCAL date
+    return new Date(y, m - 1, d);
   };
 
   const start = parseLocalDate(booking.checkIn);
@@ -67,9 +67,19 @@ export function computePricing(booking, property) {
     vegAmount +
     nonVegAmount;
 
-  const tax = Math.round(subtotal * 0.1);
-  const grandTotal = subtotal + tax;
+  let cgst = 0;
+  let sgst = 0;
+  let tax = 0;
 
+  const hasGST = property.gstin && property.gstin.trim() !== "";
+
+  if (hasGST) {
+    const GST_RATE = 0.18;
+    tax = Math.round(subtotal * GST_RATE);
+    cgst = Math.round(tax / 2);
+    sgst = Math.round(tax / 2);
+  }
+  const grandTotal = subtotal + tax;
   const totalNights = weekdayNights + weekendNights;
 
   return {
@@ -98,6 +108,8 @@ export function computePricing(booking, property) {
     },
     subtotal,
     tax,
+    cgst,
+    sgst,
     grandTotal,
   };
 }
