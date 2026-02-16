@@ -57,10 +57,12 @@ export function bookingConfirmationTemplate({
   nights,
   guests,
   subtotal,
-  taxAmount,
+  cgst,
+  sgst,
   grandTotal,
   paymentMethod,
   orderId,
+  taxRate = 18,
   portalUrl = "https://karabookdev.cloud",
 }) {
   const formatIndiaDate = (date) =>
@@ -71,11 +73,14 @@ export function bookingConfirmationTemplate({
       year: "numeric",
     });
 
+  const money = (v) => `₹${Number(v || 0).toLocaleString("en-IN")}`;
+
   const formattedCheckIn = formatIndiaDate(checkIn);
   const formattedCheckOut = formatIndiaDate(checkOut);
-  const formattedSubtotal = `₹${Number(subtotal).toLocaleString("en-IN")}`;
-  const formattedTax = `₹${Number(taxAmount).toLocaleString("en-IN")}`;
-  const formattedTotal = `₹${Number(grandTotal).toLocaleString("en-IN")}`;
+  const formattedSubtotal = money(subtotal);
+  const formattedCGST = money(cgst);
+  const formattedSGST = money(sgst);
+  const formattedTotal = money(grandTotal);
 
   return {
     subject: `Booking Confirmed – ${propertyName}`,
@@ -94,16 +99,23 @@ export function bookingConfirmationTemplate({
               <tr><td style="padding:6px 0;"><strong>Check-out:</strong></td><td>${formattedCheckOut}</td></tr>
               <tr><td style="padding:6px 0;"><strong>Nights:</strong></td><td>${nights}</td></tr>
               <tr><td style="padding:6px 0;"><strong>Guests:</strong></td><td>${guests}</td></tr>
-              <tr><td><strong>Subtotal:</strong></td><td>${formattedSubtotal}</td></tr>
-<tr><td><strong>Tax (10%):</strong></td><td>${formattedTax}</td></tr>
+              <tr>
+  <td style="padding:6px 0;"><strong>Room Charges:</strong></td>
+  <td>${formattedSubtotal}</td>
+</tr>
+
+<td style="padding:6px 0;">CGST (${halfGST}%):</td>
+<td style="padding:6px 0;">SGST (${halfGST}%):</td>
+
 <tr>
-  <td style="border-top:1px solid #eee;padding-top:8px">
-    <strong>Total Paid:</strong>
+  <td style="border-top:1px solid #eee;padding-top:10px">
+    <strong>Total Paid</strong>
   </td>
-  <td style="border-top:1px solid #eee;padding-top:8px">
+  <td style="border-top:1px solid #eee;padding-top:10px">
     <strong>${formattedTotal}</strong>
   </td>
 </tr>
+
 <tr><td><strong>Payment Method:</strong></td><td>${paymentMethod}</td></tr>
 <tr><td><strong>Order ID:</strong></td><td>${orderId}</td></tr>
               <tr><td style="padding:6px 0;"><strong>Booking ID:</strong></td><td>${bookingId}</td></tr>
