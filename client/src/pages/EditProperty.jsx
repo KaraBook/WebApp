@@ -16,16 +16,8 @@ import MultiSelectButtons from "../components/MultiSelectButtons";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { QuantityBox } from "@/components/QuantityBox";
 import { Check, ChevronDown } from "lucide-react";
-import {
-  propertyTypeOptions,
-  foodOptions,
-  amenitiesCategories,
-  kycVerifiedOptions,
-  formSteps,
-  approvalStatusOptions,
-  featuredOptions,
-  publishNowOptions,
-} from "../constants/dropdownOptions";
+import { propertyTypeOptions, foodOptions, amenitiesCategories, kycVerifiedOptions,
+  formSteps, approvalStatusOptions, featuredOptions, publishNowOptions} from "../constants/dropdownOptions";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
@@ -54,7 +46,6 @@ const EditProperty = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-
 
   const [formData, setFormData] = useState({
     propertyName: "",

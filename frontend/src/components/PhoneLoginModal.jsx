@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { sendOtp as firebaseSendOtp } from "/firebase";
+import { sendOtp as firebaseSendOtp, clearRecaptcha } from "/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -40,6 +40,22 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
     return () => clearInterval(timerRef.current);
   }, [timer]);
+
+
+  useEffect(() => {
+    if (!open) {
+      try {
+        clearRecaptcha();        
+        setStep("phone");
+        setPhone("");
+        setOtp("");
+        setConfirmResult(null);
+        setTimer(0);
+      } catch (e) {
+        console.log("recaptcha cleanup skipped");
+      }
+    }
+  }, [open]);
 
 
   const handleSendOtp = async () => {
@@ -163,7 +179,10 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       <DialogContent className="sm:max-w-md w-[95%] z-[9999999] p-0 rounded-[12px] border-none overflow-hidden">
         {/* CLOSE */}
         <button
-          onClick={() => onOpenChange(false)}
+          onClick={() => {
+            clearRecaptcha();
+            onOpenChange(false);
+          }}
           className="absolute top-3 right-3 z-20 text-white/80 hover:text-white"
         >
           ✕
@@ -291,7 +310,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         </div>
 
       </DialogContent>
-      <div id="recaptcha-container" />
     </Dialog>
   );
 }
