@@ -275,14 +275,6 @@ const BookingsPage = () => {
         window.open(url, "_blank");
     };
 
-    const mailTo = (email, subject, body) => {
-        if (!email) return;
-        const url = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(
-            subject || ""
-        )}&body=${encodeURIComponent(body || "")}`;
-        window.location.href = url;
-    };
-
     const downloadInvoicePDF = async (bookingId) => {
         try {
             toast.info("Generating PDF… please wait");
@@ -295,7 +287,6 @@ const BookingsPage = () => {
 
             setInvoiceData(res.data.data);
 
-            // ⏳ WAIT for DOM to paint
             await new Promise((r) => requestAnimationFrame(r));
             await new Promise((r) => requestAnimationFrame(r));
 
@@ -333,16 +324,13 @@ const BookingsPage = () => {
     const confirmTitle = useMemo(() => {
         if (!confirm.booking) return "";
         if (confirm.type === "invoice") return "Download Invoice";
-        if (confirm.type === "resend") return "Resend Links";
         return "";
     }, [confirm]);
 
     const confirmDescription = useMemo(() => {
         if (!confirm.booking) return "";
         if (confirm.type === "invoice")
-            return "This will download a JSON invoice for this booking.";
-        if (confirm.type === "resend")
-            return "Open WhatsApp and email with prefilled confirmation message.";
+            return "This will download a PDF invoice for this booking.";
         return "";
     }, [confirm]);
 
@@ -363,30 +351,6 @@ const BookingsPage = () => {
 
         if (confirm.type === "invoice") {
             await downloadInvoicePDF(b._id);
-        }
-
-        if (confirm.type === "resend") {
-            const traveller = `${b?.userId?.firstName || ""}`.trim() || "Guest";
-            const prop = b?.propertyId?.propertyName || "Property";
-            const lines = [
-                `🎉 Booking Confirmed!`,
-                ``,
-                `Dear ${traveller}, your stay at *${prop}* is confirmed.`,
-                `Check-in: ${formatDateLong(b.checkIn)}`,
-                `Check-out: ${formatDateLong(b.checkOut)}`,
-                `Guests: ${typeof b.guests === "number"
-                    ? b.guests
-                    : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
-                    }`
-                }`,
-                `Amount: ${formatCurrency(b.totalAmount)}`,
-            ];
-            const waText = lines.join("\n");
-            openWhatsApp(b?.userId?.mobile || b?.contactNumber, waText);
-
-            const mailSubject = `Booking Confirmation ${shortId(b._id)} — ${prop}`;
-            const mailBody = lines.join("\n");
-            mailTo(b?.userId?.email, mailSubject, mailBody);
         }
     };
 
@@ -427,7 +391,7 @@ const BookingsPage = () => {
                         <DropdownMenuContent className="w-[89vw] md:w-56 ">
                             {filterOptions.map((option) => (
                                 <DropdownMenuItem
-                                className="py-2"
+                                    className="py-2"
                                     key={option.value}
                                     onSelect={() => setSelectedFilter(option.value)}
                                 >
@@ -591,12 +555,6 @@ const BookingsPage = () => {
                                                                 onSelect={() => openConfirm("invoice", b)}
                                                             >
                                                                 Download Invoice
-                                                            </DropdownMenuItem>
-
-                                                            <DropdownMenuItem
-                                                                onSelect={() => openConfirm("resend", b)}
-                                                            >
-                                                                Resend Links (WA + Email)
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
