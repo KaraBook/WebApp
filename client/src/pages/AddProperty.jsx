@@ -69,7 +69,7 @@ const AddProperty = () => {
         city: "",
         pinCode: "",
         locationLink: "",
-        roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, total: 0 },
+        roomBreakdown: { ac: 0, nonAc: 0, deluxe: 0, luxury: 0, hall: 0, total: 0 },
         bedrooms: 0,
         bathrooms: 0,
         maxGuests: "",
@@ -150,17 +150,20 @@ const AddProperty = () => {
                 nonAc: Number(formData.roomBreakdown.nonAc || 0),
                 deluxe: Number(formData.roomBreakdown.deluxe || 0),
                 luxury: Number(formData.roomBreakdown.luxury || 0),
+                hall: Number(formData.roomBreakdown.hall || 0),
                 total:
                     Number(formData.roomBreakdown.ac || 0) +
                     Number(formData.roomBreakdown.nonAc || 0) +
                     Number(formData.roomBreakdown.deluxe || 0) +
-                    Number(formData.roomBreakdown.luxury || 0),
+                    Number(formData.roomBreakdown.luxury || 0) +
+                    Number(formData.roomBreakdown.hall || 0),
             },
             totalRooms:
                 Number(formData.roomBreakdown.ac || 0) +
                 Number(formData.roomBreakdown.nonAc || 0) +
                 Number(formData.roomBreakdown.deluxe || 0) +
-                Number(formData.roomBreakdown.luxury || 0),
+                Number(formData.roomBreakdown.luxury || 0) +
+                Number(formData.roomBreakdown.hall || 0),
             bedrooms: num(formData.bedrooms),
             bathrooms: num(formData.bathrooms),
             maxGuests: num(formData.maxGuests),
@@ -174,8 +177,8 @@ const AddProperty = () => {
             minStayNights: num(formData.minStayNights),
             foodAvailability: formData.foodAvailability,
             amenities: formData.amenities,
-            pan: formData.pan?.toUpperCase().trim(),
-            gstin: formData.gstin ? formData.gstin.toUpperCase().trim() : "",
+            pan: formData.pan?.trim() ? formData.pan.toUpperCase().trim() : undefined,
+            gstin: formData.gstin?.trim() ? formData.gstin.toUpperCase().trim() : undefined,
             kycVerified: !!formData.kycVerified,
             publishNow: !!formData.publishNow,
             featured: !!formData.featured,
@@ -198,6 +201,8 @@ const AddProperty = () => {
                     }))
                 : [],
         };
+        if (!payload.gstin) delete payload.gstin;
+        if (!payload.pan) delete payload.pan;
         return payload;
     };
 
@@ -221,14 +226,12 @@ const AddProperty = () => {
             }
         }
 
-        if (
-            formData.gstin &&
+        if (formData.gstin?.trim().length > 0 &&
             !GSTIN_REGEX.test(formData.gstin.toUpperCase())
         ) {
             toast.error("Invalid GSTIN format");
             return;
         }
-
         setLoading(true);
 
         try {
@@ -743,7 +746,7 @@ const AddProperty = () => {
                         <div className="w-full">
                             <Label className="text-sm font-semibold">Total Rooms / Units</Label>
                             <div className="flex flex-wrap items-center gap-3 mt-3">
-                                {["ac", "nonAc", "deluxe", "luxury"].map((key) => (
+                                {["ac", "nonAc", "deluxe", "luxury", "hall"].map((key) => (
                                     <div key={key} className="flex items-center gap-2">
                                         <span className="px-3 py-2 bg-black text-white rounded-md text-sm capitalize">
                                             {key === "nonAc" ? "Non AC" : key}
@@ -759,9 +762,9 @@ const AddProperty = () => {
                                                             [key]: val,
                                                         },
                                                     };
-                                                    const { ac, nonAc, deluxe, luxury } = updated.roomBreakdown;
+                                                    const { ac, nonAc, deluxe, luxury, hall } = updated.roomBreakdown;
                                                     updated.roomBreakdown.total =
-                                                        Number(ac) + Number(nonAc) + Number(deluxe) + Number(luxury);
+                                                        Number(ac) + Number(nonAc) + Number(deluxe) + Number(luxury) + Number(updated.roomBreakdown.hall || 0);
                                                     return updated;
                                                 });
                                             }}

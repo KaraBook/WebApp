@@ -128,6 +128,14 @@ export const createPropertyDraft = async (req, res) => {
       return res.status(400).json({ success: false, message: "Resort owner mobile is required (10 digits)" });
     }
 
+    if (req.body.pan !== undefined && String(req.body.pan).trim() === "") {
+      delete req.body.pan;
+    }
+
+    if (req.body.gstin !== undefined && String(req.body.gstin).trim() === "") {
+      delete req.body.gstin;
+    }
+
     const duplicatePayload = {
       "resortOwner.email": owner.email,
       "resortOwner.mobile": owner.mobile,
@@ -457,6 +465,14 @@ export const updateProperty = async (req, res) => {
     const updatedData = {};
     const files = req.files || {};
 
+    if (req.body.pan !== undefined && String(req.body.pan).trim() === "") {
+      delete req.body.pan;
+    }
+
+    if (req.body.gstin !== undefined && String(req.body.gstin).trim() === "") {
+      delete req.body.gstin;
+    }
+
     if (req.is("application/json")) {
       Object.assign(updatedData, req.body);
 
@@ -721,6 +737,14 @@ export const updateProperty = async (req, res) => {
       if (["true", true, 1, "1", "yes"].includes(updatedData.publishNow)) {
         updatedData.publishNow = true;
         updatedData.isDraft = false;
+      }
+
+      if (updatedData.pan !== undefined && String(updatedData.pan).trim() === "") {
+        delete updatedData.pan;
+      }
+
+      if (updatedData.gstin !== undefined && String(updatedData.gstin).trim() === "") {
+        delete updatedData.gstin;
       }
 
       updatedProperty = await Property.findByIdAndUpdate(
