@@ -284,7 +284,6 @@ export const verifyPayment = async (req, res) => {
   `
       )
       .populate("userId", "firstName lastName email mobile")
-      .populate("propertyId", "propertyName city state address");
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
