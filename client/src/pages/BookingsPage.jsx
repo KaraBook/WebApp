@@ -158,10 +158,10 @@ const BookingsPage = () => {
 
     const formatCurrency = (n) =>
         typeof n === "number"
-            ? `₹${n.toLocaleString("en-IN")}`
+            ? `${n.toLocaleString("en-IN")}`
             : n
-                ? `₹${Number(n).toLocaleString("en-IN")}`
-                : "₹0";
+                ? `${Number(n).toLocaleString("en-IN")}`
+                : "0";
 
     const shortId = (id = "") => `#${String(id).slice(-6).toUpperCase()}`;
 
@@ -454,7 +454,7 @@ const BookingsPage = () => {
                                     <TableHead>Check-out</TableHead>
                                     <TableHead>Nights</TableHead>
                                     <TableHead>Guests</TableHead>
-                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Amount (₹)</TableHead>
                                     <TableHead>Payment</TableHead>
                                     <TableHead>Created</TableHead>
                                     <TableHead>Actions</TableHead>
@@ -523,13 +523,11 @@ const BookingsPage = () => {
                                                     ) : (
                                                         <div className="flex flex-col leading-tight">
                                                             <span>
-                                                                {b.guests.adults} Adults
-                                                                {b.guests.children ? `, ${b.guests.children} Children` : ""}
-                                                                {b.guests.infants ? `, ${b.guests.infants} Infants` : ""}
+                                                                {b.guests.adults} A
+                                                                {b.guests.children ? `, ${b.guests.children} C` : ""}
                                                             </span>
                                                             <span className="text-xs text-gray-500">
-                                                                Total: {(b.guests.adults + b.guests.children)} Guests
-                                                                {b.guests.infants ? ` + ${b.guests.infants} Infants` : ""}
+                                                                Total: {(b.guests.adults + b.guests.children)}
                                                             </span>
                                                         </div>
                                                     )}
