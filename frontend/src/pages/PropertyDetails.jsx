@@ -21,6 +21,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import PropertyMap from "../components/PropertyMap";
 
 
 const amenitiesMap = amenitiesCategories
@@ -568,21 +569,9 @@ export default function PropertyDetails() {
               </p>
               <div className="w-full h-64 mt-3 overflow-hidden">
                 <div className="w-full h-full">
-                  {property.locationLink ? (
-                    <iframe
-                      width="100%"
-                      height="100%"
-                      className="rounded-[14px]"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      allowFullScreen
-                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAkdAC9-99Q_PLVkuFuYkgkxolbjrROwm0&q=${encodeURIComponent(property.locationLink)}`}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                      Map location not available
-                    </div>
-                  )}
+                  <div className="w-full h-64 mt-3 overflow-hidden">
+                    <PropertyMap link={property.locationLink} />
+                  </div>
 
                 </div>
               </div>

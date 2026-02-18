@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/auth";
 import Header from "@/components/Header";
+import "leaflet/dist/leaflet.css";
 import Footer from "@/components/Footer";
 import PhoneLoginModal from "@/components/PhoneLoginModal";
 import AppRoutes from "@/routes";
