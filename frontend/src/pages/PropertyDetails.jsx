@@ -576,7 +576,7 @@ export default function PropertyDetails() {
                       style={{ border: 0 }}
                       loading="lazy"
                       allowFullScreen
-                      src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(property.locationLink)}`}
+                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyAkdAC9-99Q_PLVkuFuYkgkxolbjrROwm0&q=${encodeURIComponent(property.locationLink)}`}
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full text-gray-500">
