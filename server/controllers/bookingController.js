@@ -525,27 +525,22 @@ export const getBookingInvoice = async (req, res) => {
 export const getBookingById = async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const userId = req.user.id;
-
-    const booking = await Booking.findOne({
-      _id: bookingId,
-      userId: userId
-    })
+    const booking = await Booking.findById(bookingId)
       .populate(
         "propertyId",
         `
-        propertyName
-        city
-        state
-        addressLine1
-        coverImage
-        contactNumber
-        checkInTime
-        checkOutTime
-        isRefundable
-        cancellationPolicy
-        refundNotes
-        `
+    propertyName
+    city
+    state
+    addressLine1
+    coverImage
+    contactNumber
+    checkInTime
+    checkOutTime
+    isRefundable
+    cancellationPolicy
+    refundNotes
+    `
       )
       .populate("userId", "firstName lastName email mobile");
 

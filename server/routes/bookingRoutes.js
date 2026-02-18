@@ -9,7 +9,7 @@ router.post("/verify-payment", verifyPayment);
 router.get("/booked-dates/:propertyId", getBookedDates);
 router.get("/user", requireAuth, getUserBookings);
 router.get("/invoice/:bookingId", requireAuth, getBookingInvoice);
-router.get("/:bookingId", requireAuth, getBookingById);
+router.get("/:bookingId", getBookingById);
 router.post("/preview-pricing", requireAuth, previewPricing);
 router.get("/cancel-preview/:bookingId", requireAuth, previewCancellation);
 router.post("/cancel/:bookingId", requireAuth, cancelBooking);

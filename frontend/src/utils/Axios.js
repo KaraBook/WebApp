@@ -18,6 +18,14 @@ Axios.interceptors.response.use(
   (r) => r,
   async (error) => {
     const original = error.config;
+
+    const isVerifyPaymentCall =
+      original?.url?.includes("verify") || original?.url?.includes("verify-payment");
+
+    if (isVerifyPaymentCall) {
+      return Promise.reject(error);
+    }
+
     if (error?.response?.status === 401 && !original._retry) {
       original._retry = true;
       try {
@@ -30,22 +38,22 @@ Axios.interceptors.response.use(
           method: SummaryApi.refreshToken.method,
           headers: { Authorization: `Bearer ${refreshToken}` },
         });
+
         const newAccess = resp.data?.data?.accessToken;
         const newRefresh = resp.data?.data?.refreshToken;
 
-        setTokens({
-          accessToken: newAccess,
-          refreshToken: newRefresh,
-        });
+        setTokens({ accessToken: newAccess, refreshToken: newRefresh });
+
         original.headers.Authorization = `Bearer ${newAccess}`;
         return Axios(original);
       } catch {
-        console.warn("Refresh failed, will retry later");
         return Promise.reject(error);
       }
     }
+
     return Promise.reject(error);
   }
 );
+
 
 export default Axios;

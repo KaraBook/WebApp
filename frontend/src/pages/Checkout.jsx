@@ -249,11 +249,6 @@ export default function Checkout() {
                     contactNumber: contact,
                     meals: includeMeals ? mealCounts : null,
                 },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                    },
-                }
             );
 
             const { order, pricing } = res.data;
@@ -283,16 +278,38 @@ export default function Checkout() {
                     try {
                         setOpeningRazorpay(false);
                         setVerifyingPayment(true);
+
                         const verifyRes = await Axios.post(
                             SummaryApi.verifyBookingPayment.url,
-                            response
+                            response,
+                            { timeout: 20000 }
                         );
-                        const bookingId = verifyRes.data.bookingId;
+
+                        console.log("✅ verifyRes.data:", verifyRes.data);
+
+                        const bookingId =
+                            verifyRes.data?.bookingId ||
+                            verifyRes.data?.data?.bookingId ||
+                            verifyRes.data?.booking?._id;
+
+                        if (!bookingId) {
+                            throw new Error("bookingId missing in verify response");
+                        }
+
                         toast.success("Payment successful!");
+                        setVerifyingPayment(false);
                         navigate(`/thank-you/${bookingId}`, { replace: true });
                     } catch (err) {
                         setVerifyingPayment(false);
-                        toast.error("Payment verified but redirect failed");
+
+                        console.log("❌ verify error full:", err);
+
+                        const msg =
+                            err?.response?.data?.message ||
+                            err?.message ||
+                            "Verify failed";
+
+                        toast.error(msg);
                     }
                 },
 
