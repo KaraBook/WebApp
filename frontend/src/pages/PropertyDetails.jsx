@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { State } from "country-state-city";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Axios from "../utils/Axios";
@@ -41,6 +42,12 @@ function useIsDesktop() {
   return isDesktop;
 }
 
+
+const getStateName = (code) => {
+  if (!code) return "";
+  const state = State.getStateByCodeAndCountry(code, "IN");
+  return state?.name || code;
+};
 
 const tomorrow = new Date();
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -367,6 +374,26 @@ export default function PropertyDetails() {
     basePriceTotal + extraAdultTotal + extraChildTotal;
 
 
+  const getEmbedMapUrl = (link) => {
+    if (!link) return null;
+
+    try {
+      if (link.includes("output=embed")) return link;
+      const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (match) {
+        return `https://www.google.com/maps?q=${match[1]},${match[2]}&output=embed`;
+      }
+      const qMatch = link.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (qMatch) {
+        return `https://www.google.com/maps?q=${qMatch[1]},${qMatch[2]}&output=embed`;
+      }
+      return `https://www.google.com/maps?q=${encodeURIComponent(link)}&output=embed`;
+
+    } catch {
+      return null;
+    }
+  };
+
 
   return (
     <div className="w-full bg-[#fff5f529]">
@@ -411,7 +438,7 @@ export default function PropertyDetails() {
                   href={property.locationLink || "#"}
                   className="flex items-center text-gray-800 hover:text-black"
                 >
-                  <Map className="w-4 h-4 mr-1" />{property.city}, {property.state}
+                  <Map className="w-4 h-4 mr-1" /> {property.city}, {getStateName(property.state)}
                 </a>
               )}
             </div>
@@ -555,22 +582,18 @@ export default function PropertyDetails() {
               <h2 className="text-xl font-semibold flex items-center gap-2 mb-3">
                 <MapPin className="w-5 h-5" /> Location
               </h2>
-              <p className="text-gray-700 mb-2">
-                {property.city}, {property.state}
+              <p className="text-gray-700 mb-2 leading-relaxed">
+                {property.addressLine1 && <>{property.addressLine1},<br /></>}
+                {property.addressLine2 && <>{property.addressLine2},<br /></>}
+                {property.city}, {getStateName(property.state)} {property.pincode && `- ${property.pincode}`}
               </p>
               <div className="w-full h-64 mt-3 overflow-hidden">
                 <div className="w-full h-full">
                   <iframe
-                    src={`https://www.google.com/maps?q=${encodeURIComponent(
-                      property.addressLine1 +
-                      " " +
-                      property.city +
-                      " " +
-                      property.state
-                    )}&output=embed`}
+                    src={getEmbedMapUrl(property.locationLink)}
                     width="100%"
                     height="100%"
-                    className="rounded-[14px] "
+                    className="rounded-[14px]"
                     style={{ border: 0 }}
                     loading="lazy"
                     allowFullScreen
