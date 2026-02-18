@@ -104,8 +104,14 @@ export function bookingConfirmationTemplate({
   <td>${formattedSubtotal}</td>
 </tr>
 
-<td style="padding:6px 0;">CGST (${halfGST}%):</td>
-<td style="padding:6px 0;">SGST (${halfGST}%):</td>
+<tr>
+  <td style="padding:6px 0;">CGST:</td>
+  <td>${formattedCGST}</td>
+</tr>
+<tr>
+  <td style="padding:6px 0;">SGST:</td>
+  <td>${formattedSGST}</td>
+</tr>
 
 <tr>
   <td style="border-top:1px solid #eee;padding-top:10px">
