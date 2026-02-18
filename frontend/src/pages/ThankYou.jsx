@@ -19,17 +19,20 @@ export default function ThankYou() {
             return;
         }
 
-        const fetchBooking = async () => {
+        const fetchBooking = async (retry = 0) => {
             try {
                 const res = await Axios.get(`/api/bookings/${bookingId}`);
                 setBooking(res.data.data);
-            } catch {
-                navigate("/", { replace: true });
+            } catch (err) {
+                if (retry < 5) {
+                    setTimeout(() => fetchBooking(retry + 1), 800);
+                } else {
+                    navigate("/", { replace: true });
+                }
             } finally {
                 setLoading(false);
             }
         };
-
         fetchBooking();
     }, [bookingId, navigate]);
 

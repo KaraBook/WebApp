@@ -367,7 +367,11 @@ Thank you for choosing us! 🏡`;
       console.error("❌ WhatsApp sending failed:", waErr);
     }
 
-    return res.json({ success: true, message: "Payment verified", booking });
+    return res.json({
+      success: true,
+      message: "Payment verified",
+      bookingId: booking._id.toString(),
+    });
   } catch (err) {
     console.error("Payment verification ERROR:", err);
     res.status(500).json({ success: false, message: "Verification failed" });

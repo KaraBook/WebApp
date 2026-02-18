@@ -287,7 +287,7 @@ export default function Checkout() {
                             SummaryApi.verifyBookingPayment.url,
                             response
                         );
-                        const bookingId = verifyRes.data.booking._id;
+                        const bookingId = verifyRes.data.bookingId;
                         toast.success("Payment successful!");
                         navigate(`/thank-you/${bookingId}`, { replace: true });
                     } catch (err) {
