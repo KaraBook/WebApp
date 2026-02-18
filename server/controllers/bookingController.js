@@ -248,6 +248,7 @@ export const verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
+    // 1️⃣ verify signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
@@ -258,6 +259,7 @@ export const verifyPayment = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid signature" });
     }
 
+    // 2️⃣ update booking status (FAST)
     const booking = await Booking.findOneAndUpdate(
       { orderId: razorpay_order_id },
       {
@@ -266,30 +268,40 @@ export const verifyPayment = async (req, res) => {
         status: "confirmed",
       },
       { new: true }
-    )
-      .populate(
-        "propertyId",
-        `
-  propertyName
-  city
-  state
-  addressLine1
-  coverImage
-  contactNumber
-  checkInTime
-  checkOutTime
-  isRefundable
-  cancellationPolicy
-  refundNotes
-  `
-      )
-      .populate("userId", "firstName lastName email mobile")
+    );
 
     if (!booking) {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
     console.log("✅ Payment verified for:", booking._id);
+
+    // 3️⃣ RESPOND IMMEDIATELY (IMPORTANT)
+    res.json({
+      success: true,
+      bookingId: booking._id.toString(),
+    });
+
+    // 4️⃣ BACKGROUND JOB STARTS HERE (after response)
+    runBookingBackgroundTasks(booking._id);
+
+  } catch (err) {
+    console.error("Payment verification ERROR:", err);
+    res.status(500).json({ success: false, message: "Verification failed" });
+  }
+};
+
+
+const runBookingBackgroundTasks = async (bookingId) => {
+  try {
+
+    const booking = await Booking.findById(bookingId)
+      .populate("propertyId")
+      .populate("userId", "firstName lastName email mobile");
+
+    if (!booking) return;
+
+    console.log("📦 Running background booking tasks");
 
     await Booking.updateMany(
       {
@@ -318,66 +330,38 @@ export const verifyPayment = async (req, res) => {
         checkOut: booking.checkOut,
         nights: booking.totalNights,
         guests: `${booking.guests.adults} Adults, ${booking.guests.children} Children`,
-
         subtotal: booking.totalAmount,
         taxAmount: booking.taxAmount,
         grandTotal: booking.grandTotal,
         paymentMethod: booking.paymentMethod,
         orderId: booking.orderId,
-
         bookingId: booking._id,
         portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
       });
 
-      try {
-        await sendMail({
-          to: booking.userId.email,
-          subject: mailData.subject,
-          html: mailData.html,
-        });
-        console.log("📩 Booking confirmation email sent →", booking.userId.email);
-      } catch (emailErr) {
-        console.error("❌ Email sending failed:", emailErr);
-      }
+      await sendMail({
+        to: booking.userId.email,
+        subject: mailData.subject,
+        html: mailData.html,
+      });
+
+      console.log("📩 Email sent");
+    }
+    if (booking.userId?.mobile) {
+      const msg = `🎉 Booking Confirmed!
+Property: ${booking.propertyId.propertyName}
+Check-in: ${new Date(booking.checkIn).toLocaleDateString("en-IN")}
+Check-out: ${new Date(booking.checkOut).toLocaleDateString("en-IN")}
+Amount Paid: ₹${booking.grandTotal}`;
+
+      await sendWhatsAppText(booking.userId.mobile, msg);
+      console.log("📱 WhatsApp sent");
     }
 
-    try {
-      if (booking.userId.mobile) {
-        const msg = `🎉 *Booking Confirmed!*
-
-Dear ${booking.userId.firstName},
-
-Your stay at *${booking.propertyId.propertyName}* is confirmed!
-
-📅 Check-in: ${new Date(booking.checkIn).toLocaleDateString("en-IN")}
-📅 Check-out: ${new Date(booking.checkOut).toLocaleDateString("en-IN")}
-🧍 Guests: ${booking.guests.adults + booking.guests.children}
-💰 Amount Paid: ₹${booking.grandTotal.toLocaleString("en-IN")}
-📍 Location: ${booking.propertyId.city}, ${booking.propertyId.state}
-
-🔗 View Booking:
-${process.env.PORTAL_URL}/traveller/bookings/${booking._id}
-
-Thank you for choosing us! 🏡`;
-
-        await sendWhatsAppText(booking.userId.mobile, msg);
-        console.log("📱 WhatsApp message sent →", booking.userId.mobile);
-      }
-    } catch (waErr) {
-      console.error("❌ WhatsApp sending failed:", waErr);
-    }
-
-    return res.json({
-      success: true,
-      message: "Payment verified",
-      bookingId: booking._id.toString(),
-    });
   } catch (err) {
-    console.error("Payment verification ERROR:", err);
-    res.status(500).json({ success: false, message: "Verification failed" });
+    console.error("Background booking tasks error:", err);
   }
 };
-
 
 
 
