@@ -374,27 +374,6 @@ export default function PropertyDetails() {
     basePriceTotal + extraAdultTotal + extraChildTotal;
 
 
-  const getEmbedMapUrl = (link) => {
-    if (!link) return null;
-
-    try {
-      const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-
-      if (match && match[1] && match[2]) {
-        const lat = match[1];
-        const lng = match[2];
-
-        return `https://maps.google.com/maps?hl=en&q=${lat},${lng}&z=15&output=embed`;
-      }
-
-      return null;
-    } catch {
-      return null;
-    }
-  };
-
-
-
   return (
     <div className="w-full bg-[#fff5f529]">
       <motion.div
@@ -589,21 +568,22 @@ export default function PropertyDetails() {
               </p>
               <div className="w-full h-64 mt-3 overflow-hidden">
                 <div className="w-full h-full">
-                  {getEmbedMapUrl(property.locationLink) ? (
+                  {property.locationLink ? (
                     <iframe
-                      src={getEmbedMapUrl(property.locationLink)}
                       width="100%"
                       height="100%"
                       className="rounded-[14px]"
                       style={{ border: 0 }}
                       loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
+                      allowFullScreen
+                      src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(property.locationLink)}`}
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full text-gray-500">
                       Map location not available
                     </div>
                   )}
+
                 </div>
               </div>
             </div>
