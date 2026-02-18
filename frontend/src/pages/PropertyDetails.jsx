@@ -563,9 +563,14 @@ export default function PropertyDetails() {
                 <MapPin className="w-5 h-5" /> Location
               </h2>
               <p className="text-gray-700 mb-2 leading-relaxed">
-                {property.addressLine1 && <>{property.addressLine1},<br /></>}
-                {property.addressLine2 && <>{property.addressLine2},<br /></>}
-                {property.city}, {getStateName(property.state)} {property.pincode && `- ${property.pincode}`}
+                {[
+                  property.addressLine1,
+                  property.city,
+                  getStateName(property.state),
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
+                {property.pincode ? ` - ${property.pincode}` : ""}
               </p>
               <div className="w-full h-64 mt-3 overflow-hidden">
                 <div className="w-full h-full">

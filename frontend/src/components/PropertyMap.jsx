@@ -2,32 +2,42 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { useMemo } from "react";
 
-// fix marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
+function extractCoords(link) {
+  if (!link) return null;
+
+  // 1) @lat,lng
+  let match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
+
+  // 2) ?q=lat,lng
+  match = link.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
+
+  // 3) ?ll=lat,lng
+  match = link.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
+
+  // 4) /place/lat,lng
+  match = link.match(/place\/(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
+
+  return null;
+}
+
 export default function PropertyMap({ link }) {
-  const coords = useMemo(() => {
-    if (!link) return null;
-
-    const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-
-    if (!match) return null;
-
-    return [parseFloat(match[1]), parseFloat(match[2])];
-  }, [link]);
+  const coords = useMemo(() => extractCoords(link), [link]);
 
   if (!coords) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-500">
-        Map location not available
+      <div className="flex items-center justify-center h-full text-gray-500 text-sm">
+        Please paste full Google Maps link (Open map → Share → Copy link)
       </div>
     );
   }
@@ -40,7 +50,7 @@ export default function PropertyMap({ link }) {
       style={{ height: "100%", width: "100%", borderRadius: "14px" }}
     >
       <TileLayer
-        attribution='&copy; OpenStreetMap contributors'
+        attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Marker position={coords}>
