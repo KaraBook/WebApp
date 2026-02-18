@@ -378,21 +378,21 @@ export default function PropertyDetails() {
     if (!link) return null;
 
     try {
-      if (link.includes("output=embed")) return link;
       const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-      if (match) {
-        return `https://www.google.com/maps?q=${match[1]},${match[2]}&output=embed`;
-      }
-      const qMatch = link.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
-      if (qMatch) {
-        return `https://www.google.com/maps?q=${qMatch[1]},${qMatch[2]}&output=embed`;
-      }
-      return `https://www.google.com/maps?q=${encodeURIComponent(link)}&output=embed`;
 
+      if (match && match[1] && match[2]) {
+        const lat = match[1];
+        const lng = match[2];
+
+        return `https://maps.google.com/maps?hl=en&q=${lat},${lng}&z=15&output=embed`;
+      }
+
+      return null;
     } catch {
       return null;
     }
   };
+
 
 
   return (
@@ -589,15 +589,21 @@ export default function PropertyDetails() {
               </p>
               <div className="w-full h-64 mt-3 overflow-hidden">
                 <div className="w-full h-full">
-                  <iframe
-                    src={getEmbedMapUrl(property.locationLink)}
-                    width="100%"
-                    height="100%"
-                    className="rounded-[14px]"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    allowFullScreen
-                  ></iframe>
+                  {getEmbedMapUrl(property.locationLink) ? (
+                    <iframe
+                      src={getEmbedMapUrl(property.locationLink)}
+                      width="100%"
+                      height="100%"
+                      className="rounded-[14px]"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      Map location not available
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
