@@ -12,24 +12,21 @@ L.Icon.Default.mergeOptions({
 function extractCoords(link) {
   if (!link) return null;
 
-  // 1) @lat,lng
-  let match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  let match = link.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
   if (match) return [parseFloat(match[1]), parseFloat(match[2])];
 
-  // 2) ?q=lat,lng
+  match = link.match(/!4d(-?\d+\.\d+)!3d(-?\d+\.\d+)/);
+  if (match) return [parseFloat(match[2]), parseFloat(match[1])];
+
+  match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
+
   match = link.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
-
-  // 3) ?ll=lat,lng
-  match = link.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
-
-  // 4) /place/lat,lng
-  match = link.match(/place\/(-?\d+\.\d+),(-?\d+\.\d+)/);
   if (match) return [parseFloat(match[1]), parseFloat(match[2])];
 
   return null;
 }
+
 
 export default function PropertyMap({ link }) {
   const coords = useMemo(() => extractCoords(link), [link]);
