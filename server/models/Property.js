@@ -36,7 +36,7 @@ const propertySchema = new mongoose.Schema({
   ownerUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
   propertyType: { type: String, enum: ["villa", "tent", "cottage", "hotel", "apartment"], required: true },
-  description: { type: String, required: true, minlength: 30, maxlength: 500 },
+  description: { type: String, required: true, minlength: 30, maxlength: 1000 },
   addressLine1: {
     type: String,
     required: true,

@@ -137,7 +137,7 @@ const AddProperty = () => {
                 password: formData.resortOwner.password
             },
             propertyType: formData.propertyType,
-            description: formData.description,
+            description: formData.description?.slice(0, 1000),
             addressLine1: formData.addressLine1,
             area: formData.area,
             addressLine2: formData.addressLine2 || undefined,
@@ -336,6 +336,10 @@ const AddProperty = () => {
         const allStates = getIndianStates();
         setStates(allStates);
     }, []);
+
+    const DESCRIPTION_LIMIT = 1000;
+    const descriptionLength = formData.description?.length || 0;
+    const remainingChars = DESCRIPTION_LIMIT - descriptionLength;
 
     return (
         <div className="md:p-3 p-0 w-full mx-auto">
@@ -589,16 +593,56 @@ const AddProperty = () => {
                             <Label htmlFor="description" className="text-sm">
                                 Description <span className="text-red-500">*</span>
                             </Label>
-                            <Textarea id="description" name="description"
-                                className="mt-2"
-                                rows={4}
+
+                            <Textarea
+                                id="description"
+                                name="description"
+                                rows={5}
+                                className={`mt-2 resize-none ${descriptionLength >= DESCRIPTION_LIMIT
+                                        ? "border-red-500 focus-visible:ring-red-500"
+                                        : ""
+                                    }`}
                                 value={formData.description}
-                                onChange={handleChange}
-                                minLength={30}
-                                maxLength={500}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+
+                                    // HARD STOP after 1000 chars
+                                    if (value.length > DESCRIPTION_LIMIT) {
+                                        return;
+                                    }
+
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        description: value,
+                                    }));
+                                }}
+                                placeholder="Minimum 30 characters. Provide full property details..."
                                 required
                             />
+
+                            {/* CHARACTER COUNTER */}
+                            <div className="flex justify-between items-center mt-1">
+                                <p
+                                    className={`text-xs ${descriptionLength < 30
+                                            ? "text-orange-500"
+                                            : descriptionLength >= DESCRIPTION_LIMIT
+                                                ? "text-red-500 font-semibold"
+                                                : "text-gray-500"
+                                        }`}
+                                >
+                                    {descriptionLength < 30
+                                        ? `Minimum ${30 - descriptionLength} more characters required`
+                                        : descriptionLength >= DESCRIPTION_LIMIT
+                                            ? "Maximum character limit reached"
+                                            : `${remainingChars} characters remaining`}
+                                </p>
+
+                                <span className="text-xs text-gray-400">
+                                    {descriptionLength} / {DESCRIPTION_LIMIT}
+                                </span>
+                            </div>
                         </div>
+
                     </>
                 )}
 

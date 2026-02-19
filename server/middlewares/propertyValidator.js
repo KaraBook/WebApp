@@ -41,7 +41,7 @@ const baseFields = {
 
   propertyType: Joi.string().valid("villa", "tent", "cottage", "hotel", "apartment").required(),
 
-  description: Joi.string().min(30).max(500).required(),
+  description: Joi.string().min(30).max(1000).required(),
 
   addressLine1: Joi.string()
     .trim()
