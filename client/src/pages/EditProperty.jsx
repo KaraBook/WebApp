@@ -49,10 +49,6 @@ const EditProperty = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-  const DESCRIPTION_LIMIT = 1000;
-  const descriptionLength = formData.description?.length || 0;
-  const remainingChars = DESCRIPTION_LIMIT - descriptionLength;
-
   const [formData, setFormData] = useState({
     propertyName: "",
     resortOwner: { firstName: "", lastName: "", email: "", mobile: "", resortEmail: "", resortMobile: "" },
@@ -90,6 +86,10 @@ const EditProperty = () => {
     refundNotes: "",
     cancellationPolicy: [],
   });
+
+  const DESCRIPTION_LIMIT = 1000;
+  const descriptionLength = formData.description?.length || 0;
+  const remainingChars = DESCRIPTION_LIMIT - descriptionLength;
 
   const nextStep = () => {
     if (currentStep < formSteps.length) setCurrentStep((prev) => prev + 1);
@@ -506,8 +506,8 @@ const EditProperty = () => {
                 name="description"
                 rows={5}
                 className={`mt-2 resize-none ${descriptionLength >= DESCRIPTION_LIMIT
-                    ? "border-red-500 focus-visible:ring-red-500"
-                    : ""
+                  ? "border-red-500 focus-visible:ring-red-500"
+                  : ""
                   }`}
                 value={formData.description}
                 onChange={(e) => {
@@ -529,10 +529,10 @@ const EditProperty = () => {
               <div className="flex justify-between items-center mt-1">
                 <p
                   className={`text-xs ${descriptionLength < 30
-                      ? "text-orange-500"
-                      : descriptionLength >= DESCRIPTION_LIMIT
-                        ? "text-red-500 font-semibold"
-                        : "text-gray-500"
+                    ? "text-orange-500"
+                    : descriptionLength >= DESCRIPTION_LIMIT
+                      ? "text-red-500 font-semibold"
+                      : "text-gray-500"
                     }`}
                 >
                   {descriptionLength < 30
