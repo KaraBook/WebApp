@@ -37,6 +37,7 @@ const AddProperty = () => {
     const [existingGallery, setExistingGallery] = useState([]);
     const [newGalleryFiles, setNewGalleryFiles] = useState([]);
     const [newGalleryPreviews, setNewGalleryPreviews] = useState([]);
+    const [errors, setErrors] = useState({});
 
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -95,6 +96,77 @@ const AddProperty = () => {
         cancellationPolicy: []
     });
 
+    const setFieldError = (field, message) => {
+        setErrors(prev => ({
+            ...prev,
+            [field]: message
+        }));
+    };
+
+    const clearFieldError = (field) => {
+        setErrors(prev => {
+            const copy = { ...prev };
+            delete copy[field];
+            return copy;
+        });
+    };
+
+    const validateStep = (stepToValidate = currentStep) => {
+        const e = {};
+
+        if (stepToValidate === 1) {
+
+            if (!formData.propertyName || formData.propertyName.trim().length < 10)
+                e.propertyName = "Property name must be at least 10 characters";
+            if (!formData.propertyType)
+                e.propertyType = "Please select property type";
+            if (!formData.resortOwner.firstName)
+                e.firstName = "Owner first name is required";
+            if (!formData.resortOwner.lastName)
+                e.lastName = "Owner last name is required";
+            if (!/^[6-9]\d{9}$/.test(formData.resortOwner.mobile))
+                e.mobile = "Enter valid 10 digit Indian mobile number";
+            if (!/\S+@\S+\.\S+/.test(formData.resortOwner.email))
+                e.email = "Enter valid email address";
+            if (!formData.resortOwner.password || formData.resortOwner.password.length < 6)
+                e.password = "Password must be at least 6 characters";
+            if (!formData.description || formData.description.length < 30)
+                e.description = "Description must be minimum 30 characters";
+        }
+
+        if (stepToValidate === 2) {
+            if (!formData.addressLine1)
+                e.addressLine1 = "Address is required";
+            if (!formData.state)
+                e.state = "Select state";
+            if (!formData.city)
+                e.city = "Select city";
+            if (!/^\d{6}$/.test(formData.pinCode))
+                e.pinCode = "Enter valid 6 digit pincode";
+            if (!/(google\.com|goo\.gl)/i.test(formData.locationLink || ""))
+                e.locationLink = "Paste valid Google Maps link";
+        }
+
+        if (stepToValidate === 3) {
+            if (!formData.maxGuests)
+                e.maxGuests = "Enter max guests";
+            if (Number(formData.baseGuests) > Number(formData.maxGuests))
+                e.baseGuests = "Base guests cannot exceed max guests";
+            if (!formData.pricingPerNightWeekdays)
+                e.weekdayPrice = "Enter weekday price";
+            if (!formData.pricingPerNightWeekend)
+                e.weekendPrice = "Enter weekend price";
+            if (!formData.checkInTime)
+                e.checkIn = "Check-in time required";
+            if (!formData.checkOutTime)
+                e.checkOut = "Check-out time required";
+            if (formData.isRefundable && !formData.refundNotes)
+                e.refundNotes = "Refund policy required for refundable property";
+        }
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
+
     const nextStep = () => {
         if (currentStep < formSteps.length) setCurrentStep((p) => p + 1);
     };
@@ -105,22 +177,20 @@ const AddProperty = () => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
-
-        if (name === "state") {
-            const stateCode = value;
-            const selectedCities = getCitiesByState(stateCode);
-            setCities(selectedCities);
-            setFormData((prev) => ({
+        setFormData((prev) => {
+            const updated = {
                 ...prev,
-                state: value,
-                city: "",
-            }));
-        }
+                [name]: type === "checkbox" ? checked : value,
+            };
+            if (name === "state") {
+                const selectedCities = getCitiesByState(value);
+                setCities(selectedCities);
+                updated.city = "";
+            }
+            return updated;
+        });
     };
+
 
     const buildDraftPayload = () => {
         const num = (v) => (v === "" || v === null || v === undefined ? undefined : Number(v));
@@ -261,17 +331,6 @@ const AddProperty = () => {
     };
 
 
-    useEffect(() => {
-        if (
-            formData.baseGuests &&
-            formData.maxGuests &&
-            Number(formData.baseGuests) > Number(formData.maxGuests)
-        ) {
-            toast.error("Base guests cannot exceed max guests");
-        }
-    }, [formData.baseGuests, formData.maxGuests]);
-
-
     const finalizeMedia = async () => {
         if (!propertyId) {
             await createDraft();
@@ -325,10 +384,32 @@ const AddProperty = () => {
     };
 
     const handleNext = async () => {
+        const valid = validateStep();
+        if (!valid) {
+            toast.error("Please correct the highlighted fields");
+
+            setTimeout(() => {
+                const el = document.querySelector(".border-red-500");
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 100);
+
+            return;
+        }
         if (currentStep === 5) {
+            for (let i = 1; i <= 3; i++) {
+                const ok = validateStep(i);
+                if (!ok) {
+                    setCurrentStep(i);
+                    toast.error("Please complete all previous steps");
+                    return;
+                }
+            }
+
             await createDraft();
-        } else {
+        }
+        else {
             nextStep();
+            window.scrollTo({ top: 0, behavior: "smooth" });
         }
     };
 
@@ -336,6 +417,11 @@ const AddProperty = () => {
         const allStates = getIndianStates();
         setStates(allStates);
     }, []);
+
+    const fieldClass = (field) =>
+        errors[field]
+            ? "mt-2 border-red-500 focus-visible:ring-red-500"
+            : "mt-2";
 
     const DESCRIPTION_LIMIT = 1000;
     const descriptionLength = formData.description?.length || 0;
@@ -364,8 +450,23 @@ const AddProperty = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => {
+
+                                                        if (step.id <= currentStep) {
+                                                            setCurrentStep(step.id);
+                                                            return;
+                                                        }
+                                                        for (let i = 1; i < step.id; i++) {
+                                                            const ok = validateStep(i);
+                                                            if (!ok) {
+                                                                setCurrentStep(i);
+                                                                toast.error("Please complete previous steps first");
+                                                                return;
+                                                            }
+                                                        }
                                                         setCurrentStep(step.id);
                                                     }}
+
+
                                                     className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-colors duration-200
                                                            ${completed
                                                             ? "bg-black text-white border-black hover:bg-gray-800"
@@ -402,21 +503,33 @@ const AddProperty = () => {
                             <Input
                                 id="propertyName"
                                 name="propertyName"
-                                className="mt-2"
+                                className={fieldClass("propertyName")}
                                 value={formData.propertyName}
-                                onChange={handleChange}
-                                required
+                                onChange={(e) => {
+                                    handleChange(e);
+                                    clearFieldError("propertyName");
+                                }}
                             />
+
+                            {errors.propertyName && (
+                                <p className="text-red-500 text-xs mt-1">{errors.propertyName}</p>
+                            )}
                         </div>
 
                         <div className="md:w-[48%] w-[100%]">
-                            <SingleSelectButtons label="Property Type"
+                            <SingleSelectButtons
+                                label="Property Type"
                                 options={propertyTypeOptions}
                                 selected={formData.propertyType}
-                                onChange={(selected) =>
-                                    setFormData((prev) => ({ ...prev, propertyType: selected }))
-                                }
+                                onChange={(selected) => {
+                                    setFormData((prev) => ({ ...prev, propertyType: selected }));
+                                    clearFieldError("propertyType");
+                                }}
                             />
+
+                            {errors.propertyType && (
+                                <p className="text-red-500 text-xs mt-1">{errors.propertyType}</p>
+                            )}
                         </div>
 
                         {/* First Name */}
@@ -424,20 +537,21 @@ const AddProperty = () => {
                             <Label htmlFor="resortOwnerFirstName" className="text-sm">
                                 Resort Owner First Name <span className="text-red-500">*</span>
                             </Label>
-                            <Input id="resortOwnerFirstName" name="resortOwnerFirstName" type="text"
-                                className="mt-2"
+                            <Input
+                                className={fieldClass("firstName")}
                                 value={formData.resortOwner.firstName}
-                                onChange={(e) =>
-                                    setFormData((prev) => ({
+                                onChange={(e) => {
+                                    setFormData(prev => ({
                                         ...prev,
-                                        resortOwner: {
-                                            ...prev.resortOwner,
-                                            firstName: e.target.value,
-                                        },
-                                    }))
-                                }
-                                required
+                                        resortOwner: { ...prev.resortOwner, firstName: e.target.value }
+                                    }));
+                                    clearFieldError("firstName");
+                                }}
                             />
+
+                            {errors.firstName && (
+                                <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
+                            )}
                         </div>
 
                         {/* Last Name */}
@@ -445,20 +559,21 @@ const AddProperty = () => {
                             <Label htmlFor="resortOwnerLastName" className="text-sm">
                                 Resort Owner Last Name <span className="text-red-500">*</span>
                             </Label>
-                            <Input id="resortOwnerLastName" name="resortOwnerLastName" type="text"
-                                className="mt-2"
+                            <Input
+                                className={fieldClass("lastName")}
                                 value={formData.resortOwner.lastName}
-                                onChange={(e) =>
-                                    setFormData((prev) => ({
+                                onChange={(e) => {
+                                    setFormData(prev => ({
                                         ...prev,
-                                        resortOwner: {
-                                            ...prev.resortOwner,
-                                            lastName: e.target.value,
-                                        },
-                                    }))
-                                }
-                                required
+                                        resortOwner: { ...prev.resortOwner, lastName: e.target.value }
+                                    }));
+                                    clearFieldError("lastName");
+                                }}
                             />
+
+                            {errors.lastName && (
+                                <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+                            )}
                         </div>
 
                         {/* Email */}
@@ -466,20 +581,21 @@ const AddProperty = () => {
                             <Label htmlFor="resortOwnerEmail" className="text-sm">
                                 Resort Owner Email <span className="text-red-500">*</span>
                             </Label>
-                            <Input id="resortOwnerEmail" name="resortOwnerEmail" type="email"
-                                className="mt-2"
+                            <Input
+                                className={fieldClass("email")}
                                 value={formData.resortOwner.email}
-                                onChange={(e) =>
-                                    setFormData((prev) => ({
+                                onChange={(e) => {
+                                    setFormData(prev => ({
                                         ...prev,
-                                        resortOwner: {
-                                            ...prev.resortOwner,
-                                            email: e.target.value,
-                                        },
-                                    }))
-                                }
-                                required
+                                        resortOwner: { ...prev.resortOwner, email: e.target.value }
+                                    }));
+                                    clearFieldError("email");
+                                }}
                             />
+
+                            {errors.email && (
+                                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                            )}
                         </div>
 
                         <div className="md:w-[48%] w-[100%] flex justify-between ">
@@ -491,20 +607,20 @@ const AddProperty = () => {
 
                                 <Input
                                     type={showPassword ? "text" : "password"}
-                                    className="mt-2 pr-10"
+                                    className={fieldClass("password")}
                                     value={formData.resortOwner.password}
-                                    onChange={(e) =>
-                                        setFormData((prev) => ({
+                                    onChange={(e) => {
+                                        setFormData(prev => ({
                                             ...prev,
-                                            resortOwner: {
-                                                ...prev.resortOwner,
-                                                password: e.target.value,
-                                            },
-                                        }))
-                                    }
-                                    minLength={6}
-                                    required
+                                            resortOwner: { ...prev.resortOwner, password: e.target.value }
+                                        }));
+                                        clearFieldError("password");
+                                    }}
                                 />
+
+                                {errors.password && (
+                                    <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                                )}
 
                                 <button
                                     type="button"
@@ -521,24 +637,24 @@ const AddProperty = () => {
                                 <Label htmlFor="resortOwnerMobile" className="text-sm">
                                     Resort Owner Mobile Number <span className="text-red-500">*</span>
                                 </Label>
-                                <Input id="resortOwnerMobile" name="resortOwnerMobile" type="tel"
-                                    className="mt-2"
+                                <Input
+                                    className={fieldClass("mobile")}
                                     value={formData.resortOwner.mobile}
                                     onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (/^\d*$/.test(value)) {
-                                            setFormData((prev) => ({
+                                        const v = e.target.value;
+                                        if (/^\d*$/.test(v)) {
+                                            setFormData(prev => ({
                                                 ...prev,
-                                                resortOwner: {
-                                                    ...prev.resortOwner,
-                                                    mobile: value,
-                                                },
+                                                resortOwner: { ...prev.resortOwner, mobile: v }
                                             }));
+                                            clearFieldError("mobile");
                                         }
                                     }}
-                                    maxLength={10}
-                                    required
                                 />
+
+                                {errors.mobile && (
+                                    <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>
+                                )}
                             </div>
                         </div>
 
@@ -599,14 +715,13 @@ const AddProperty = () => {
                                 name="description"
                                 rows={5}
                                 className={`mt-2 resize-none ${descriptionLength >= DESCRIPTION_LIMIT
-                                        ? "border-red-500 focus-visible:ring-red-500"
-                                        : ""
+                                    ? "border-red-500 focus-visible:ring-red-500"
+                                    : ""
                                     }`}
                                 value={formData.description}
                                 onChange={(e) => {
                                     const value = e.target.value;
 
-                                    // HARD STOP after 1000 chars
                                     if (value.length > DESCRIPTION_LIMIT) {
                                         return;
                                     }
@@ -615,6 +730,8 @@ const AddProperty = () => {
                                         ...prev,
                                         description: value,
                                     }));
+
+                                    if (value.length >= 30) clearFieldError("description");
                                 }}
                                 placeholder="Minimum 30 characters. Provide full property details..."
                                 required
@@ -624,10 +741,10 @@ const AddProperty = () => {
                             <div className="flex justify-between items-center mt-1">
                                 <p
                                     className={`text-xs ${descriptionLength < 30
-                                            ? "text-orange-500"
-                                            : descriptionLength >= DESCRIPTION_LIMIT
-                                                ? "text-red-500 font-semibold"
-                                                : "text-gray-500"
+                                        ? "text-orange-500"
+                                        : descriptionLength >= DESCRIPTION_LIMIT
+                                            ? "text-red-500 font-semibold"
+                                            : "text-gray-500"
                                         }`}
                                 >
                                     {descriptionLength < 30
@@ -641,6 +758,9 @@ const AddProperty = () => {
                                     {descriptionLength} / {DESCRIPTION_LIMIT}
                                 </span>
                             </div>
+                            {errors.description && (
+                                <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+                            )}
                         </div>
 
                     </>
@@ -653,12 +773,20 @@ const AddProperty = () => {
                             <Label htmlFor="addressLine1" className="text-sm">
                                 Address Line 1<span className="text-red-500"> *</span>
                             </Label>
-                            <Input id="addressLine1" name="addressLine1" type="text"
-                                className="mt-2"
+                            <Input
+                                id="addressLine1"
+                                name="addressLine1"
+                                type="text"
+                                className={fieldClass("addressLine1")}
                                 value={formData.addressLine1}
-                                onChange={handleChange}
-                                required
+                                onChange={(e) => {
+                                    handleChange(e);
+                                    clearFieldError("addressLine1");
+                                }}
                             />
+                            {errors.addressLine1 && (
+                                <p className="text-red-500 text-xs mt-1">{errors.addressLine1}</p>
+                            )}
                         </div>
 
                         <div className="md:w-[48%] w-[100%]">
@@ -681,6 +809,7 @@ const AddProperty = () => {
                                 value={formData.state}
                                 onValueChange={(value) => {
                                     setFormData((prev) => ({ ...prev, state: value, city: "" }));
+                                    clearFieldError("state");
                                     const selectedCities = getCitiesByState(value);
                                     setCities(selectedCities);
                                 }}
@@ -697,6 +826,8 @@ const AddProperty = () => {
                                     ))}
                                 </SelectContent>
                             </Select>
+
+                            {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
                         </div>
 
 
@@ -706,7 +837,10 @@ const AddProperty = () => {
                             </Label>
                             <Select
                                 value={formData.city}
-                                onValueChange={(value) => handleChange({ target: { name: "city", value } })}
+                                onValueChange={(value) => {
+                                    handleChange({ target: { name: "city", value } });
+                                    clearFieldError("city");
+                                }}
                             >
                                 <SelectTrigger className="w-full border p-2 rounded mt-2">
                                     <SelectValue placeholder="Select City" />
@@ -719,6 +853,7 @@ const AddProperty = () => {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
                         </div>
 
 
@@ -746,19 +881,18 @@ const AddProperty = () => {
                                 Pin Code <span className="text-red-500">*</span>
                             </Label>
                             <Input
-                                id="pinCode" type="text" name="pinCode" maxLength={6} className="mt-2"
+                                id="pinCode" type="text" name="pinCode" maxLength={6} className={fieldClass("pinCode")}
                                 value={formData.pinCode}
                                 onChange={(e) => {
                                     const value = e.target.value;
                                     if (/^\d{0,6}$/.test(value)) {
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            pinCode: value,
-                                        }));
+                                        setFormData((prev) => ({ ...prev, pinCode: value }));
+                                        clearFieldError("pinCode");
                                     }
                                 }}
                                 required
                             />
+                            {errors.pinCode && <p className="text-red-500 text-xs mt-1">{errors.pinCode}</p>}
                         </div>
 
                         <div className="md:w-[48%] w-[100%]">
@@ -770,14 +904,15 @@ const AddProperty = () => {
                                 value={formData.locationLink}
                                 onChange={(e) => {
                                     const value = e.target.value;
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        locationLink: value,
-                                    }));
+                                    setFormData((prev) => ({ ...prev, locationLink: value }));
+                                    clearFieldError("locationLink");
                                 }}
                                 pattern="https://.*"
                                 required
                             />
+                            {errors.locationLink && (
+                                <p className="text-red-500 text-xs mt-1">{errors.locationLink}</p>
+                            )}
                         </div>
 
                     </>
@@ -893,6 +1028,7 @@ const AddProperty = () => {
                                     min={1}
                                     max={999}
                                 />
+                                {errors.maxGuests && <p className="text-red-500 text-xs mt-1">{errors.maxGuests}</p>}
                             </div>
                         </div>
 
@@ -909,6 +1045,7 @@ const AddProperty = () => {
                                     min={1}
                                     max={formData.maxGuests || 999}
                                 />
+                                {errors.baseGuests && <p className="text-red-500 text-xs mt-1">{errors.baseGuests}</p>}
                             </div>
                         </div>
 
@@ -918,7 +1055,8 @@ const AddProperty = () => {
                             </Label>
                             <div className="mt-2">
                                 <Input
-                                    id="pricingPerNightWeekdays" name="pricingPerNightWeekdays" type="text" inputMode="numeric" className="mt-2"
+                                    id="pricingPerNightWeekdays" name="pricingPerNightWeekdays" type="text" inputMode="numeric"
+                                    className={fieldClass("weekdayPrice")}
                                     value={formData.pricingPerNightWeekdays}
                                     onChange={(e) => {
                                         const value = e.target.value;
@@ -927,10 +1065,12 @@ const AddProperty = () => {
                                                 ...prev,
                                                 pricingPerNightWeekdays: value,
                                             }));
+                                            clearFieldError("weekdayPrice");
                                         }
                                     }}
                                     required
                                 />
+                                {errors.weekdayPrice && <p className="text-red-500 text-xs mt-1">{errors.weekdayPrice}</p>}
                             </div>
                         </div>
 
@@ -950,10 +1090,12 @@ const AddProperty = () => {
                                                 ...prev,
                                                 pricingPerNightWeekend: value,
                                             }));
+                                            clearFieldError("weekendPrice");
                                         }
                                     }}
                                     required
                                 />
+                                {errors.weekendPrice && <p className="text-red-500 text-xs mt-1">{errors.weekendPrice}</p>}
                             </div>
                         </div>
 
@@ -995,15 +1137,22 @@ const AddProperty = () => {
                         <CustomTimePicker
                             label="Check-In Time"
                             value={formData.checkInTime}
-                            onChange={(val) => setFormData({ ...formData, checkInTime: val })}
-                            className="w-full"
+                            onChange={(val) => {
+                                setFormData({ ...formData, checkInTime: val });
+                                clearFieldError("checkIn");
+                            }}
                         />
+                        {errors.checkIn && <p className="text-red-500 text-xs mt-1">{errors.checkIn}</p>}
 
                         <CustomTimePicker
                             label="Check-Out Time"
                             value={formData.checkOutTime}
-                            onChange={(val) => setFormData({ ...formData, checkOutTime: val })}
+                            onChange={(val) => {
+                                setFormData({ ...formData, checkOutTime: val });
+                                clearFieldError("checkOut");
+                            }}
                         />
+                        {errors.checkOut && <p className="text-red-500 text-xs mt-1">{errors.checkOut}</p>}
 
                         <div className="md:w-[48%] w-[100%] flex flex-col gap-2">
                             <Label className="text-sm">
@@ -1041,13 +1190,12 @@ const AddProperty = () => {
                                     className="w-full mt-2 border rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-black"
                                     placeholder="Example: 100% refund if cancelled 7 days before check-in"
                                     value={formData.refundNotes}
-                                    onChange={(e) =>
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            refundNotes: e.target.value,
-                                        }))
-                                    }
+                                    onChange={(e) => {
+                                        setFormData((prev) => ({ ...prev, refundNotes: e.target.value }));
+                                        clearFieldError("refundNotes");
+                                    }}
                                 />
+                                {errors.refundNotes && <p className="text-red-500 text-xs mt-1">{errors.refundNotes}</p>}
                             </div>
                         )}
 
@@ -1367,6 +1515,12 @@ const AddProperty = () => {
                     <button
                         type="button"
                         onClick={async () => {
+                            const ok = validateStep(5);
+                            if (!ok) {
+                                toast.error("Please complete KYC details");
+                                setCurrentStep(5);
+                                return;
+                            }
                             if (!propertyId) {
                                 await createDraft();
                             }
