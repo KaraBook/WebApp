@@ -39,9 +39,7 @@ const FileUploadsSection = ({
     if (coverImagePreview) URL.revokeObjectURL(coverImagePreview);
     setCoverImageFile && setCoverImageFile(file);
     setCoverImagePreview && setCoverImagePreview(URL.createObjectURL(file));
-    if (errors.coverImage) {
-      delete errors.coverImage;
-    }
+    if (clearFieldError) clearFieldError("coverImage");
     if (coverInputRef.current) coverInputRef.current.value = "";
   };
 
@@ -89,6 +87,21 @@ const FileUploadsSection = ({
     setNewGalleryPreviews((prev) => [...prev, ...previews]);
 
     if (galleryInputRef.current) galleryInputRef.current.value = "";
+
+    const MAX_SIZE = 5 * 1024 * 1024; 
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        alert("Only JPG, PNG, WEBP allowed");
+        return;
+      }
+
+      if (file.size > MAX_SIZE) {
+        alert("Image size must be less than 5MB");
+        return;
+      }
+    }
   };
 
   const removeExisting = (index) => {
@@ -269,27 +282,28 @@ const FileUploadsSection = ({
 
               {/* Newly added in this session */}
               {newGalleryPreviews.map((src, index) => (
-                <div key={`new-${index}`} className="relative w-20 h-20">
-                  <img
-                    src={src}
-                    alt={`New ${index}`}
-                    className="w-full h-full object-cover rounded"
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="destructive"
-                    onClick={() => removeNew(index)}
-                    className="absolute top-1 right-1 p-1 h-5 w-5"
-                    title="Remove"
-                  >
-                    <RxCross2 size={12} />
-                  </Button>
-                  {newGalleryFiles[index]?.name && (
-                    <div className="absolute -bottom-5 left-0 right-0 text-[10px] text-center truncate">
-                      {newGalleryFiles[index].name}
-                    </div>
-                  )}
+                <div key={`new-${index}`} className="w-20">
+                  <div className="relative w-20 h-20">
+                    <img
+                      src={src}
+                      alt={`New ${index}`}
+                      className="w-full h-full object-cover rounded"
+                    />
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="destructive"
+                      onClick={() => removeNew(index)}
+                      className="absolute top-1 right-1 p-1 h-5 w-5"
+                    >
+                      <RxCross2 size={12} />
+                    </Button>
+                  </div>
+
+                  {/* FILE NAME BELOW IMAGE */}
+                  <p className="text-[10px] text-center mt-1 truncate">
+                    {newGalleryFiles[index]?.name}
+                  </p>
                 </div>
               ))}
             </div>

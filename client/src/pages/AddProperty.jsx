@@ -398,7 +398,12 @@ const AddProperty = () => {
             toast.success("Property created successfully!");
             navigate("/properties");
         } catch (err) {
-            toast.error(err?.response?.data?.message || "Failed to upload media");
+            const message =
+                err?.response?.data?.message ||
+                err?.response?.data?.error ||
+                "Something went wrong while uploading media";
+
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -1186,7 +1191,7 @@ const AddProperty = () => {
                             <CustomTimePicker
                                 label={
                                     <>
-                                        Check-In Time <span className="text-red-500">*</span>
+                                        Check-In Time
                                     </>
                                 }
                                 value={formData.checkInTime}
@@ -1207,7 +1212,7 @@ const AddProperty = () => {
                             <CustomTimePicker
                                 label={
                                     <>
-                                        Check-Out Time <span className="text-red-500">*</span>
+                                        Check-Out Time
                                     </>
                                 }
                                 value={formData.checkOutTime}
