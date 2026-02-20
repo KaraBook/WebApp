@@ -137,6 +137,8 @@ const AddProperty = () => {
         if (stepToValidate === 2) {
             if (!formData.addressLine1)
                 e.addressLine1 = "Address is required";
+            if (!formData.area || formData.area.trim().length === 0)
+                e.area = "Area is required";
             if (!formData.state)
                 e.state = "Select state";
             if (!formData.city)
@@ -148,8 +150,16 @@ const AddProperty = () => {
         }
 
         if (stepToValidate === 3) {
-            if (!formData.maxGuests)
+            if (!formData.minStayNights || Number(formData.minStayNights) < 1)
+                e.minStayNights = "Minimum stay is required";
+            if (!formData.bedrooms || Number(formData.bedrooms) < 1)
+                e.bedrooms = "Bedrooms required";
+            if (!formData.bathrooms || Number(formData.bathrooms) < 1)
+                e.bathrooms = "Bathrooms required";
+            if (!formData.maxGuests || Number(formData.maxGuests) < 1)
                 e.maxGuests = "Enter max guests";
+            if (!formData.baseGuests || Number(formData.baseGuests) < 1)
+                e.baseGuests = "Enter base guests";
             if (Number(formData.baseGuests) > Number(formData.maxGuests))
                 e.baseGuests = "Base guests cannot exceed max guests";
             if (!formData.pricingPerNightWeekdays)
@@ -162,6 +172,24 @@ const AddProperty = () => {
                 e.checkOut = "Check-out time required";
             if (formData.isRefundable && !formData.refundNotes)
                 e.refundNotes = "Refund policy required for refundable property";
+        }
+        if (stepToValidate === 4) {
+            if (!formData.foodAvailability || formData.foodAvailability.length === 0) {
+                e.foodAvailability = "Please select at least one food option";
+            }
+        }
+        if (stepToValidate === 6) {
+            const totalGalleryCount =
+                (existingGallery?.length || 0) + (newGalleryFiles?.length || 0);
+            if (!coverImageFile && !coverImagePreview) {
+                e.coverImage = "Cover image is required";
+            }
+            if (totalGalleryCount < 3) {
+                e.galleryPhotos = "Minimum 3 gallery images required";
+            }
+            if (totalGalleryCount > 10) {
+                e.galleryPhotos = "Maximum 10 gallery images allowed";
+            }
         }
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -334,20 +362,13 @@ const AddProperty = () => {
     const finalizeMedia = async () => {
         if (!propertyId) {
             await createDraft();
-            toast.error("Draft not created yet. Please complete previous step.");
             return;
         }
-
         const totalGalleryCount =
             (existingGallery?.length || 0) + (newGalleryFiles?.length || 0);
-
-        if (!coverImageFile && !coverImagePreview) {
-            toast.error("Please add a cover image.");
-            return;
-        }
-
-        if (totalGalleryCount < 3) {
-            toast.error("Please add at least 3 gallery images.");
+        const valid = validateStep(6);
+        if (!valid) {
+            toast.error("Please fix media upload errors");
             return;
         }
 
@@ -518,7 +539,11 @@ const AddProperty = () => {
 
                         <div className="md:w-[48%] w-[100%]">
                             <SingleSelectButtons
-                                label="Property Type"
+                                label={
+                                    <>
+                                        Property Type <span className="text-red-500">*</span>
+                                    </>
+                                }
                                 options={propertyTypeOptions}
                                 selected={formData.propertyType}
                                 onChange={(selected) => {
@@ -861,8 +886,12 @@ const AddProperty = () => {
                             <Label htmlFor="area" className="text-sm">
                                 Area <span className="text-red-500">*</span>
                             </Label>
+
                             <Input
-                                id="area" type="text" name="area" className="mt-2"
+                                id="area"
+                                name="area"
+                                type="text"
+                                className={fieldClass("area")}
                                 value={formData.area}
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -870,9 +899,13 @@ const AddProperty = () => {
                                         ...prev,
                                         area: value,
                                     }));
+                                    clearFieldError("area");
                                 }}
-                                required
                             />
+
+                            {errors.area && (
+                                <p className="text-red-500 text-xs mt-1">{errors.area}</p>
+                            )}
                         </div>
 
 
@@ -974,12 +1007,16 @@ const AddProperty = () => {
                             <div className="mt-2">
                                 <QuantityBox
                                     value={formData.minStayNights}
-                                    onChange={(val) =>
-                                        setFormData((prev) => ({ ...prev, minStayNights: val }))
-                                    }
+                                    onChange={(val) => {
+                                        setFormData((prev) => ({ ...prev, minStayNights: val }));
+                                        clearFieldError("minStayNights");
+                                    }}
                                     min={1}
                                     max={999}
                                 />
+                                {errors.minStayNights && (
+                                    <p className="text-red-500 text-xs mt-1">{errors.minStayNights}</p>
+                                )}
                             </div>
                         </div>
 
@@ -990,12 +1027,16 @@ const AddProperty = () => {
                             <div className="mt-2">
                                 <QuantityBox
                                     value={formData.bedrooms}
-                                    onChange={(val) =>
-                                        setFormData((prev) => ({ ...prev, bedrooms: val }))
-                                    }
+                                    onChange={(val) => {
+                                        setFormData((prev) => ({ ...prev, bedrooms: val }));
+                                        clearFieldError("bedrooms");
+                                    }}
                                     min={1}
                                     max={999}
                                 />
+                                {errors.bedrooms && (
+                                    <p className="text-red-500 text-xs mt-1">{errors.bedrooms}</p>
+                                )}
                             </div>
                         </div>
 
@@ -1006,12 +1047,16 @@ const AddProperty = () => {
                             <div className="mt-2">
                                 <QuantityBox
                                     value={formData.bathrooms}
-                                    onChange={(val) =>
-                                        setFormData((prev) => ({ ...prev, bathrooms: val }))
-                                    }
+                                    onChange={(val) => {
+                                        setFormData((prev) => ({ ...prev, bathrooms: val }));
+                                        clearFieldError("bathrooms");
+                                    }}
                                     min={1}
                                     max={999}
                                 />
+                                {errors.bathrooms && (
+                                    <p className="text-red-500 text-xs mt-1">{errors.bathrooms}</p>
+                                )}
                             </div>
                         </div>
 
@@ -1039,13 +1084,16 @@ const AddProperty = () => {
                             <div className="mt-2">
                                 <QuantityBox
                                     value={formData.baseGuests}
-                                    onChange={(val) =>
-                                        setFormData((prev) => ({ ...prev, baseGuests: val }))
-                                    }
+                                    onChange={(val) => {
+                                        setFormData((prev) => ({ ...prev, baseGuests: val }));
+                                        clearFieldError("baseGuests");
+                                    }}
                                     min={1}
                                     max={formData.maxGuests || 999}
                                 />
-                                {errors.baseGuests && <p className="text-red-500 text-xs mt-1">{errors.baseGuests}</p>}
+                                {errors.baseGuests && (
+                                    <p className="text-red-500 text-xs mt-1">{errors.baseGuests}</p>
+                                )}
                             </div>
                         </div>
 
@@ -1134,26 +1182,47 @@ const AddProperty = () => {
                         </div>
 
 
-                        <CustomTimePicker
-                            label="Check-In Time"
-                            value={formData.checkInTime}
-                            onChange={(val) => {
-                                setFormData({ ...formData, checkInTime: val });
-                                clearFieldError("checkIn");
-                            }}
-                        />
-                        {errors.checkIn && <p className="text-red-500 text-xs mt-1">{errors.checkIn}</p>}
+                        <div className="md:w-[48%] w-[100%]">
+                            <CustomTimePicker
+                                label={
+                                    <>
+                                        Check-In Time <span className="text-red-500">*</span>
+                                    </>
+                                }
+                                value={formData.checkInTime}
+                                onChange={(val) => {
+                                    setFormData({ ...formData, checkInTime: val });
+                                    clearFieldError("checkIn");
+                                }}
+                                error={!!errors.checkIn}
+                            />
+                            {errors.checkIn && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.checkIn}
+                                </p>
+                            )}
+                        </div>
 
-                        <CustomTimePicker
-                            label="Check-Out Time"
-                            value={formData.checkOutTime}
-                            onChange={(val) => {
-                                setFormData({ ...formData, checkOutTime: val });
-                                clearFieldError("checkOut");
-                            }}
-                        />
-                        {errors.checkOut && <p className="text-red-500 text-xs mt-1">{errors.checkOut}</p>}
-
+                        <div className="md:w-[48%] w-[100%]">
+                            <CustomTimePicker
+                                label={
+                                    <>
+                                        Check-Out Time <span className="text-red-500">*</span>
+                                    </>
+                                }
+                                value={formData.checkOutTime}
+                                onChange={(val) => {
+                                    setFormData({ ...formData, checkOutTime: val });
+                                    clearFieldError("checkOut");
+                                }}
+                                error={!!errors.checkOut}
+                            />
+                            {errors.checkOut && (
+                                <p className="text-red-500 text-xs mt-1">
+                                    {errors.checkOut}
+                                </p>
+                            )}
+                        </div>
                         <div className="md:w-[48%] w-[100%] flex flex-col gap-2">
                             <Label className="text-sm">
                                 Is this property refundable?
@@ -1254,13 +1323,24 @@ const AddProperty = () => {
                 {currentStep === 4 && (
                     <>
                         <div className="w-[100%]">
-                            <MultiSelectButtons label="Food Availability"
+                            <MultiSelectButtons
+                                label={
+                                    <>
+                                        Food Availability <span className="text-red-500">*</span>
+                                    </>
+                                }
                                 options={foodOptions}
                                 selected={formData.foodAvailability}
-                                onChange={(selected) =>
-                                    setFormData((prev) => ({ ...prev, foodAvailability: selected }))
-                                }
+                                onChange={(selected) => {
+                                    setFormData((prev) => ({ ...prev, foodAvailability: selected }));
+                                    clearFieldError("foodAvailability");
+                                }}
                             />
+                            {errors.foodAvailability && (
+                                <p className="text-red-500 text-xs mt-2">
+                                    {errors.foodAvailability}
+                                </p>
+                            )}
                         </div>
 
                         <div className="w-[100%]">
@@ -1452,6 +1532,8 @@ const AddProperty = () => {
                                 shopActPreview={shopActPreview}
                                 setShopActPreview={setShopActPreview}
                                 showFields={{ coverImage: false, galleryPhotos: false, shopAct: true }}
+                                errors={errors}
+                                clearFieldError={clearFieldError}
                             />
                         </div>
 
@@ -1486,6 +1568,8 @@ const AddProperty = () => {
                             setNewGalleryPreviews={setNewGalleryPreviews}
 
                             showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+                            errors={errors}
+                            clearFieldError={clearFieldError}
                         />
 
 

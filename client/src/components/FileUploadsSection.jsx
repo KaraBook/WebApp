@@ -16,30 +16,32 @@ const FileUploadsSection = ({
   setShopActPreview,
 
   existingGallery = [],
-  setExistingGallery = () => {},
+  setExistingGallery = () => { },
   newGalleryFiles = [],
-  setNewGalleryFiles = () => {},
+  setNewGalleryFiles = () => { },
   newGalleryPreviews = [],
-  setNewGalleryPreviews = () => {},
+  setNewGalleryPreviews = () => { },
 
   showFields = { coverImage: true, shopAct: true, galleryPhotos: true },
 
   minGallery = 3,
   maxGallery = 10,
+  errors = {},
+  clearFieldError,
 }) => {
   const coverInputRef = useRef(null);
   const galleryInputRef = useRef(null);
   const shopActInputRef = useRef(null);
 
-  // -------- Cover Image ----------
   const handleCoverImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (coverImagePreview) URL.revokeObjectURL(coverImagePreview);
-
     setCoverImageFile && setCoverImageFile(file);
     setCoverImagePreview && setCoverImagePreview(URL.createObjectURL(file));
+    if (errors.coverImage) {
+      delete errors.coverImage;
+    }
     if (coverInputRef.current) coverInputRef.current.value = "";
   };
 
@@ -113,7 +115,8 @@ const FileUploadsSection = ({
             Cover Image <span className="text-red-500">*</span>
           </Label>
 
-          <div className="mt-2 border flex items-center gap-2 bg-white p-4 rounded-[10px] ">
+          <div className={`mt-2 flex items-center gap-2 bg-white p-4 rounded-[10px] border 
+               ${errors.coverImage ? "border-red-500" : "border-gray-300"} `}>
             <Input
               id="coverImage"
               type="file"
@@ -151,6 +154,11 @@ const FileUploadsSection = ({
                 <RxCross2 size={12} />
               </Button>
             </div>
+          )}
+          {errors.coverImage && (
+            <p className="text-red-500 text-xs mt-2">
+              {errors.coverImage}
+            </p>
           )}
         </div>
       )}
@@ -211,7 +219,8 @@ const FileUploadsSection = ({
             Gallery Photos (Min {minGallery}, Max {maxGallery})
           </Label>
 
-          <div className="mt-2 flex items-center gap-2 bg-white p-4 rounded-[10px] border">
+          <div className={`mt-2 flex items-center gap-2 bg-white p-4 rounded-[10px] border
+               ${errors.galleryPhotos ? "border-red-500" : "border-gray-300"} `}>
             <Input
               id="galleryPhotos"
               type="file"
@@ -284,6 +293,11 @@ const FileUploadsSection = ({
                 </div>
               ))}
             </div>
+          )}
+          {errors.galleryPhotos && (
+            <p className="text-red-500 text-xs mt-2">
+              {errors.galleryPhotos}
+            </p>
           )}
         </div>
       )}

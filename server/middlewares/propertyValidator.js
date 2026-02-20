@@ -142,7 +142,13 @@ const baseFields = {
 
   minStayNights: Joi.number().min(1).max(999).required(),
 
-  foodAvailability: Joi.array().items(Joi.string()).default([]),
+  foodAvailability: Joi.array()
+    .items(Joi.string())
+    .min(1)
+    .required()
+    .messages({
+      "array.min": "At least one food availability option must be selected",
+    }),
   amenities: Joi.array().items(Joi.string().trim().min(1).max(50)).default([]),
 
   pan: Joi.string().length(10).optional().allow("")

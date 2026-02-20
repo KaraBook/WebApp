@@ -91,7 +91,16 @@ const propertySchema = new mongoose.Schema({
   checkOutTime: { type: String, required: true },
   minStayNights: { type: Number, required: true },
 
-  foodAvailability: { type: [String], default: [] },
+  foodAvailability: {
+    type: [String],
+    required: true,
+    validate: {
+      validator: function (arr) {
+        return Array.isArray(arr) && arr.length > 0;
+      },
+      message: "At least one food availability option is required"
+    }
+  },
   amenities: { type: [String], default: [] },
 
   pan: { type: String, uppercase: true, trim: true, sparse: true, unique: true },
