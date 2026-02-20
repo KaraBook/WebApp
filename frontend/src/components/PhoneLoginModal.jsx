@@ -122,7 +122,9 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         onOpenChange(false);
       } else {
         onOpenChange(false);
-        navigate("/signup", { state: { idToken } });
+        setTimeout(() => {
+          navigate("/signup", { state: { idToken } });
+        }, 0);
       }
     } catch {
       setAttempts((prev) => {
@@ -130,7 +132,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
         if (newAttempts >= 3) {
           setTimer(0);
-          setOtp("");
+          setOtp(Array(6).fill(""));
           toast.error("Too many incorrect attempts. Please resend OTP.");
         } else {
           toast.error("Incorrect OTP. Please check the 6-digit code.");
@@ -354,7 +356,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
               <Button
                 className="w-full py-5 rounded-[14px] bg-primary text-white"
                 disabled={otp.join("").length !== 6 || verifying}
-                onClick={() => verifyOtp(otp)}
+                onClick={() => verifyOtp(otp.join(""))}
               >
                 {verifying ? (
                   <div className="flex items-center justify-center gap-2">
