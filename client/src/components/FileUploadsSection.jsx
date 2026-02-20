@@ -28,6 +28,7 @@ const FileUploadsSection = ({
   maxGallery = 10,
   errors = {},
   clearFieldError,
+  setFieldError,
 }) => {
   const coverInputRef = useRef(null);
   const galleryInputRef = useRef(null);

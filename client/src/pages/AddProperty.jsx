@@ -1542,6 +1542,7 @@ const AddProperty = () => {
                                 showFields={{ coverImage: false, galleryPhotos: false, shopAct: true }}
                                 errors={errors}
                                 clearFieldError={clearFieldError}
+                                setFieldError={setFieldError}
                             />
                         </div>
 
@@ -1578,6 +1579,7 @@ const AddProperty = () => {
                             showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
                             errors={errors}
                             clearFieldError={clearFieldError}
+                            setFieldError={setFieldError}
                         />
 
 
