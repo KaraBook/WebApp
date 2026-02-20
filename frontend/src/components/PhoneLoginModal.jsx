@@ -82,9 +82,31 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
       toast.success("OTP sent successfully");
     } catch (err) {
-      toast.error(
-        err?.response?.data?.message || "Cannot send OTP"
-      );
+      const errorCode = err?.code || err?.response?.data?.error?.message;
+
+      if (
+        errorCode?.includes("TOO_MANY_ATTEMPTS_TRY_LATER") ||
+        errorCode?.includes("auth/too-many-requests")
+      ) {
+        toast.error(
+          "Too many OTP requests. Please try again after a few minutes."
+        );
+      } else if (
+        errorCode?.includes("captcha-check-failed")
+      ) {
+        toast.error(
+          "Verification failed. Please refresh and try again."
+        );
+      } else if (
+        errorCode?.includes("quota-exceeded")
+      ) {
+        toast.error(
+          "OTP service temporarily unavailable. Please try again later."
+        );
+      } else {
+        toast.error("Unable to send OTP. Please try again.");
+      }
+      console.error("OTP Error:", err);
     } finally {
       setSending(false);
     }
@@ -126,7 +148,16 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           navigate("/signup", { state: { idToken } });
         }, 0);
       }
-    } catch {
+    } catch (err) {
+      const errorCode = err?.code;
+
+      if (errorCode === "auth/too-many-requests") {
+        toast.error("Too many incorrect attempts. Please wait before trying again.");
+        setTimer(0);
+        setOtp(Array(6).fill(""));
+        return;
+      }
+
       setAttempts((prev) => {
         const newAttempts = prev + 1;
 
@@ -210,8 +241,8 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         {/* HEADER */}
         <div className="bg-primary-gradient text-white px-6 pt-5 pb-5 text-center">
 
-          <div className="w-14 h-14 mx-auto rounded-[14px] bg-white/20 flex items-center justify-center mb-4">
-            <Phone className="w-7 h-7 text-white/70" />
+          <div className="w-12 h-12 md:w-14 md:h-14 mx-auto rounded-[14px] bg-white/20 flex items-center justify-center mb-2">
+            <Phone className="w-5 h-5 md:w-7 md:h-7 text-white/70" />
           </div>
 
           <h2 className="text-xl font-semibold">Welcome Back</h2>
@@ -221,7 +252,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         </div>
 
         {/* BODY */}
-        <div className="px-6 py-6 space-y-4">
+        <div className="px-6 py-6 space-y-2">
           {step === "phone" && (
             <>
               <div>
@@ -285,7 +316,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
               </div>
 
               {/* OTP INPUT */}
-              {/* OTP INPUT BOXES */}
               <div>
                 <Label className="text-sm font-medium mb-3 block text-center">
                   Enter OTP
