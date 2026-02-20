@@ -48,6 +48,7 @@ const EditProperty = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({
     propertyName: "",
@@ -86,6 +87,119 @@ const EditProperty = () => {
     refundNotes: "",
     cancellationPolicy: [],
   });
+
+  const setFieldError = (field, message) => {
+    setErrors(prev => ({
+      ...prev,
+      [field]: message,
+    }));
+  };
+
+  const clearFieldError = (field) => {
+    setErrors(prev => {
+      const copy = { ...prev };
+      delete copy[field];
+      return copy;
+    });
+  };
+
+
+  const validateStep = (stepToValidate = currentStep) => {
+    const e = {};
+
+    if (stepToValidate === 1) {
+
+      if (!formData.propertyName || formData.propertyName.trim().length < 10)
+        e.propertyName = "Property name must be at least 10 characters";
+      if (!formData.propertyType)
+        e.propertyType = "Please select property type";
+      if (!formData.resortOwner.firstName)
+        e.firstName = "Owner first name is required";
+      if (!formData.resortOwner.lastName)
+        e.lastName = "Owner last name is required";
+      if (!/^[6-9]\d{9}$/.test(formData.resortOwner.mobile))
+        e.mobile = "Enter valid 10 digit Indian mobile number";
+      if (!/\S+@\S+\.\S+/.test(formData.resortOwner.email))
+        e.email = "Enter valid email address";
+      if (!/\S+@\S+\.\S+/.test(formData.resortOwner.resortEmail || ""))
+        e.resortEmail = "Enter valid resort email";
+      if (!/^[6-9]\d{9}$/.test(formData.resortOwner.resortMobile || ""))
+        e.resortMobile = "Enter valid resort mobile number";
+      if (!formData.description || formData.description.length < 30)
+        e.description = "Description must be minimum 30 characters";
+    }
+
+    if (stepToValidate === 2) {
+      if (!formData.addressLine1)
+        e.addressLine1 = "Address is required";
+      if (!formData.area || formData.area.trim().length === 0)
+        e.area = "Area is required";
+      if (!formData.state)
+        e.state = "Select state";
+      if (!formData.city)
+        e.city = "Select city";
+      if (!/^\d{6}$/.test(formData.pinCode))
+        e.pinCode = "Enter valid 6 digit pincode";
+      if (!/(google\.com|goo\.gl)/i.test(formData.locationLink || ""))
+        e.locationLink = "Paste valid Google Maps link";
+    }
+
+    if (stepToValidate === 3) {
+      if (!formData.minStayNights || Number(formData.minStayNights) < 1)
+        e.minStayNights = "Minimum stay is required";
+      if (!formData.bedrooms || Number(formData.bedrooms) < 1)
+        e.bedrooms = "Bedrooms required";
+      if (!formData.bathrooms || Number(formData.bathrooms) < 1)
+        e.bathrooms = "Bathrooms required";
+      if (!formData.maxGuests || Number(formData.maxGuests) < 1)
+        e.maxGuests = "Enter max guests";
+      if (!formData.baseGuests || Number(formData.baseGuests) < 1)
+        e.baseGuests = "Enter base guests";
+      if (Number(formData.baseGuests) > Number(formData.maxGuests))
+        e.baseGuests = "Base guests cannot exceed max guests";
+      if (!formData.pricingPerNightWeekdays)
+        e.weekdayPrice = "Enter weekday price";
+      if (!formData.pricingPerNightWeekend)
+        e.weekendPrice = "Enter weekend price";
+      if (!formData.checkInTime)
+        e.checkIn = "Check-in time required";
+      if (!formData.checkOutTime)
+        e.checkOut = "Check-out time required";
+      if (formData.isRefundable) {
+        if (!formData.refundNotes?.trim()) {
+          e.refundNotes = "Refund policy required";
+        }
+        const validRules = formData.cancellationPolicy.filter(
+          rule =>
+            rule?.minDaysBefore > 0 &&
+            rule?.refundPercent >= 0
+        );
+        if (!validRules.length) {
+          e.cancellationPolicy = "Add at least one valid cancellation rule";
+        }
+      }
+    }
+    if (stepToValidate === 4) {
+      if (!formData.foodAvailability || formData.foodAvailability.length === 0) {
+        e.foodAvailability = "Please select at least one food option";
+      }
+    }
+    if (stepToValidate === 6) {
+      const totalGalleryCount =
+        (existingGallery?.length || 0) + (newGalleryFiles?.length || 0);
+      if (!coverImageFile && !coverImagePreview) {
+        e.coverImage = "Cover image is required";
+      }
+      if (totalGalleryCount < 3) {
+        e.galleryPhotos = "Minimum 3 gallery images required";
+      }
+      if (totalGalleryCount > 10) {
+        e.galleryPhotos = "Maximum 10 gallery images allowed";
+      }
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
   const DESCRIPTION_LIMIT = 1000;
   const descriptionLength = formData.description?.length || 0;
@@ -214,17 +328,27 @@ const EditProperty = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const valid = validateStep(currentStep);
+    if (!valid) {
+      toast.error("Please fix highlighted fields");
+      return;
+    }
+    if (submitMode === "final") {
+      for (let i = 1; i <= formSteps.length; i++) {
+        const ok = validateStep(i);
+        if (!ok) {
+          setCurrentStep(i);
+          toast.error("Please complete all required fields");
+          return;
+        }
+      }
+    }
 
     if (
       formData.isRefundable &&
       (!formData.refundNotes || !formData.refundNotes.trim())
     ) {
       toast.error("Please enter refund policy / notes");
-      return;
-    }
-
-    if (submitMode === "step" && currentStep === 5) {
-      setCurrentStep(6);
       return;
     }
     setLoading(true);
@@ -290,12 +414,10 @@ const EditProperty = () => {
       });
 
 
-      const response = await Axios.put(SummaryApi.editProperty(id).url, data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
+      const response = await Axios.put(
+        SummaryApi.editProperty(id).url,
+        data
+      );
       toast.success("Property updated successfully!");
       if (submitMode === "final") {
         navigate("/properties");
@@ -343,7 +465,21 @@ const EditProperty = () => {
                     <TooltipTrigger asChild>
                       <button
                         type="button"
-                        onClick={() => setCurrentStep(step.id)}
+                        onClick={() => {
+                          if (step.id <= currentStep) {
+                            setCurrentStep(step.id);
+                            return;
+                          }
+                          for (let i = 1; i < step.id; i++) {
+                            const ok = validateStep(i);
+                            if (!ok) {
+                              setCurrentStep(i);
+                              toast.error("Please complete previous steps");
+                              return;
+                            }
+                          }
+                          setCurrentStep(step.id);
+                        }}
                         className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium border-2 transition-colors duration-200
                           ${completed
                             ? "bg-black text-white border-black hover:bg-gray-800"
@@ -378,18 +514,44 @@ const EditProperty = () => {
                 name="propertyName"
                 className="mt-2"
                 value={formData.propertyName}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  clearFieldError("propertyName");
+                }}
                 required
               />
+              {errors.propertyName && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.propertyName}
+                </p>
+              )}
             </div>
 
             <div className="md:w-[48%] w-[100%]">
-              <SingleSelectButtons
-                label="Property Type"
-                options={propertyTypeOptions}
-                selected={formData.propertyType}
-                onChange={(selected) => setFormData((prev) => ({ ...prev, propertyType: selected }))}
-              />
+              <Label className="text-sm">
+                Property Type <span className="text-red-500">*</span>
+              </Label>
+
+              <div className="mt-2">
+                <SingleSelectButtons
+                  options={propertyTypeOptions}
+                  selected={formData.propertyType}
+                  onChange={(selected) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      propertyType: selected,
+                    }));
+                    clearFieldError("propertyType");
+                  }}
+                  className={errors.propertyType ? "border-red-500" : ""}
+                />
+              </div>
+
+              {errors.propertyType && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.propertyType}
+                </p>
+              )}
             </div>
 
             {/* First Name */}
@@ -399,13 +561,17 @@ const EditProperty = () => {
               </Label>
               <Input
                 id="resortOwnerFirstName"
-                name="resortOwnerFirstName"
                 type="text"
-                className="mt-2"
+                className={`mt-2 ${errors.firstName ? "border-red-500" : ""}`}
                 value={formData.resortOwner.firstName}
-                onChange={(e) => setOwnerField("firstName", e.target.value)}
-                required
+                onChange={(e) => {
+                  setOwnerField("firstName", e.target.value);
+                  clearFieldError("firstName");
+                }}
               />
+              {errors.firstName && (
+                <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
+              )}
             </div>
 
             {/* Last Name */}
@@ -415,13 +581,17 @@ const EditProperty = () => {
               </Label>
               <Input
                 id="resortOwnerLastName"
-                name="resortOwnerLastName"
                 type="text"
-                className="mt-2"
+                className={`mt-2 ${errors.lastName ? "border-red-500" : ""}`}
                 value={formData.resortOwner.lastName}
-                onChange={(e) => setOwnerField("lastName", e.target.value)}
-                required
+                onChange={(e) => {
+                  setOwnerField("lastName", e.target.value);
+                  clearFieldError("lastName");
+                }}
               />
+              {errors.lastName && (
+                <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+              )}
             </div>
 
             {/* Email */}
@@ -431,13 +601,17 @@ const EditProperty = () => {
               </Label>
               <Input
                 id="resortOwnerEmail"
-                name="resortOwnerEmail"
                 type="email"
-                className="mt-2"
+                className={`mt-2 ${errors.email ? "border-red-500" : ""}`}
                 value={formData.resortOwner.email}
-                onChange={(e) => setOwnerField("email", e.target.value)}
-                required
+                onChange={(e) => {
+                  setOwnerField("email", e.target.value);
+                  clearFieldError("email");
+                }}
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </div>
 
             {/* Mobile Number */}
@@ -447,17 +621,21 @@ const EditProperty = () => {
               </Label>
               <Input
                 id="resortOwnerMobile"
-                name="resortOwnerMobile"
                 type="tel"
-                className="mt-2"
+                className={`mt-2 ${errors.mobile ? "border-red-500" : ""}`}
                 value={formData.resortOwner.mobile}
                 onChange={(e) => {
                   const v = e.target.value;
-                  if (/^\d*$/.test(v)) setOwnerField("mobile", v);
+                  if (/^\d*$/.test(v)) {
+                    setOwnerField("mobile", v);
+                    clearFieldError("mobile");
+                  }
                 }}
                 maxLength={10}
-                required
               />
+              {errors.mobile && (
+                <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>
+              )}
             </div>
 
             {/* Resort Email */}
@@ -467,12 +645,10 @@ const EditProperty = () => {
               </Label>
               <Input
                 id="resortOwnerResortEmail"
-                name="resortOwnerResortEmail"
                 type="email"
                 className="mt-2"
                 value={formData.resortOwner.resortEmail}
                 onChange={(e) => setOwnerField("resortEmail", e.target.value)}
-                required
               />
             </div>
 
@@ -503,27 +679,28 @@ const EditProperty = () => {
 
               <Textarea
                 id="description"
-                name="description"
                 rows={5}
-                className={`mt-2 resize-none ${descriptionLength >= DESCRIPTION_LIMIT
+                className={`mt-2 resize-none ${errors.description
                   ? "border-red-500 focus-visible:ring-red-500"
-                  : ""
+                  : descriptionLength >= DESCRIPTION_LIMIT
+                    ? "border-red-500 focus-visible:ring-red-500"
+                    : ""
                   }`}
                 value={formData.description}
                 onChange={(e) => {
                   const value = e.target.value;
-
-                  // HARD STOP
                   if (value.length > DESCRIPTION_LIMIT) return;
 
                   setFormData((prev) => ({
                     ...prev,
                     description: value,
                   }));
+                  clearFieldError("description");
                 }}
-                placeholder="Minimum 30 characters. Provide full property details..."
-                required
               />
+              {errors.description && (
+                <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+              )}
 
               {/* COUNTER + VALIDATION */}
               <div className="flex justify-between items-center mt-1">
@@ -562,11 +739,18 @@ const EditProperty = () => {
                 id="addressLine1"
                 name="addressLine1"
                 type="text"
-                className="mt-2"
+                className={`mt-2 ${errors.addressLine1 ? "border-red-500" : ""}`}
                 value={formData.addressLine1}
-                onChange={handleChange}
-                required
+                onChange={(e) => {
+                  handleChange(e);
+                  clearFieldError("addressLine1");
+                }}
               />
+              {errors.addressLine1 && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.addressLine1}
+                </p>
+              )}
             </div>
 
             <div className="md:w-[48%] w-[100%]">
@@ -591,13 +775,19 @@ const EditProperty = () => {
               <Select
                 value={formData.state}
                 onValueChange={(value) => {
-                  setFormData((prev) => ({ ...prev, state: value, city: "" }));
-                  const selectedCities = getCitiesByState(value);
-                  setCities(selectedCities);
+                  setFormData(prev => ({
+                    ...prev,
+                    state: value,
+                    city: "",
+                  }));
+                  setCities(getCitiesByState(value));
+                  clearFieldError("state");
                 }}
-                required
               >
-                <SelectTrigger id="state" className="mt-2">
+                <SelectTrigger
+                  id="state"
+                  className={`mt-2 ${errors.state ? "border-red-500" : ""}`}
+                >
                   <SelectValue placeholder="Select State" />
                 </SelectTrigger>
                 <SelectContent>
@@ -608,6 +798,12 @@ const EditProperty = () => {
                   ))}
                 </SelectContent>
               </Select>
+
+              {errors.state && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.state}
+                </p>
+              )}
             </div>
 
             <div className="md:w-[32%] w-[48%]">
@@ -616,9 +812,14 @@ const EditProperty = () => {
               </Label>
               <Select
                 value={formData.city}
-                onValueChange={(value) => handleChange({ target: { name: "city", value } })}
+                onValueChange={(value) => {
+                  setFormData((prev) => ({ ...prev, city: value }));
+                  clearFieldError("city");
+                }}
               >
-                <SelectTrigger className="w-full border p-2 rounded mt-2">
+                <SelectTrigger
+                  className={`mt-2 ${errors.city ? "border-red-500" : ""}`}
+                >
                   <SelectValue placeholder="Select City" />
                 </SelectTrigger>
                 <SelectContent>
@@ -629,6 +830,11 @@ const EditProperty = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {errors.city && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.city}
+                </p>
+              )}
             </div>
 
 
@@ -640,11 +846,18 @@ const EditProperty = () => {
                 id="area"
                 name="area"
                 type="text"
-                className="mt-2"
+                className={`mt-2 ${errors.area ? "border-red-500" : ""}`}
                 value={formData.area}
-                onChange={handleChange}
-                required
+                onChange={(e) => {
+                  handleChange(e);
+                  clearFieldError("area");
+                }}
               />
+              {errors.area && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.area}
+                </p>
+              )}
             </div>
 
 
@@ -657,16 +870,21 @@ const EditProperty = () => {
                 type="text"
                 name="pinCode"
                 maxLength={6}
-                className="mt-2"
+                className={`mt-2 ${errors.pinCode ? "border-red-500" : ""}`}
                 value={formData.pinCode}
                 onChange={(e) => {
                   const value = e.target.value;
                   if (/^\d{0,6}$/.test(value)) {
                     setFormData((prev) => ({ ...prev, pinCode: value }));
+                    clearFieldError("pinCode");
                   }
                 }}
-                required
               />
+              {errors.pinCode && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.pinCode}
+                </p>
+              )}
             </div>
 
             <div className="md:w-[48%] w-[100%]">
@@ -677,15 +895,19 @@ const EditProperty = () => {
                 id="locationLink"
                 type="url"
                 name="locationLink"
-                className="mt-2"
+                className={`mt-2 ${errors.locationLink ? "border-red-500" : ""}`}
                 value={formData.locationLink}
                 onChange={(e) => {
                   const value = e.target.value;
                   setFormData((prev) => ({ ...prev, locationLink: value }));
+                  clearFieldError("locationLink");
                 }}
-                pattern="https://.*"
-                required
               />
+              {errors.locationLink && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.locationLink}
+                </p>
+              )}
             </div>
           </>
         )}
@@ -744,10 +966,18 @@ const EditProperty = () => {
               <div className="mt-2">
                 <QuantityBox
                   value={formData.minStayNights}
-                  onChange={(val) => setFormData((prev) => ({ ...prev, minStayNights: val }))}
+                  onChange={(val) => {
+                    setFormData((prev) => ({ ...prev, minStayNights: val }));
+                    clearFieldError("minStayNights");
+                  }}
                   min={1}
                   max={999}
                 />
+                {errors.minStayNights && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.minStayNights}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -759,10 +989,18 @@ const EditProperty = () => {
               <div className="mt-2">
                 <QuantityBox
                   value={formData.bedrooms}
-                  onChange={(val) => setFormData((prev) => ({ ...prev, bedrooms: val }))}
+                  onChange={(val) => {
+                    setFormData((prev) => ({ ...prev, bedrooms: val }))
+                    clearFieldError("bedrooms");
+                  }}
                   min={1}
                   max={999}
                 />
+                {errors.bedrooms && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.bedrooms}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -774,10 +1012,18 @@ const EditProperty = () => {
               <div className="mt-2">
                 <QuantityBox
                   value={formData.bathrooms}
-                  onChange={(val) => setFormData((prev) => ({ ...prev, bathrooms: val }))}
+                  onChange={(val) => {
+                    setFormData((prev) => ({ ...prev, bathrooms: val }))
+                    clearFieldError("bathrooms");
+                  }}
                   min={1}
                   max={999}
                 />
+                {errors.bathrooms && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.bathrooms}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -789,10 +1035,18 @@ const EditProperty = () => {
               <div className="mt-2">
                 <QuantityBox
                   value={formData.maxGuests}
-                  onChange={(val) => setFormData((prev) => ({ ...prev, maxGuests: val }))}
+                  onChange={(val) => {
+                    setFormData((prev) => ({ ...prev, maxGuests: val }));
+                    clearFieldError("maxGuests");
+                  }}
                   min={1}
                   max={999}
                 />
+                {errors.maxGuests && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.maxGuests}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -803,12 +1057,18 @@ const EditProperty = () => {
               <div className="mt-2">
                 <QuantityBox
                   value={formData.baseGuests}
-                  onChange={(val) =>
-                    setFormData((prev) => ({ ...prev, baseGuests: val }))
-                  }
+                  onChange={(val) => {
+                    setFormData((prev) => ({ ...prev, baseGuests: val }));
+                    clearFieldError("baseGuests");
+                  }}
                   min={1}
                   max={formData.maxGuests || 999}
                 />
+                {errors.baseGuests && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.baseGuests}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -819,19 +1079,26 @@ const EditProperty = () => {
               <div className="mt-2">
                 <Input
                   id="pricingPerNightWeekdays"
-                  name="pricingPerNightWeekdays"
                   type="text"
                   inputMode="numeric"
-                  className="mt-2"
+                  className={`mt-2 ${errors.weekdayPrice ? "border-red-500" : ""}`}
                   value={formData.pricingPerNightWeekdays}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (/^\d{0,6}$/.test(value)) {
-                      setFormData((prev) => ({ ...prev, pricingPerNightWeekdays: value }));
+                      setFormData((prev) => ({
+                        ...prev,
+                        pricingPerNightWeekdays: value,
+                      }));
+                      clearFieldError("weekdayPrice");
                     }
                   }}
-                  required
                 />
+                {errors.weekdayPrice && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.weekdayPrice}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -845,16 +1112,25 @@ const EditProperty = () => {
                   name="pricingPerNightWeekend"
                   type="text"
                   inputMode="numeric"
-                  className="mt-2"
+                  className={`mt-2 ${errors.weekendPrice ? "border-red-500" : ""}`}
                   value={formData.pricingPerNightWeekend}
                   onChange={(e) => {
                     const value = e.target.value;
                     if (/^\d{0,6}$/.test(value)) {
-                      setFormData((prev) => ({ ...prev, pricingPerNightWeekend: value }));
+                      setFormData((prev) => ({
+                        ...prev,
+                        pricingPerNightWeekend: value,
+                      }));
+                      clearFieldError("weekendPrice");
                     }
                   }}
                   required
                 />
+                {errors.weekendPrice && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.weekendPrice}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -892,17 +1168,40 @@ const EditProperty = () => {
               </div>
             </div>
 
-            <CustomTimePicker
-              label="Check-In Time"
-              value={formData.checkInTime}
-              onChange={(val) => setFormData({ ...formData, checkInTime: val })}
-            />
+            <div className="md:w-[48%] w-[100%]">
+              <CustomTimePicker
+                label="Check-In Time"
+                value={formData.checkInTime}
+                onChange={(val) => {
+                  setFormData({ ...formData, checkInTime: val });
+                  clearFieldError("checkIn");
+                }}
+                error={!!errors.checkIn}
+              />
 
-            <CustomTimePicker
-              label="Check-Out Time"
-              value={formData.checkOutTime}
-              onChange={(val) => setFormData({ ...formData, checkOutTime: val })}
-            />
+              {errors.checkIn && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.checkIn}
+                </p>
+              )}
+            </div>
+
+            <div className="md:w-[48%] w-[100%]">
+              <CustomTimePicker
+                label="Check-Out Time"
+                value={formData.checkOutTime}
+                onChange={(val) => {
+                  setFormData({ ...formData, checkOutTime: val });
+                  clearFieldError("checkOut");
+                }}
+                error={!!errors.checkOut}
+              />
+              {errors.checkOut && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.checkOut}
+                </p>
+              )}
+            </div>
 
             <div className="md:w-[48%] w-[100%] flex flex-col gap-2">
               <Label className="text-sm">
@@ -912,10 +1211,7 @@ const EditProperty = () => {
 
               <SingleSelectDropdown
                 value={formData.isRefundable}
-                options={[
-                  { label: "Yes", value: true },
-                  { label: "No", value: false },
-                ]}
+                options={[{ label: "Yes", value: true }, { label: "No", value: false }]}
                 onChange={(val) => {
                   const boolVal = val === true || val === "true";
 
@@ -925,9 +1221,15 @@ const EditProperty = () => {
                     refundNotes: boolVal ? prev.refundNotes : "",
                     cancellationPolicy: boolVal ? prev.cancellationPolicy : [],
                   }));
+
+                  clearFieldError("isRefundable");
                 }}
-                placeholder="Select Option"
               />
+              {errors.isRefundable && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.isRefundable}
+                </p>
+              )}
             </div>
 
             {formData.isRefundable === true && (
@@ -969,13 +1271,18 @@ const EditProperty = () => {
                 ))}
 
                 <Textarea
-                  className="mt-3"
-                  placeholder="Human readable notes"
+                  className={`mt-3 ${errors.refundNotes ? "border-red-500" : ""}`}
                   value={formData.refundNotes}
-                  onChange={(e) =>
-                    setFormData(p => ({ ...p, refundNotes: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    setFormData(p => ({ ...p, refundNotes: e.target.value }));
+                    clearFieldError("refundNotes");
+                  }}
                 />
+                {errors.refundNotes && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.refundNotes}
+                  </p>
+                )}
               </div>
             )}
 
@@ -986,12 +1293,30 @@ const EditProperty = () => {
         {currentStep === 4 && (
           <>
             <div className="w-[100%]">
-              <MultiSelectButtons
-                label="Food Availability"
-                options={foodOptions}
-                selected={formData.foodAvailability}
-                onChange={(selected) => setFormData((prev) => ({ ...prev, foodAvailability: selected }))}
-              />
+              <Label className="text-sm">
+                Food Availability <span className="text-red-500">*</span>
+              </Label>
+
+              <div className="mt-2">
+                <MultiSelectButtons
+                  options={foodOptions}
+                  selected={formData.foodAvailability}
+                  onChange={(selected) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      foodAvailability: selected,
+                    }));
+                    clearFieldError("foodAvailability");
+                  }}
+                  className={errors.foodAvailability ? "border-red-500" : ""}
+                />
+              </div>
+
+              {errors.foodAvailability && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.foodAvailability}
+                </p>
+              )}
             </div>
 
             <div className="w-[100%]">
@@ -1107,7 +1432,7 @@ const EditProperty = () => {
 
             <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="gstin" className="text-sm">
-                GSTIN <span className="text-gray-400 text-xs">(15 characters)</span> <span className="text-red-500">*</span>
+                GSTIN <span className="text-gray-400 text-xs">(15 characters)</span>
               </Label>
               <Input
                 id="gstin"
@@ -1150,7 +1475,7 @@ const EditProperty = () => {
 
             <div className="md:w-[48%] w-[100%]">
               <Label htmlFor="internalNotes" className="text-sm">
-                Internal Notes <span className="text-red-500">*</span>
+                Internal Notes
               </Label>
               <Textarea
                 id="internalNotes"
@@ -1159,7 +1484,6 @@ const EditProperty = () => {
                 rows={4}
                 value={formData.internalNotes}
                 onChange={handleChange}
-                minLength={3}
                 maxLength={500}
               />
             </div>
@@ -1177,6 +1501,9 @@ const EditProperty = () => {
                 shopActPreview={shopActPreview}
                 setShopActPreview={setShopActPreview}
                 showFields={{ coverImage: false, galleryPhotos: false, shopAct: true }}
+                errors={errors}
+                clearFieldError={clearFieldError}
+                setFieldError={setFieldError}
               />
             </div>
 
@@ -1206,6 +1533,9 @@ const EditProperty = () => {
               setNewGalleryPreviews={setNewGalleryPreviews}
 
               showFields={{ coverImage: true, galleryPhotos: true, shopAct: false }}
+              errors={errors}
+              clearFieldError={clearFieldError}
+              setFieldError={setFieldError}
             />
 
           </>
@@ -1223,18 +1553,17 @@ const EditProperty = () => {
           </button>
         )}
 
-        {currentStep === 5 ? (
-          <button
-            type="submit"
-            onClick={() => setSubmitMode("step")}
-            className="ml-auto px-4 py-2 border rounded-md bg-black text-white"
-          >
-            Next
-          </button>
-        ) : currentStep < formSteps.length ? (
+        {currentStep < formSteps.length ? (
           <button
             type="button"
-            onClick={() => setCurrentStep((prev) => prev + 1)}
+            onClick={() => {
+              const valid = validateStep(currentStep);
+              if (!valid) {
+                toast.error("Please fix highlighted fields");
+                return;
+              }
+              setCurrentStep((prev) => prev + 1);
+            }}
             className="ml-auto px-4 py-2 border rounded-md bg-black text-white"
           >
             Next
