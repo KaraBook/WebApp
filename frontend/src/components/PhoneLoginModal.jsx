@@ -206,7 +206,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         </button>
 
         {/* HEADER */}
-        <div className="bg-primary-gradient text-white px-6 pt-10 pb-8 text-center">
+        <div className="bg-primary-gradient text-white px-6 pt-5 pb-5 text-center">
 
           <div className="w-14 h-14 mx-auto rounded-[14px] bg-white/20 flex items-center justify-center mb-4">
             <Phone className="w-7 h-7 text-white/70" />
