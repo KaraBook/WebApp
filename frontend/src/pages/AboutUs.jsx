@@ -3,7 +3,7 @@ import WelcomeSection from "@/components/WelcomeSection";
 import ExperiencesSection from "@/components/FacilitiesExperience";
 import WhyListWithUs from "@/components/WhyListWithUs";
 import WhyChooseUs from "@/components/WhyChooseUs";
-
+import { Link } from "react-router-dom";
 
 export default function AboutUs() {
   return (
@@ -12,7 +12,7 @@ export default function AboutUs() {
       {/* BACKGROUND IMAGE */}
       <div className="absolute inset-0">
         <img
-          src="/bannerImg1.webp" 
+          src="/bannerImg1.webp"
           alt="Karabook stays across Maharashtra"
           className="w-full h-[85vh] object-cover"
         />
@@ -21,7 +21,7 @@ export default function AboutUs() {
       </div>
 
       {/* CONTENT */}
-      <div className="relative z-10 h-[85vh] flex items-center">
+      <div className="relative z-10 h-[85vh] flex items-center mb-4">
         <div className="max-w-7xl mx-auto px-4 text-center md:text-left">
 
           {/* LABEL */}
@@ -64,14 +64,16 @@ export default function AboutUs() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mt-8 flex justify-center md:justify-start"
           >
-            <button className="bg-[#F6B400] hover:bg-[#e3a700] transition text-black font-semibold px-8 py-4 rounded-[12px] shadow-lg">
-              Explore Stays
-            </button>
+            <Link to="/properties">
+              <button className="bg-[#F6B400] hover:bg-[#e3a700] transition text-black font-semibold px-8 py-4 rounded-[12px] shadow-lg">
+                Explore Stays
+              </button>
+            </Link>
           </motion.div>
 
         </div>
       </div>
-     <WelcomeSection />
+      <WelcomeSection />
       <ExperiencesSection />
       <WhyListWithUs />
       <WhyChooseUs />

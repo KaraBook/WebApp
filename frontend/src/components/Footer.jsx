@@ -31,12 +31,14 @@ export default function Footer() {
             </Link>
 
             {/* Secondary Button */}
-            <Link
-              to="/owner-login"
+            <a
+              href="https://owner.karabook.in/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-white/20 text-white font-medium px-8 py-2 md:py-3 rounded-[10px] md:rounded-[12px] hover:bg-white/30 transition"
             >
               Already a Partner? Sign In
-            </Link>
+            </a>
           </div>
         </div>
       </section>

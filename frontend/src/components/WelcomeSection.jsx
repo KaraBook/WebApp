@@ -1,4 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
+
 
 export default function WelcomeSection() {
   return (
@@ -70,9 +72,12 @@ export default function WelcomeSection() {
           </div>
 
           {/* CTA */}
-          <button className="mt-6 inline-flex items-center justify-center bg-[#F6B400] hover:bg-[#e3a700] transition text-black font-semibold px-7 py-4 rounded-[10px] shadow-md">
+          <Link
+            to="/properties"
+            className="mt-6 inline-flex items-center justify-center bg-[#F6B400] hover:bg-[#e3a700] transition text-black font-semibold px-7 py-4 rounded-[10px] shadow-md"
+          >
             Discover Your Stay
-          </button>
+          </Link>
 
         </div>
       </div>

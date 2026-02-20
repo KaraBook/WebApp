@@ -38,9 +38,24 @@ export default function ListYourProperty() {
             </p>
 
             <div className="space-y-3 text-sm">
-              <p className="flex gap-2"><Phone className="w-4 h-4" /> +91 9XXXXXXXXX</p>
-              <p className="flex gap-2"><Inbox className="w-4 h-4" /> partners@karabook.com</p>
-              <p className="flex gap-2"><Map className="w-4 h-4" /> Mon–Sat, 10:00 AM – 7:00 PM</p>
+              <a
+                href="tel:+919604520520"
+                className="flex gap-2 items-center"
+              >
+                <Phone className="w-4 h-4" />
+                +91 9604520520
+              </a>
+              <a
+                href="mailto:partners@karabook.com"
+                className="flex gap-2 items-center"
+              >
+                <Inbox className="w-4 h-4" />
+                partners@karabook.com
+              </a>
+              <p className="flex gap-2 items-center">
+                <Map className="w-4 h-4" />
+                Mon–Sat, 10:00 AM – 7:00 PM
+              </p>
             </div>
           </div>
 
