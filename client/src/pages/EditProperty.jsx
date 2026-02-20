@@ -424,7 +424,24 @@ const EditProperty = () => {
       }
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Failed to update property");
+      if (!error.response) {
+        toast.error("Network error. Please check your internet connection.");
+      }
+      else if (error.response.status === 401) {
+        toast.error("Session expired. Please login again.");
+      }
+      else if (error.response.status === 413) {
+        toast.error("Uploaded files are too large. Please reduce image size (Max 5MB each).");
+      }
+      else if (error.response.status === 400) {
+        toast.error(error.response.data?.message || "Invalid data submitted.");
+      }
+      else if (error.response.status === 500) {
+        toast.error("Server error. Please try again later.");
+      }
+      else {
+        toast.error(error.response.data?.message || "Something went wrong.");
+      }
     } finally {
       setLoading(false);
     }
