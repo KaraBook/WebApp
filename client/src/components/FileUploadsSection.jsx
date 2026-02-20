@@ -36,10 +36,20 @@ const FileUploadsSection = ({
   const handleCoverImageChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const MAX_SIZE = 5 * 1024 * 1024;
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setFieldError("coverImage", "Only JPG, PNG, WEBP allowed");
+      return;
+    }
+    if (file.size > MAX_SIZE) {
+      setFieldError("coverImage", "Image must be under 5MB");
+      return;
+    }
     if (coverImagePreview) URL.revokeObjectURL(coverImagePreview);
-    setCoverImageFile && setCoverImageFile(file);
-    setCoverImagePreview && setCoverImagePreview(URL.createObjectURL(file));
-    if (clearFieldError) clearFieldError("coverImage");
+    setCoverImageFile(file);
+    setCoverImagePreview(URL.createObjectURL(file));
+    clearFieldError("coverImage");
     if (coverInputRef.current) coverInputRef.current.value = "";
   };
 
@@ -73,36 +83,37 @@ const FileUploadsSection = ({
   const handleGalleryImagesChange = (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-
-    const totalCount = existingGallery.length + newGalleryFiles.length + files.length;
+    const MAX_SIZE = 5 * 1024 * 1024;
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setFieldError("galleryPhotos", "Only JPG, PNG, WEBP files allowed");
+        if (galleryInputRef.current) galleryInputRef.current.value = "";
+        return;
+      }
+      if (file.size > MAX_SIZE) {
+        setFieldError("galleryPhotos", "Each image must be less than 5MB");
+        if (galleryInputRef.current) galleryInputRef.current.value = "";
+        return;
+      }
+    }
+    const totalCount =
+      existingGallery.length + newGalleryFiles.length + files.length;
     if (totalCount > maxGallery) {
-      alert(`Max ${maxGallery} images allowed`);
+      setFieldError(
+        "galleryPhotos",
+        `Maximum ${maxGallery} images allowed`
+      );
       if (galleryInputRef.current) galleryInputRef.current.value = "";
       return;
     }
-
     const previews = files.map((f) => URL.createObjectURL(f));
-
     setNewGalleryFiles((prev) => [...prev, ...files]);
     setNewGalleryPreviews((prev) => [...prev, ...previews]);
-
+    clearFieldError("galleryPhotos");
     if (galleryInputRef.current) galleryInputRef.current.value = "";
-
-    const MAX_SIZE = 5 * 1024 * 1024; 
-    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-    for (const file of files) {
-      if (!ALLOWED_TYPES.includes(file.type)) {
-        alert("Only JPG, PNG, WEBP allowed");
-        return;
-      }
-
-      if (file.size > MAX_SIZE) {
-        alert("Image size must be less than 5MB");
-        return;
-      }
-    }
   };
+
 
   const removeExisting = (index) => {
     const updated = existingGallery.filter((_, i) => i !== index);

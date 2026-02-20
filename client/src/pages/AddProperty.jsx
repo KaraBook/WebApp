@@ -398,11 +398,14 @@ const AddProperty = () => {
             toast.success("Property created successfully!");
             navigate("/properties");
         } catch (err) {
+            if (err.response?.status === 413) {
+                toast.error("Upload failed: Total file size too large (Max 5MB per image)");
+                return;
+            }
             const message =
                 err?.response?.data?.message ||
                 err?.response?.data?.error ||
                 "Something went wrong while uploading media";
-
             toast.error(message);
         } finally {
             setLoading(false);
