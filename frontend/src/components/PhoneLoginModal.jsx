@@ -19,36 +19,40 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   const [step, setStep] = useState("phone");
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(Array(6).fill(""));
+  const otpRefs = useRef([]);
 
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [confirmResult, setConfirmResult] = useState(null);
+  const [attempts, setAttempts] = useState(0);
 
   const [timer, setTimer] = useState(0);
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (timer <= 0) {
-      clearInterval(timerRef.current);
-      return;
-    }
-
-    timerRef.current = setInterval(() => {
-      setTimer((t) => t - 1);
+    if (timer === 0) return;
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
-    return () => clearInterval(timerRef.current);
+    return () => clearInterval(interval);
   }, [timer]);
 
 
   useEffect(() => {
     if (!open) {
       try {
-        clearRecaptcha();        
+        clearRecaptcha();
         setStep("phone");
         setPhone("");
-        setOtp("");
+        setOtp(Array(6).fill(""));
         setConfirmResult(null);
         setTimer(0);
       } catch (e) {
@@ -74,6 +78,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       setConfirmResult(confirmation);
       setStep("otp");
       setTimer(60);
+      setAttempts(0);
 
       toast.success("OTP sent successfully");
     } catch (err) {
@@ -120,16 +125,28 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         navigate("/signup", { state: { idToken } });
       }
     } catch {
-      toast.error("Invalid OTP. Please try again.");
-      setOtp("");
+      setAttempts((prev) => {
+        const newAttempts = prev + 1;
+
+        if (newAttempts >= 3) {
+          setTimer(0);
+          setOtp("");
+          toast.error("Too many incorrect attempts. Please resend OTP.");
+        } else {
+          toast.error("Incorrect OTP. Please check the 6-digit code.");
+        }
+
+        return newAttempts;
+      });
     } finally {
       setVerifying(false);
     }
   };
 
   useEffect(() => {
-    if (otp.length === 6 && !verifying) {
-      verifyOtp(otp);
+    const joinedOtp = otp.join("");
+    if (joinedOtp.length === 6 && !verifying) {
+      verifyOtp(joinedOtp);
     }
   }, [otp]);
 
@@ -244,24 +261,82 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
           {step === "otp" && (
             <>
+              {/* MOBILE DISPLAY WITH CHANGE OPTION */}
+              <div className="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-[14px] border">
+                <div>
+                  <p className="text-xs text-gray-500">OTP sent to</p>
+                  <p className="font-medium text-sm">+91 {phone}</p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    clearRecaptcha();
+                    setStep("phone");
+                    setOtp("");
+                    setConfirmResult(null);
+                    setTimer(0);
+                  }}
+                  className="text-primary text-sm font-medium hover:underline"
+                >
+                  Change
+                </button>
+              </div>
+
+              {/* OTP INPUT */}
+              {/* OTP INPUT BOXES */}
               <div>
-                <Label className="text-sm font-medium mb-1 block">
+                <Label className="text-sm font-medium mb-3 block text-center">
                   Enter OTP
                 </Label>
 
-                <Input
-                  maxLength={6}
-                  inputMode="numeric"
-                  placeholder="6-digit OTP"
-                  value={otp}
-                  disabled={verifying}
-                  onChange={(e) =>
-                    setOtp(e.target.value.replace(/\D/g, ""))
-                  }
-                  className="rounded-[14px] p-6 text-center tracking-[6px]"
-                />
+                <div className="flex justify-center gap-3">
+                  {otp.map((digit, index) => (
+                    <Input
+                      key={index}
+                      ref={(el) => (otpRefs.current[index] = el)}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      disabled={verifying}
+                      className="w-12 h-12 text-center text-lg font-semibold rounded-xl"
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, "");
+                        if (!value) return;
+
+                        const newOtp = [...otp];
+                        newOtp[index] = value;
+                        setOtp(newOtp);
+
+                        if (index < 5) {
+                          otpRefs.current[index + 1]?.focus();
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Backspace") {
+                          if (otp[index]) {
+                            const newOtp = [...otp];
+                            newOtp[index] = "";
+                            setOtp(newOtp);
+                          } else if (index > 0) {
+                            otpRefs.current[index - 1]?.focus();
+                          }
+                        }
+                      }}
+                      onPaste={(e) => {
+                        const pasted = e.clipboardData.getData("text").replace(/\D/g, "");
+                        if (pasted.length === 6) {
+                          const newOtp = pasted.split("").slice(0, 6);
+                          setOtp(newOtp);
+                          otpRefs.current[5]?.focus();
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
 
+              {/* TIMER / RESEND */}
               <div className="text-sm text-gray-600 text-center">
                 {timer > 0 ? (
                   <span>Resend OTP in {timer}s</span>
@@ -275,12 +350,20 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
                 )}
               </div>
 
+              {/* VERIFY BUTTON */}
               <Button
                 className="w-full py-5 rounded-[14px] bg-primary text-white"
-                disabled={otp.length !== 6 || verifying}
+                disabled={otp.join("").length !== 6 || verifying}
                 onClick={() => verifyOtp(otp)}
               >
-                {verifying ? "Verifying..." : "Verify & Continue →"}
+                {verifying ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="animate-spin w-4 h-4" />
+                    Verifying...
+                  </div>
+                ) : (
+                  "Verify & Continue →"
+                )}
               </Button>
             </>
           )}
