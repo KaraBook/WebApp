@@ -439,6 +439,28 @@ export const getSingleProperty = async (req, res) => {
 
 
 
+export const getFeaturedProperties = async (req, res) => {
+  try {
+    const properties = await Property.find({
+      isDraft: false,
+      publishNow: true,
+      featured: true,
+      isBlocked: { $ne: true }, 
+    })
+      .sort({ updatedAt: -1 }) 
+      .limit(10); 
+    res.status(200).json({
+      success: true,
+      data: properties,
+    });
+  } catch (err) {
+    console.error("getFeaturedProperties error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch featured properties",
+    });
+  }
+};
 
 
 export const updateProperty = async (req, res) => {

@@ -12,7 +12,8 @@ import {
   getPublishedProperties,
   getPropertyBlockedDatesPublic,
   deleteProperty,
-  getDraftProperties
+  getDraftProperties,
+  getFeaturedProperties
 } from "../controllers/propertyController.js";
 import { requireAuth, requirePropertyAdmin } from "../middlewares/requireAuth.js";
 import upload from "../middlewares/multer.js";
@@ -47,6 +48,7 @@ router.post(
 );
 router.get("/", getAllProperties);
 router.get("/published", getPublishedProperties);
+router.get("/featured", getFeaturedProperties);
 router.get("/drafts", requireAuth, requirePropertyAdmin, getDraftProperties);
 router.get("/:id", getSingleProperty);
 

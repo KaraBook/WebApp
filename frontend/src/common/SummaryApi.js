@@ -45,6 +45,10 @@ const SummaryApi = {
     url: "/api/properties/published",
     method: "get",
   },
+  getFeaturedProperties: {
+    url: "/api/properties/featured",
+    method: "get",
+  },
   getWishlist: {
     url: "/api/wishlist",
     method: "get",

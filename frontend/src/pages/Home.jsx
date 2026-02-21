@@ -67,9 +67,9 @@ export default function Home() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const res = await Axios.get(SummaryApi.getPublishedProperties.url);
+        const res = await Axios.get(SummaryApi.getFeaturedProperties.url);
         if (res.data.success) {
-          setProperties(res.data.data.slice(0, 10));
+          setProperties(res.data.data);
         }
       } catch (err) {
         console.error("Failed to fetch featured properties:", err);
@@ -385,42 +385,51 @@ export default function Home() {
           </div>
 
           {/* SWIPER */}
-          <Swiper
-            modules={[Navigation, Autoplay]}
-            spaceBetween={18}
-            slidesPerView={1.15}
-            loop={properties.length > 4}
-            autoplay={{ delay: 3200, disableOnInteraction: false }}
-            onSwiper={setSwiperInstance}
-            breakpoints={{
-              480: { slidesPerView: 1.25 },
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 4 },
-            }}
-            className="featuredPropsSwiper"
-          >
-            <div className="flex items-center justify-end p-4 gap-3">
-              <button
-                onClick={() => swiperInstance?.slidePrev()}
-                className="hidden md:flex h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
-              >
-                ‹
-              </button>
-              <button
-                onClick={() => swiperInstance?.slideNext()}
-                className="hidden md:flex h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
-              >
-                ›
-              </button>
+          {properties.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="text-gray-500 text-sm md:text-base">
+                No featured properties available right now.
+              </p>
             </div>
-            {properties.map((property) => (
-              <SwiperSlide key={property._id} className="!h-auto">
-                <div className="h-full">
-                  <PropertyCard property={property} />
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          ) : (
+            <Swiper
+              modules={[Navigation, Autoplay]}
+              spaceBetween={18}
+              slidesPerView={1.15}
+              loop={properties.length > 4}
+              autoplay={{ delay: 3200, disableOnInteraction: false }}
+              onSwiper={setSwiperInstance}
+              breakpoints={{
+                480: { slidesPerView: 1.25 },
+                640: { slidesPerView: 2 },
+                1024: { slidesPerView: 4 },
+              }}
+              className="featuredPropsSwiper"
+            >
+              <div className="flex items-center justify-end p-4 gap-3">
+                <button
+                  onClick={() => swiperInstance?.slidePrev()}
+                  className="hidden md:flex h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => swiperInstance?.slideNext()}
+                  className="hidden md:flex h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
+                >
+                  ›
+                </button>
+              </div>
+
+              {properties.map((property) => (
+                <SwiperSlide key={property._id} className="!h-auto">
+                  <div className="h-full">
+                    <PropertyCard property={property} />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
 
         </div>
       </section>
