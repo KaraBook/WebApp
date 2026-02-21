@@ -303,7 +303,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
                 <button
                   onClick={() => {
-                    clearRecaptcha();
                     setStep("phone");
                     setOtp(Array(6).fill("")); 
                     setConfirmResult(null);

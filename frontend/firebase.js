@@ -23,27 +23,27 @@ export const clearRecaptcha = () => {
 
     const container = document.getElementById("recaptcha-container");
     if (container) {
-      container.innerHTML = ""; // 🔥 Important
+      container.innerHTML = ""; 
     }
   } catch (e) {
     console.log("recaptcha cleanup failed", e);
   }
 };
 
+export const getRecaptcha = () => {
+  if (!recaptchaVerifier) {
+    recaptchaVerifier = new RecaptchaVerifier(
+      auth,
+      "recaptcha-container",
+      {
+        size: "invisible",
+      }
+    );
+  }
+  return recaptchaVerifier;
+};
+
 export const sendOtp = async (phoneNumber) => {
-  clearRecaptcha(); 
-
-  const verifier = new RecaptchaVerifier(
-    auth,
-    "recaptcha-container",
-    {
-      size: "invisible",
-    }
-  );
-
-  recaptchaVerifier = verifier;
-
-  await verifier.render();
-
+  const verifier = getRecaptcha();
   return signInWithPhoneNumber(auth, phoneNumber, verifier);
 };
