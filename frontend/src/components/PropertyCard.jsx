@@ -7,6 +7,7 @@ import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { State } from "country-state-city";
 
 export default function PropertyCard({ property }) {
   const { user, showAuthModal, wishlist, setWishlist, accessToken } =
