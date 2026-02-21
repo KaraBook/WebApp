@@ -177,7 +177,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
   };
 
   useEffect(() => {
-    const joinedOtp = otp.join("");
+    const joinedOtp = Array.isArray(otp) ? otp.join("") : "";
     if (joinedOtp.length === 6 && !verifying) {
       verifyOtp(joinedOtp);
     }
@@ -305,7 +305,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
                   onClick={() => {
                     clearRecaptcha();
                     setStep("phone");
-                    setOtp("");
+                    setOtp(Array(6).fill("")); 
                     setConfirmResult(null);
                     setTimer(0);
                   }}
