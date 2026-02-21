@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Phone, Shield } from "lucide-react";
+import { Phone, Shield, Loader2 } from "lucide-react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "/firebase";
 
