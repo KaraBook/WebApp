@@ -284,7 +284,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
               <Button
                 className="w-full py-5 rounded-[14px] bg-primary text-white"
-                disabled={phone.length !== 10 || sending}
+                disabled={phone.length !== 10 || sending || timer > 0}
                 onClick={handleSendOtp}
               >
                 {sending ? "Sending OTP..." : "Continue →"}
