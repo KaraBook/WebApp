@@ -43,6 +43,12 @@ export default function PropertyCard({ property }) {
     }
   };
 
+  const stateName = useMemo(() => {
+    if (!property.state) return "";
+    const stateObj = State.getStateByCodeAndCountry(property.state, "IN");
+    return stateObj?.name || property.state;
+  }, [property.state]);
+
   return (
     <Card
       className="
@@ -130,7 +136,7 @@ export default function PropertyCard({ property }) {
 
         <div className="flex items-center text-sm text-gray-500 mt-1">
           <MapPin className="w-4 h-4 mr-1 text-gray-400" />
-          {property.city}, {property.state}
+          {property.city}, {stateName}
         </div>
       </CardContent>
 
