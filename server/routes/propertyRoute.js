@@ -46,10 +46,12 @@ router.post(
   ensureMediaFilesPresent, 
   attachPropertyMediaAndFinalize
 );
-router.get("/", getAllProperties);
-router.get("/published", getPublishedProperties);
 router.get("/featured", getFeaturedProperties);
+router.get("/published", getPublishedProperties);
 router.get("/drafts", requireAuth, requirePropertyAdmin, getDraftProperties);
+router.get("/", getAllProperties);
+
+router.get("/:id/blocked-dates", getPropertyBlockedDatesPublic);
 router.get("/:id", getSingleProperty);
 
 function conditionalUpload(req, res, next) {
@@ -78,7 +80,6 @@ router.put("/:id/block", requireAuth, requirePropertyAdmin, blockProperty);
 router.put("/:id/unblock", requireAuth, requirePropertyAdmin, unblockProperty);
 router.put("/:id/toggle-featured", requireAuth, requirePropertyAdmin, toggleFeaturedProperty);
 router.put("/:id/toggle-publish", requireAuth, requirePropertyAdmin, togglePublishProperty);
-router.get("/:id/blocked-dates", getPropertyBlockedDatesPublic);
 router.delete( "/:id", requireAuth, requirePropertyAdmin, deleteProperty);
 
 
