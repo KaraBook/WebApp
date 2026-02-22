@@ -64,17 +64,6 @@ const baseSchema = {
   image: z.any().optional(),
 };
 
-const schema = z.object(
-  isGoogle
-    ? {
-      ...baseSchema,
-      mobile: z.string()
-        .min(1, "Mobile number is required")
-        .regex(/^[6-9]\d{9}$/, "Enter valid 10-digit mobile"),
-    }
-    : baseSchema
-);
-
 
 
 export default function Signup() {
@@ -83,6 +72,17 @@ export default function Signup() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
   const isGoogle = state?.method === "google"
+
+  const schema = z.object(
+    isGoogle
+      ? {
+        ...baseSchema,
+        mobile: z.string()
+          .min(1, "Mobile number is required")
+          .regex(/^[6-9]\d{9}$/, "Enter valid 10-digit mobile"),
+      }
+      : baseSchema
+  );
 
   const {
     register,
