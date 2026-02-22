@@ -16,12 +16,7 @@ import { toast } from "sonner";
 
 const nameRegex = /^[a-zA-Z][a-zA-Z\s'.-]{1,49}$/;
 
-const schema = z.object({
-  mobile: z
-    .string()
-    .regex(/^[6-9]\d{9}$/, "Enter valid 10-digit mobile")
-    .optional(),
-
+const baseSchema = {
   firstName: z.string()
     .min(2, "First name is too short")
     .max(50)
@@ -42,12 +37,21 @@ const schema = z.object({
     .refine((val) => {
       const dob = new Date(val);
       const today = new Date();
-
       if (dob > today) return false;
 
-      const age = today.getFullYear() - dob.getFullYear();
-      return age >= 18 && age <= 100;
+      const age =
+        today.getFullYear() -
+        dob.getFullYear() -
+        (today <
+          new Date(
+            today.getFullYear(),
+            dob.getMonth(),
+            dob.getDate()
+          )
+          ? 1
+          : 0);
 
+      return age >= 18 && age <= 100;
     }, "Age must be between 18 and 100"),
 
   address: z.string()
@@ -58,7 +62,20 @@ const schema = z.object({
     .regex(/^[1-9][0-9]{5}$/, "Enter valid 6-digit pin code"),
 
   image: z.any().optional(),
-});
+};
+
+const schema = z.object(
+  isGoogle
+    ? {
+      ...baseSchema,
+      mobile: z.string()
+        .min(1, "Mobile number is required")
+        .regex(/^[6-9]\d{9}$/, "Enter valid 10-digit mobile"),
+    }
+    : baseSchema
+);
+
+
 
 export default function Signup() {
 
@@ -73,7 +90,10 @@ export default function Signup() {
     control,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) });
+  } = useForm({
+    resolver: zodResolver(schema),
+    mode: "onSubmit",
+  });
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -226,6 +246,11 @@ export default function Signup() {
                 placeholder="Enter mobile number"
                 {...register("mobile")}
               />
+              {errors.mobile && (
+                <p className="text-sm text-destructive">
+                  {errors.mobile.message}
+                </p>
+              )}
             </div>
           )}
 
