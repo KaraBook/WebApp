@@ -178,8 +178,14 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   useEffect(() => {
     const joinedOtp = Array.isArray(otp) ? otp.join("") : "";
+
     if (joinedOtp.length === 6 && !verifying) {
-      verifyOtp(joinedOtp);
+      (async () => {
+        try {
+          await verifyOtp(joinedOtp);
+        } catch (e) {
+        }
+      })();
     }
   }, [otp]);
 
@@ -304,7 +310,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
                 <button
                   onClick={() => {
                     setStep("phone");
-                    setOtp(Array(6).fill("")); 
+                    setOtp(Array(6).fill(""));
                     setConfirmResult(null);
                     setTimer(0);
                   }}
