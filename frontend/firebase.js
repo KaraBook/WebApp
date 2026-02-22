@@ -17,9 +17,9 @@ let recaptchaVerifier = null;
 export const getRecaptcha = async () => {
   if (!recaptchaVerifier) {
     recaptchaVerifier = new RecaptchaVerifier(
-      "recaptcha-container",
-      { size: "invisible" },
-      auth
+      auth,                     
+      "recaptcha-container",    
+      { size: "invisible" }     
     );
     await recaptchaVerifier.render();
   }
