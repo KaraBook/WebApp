@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { sendOtp as firebaseSendOtp, clearRecaptcha } from "@/firebase";
-import { auth } from "@/firebase";
+import { sendOtp as firebaseSendOtp, clearRecaptcha } from "../../firebase";
+import { auth } from "../../firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
