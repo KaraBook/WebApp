@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { sendOtp as firebaseSendOtp, clearRecaptcha } from "/firebase";
+import { sendOtp as firebaseSendOtp, clearRecaptcha } from "@/firebase";
+import { auth } from "@/firebase";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { useAuthStore } from "../store/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -11,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Phone, Shield, Loader2 } from "lucide-react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "/firebase";
 
 export default function PhoneLoginModal({ open, onOpenChange }) {
   const navigate = useNavigate();
