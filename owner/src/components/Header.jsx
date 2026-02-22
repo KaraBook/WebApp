@@ -44,8 +44,8 @@ export default function Header() {
   const fullName = isManager
     ? `${user?.firstName} (Manager)`
     : `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim() ||
-      user?.name ||
-      "Owner";
+    user?.name ||
+    "Owner";
 
   const getInitials = (name) => {
     const parts = name.trim().split(" ");
@@ -57,22 +57,22 @@ export default function Header() {
 
   const navItems = isManager
     ? [
-        { label: "Dashboard", path: "/manager/dashboard" },
-        { label: "Bookings", path: "/bookings" },
-        { label: "Calendar", path: "/calendar" },
-        { label: "Users", path: "/users" },
-      ]
+      { label: "Dashboard", path: "/manager/dashboard" },
+      { label: "Bookings", path: "/bookings" },
+      { label: "Calendar", path: "/calendar" },
+      { label: "Users", path: "/users" },
+    ]
     : [
-        { label: "Dashboard", path: "/dashboard" },
-        { label: "Property", path: `/view-property/${propertyId ?? ""}` },
-        { label: "Bookings", path: "/bookings" },
-        { label: "Calendar", path: "/calendar" },
-        {
-          label: "Customize",
-          path: propertyId ? `/offline-booking/${propertyId}` : null,
-        },
-        { label: "Users", path: "/users" },
-      ];
+      { label: "Dashboard", path: "/dashboard" },
+      { label: "Property", path: `/view-property/${propertyId ?? ""}` },
+      { label: "Bookings", path: "/bookings" },
+      { label: "Calendar", path: "/calendar" },
+      {
+        label: "Customize",
+        path: propertyId ? `/offline-booking/${propertyId}` : null,
+      },
+      { label: "Users", path: "/users" },
+    ];
 
   const isPropertyActive =
     location.pathname.startsWith("/view-property") ||
@@ -92,7 +92,13 @@ export default function Header() {
       <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur border-b border-gray-200 px-4 sm:px-8 py-3 flex items-center justify-between">
 
         {/* LOGO */}
-        <img src="/KarabookLogo.png" alt="logo" className="h-auto w-[140px]" />
+        <Link to={isManager ? "/manager/dashboard" : "/dashboard"}>
+          <img
+            src="/KarabookLogo.png"
+            alt="Karabook Logo"
+            className="h-auto w-[140px] cursor-pointer"
+          />
+        </Link>
 
         {/* DESKTOP NAV */}
         <nav className="hidden md:flex items-center gap-6">
@@ -107,11 +113,10 @@ export default function Header() {
                 <button
                   key={item.label}
                   onClick={handlePropertyClick}
-                  className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${
-                    active
+                  className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
                       ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   Property
                 </button>
@@ -122,11 +127,10 @@ export default function Header() {
               <NavLink
                 key={item.path}
                 to={item.path}
-                className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${
-                  active
+                className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
                     ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 {item.label}
               </NavLink>
@@ -226,10 +230,9 @@ export default function Header() {
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
                     className={({ isActive }) =>
-                      `block px-4 py-3 rounded-xl text-[15px] transition ${
-                        isActive
-                          ? "bg-white/20 font-semibold"
-                          : "hover:bg-white/10"
+                      `block px-4 py-3 rounded-xl text-[15px] transition ${isActive
+                        ? "bg-white/20 font-semibold"
+                        : "hover:bg-white/10"
                       }`
                     }
                   >

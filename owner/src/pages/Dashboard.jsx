@@ -414,7 +414,7 @@ export default function Dashboard() {
         <div className="space-y-1">
           <h1 className="text-xl sm:text-[26px] font-bold text-gray-900">Dashboard</h1>
           <p className="text-sm sm:text-[16px] text-gray-500">
-            Welcome {user?.firstName ? `, ${user.firstName}` : ""} at {propertyName}
+            Welcome{user?.firstName ? `, ${user.firstName}` : ""} at {propertyName}
           </p>
         </div>
 
