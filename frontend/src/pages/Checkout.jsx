@@ -43,8 +43,8 @@ export default function Checkout() {
     const [creatingOrder, setCreatingOrder] = useState(false);
     const [verifyingPayment, setVerifyingPayment] = useState(false);
     const [openingRazorpay, setOpeningRazorpay] = useState(false);
-    const showFullLoader = creatingOrder || verifyingPayment;
-
+    const showFullLoader =
+        creatingOrder || openingRazorpay || verifyingPayment;
     const hasFood =
         Array.isArray(property?.foodAvailability) &&
         property.foodAvailability.length > 0;
@@ -212,6 +212,7 @@ export default function Checkout() {
 
     const handlePayment = async () => {
         if (creatingOrder || openingRazorpay || verifyingPayment) return;
+
         if (contact.length !== 10) {
             toast.error("Enter a valid 10-digit mobile number");
             return;
@@ -223,11 +224,43 @@ export default function Checkout() {
         }
 
         try {
+            setCreatingOrder(true);
+
+            const toLocalYMD = (date) => {
+                const d = new Date(date);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, "0");
+                const day = String(d.getDate()).padStart(2, "0");
+                return `${y}-${m}-${day}`;
+            };
+
+            // ✅ STEP 1 — CREATE ORDER FROM BACKEND
+            const res = await Axios.post(
+                SummaryApi.createBookingOrder.url,
+                {
+                    propertyId,
+                    checkIn: toLocalYMD(startDate),
+                    checkOut: toLocalYMD(endDate),
+                    guests: guestData,
+                    contactNumber: contact,
+                    meals: mealCounts,
+                }
+            );
+
+            const { order, pricing } = res.data;
+
+            if (!order?.id) {
+                throw new Error("Order creation failed");
+            }
+
+            setPricing(pricing);
             setCreatingOrder(false);
 
+            // ✅ STEP 2 — LOAD RAZORPAY
             const loaded = await loadRazorpayScript();
             if (!loaded) {
-                return toast.error("Razorpay SDK failed to load");
+                toast.error("Razorpay SDK failed to load");
+                return;
             }
 
             setOpeningRazorpay(true);
@@ -284,11 +317,12 @@ export default function Checkout() {
 
             const rzp = new window.Razorpay(options);
             rzp.open();
+
         } catch (err) {
             setCreatingOrder(false);
+            setOpeningRazorpay(false);
             setVerifyingPayment(false);
 
-            console.error(err);
             toast.error(
                 err.response?.data?.message || "Unable to create payment"
             );
@@ -802,11 +836,13 @@ export default function Checkout() {
                         }
                         className="bg-primary text-white rounded-[10px] px-12 py-6 text-base"
                     >
-                        <p className="text-sm font-medium text-gray-700">
-                            {creatingOrder && "Preparing your booking..."}
-                            {openingRazorpay && "Opening secure payment..."}
-                            {verifyingPayment && "Confirming your payment..."}
-                        </p>
+                        {creatingOrder
+                            ? "Preparing payment..."
+                            : openingRazorpay
+                                ? "Opening payment..."
+                                : verifyingPayment
+                                    ? "Confirming payment..."
+                                    : "Pay Now"}
                     </Button>
                 </div>
             </div>
