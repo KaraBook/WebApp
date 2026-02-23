@@ -594,7 +594,7 @@ export default function Checkout() {
                     <div className="border rounded-[12px] p-5 mb-6">
                         {property?.foodAvailability?.length > 0 && (
                             <div className="text-sm">
-                                <span className="text-gray-500">Meals offered:</span>
+                                <span className="font-semibold text-lg">Meals offered:</span>
                                 <span className="ml-2 font-medium text-teal-700">
                                     {property.foodAvailability
                                         .map((item) =>
@@ -605,7 +605,7 @@ export default function Checkout() {
                             </div>
                         )}
 
-                        <div className="bg-green-50 border border-green-200 rounded-[8px] px-3 py-2 mb-4">
+                        <div className="bg-green-50 border border-green-200 rounded-[8px] px-3 py-2 mb-2 mt-1">
                             <p className="text-sm font-medium text-green-700">
                                 🍳 Breakfast is complimentary
                             </p>
@@ -613,7 +613,7 @@ export default function Checkout() {
 
                         {(property.foodAvailability.includes("lunch") ||
                             property.foodAvailability.includes("dinner")) && (
-                                <div className="space-y-4">
+                                <div className="space-y-3">
 
                                     <p className="text-xs text-gray-500">
                                         Add meals (optional)
