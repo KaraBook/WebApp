@@ -199,7 +199,7 @@ export default function Checkout() {
 
 
         fetchPricing();
-    }, [property, startDate, endDate, guestData, mealCounts, includeMeals]);
+    }, [property, startDate, endDate, guestData, mealCounts]);
 
 
     if (loading) return <div className="text-center py-20">Loading...</div>;
