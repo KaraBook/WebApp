@@ -42,6 +42,7 @@ export default function Checkout() {
     const [pricing, setPricing] = useState(null);
     const [creatingOrder, setCreatingOrder] = useState(false);
     const [verifyingPayment, setVerifyingPayment] = useState(false);
+    const [openingRazorpay, setOpeningRazorpay] = useState(false);
     const showFullLoader = creatingOrder || verifyingPayment;
 
     const hasFood =
@@ -222,35 +223,14 @@ export default function Checkout() {
         }
 
         try {
-            setCreatingOrder(true);
-            const toLocalYMD = (date) => {
-                const d = new Date(date);
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, "0");
-                const day = String(d.getDate()).padStart(2, "0");
-                return `${y}-${m}-${day}`;
-            };
-
-            const res = await Axios.post(
-                SummaryApi.createBookingOrder.url,
-                {
-                    propertyId,
-                    checkIn: toLocalYMD(startDate),
-                    checkOut: toLocalYMD(endDate),
-                    guests: guestData,
-                    contactNumber: contact,
-                    meals: mealCounts,
-                },
-            );
-
-            const { order, pricing } = res.data;
-            setPricing(pricing);
             setCreatingOrder(false);
+
             const loaded = await loadRazorpayScript();
             if (!loaded) {
-                setCreatingOrder(false);
                 return toast.error("Razorpay SDK failed to load");
             }
+
+            setOpeningRazorpay(true);
 
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -259,8 +239,10 @@ export default function Checkout() {
                 name: "Villa Booking",
                 description: "Confirm & Pay",
                 order_id: order.id,
+
                 handler: async (response) => {
                     try {
+                        setOpeningRazorpay(false);
                         setVerifyingPayment(true);
 
                         const verifyRes = await Axios.post(
@@ -269,49 +251,38 @@ export default function Checkout() {
                             { timeout: 20000 }
                         );
 
-                        console.log("✅ verifyRes.data:", verifyRes.data);
-
                         const bookingId =
                             verifyRes.data?.bookingId ||
                             verifyRes.data?.data?.bookingId ||
                             verifyRes.data?.booking?._id;
 
                         if (!bookingId) {
-                            throw new Error("bookingId missing in verify response");
+                            throw new Error("bookingId missing");
                         }
 
                         toast.success("Payment successful!");
                         setVerifyingPayment(false);
                         navigate(`/thank-you/${bookingId}`, { replace: true });
+
                     } catch (err) {
                         setVerifyingPayment(false);
-
-                        console.log("❌ verify error full:", err);
-
-                        const msg =
-                            err?.response?.data?.message ||
-                            err?.message ||
-                            "Verify failed";
-
-                        toast.error(msg);
+                        toast.error("Payment verification failed");
                     }
                 },
 
-                prefill: { contact },
+                modal: {
+                    ondismiss: function () {
+                        setOpeningRazorpay(false);
+                        setCreatingOrder(false);
+                        setVerifyingPayment(false);
+                        toast.info("Payment cancelled");
+                    },
+                },
+
                 theme: { color: "#efcc61" },
             };
 
             const rzp = new window.Razorpay(options);
-            rzp.on("modal.closed", function () {
-                setCreatingOrder(false);
-                setVerifyingPayment(false);
-                toast.info("Payment cancelled");
-            });
-            rzp.on("payment.failed", function () {
-                setCreatingOrder(false);
-                setVerifyingPayment(false);
-                toast.error("Payment failed. Please try again.");
-            });
             rzp.open();
         } catch (err) {
             setCreatingOrder(false);
@@ -831,13 +802,11 @@ export default function Checkout() {
                         }
                         className="bg-primary text-white rounded-[10px] px-12 py-6 text-base"
                     >
-                        {creatingOrder
-                            ? "Preparing payment..."
-                            : openingRazorpay
-                                ? "Opening payment gateway..."
-                                : verifyingPayment
-                                    ? "Confirming payment..."
-                                    : "Pay Now"}
+                        <p className="text-sm font-medium text-gray-700">
+                            {creatingOrder && "Preparing your booking..."}
+                            {openingRazorpay && "Opening secure payment..."}
+                            {verifyingPayment && "Confirming your payment..."}
+                        </p>
                     </Button>
                 </div>
             </div>
