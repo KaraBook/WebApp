@@ -96,10 +96,17 @@ export default function PropertyDetails() {
     Array.isArray(property?.foodAvailability) &&
     property.foodAvailability.length > 0;
 
+  const initialStart = new Date();
+  initialStart.setDate(initialStart.getDate() + 1);
+  initialStart.setHours(0, 0, 0, 0);
+
+  const initialEnd = new Date(initialStart);
+  initialEnd.setDate(initialEnd.getDate() + 1);
+
   const [dateRange, setDateRange] = useState([
     {
-      startDate: new Date(),
-      endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+      startDate: initialStart,
+      endDate: initialEnd,
       key: "selection",
     },
   ]);
