@@ -2,15 +2,23 @@ import { Navigate, Outlet } from "react-router-dom";
 
 function ProtectedAdminRoute({ allowPropertyAdmin = false }) {
   const token = localStorage.getItem("accessToken");
-  const role = localStorage.getItem("role");
 
   if (!token) return <Navigate to="/login" replace />;
 
-  if (!allowPropertyAdmin && role !== "admin") {
+  let activeRole = null;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    activeRole = payload.activeRole;
+  } catch {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!allowPropertyAdmin && activeRole !== "admin") {
     return <Navigate to="/dashboard" replace />;
   }
 
   return <Outlet />;
 }
 
-export default ProtectedAdminRoute; 
+export default ProtectedAdminRoute;

@@ -8,7 +8,7 @@ import { useAuthStore } from "@/store/auth";
 import EditProfileDialog from "../EditProfileDialog";
 
 export default function Profile() {
-  const { accessToken, clearAuth, updateUser } = useAuthStore();
+  const { accessToken, clearAuth, updateUser, user } = useAuthStore();
   const [profile, setProfile] = useState(null);
   const [bookingCount, setBookingCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -85,20 +85,20 @@ export default function Profile() {
     : "—";
 
   const handleRemoveAvatar = async () => {
-  try {
-    await Axios.delete(SummaryApi.removeTravellerAvatar.url);
+    try {
+      await Axios.delete(SummaryApi.removeTravellerAvatar.url);
 
-    setAvatarPreview("");
-    updateUser({ avatarUrl: "" });
+      setAvatarPreview("");
+      updateUser({ avatarUrl: "" });
 
-    fileRef.current.value = "";   
+      fileRef.current.value = "";
 
-    toast.success("Profile photo removed");
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to remove photo");
-  }
-};
+      toast.success("Profile photo removed");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove photo");
+    }
+  };
 
 
   return (
@@ -169,6 +169,18 @@ export default function Profile() {
           <h2 className="text-xl font-semibold text-gray-900">
             {profile.name}
           </h2>
+          {profile.roles?.length > 0 && (
+            <div className="flex gap-2 mt-2 flex-wrap">
+              {profile.roles.map((role) => (
+                <span
+                  key={role}
+                  className="px-2 py-1 text-xs bg-gray-100 rounded-md capitalize"
+                >
+                  {role}
+                </span>
+              ))}
+            </div>
+          )}
           <p className="text-gray-500 text-sm mt-1">
             {profile.email}
           </p>

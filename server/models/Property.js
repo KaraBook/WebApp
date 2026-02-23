@@ -27,13 +27,13 @@ const propertySchema = new mongoose.Schema({
       type: String, required: true, minlength: 2, maxlength: 50,
       match: [/^[\p{L}\s.'-]+$/u, "Last name must contain only letters, spaces, and allowed special characters (.'-)"]
     },
-    email: { type: String, required: true, lowercase: true, match: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/, unique: true },
+    email: { type: String, required: true, lowercase: true, match: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/ },
     resortEmail: { type: String, required: true, lowercase: true, match: /^[\w.-]+@([\w-]+\.)+[\w-]{2,4}$/ },
-    mobile: { type: String, required: true, match: /^[6-9]\d{9}$/, unique: true },
+    mobile: { type: String, required: true, match: /^[6-9]\d{9}$/ },
     resortMobile: { type: String, required: true, match: /^[6-9]\d{9}$/ },
   },
 
-  ownerUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  ownerUserId: { type: mongoose.Schema.Types.ObjectId, ref: "User", index: true },
 
   propertyType: { type: String, enum: ["villa", "tent", "cottage", "hotel", "apartment"], required: true },
   description: { type: String, required: true, minlength: 30, maxlength: 1000 },
@@ -173,6 +173,10 @@ const propertySchema = new mongoose.Schema({
       addedByOwner: { type: Boolean, default: true }
     }
   ],
+  ownerPublishedEmailSent: {
+    type: Boolean,
+    default: false,
+  },
 
 
 }, { timestamps: true });

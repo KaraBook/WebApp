@@ -27,6 +27,22 @@ import TagInput from "@/components/TagInput";
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
 
 const AddProperty = () => {
+    const getRoles = (u) =>
+        Array.isArray(u?.roles) ? u.roles : (u?.role ? [u.role] : []);
+    const hasAnyRole = (u, list) => {
+        const roles = getRoles(u);
+        return roles.some((r) => list.includes(r));
+    };
+    const authUser = (() => {
+        try {
+            return JSON.parse(localStorage.getItem("user") || "null");
+        } catch {
+            return null;
+        }
+    })();
+    const isAdmin = hasAnyRole(authUser, ["admin"]);
+    const isOwnerLike = hasAnyRole(authUser, ["resortOwner", "manager", "property_admin"]);
+
     const navigate = useNavigate();
     const [states, setStates] = useState([]);
     const [cities, setCities] = useState([]);
@@ -115,21 +131,27 @@ const AddProperty = () => {
         const e = {};
 
         if (stepToValidate === 1) {
-
             if (!formData.propertyName || formData.propertyName.trim().length < 10)
                 e.propertyName = "Property name must be at least 10 characters";
+
             if (!formData.propertyType)
                 e.propertyType = "Please select property type";
+
             if (!formData.resortOwner.firstName)
                 e.firstName = "Owner first name is required";
+
             if (!formData.resortOwner.lastName)
                 e.lastName = "Owner last name is required";
+
             if (!/^[6-9]\d{9}$/.test(formData.resortOwner.mobile))
                 e.mobile = "Enter valid 10 digit Indian mobile number";
+
             if (!/\S+@\S+\.\S+/.test(formData.resortOwner.email))
                 e.email = "Enter valid email address";
+
             if (!formData.resortOwner.password || formData.resortOwner.password.length < 6)
                 e.password = "Password must be at least 6 characters";
+
             if (!formData.description || formData.description.length < 30)
                 e.description = "Description must be minimum 30 characters";
         }
@@ -228,7 +250,7 @@ const AddProperty = () => {
                 ...formData.resortOwner,
                 firstName: formData.resortOwner.firstName?.trim(),
                 lastName: formData.resortOwner.lastName?.trim(),
-                email: formData.resortOwner.email?.trim(),
+                email: formData.resortOwner.email?.trim()?.toLowerCase(),
                 mobile: formData.resortOwner.mobile?.trim(),
                 resortEmail: formData.resortOwner.resortEmail?.trim(),
                 resortMobile: formData.resortOwner.resortMobile?.trim(),
@@ -334,6 +356,7 @@ const AddProperty = () => {
 
         try {
             const payload = buildDraftPayload();
+
             const resp = await Axios.post(
                 SummaryApi.createPropertyDraft.url,
                 payload,
@@ -725,10 +748,7 @@ const AddProperty = () => {
                                     if (/^\d*$/.test(value)) {
                                         setFormData((prev) => ({
                                             ...prev,
-                                            resortOwner: {
-                                                ...prev.resortOwner,
-                                                resortMobile: value,
-                                            },
+                                            resortOwner: { ...prev.resortOwner, resortMobile: value },
                                         }));
                                     }
                                 }}

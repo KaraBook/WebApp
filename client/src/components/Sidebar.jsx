@@ -10,7 +10,9 @@ function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const role = localStorage.getItem("role");
+  const role =
+  JSON.parse(atob(localStorage.getItem("accessToken")?.split(".")[1] || "{}"))
+    ?.activeRole || null;
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 

@@ -73,18 +73,13 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
         setSending(true);
         try {
-            await axios.post(
-                baseURL + SummaryApi.travellerPrecheck.url,
-                { mobile }
-            );
-
             const confirmation = await firebaseSendOtp(`+91${mobile}`);
 
             setConfirmResult(confirmation);
             setTimer(60);
             toast.success("OTP sent successfully");
         } catch (err) {
-            toast.error(err?.response?.data?.message || "Cannot send OTP");
+            toast.error("Cannot send OTP");
         } finally {
             setSending(false);
         }

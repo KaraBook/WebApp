@@ -34,7 +34,7 @@ export default function MobileUserCard({ user, onView }) {
 
   return (
     <div
-      onClick={() => onView(user)}   // ✅ CARD CLICK
+      onClick={() => onView(user)}   
       className="
         md:hidden
         bg-white border rounded-xl p-4 shadow-sm
@@ -57,13 +57,6 @@ export default function MobileUserCard({ user, onView }) {
               {user.firstName} {user.lastName}
             </span>
 
-            <span className="
-              text-[10px] px-2 py-[2px]
-              rounded-full border
-              bg-neutral-50 text-neutral-600 font-medium
-            ">
-              {roleLabel}
-            </span>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-neutral-600">

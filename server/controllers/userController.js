@@ -5,19 +5,24 @@ import { normalizeMobile } from "../utils/phone.js";
 import fs from "fs";
 import path from "path";
 
-const issueTokens = (user) => {
+const issueTokens = (user, activeRole) => {
+  const roles = Array.isArray(user.roles)
+    ? user.roles
+    : (user.role ? [user.role] : []);
   const accessToken = jwt.sign(
-    { id: user._id, role: user.role },
+    {
+      id: user._id,
+      roles,
+      activeRole,
+    },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "6h" }
   );
-
   const refreshToken = jwt.sign(
     { id: user._id },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "30d" }
   );
-
   return { accessToken, refreshToken };
 };
 
@@ -28,7 +33,8 @@ const publicUser = (u) => ({
   lastName: u.lastName,
   email: u.email,
   mobile: u.mobile,
-  role: u.role,
+  roles: u.roles,
+  primaryRole: u.primaryRole,
   state: u.state,
   city: u.city,
   dateOfBirth: u.dateOfBirth,
@@ -54,15 +60,24 @@ export const login = async (req, res) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
-    const { accessToken, refreshToken } = issueTokens(user);
+    const roles = user.roles || [];
+    const activeRole =
+      roles.includes("admin") ? "admin" :
+        roles.includes("property_admin") ? "property_admin" :
+          roles.includes("manager") ? "manager" :
+            roles.includes("resortOwner") ? "resortOwner" :
+              "traveller";
+
+    const { accessToken, refreshToken } = issueTokens(user, activeRole);
 
     return res.json({
       data: {
         accessToken,
         refreshToken,
-        role: user.role,
+        activeRole,
+        roles,
         user: publicUser(user),
-      }
+      },
     });
 
   } catch (err) {
@@ -77,11 +92,19 @@ export const refreshToken = async (req, res) => {
     const token = req.headers.authorization?.split(" ")[1];
     const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).select("roles primaryRole");
     if (!user) throw new Error();
 
+    const roles = user.roles || [];
+    const activeRole =
+      roles.includes("admin") ? "admin" :
+        roles.includes("property_admin") ? "property_admin" :
+          roles.includes("manager") ? "manager" :
+            roles.includes("resortOwner") ? "resortOwner" :
+              "traveller";
+
     const newAccessToken = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, roles, activeRole },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "6h" }
     );
@@ -96,6 +119,8 @@ export const refreshToken = async (req, res) => {
       data: {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
+        activeRole,
+        roles,
       },
     });
   } catch {
@@ -112,38 +137,27 @@ export const travellerLogin = async (req, res) => {
     if (!normalized || normalized.length !== 10) {
       return res.status(400).json({ message: "Invalid phone token" });
     }
-
-    const user = await User.findOne({
-      mobile: normalized.trim(),
-    });
+    const user = await User.findOne({ mobile: normalized.trim() });
     if (!user) {
       return res.status(404).json({ message: "User not found. Please sign up first." });
     }
-
-    // 🚫 Block resortOwner/admin
-    if (user.role === "resortOwner") {
-      return res.status(403).json({
-        message: "This number belongs to a Resort Owner account. Please log in through the Owner Portal.",
-      });
-    }
-    if (user.role === "admin") {
+    const roles = user.roles || [];
+    if (roles.includes("admin") && !roles.includes("traveller")) {
       return res.status(403).json({
         message: "Admins cannot log in via traveller portal.",
       });
     }
-
-    // ✅ Only traveller can pass
-    if (user.role !== "traveller") {
+    if (!roles.includes("traveller")) {
       return res.status(403).json({
-        message: "Access restricted. Traveller login allowed only for traveller accounts.",
+        message: "This account is not enabled for Traveller portal.",
       });
     }
-
-    const { accessToken, refreshToken } = issueTokens(user);
+    const tokens = issueTokens(user, "traveller");
     return res.status(200).json({
       message: "Traveller login successful",
-      accessToken,
-      refreshToken,
+      ...tokens,
+      activeRole: "traveller",
+      roles,
       user: publicUser(user),
     });
   } catch (err) {
@@ -173,54 +187,22 @@ export const travellerPrecheck = async (req, res) => {
   if (!normalized || normalized.length !== 10) {
     return res.status(400).json({ message: "Invalid mobile number" });
   }
-
-  const user = await User.findOne({
-    mobile: normalized.trim(),
-  });
-
-  if (user && user.role !== "traveller") {
-    return res.status(403).json({
-      message:
-        user.role === "resortOwner"
-          ? "This number belongs to a Resort Owner account"
-          : "This number is not allowed for traveller login",
-    });
-  }
-
   return res.status(200).json({ allowOtp: true });
 };
-
 
 
 export const travellerSignup = async (req, res) => {
   try {
     let mobile = null;
-
     if (req.firebaseUser?.phone_number) {
       mobile = normalizeMobile(req.firebaseUser.phone_number);
     }
-
     if (!mobile && req.body.mobile) {
       mobile = normalizeMobile(req.body.mobile);
     }
-
     if (!mobile || mobile.length !== 10) {
       return res.status(400).json({ message: "Valid mobile number required" });
     }
-    if (!mobile || mobile.length !== 10) {
-      return res.status(400).json({ message: "Invalid phone token" });
-    }
-
-    const existingAnyRole = await User.findOne({ mobile: mobile.trim() }).select("role");
-    if (existingAnyRole && existingAnyRole.role !== "traveller") {
-      return res.status(403).json({
-        message:
-          existingAnyRole.role === "resortOwner"
-            ? "This number belongs to a Resort Owner account"
-            : "This number is not allowed for traveller signup",
-      });
-    }
-
     const {
       firstName,
       lastName,
@@ -231,7 +213,6 @@ export const travellerSignup = async (req, res) => {
       address,
       pinCode,
     } = req.body ?? {};
-
     if (
       !firstName ||
       !lastName ||
@@ -244,56 +225,58 @@ export const travellerSignup = async (req, res) => {
     ) {
       return res.status(400).json({ message: "All fields are required" });
     }
+    const emailLower = email.toLowerCase().trim();
+    let user = await User.findOne({
+      $or: [{ mobile: mobile.trim() }, { email: emailLower }],
+    });
+    if (user) {
+      user.roles = Array.from(new Set([...(user.roles || []), "traveller"]));
+      user.firstName = firstName;
+      user.lastName = lastName;
+      user.name = `${firstName} ${lastName}`.trim();
+      user.email = emailLower;
+      user.state = state;
+      user.city = city;
+      user.dateOfBirth = new Date(dateOfBirth);
+      user.address = address;
+      user.pinCode = pinCode;
+      user.mobile = mobile.trim();
 
-    if (existingAnyRole) {
-      return res.status(409).json({
-        message: "User already exists. Please login.",
+      await user.save();
+
+      const tokens = issueTokens(user, "traveller");
+      return res.status(200).json({
+        message: "Traveller profile enabled successfully",
+        ...tokens,
+        user: publicUser(user),
       });
     }
-
-    const existsEmail = await User.findOne({
-      email: email.toLowerCase(),
-    }).select("_id");
-
-    if (existsEmail) {
-      return res.status(409).json({ message: "Email already in use." });
-    }
-
-    const user = await User.create({
+    user = await User.create({
       firstName,
       lastName,
       name: `${firstName} ${lastName}`.trim(),
-      email: email.toLowerCase(),
+      email: emailLower,
       state,
       city,
-      mobile,
-      role: "traveller",
+      mobile: mobile.trim(),
+      roles: ["traveller"],
+      primaryRole: "traveller",
       dateOfBirth: new Date(dateOfBirth),
       address,
       pinCode,
     });
-
-    const { accessToken, refreshToken } = issueTokens(user);
-
+    const tokens = issueTokens(user, "traveller");
     return res.status(201).json({
       message: "Signup successful",
-      accessToken,
-      refreshToken,
+      ...tokens,
       user: publicUser(user),
     });
   } catch (err) {
     console.error("Traveller signup error:", err);
-
-    if (err.name === "ValidationError") {
-      return res.status(400).json({
-        message: Object.values(err.errors)[0].message,
-      });
-    }
     if (err?.code === 11000) {
       const field = Object.keys(err?.keyPattern ?? {})[0] || "field";
       return res.status(409).json({ message: `${field} already exists` });
     }
-
     return res.status(500).json({
       message: "Signup failed",
       error: err.message,
@@ -346,7 +329,8 @@ export const updateTravellerMobile = async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
-    if (user.role !== "traveller") {
+    const roles = user.roles || [];
+    if (!roles.includes("traveller")) {
       return res.status(403).json({ message: "Only travellers can update mobile here" });
     }
 
@@ -405,38 +389,27 @@ export const resortOwnerLogin = async (req, res) => {
   try {
     const { firebaseUser } = req;
     const mobile = normalizeMobile(firebaseUser?.phone_number);
-
     if (!mobile || mobile.length !== 10) {
       return res.status(400).json({ message: "Invalid phone verification token" });
     }
-
     const user = await User.findOne({ mobile: mobile.trim() });
     if (!user) {
       return res.status(404).json({
         message:
-          "No account found for this mobile number. Please contact our support team to register your property.",
+          "No account found for this mobile number. Please contact support to register your property.",
       });
     }
-
-    if (user.role === "traveller") {
+    const roles = user.roles || [];
+    if (!roles.some((r) => ["admin", "resortOwner", "manager"].includes(r))) {
       return res.status(403).json({
-        message:
-          "This mobile number is registered as a Traveller account. Please log in through the Traveller Portal instead.",
+        message: "Access denied. Only Owners/Managers/Admins can use this portal.",
       });
     }
-
-    if (!["admin", "resortOwner", "manager"].includes(user.role)) {
-      return res.status(403).json({
-        message:
-          "Access denied. Only verified Resort Owners, Managers or Admins can use this portal.",
-      });
-    }
-
-    const { accessToken, refreshToken } = issueTokens(user);
+    const activeRole = roles.includes("manager") ? "manager" : (roles.includes("resortOwner") ? "resortOwner" : "admin");
+    const tokens = issueTokens(user, activeRole);
     return res.status(200).json({
       message: "Login successful",
-      accessToken,
-      refreshToken,
+      ...tokens,
       user: publicUser(user),
     });
   } catch (err) {
@@ -459,17 +432,14 @@ export const resortOwnerPasswordLogin = async (req, res) => {
         message: "Username/email and password are required",
       });
     }
-    const user = await User.findOne({
-      $or: [
-        { email: identifier.toLowerCase() },
-        { username: identifier },
-      ],
-    }).select("+password");
+    const email = identifier.toLowerCase().trim();
+    const user = await User.findOne({ email }).select("+password roles");
 
     if (!user || !user.password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    if (!["resortOwner", "manager", "admin"].includes(user.role)) {
+    const roles = user.roles || [];
+    if (!roles.some((r) => ["resortOwner", "manager", "admin"].includes(r))) {
       return res.status(403).json({
         message: "Access denied. Only owners/managers/admins allowed.",
       });
@@ -479,12 +449,13 @@ export const resortOwnerPasswordLogin = async (req, res) => {
     if (!ok) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const { accessToken, refreshToken } = issueTokens(user);
-    return res.json({
-      accessToken,
-      refreshToken,
-      user: publicUser(user),
-    });
+    const activeRole =
+      roles.includes("manager") ? "manager" :
+        roles.includes("resortOwner") ? "resortOwner" :
+          "admin";
+
+    const tokens = issueTokens(user, activeRole);
+    return res.json({ ...tokens, activeRole, roles, user: publicUser(user) });
   } catch (err) {
     console.error("Owner password login error:", err);
     return res.status(500).json({
@@ -501,8 +472,8 @@ export const updateOwnerProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    if (!["resortOwner", "manager", "admin"].includes(user.role)) {
+    const roles = user.roles || [];
+    if (!roles.some((r) => ["resortOwner", "manager", "admin"].includes(r))) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
@@ -642,10 +613,9 @@ export const updateOwnerMobile = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!["resortOwner", "manager", "admin"].includes(user.role)) {
-      return res.status(403).json({
-        message: "Only owners/managers/admins can update mobile",
-      });
+    const roles = user.roles || [];
+    if (!roles.some((r) => ["resortOwner", "manager", "admin"].includes(r))) {
+      return res.status(403).json({ message: "Not allowed" });
     }
 
     if (user.mobile === newMobile) {
@@ -657,22 +627,17 @@ export const updateOwnerMobile = async (req, res) => {
     const exists = await User.findOne({
       mobile: newMobile.trim(),
       _id: { $ne: userId },
-    }).select("role");
+    }).select("roles");
 
     if (exists) {
+      const eroles = exists.roles || [];
       let message = "This mobile number is already in use.";
-      if (exists.role === "traveller") {
-        message =
-          "This number belongs to a Traveller account. Please use a different number.";
-      }
-      if (exists.role === "resortOwner") {
-        message =
-          "This number belongs to another Resort Owner account.";
-      }
-      if (exists.role === "manager") {
-        message =
-          "This number belongs to a Manager account.";
-      }
+
+      if (eroles.includes("traveller")) message = "This number belongs to a Traveller account. Please use a different number.";
+      else if (eroles.includes("resortOwner")) message = "This number belongs to another Resort Owner account.";
+      else if (eroles.includes("manager")) message = "This number belongs to a Manager account.";
+      else if (eroles.includes("admin")) message = "This number belongs to an Admin account.";
+
       return res.status(409).json({ message });
     }
 
@@ -707,26 +672,16 @@ export const checkMobileAvailability = async (req, res) => {
 
     const exists = await User.findOne({
       mobile: normalized.trim(),
-    }).select("role");
+    }).select("roles");
 
     if (exists) {
+      const eroles = exists.roles || [];
       let message = "This mobile number is already in use.";
 
-      if (exists.role === "traveller") {
-        message = "This number belongs to a Traveller account.";
-      }
-
-      if (exists.role === "resortOwner") {
-        message = "This number belongs to another Resort Owner account.";
-      }
-
-      if (exists.role === "manager") {
-        message = "This number belongs to a Manager account.";
-      }
-
-      if (exists.role === "admin") {
-        message = "This number belongs to an Admin account.";
-      }
+      if (eroles.includes("traveller")) message = "This number belongs to a Traveller account.";
+      else if (eroles.includes("resortOwner")) message = "This number belongs to another Resort Owner account.";
+      else if (eroles.includes("manager")) message = "This number belongs to a Manager account.";
+      else if (eroles.includes("admin")) message = "This number belongs to an Admin account.";
 
       return res.status(409).json({ message });
     }
@@ -777,15 +732,16 @@ export const checkResortOwnerNumber = async (req, res) => {
       });
     }
 
-    if (user.role === "traveller") {
+    const roles = user.roles || [];
+
+    if (roles.includes("traveller") && !roles.some(r => ["resortOwner", "manager", "admin"].includes(r))) {
       return res.status(403).json({
         success: false,
-        message:
-          "This number belongs to a Traveller account. Please log in via the Traveller Portal.",
+        message: "This number belongs to a Traveller-only account. Please use Traveller Portal.",
       });
     }
 
-    if (!["resortOwner", "admin", "manager"].includes(user.role)) {
+    if (!roles.some((r) => ["resortOwner", "admin", "manager"].includes(r))) {
       return res.status(403).json({
         success: false,
         message: "Access denied. Only Owners, Managers or Admins can log in here.",
@@ -809,13 +765,17 @@ export const checkResortOwnerNumber = async (req, res) => {
 export const me = async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) return res.status(404).json({ message: "User not found" });
-  res.json({ user: publicUser(user), roleNotice: `Logged in as ${user.role}` });
+  return res.json({
+    user: publicUser(user),
+    roles: req.user.roles || user.roles || [],
+    activeRole: req.user.activeRole || user.primaryRole || null,
+  });
 };
 
 
 export const managerPrecheck = async (req, res) => {
   const { mobile } = req.body;
-  const user = await User.findOne({ mobile, role: "manager" });
+  const user = await User.findOne({ mobile, roles: "manager" });
   if (!user) return res.status(404).json({ message: "Manager not found" });
   res.json({ success: true });
 };
@@ -829,15 +789,16 @@ export const managerLogin = async (req, res) => {
   }
   const user = await User.findOne({
     mobile: mobile.trim(),
-    role: "manager",
+    roles: "manager",
   });
   if (!user) {
     return res.status(401).json({ message: "Not authorized as manager" });
   }
-  const { accessToken, refreshToken } = issueTokens(user);
+  const tokens = issueTokens(user, "manager");
   return res.json({
-    accessToken,
-    refreshToken,
+    ...tokens,
+    activeRole: "manager",
+    roles: user.roles || [],
     user: publicUser(user),
   });
 };
@@ -892,30 +853,18 @@ export const travellerLoginGoogle = async (req, res) => {
   const email = req.firebaseUser?.email;
   if (!email) return res.status(400).json({ message: "No email" });
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email: email.toLowerCase().trim() });
   if (!user) return res.status(404).json({ message: "Not registered" });
 
-  if (user.role === "resortOwner") {
-    return res.status(403).json({
-      message: "This account belongs to a Resort Owner. Please log in through the Owner Portal."
-    });
+  if (!user.roles.includes("traveller")) {
+    user.roles.push("traveller");
+    await user.save();
   }
-
-  if (user.role === "admin") {
-    return res.status(403).json({
-      message: "This account belongs to an Admin. Please log in through the Admin Portal."
-    });
-  }
-
-  if (user.role !== "traveller") {
-    return res.status(403).json({
-      message: "This account is not allowed on the Traveller portal."
-    });
-  }
-
-  const tokens = issueTokens(user);
+  const tokens = issueTokens(user, "traveller");
   return res.json({
     ...tokens,
+    activeRole: "traveller",
+    roles: user.roles,
     user: publicUser(user),
   });
 };

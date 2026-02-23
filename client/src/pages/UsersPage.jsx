@@ -85,8 +85,7 @@ const UsersPage = () => {
     if (selectedFilter !== "all") {
       base = base.filter(
         (u) =>
-          (u.role || "")
-            .toString()
+          (u.roles?.[0] || "").toLowerCase()
             .toLowerCase()
             .trim() === selectedFilter.toLowerCase()
       );
@@ -97,7 +96,7 @@ const UsersPage = () => {
     if (!q) return base;
 
     return base.filter((u) =>
-      [u.firstName, u.lastName, u.email, u.mobile, u.city, u.state, u.role]
+      [u.firstName, u.lastName, u.email, u.mobile, u.city, u.state, u.roles?.join(", ")]
         .filter(Boolean)
         .join(" ")
         .toLowerCase()
@@ -278,7 +277,7 @@ const UsersPage = () => {
                             <span className="font-medium">
                               {u.firstName} {u.lastName}
                             </span>
-                            <div className="mt-0.5 capitalize"><span>{u.role}</span></div>
+                            <div className="mt-0.5 capitalize"><span>{u.roles?.join(", ")}</span></div>
                           </div>
                         </div>
                       </TableCell>

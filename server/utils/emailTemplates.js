@@ -141,3 +141,35 @@ export function bookingConfirmationTemplate({
     `
   };
 }
+
+
+export function propertyPublishedTemplate({
+  ownerFirstName,
+  propertyName,
+  portalUrl = "https://karabookdev.cloud/owner/dashboard",
+}) {
+  const greeting = ownerFirstName ? `Hi ${ownerFirstName},` : "Hi,";
+
+  return {
+    subject: `Your property "${propertyName}" is now live! 🎉`,
+    html: `
+      <div style="font-family: Inter, Arial, sans-serif; line-height:1.6; color:#111">
+        <h2>Property Published Successfully</h2>
+        <p>${greeting}</p>
+        <p>Great news! Your property <strong>${propertyName}</strong> has now been published and is live on Karabook.</p>
+        <p>You can now start receiving bookings from travellers.</p>
+        <p>
+          <a href="${portalUrl}" 
+             style="display:inline-block;background:#0694a0;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">
+            Go to Owner Dashboard
+          </a>
+        </p>
+      </div>
+    `,
+    text:
+      `Hi,\n\n` +
+      `Your property "${propertyName}" is now live on Karabook.\n\n` +
+      `You can start receiving bookings.\n\n` +
+      `Dashboard: ${portalUrl}`,
+  };
+}

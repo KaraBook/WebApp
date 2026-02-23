@@ -8,8 +8,10 @@ const router = express.Router();
 
 const requireAdmin = async (req, res, next) => {
   try {
-    const u = await User.findById(req.user.id).select("role");
-    if (!u || u.role !== "admin") return res.status(403).json({ message: "Admin only" });
+    const u = await User.findById(req.user.id).select("roles");
+    if (!u || !Array.isArray(u.roles) || !u.roles.includes("admin")) {
+      return res.status(403).json({ message: "Admin only" });
+    }
     next();
   } catch {
     return res.status(401).json({ message: "Unauthorized" });
@@ -36,13 +38,13 @@ router.get("/users", requireAuth, requireAdmin, async (_req, res) => {
     const users = await User.aggregate([
       {
         $match: {
-          role: { $in: ["traveller", "resortOwner", "admin"] },
+          roles: { $in: ["traveller", "resortOwner", "admin"] },
         },
       },
 
       {
         $lookup: {
-          from: "bookings",        
+          from: "bookings",
           localField: "_id",
           foreignField: "userId",
           as: "bookings",

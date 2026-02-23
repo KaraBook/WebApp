@@ -46,8 +46,6 @@ export default function UserDetailsDrawer({ open, user, onClose }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <RolePill role={user.role} />
-
           <button
             onClick={onClose}
             className="p-1 rounded-md text-red-500 hover:bg-red-50"
@@ -98,7 +96,22 @@ export default function UserDetailsDrawer({ open, user, onClose }) {
         </Section>
 
         <Section title="Account Information">
-          <InfoRow icon={Shield} value={user.role} />
+          <InfoRow
+            icon={Shield}
+            value={
+              user.roles?.length
+                ? user.roles
+                  .map((r) => {
+                    if (r === "traveller") return "Traveller";
+                    if (r === "resortOwner") return "Resort Owner";
+                    if (r === "admin") return "Admin";
+                    if (r === "manager") return "Manager";
+                    return r.charAt(0).toUpperCase() + r.slice(1);
+                  })
+                  .join(", ")
+                : "—"
+            }
+          />
           <InfoRow
             icon={Calendar}
             value={`Joined on ${formatDate(user.createdAt)}`}
@@ -207,7 +220,15 @@ function RolePill({ role }) {
         ${map[role] || "border-neutral-300 text-neutral-600"}
       `}
     >
-      {role === "traveller" ? "Traveller" : role}
+      {role === "traveller"
+        ? "Traveller"
+        : role === "resortOwner"
+          ? "Resort Owner"
+          : role === "admin"
+            ? "Admin"
+            : role === "manager"
+              ? "Manager"
+              : role}
     </span>
   );
 }

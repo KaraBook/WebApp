@@ -49,10 +49,11 @@ const EditProperty = () => {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [errors, setErrors] = useState({});
+  const [isDraftProperty, setIsDraftProperty] = useState(false);
 
   const [formData, setFormData] = useState({
     propertyName: "",
-    resortOwner: { firstName: "", lastName: "", email: "", mobile: "", resortEmail: "", resortMobile: "" },
+    resortOwner: { firstName: "", lastName: "", email: "", mobile: "", resortEmail: "", resortMobile: "", password: "" },
     propertyType: "",
     description: "",
     addressLine1: "",
@@ -237,6 +238,7 @@ const EditProperty = () => {
     const init = async () => {
       try {
         setFetching(true);
+
         const allStates = getIndianStates();
         setStates(allStates);
 
@@ -244,6 +246,8 @@ const EditProperty = () => {
         const prop = res.data?.data;
 
         if (!prop) throw new Error("Property not found");
+
+        setIsDraftProperty(!!prop.isDraft);
 
         const cityList = prop.state ? getCitiesByState(prop.state) : [];
         setCities(cityList);
@@ -376,7 +380,13 @@ const EditProperty = () => {
         }
 
         if (key === "resortOwner") {
-          data.append("resortOwner", JSON.stringify(value));
+          const safeOwner = { ...value };
+
+          if (!isDraftProperty) {
+            delete safeOwner.password;
+          }
+
+          data.append("resortOwner", JSON.stringify(safeOwner));
           return;
         }
 
@@ -631,28 +641,64 @@ const EditProperty = () => {
               )}
             </div>
 
-            {/* Mobile Number */}
-            <div className="md:w-[48%] w-[100%]">
-              <Label htmlFor="resortOwnerMobile" className="text-sm">
-                Resort Owner Mobile Number <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="resortOwnerMobile"
-                type="tel"
-                className={`mt-2 ${errors.mobile ? "border-red-500" : ""}`}
-                value={formData.resortOwner.mobile}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (/^\d*$/.test(v)) {
-                    setOwnerField("mobile", v);
-                    clearFieldError("mobile");
-                  }
-                }}
-                maxLength={10}
-              />
-              {errors.mobile && (
-                <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>
+            <div className="md:w-[48%] w-[100%] flex justify-between items-start">
+
+              {isDraftProperty && (
+                <div className="md:w-[48%] w-[100%]">
+                  <Label className="text-sm">
+                    Owner Password <span className="text-red-500">*</span>
+                  </Label>
+
+                  <Input
+                    type="password"
+                    className="mt-2"
+                    value={formData.resortOwner.password}
+                    placeholder="Password already set. Enter to change"
+                    onChange={(e) => setOwnerField("password", e.target.value)}
+                  />
+
+                  <p className="text-xs text-gray-500 mt-1">
+                    For security, password is not displayed. Enter a new one only if you want to change it.
+                  </p>
+                </div>
               )}
+
+              {!isDraftProperty && (
+                <div className="md:w-[48%] w-[100%]">
+                  <Label className="text-sm">Owner Password</Label>
+                  <Input
+                    type="password"
+                    disabled
+                    placeholder="Password cannot be edited after publish"
+                    className="mt-2 bg-gray-100 cursor-not-allowed"
+                  />
+                </div>
+              )}
+
+              {/* Mobile Number */}
+              <div className="md:w-[48%] w-[100%]">
+                <Label htmlFor="resortOwnerMobile" className="text-sm">
+                  Resort Owner Mobile Number <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="resortOwnerMobile"
+                  type="tel"
+                  className={`mt-2 ${errors.mobile ? "border-red-500" : ""}`}
+                  value={formData.resortOwner.mobile}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (/^\d*$/.test(v)) {
+                      setOwnerField("mobile", v);
+                      clearFieldError("mobile");
+                    }
+                  }}
+                  maxLength={10}
+                />
+                {errors.mobile && (
+                  <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>
+                )}
+              </div>
+
             </div>
 
             {/* Resort Email */}

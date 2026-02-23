@@ -6,7 +6,7 @@ import crypto from "crypto";
 import mongoose from "mongoose";
 import { normalizeMobile } from "../utils/phone.js";
 import { sendMail } from "../utils/mailer.js";
-import { propertyCreatedTemplate } from "../utils/emailTemplates.js";
+import { propertyCreatedTemplate, propertyPublishedTemplate } from "../utils/emailTemplates.js";
 import get from "lodash.get";
 
 
@@ -46,7 +46,29 @@ async function sendOwnerCreationEmail(prop, { password = null } = {}) {
   }
 }
 
+async function sendPropertyPublishedEmail(prop) {
+  try {
+    const owner = await User.findById(prop.ownerUserId);
+    if (!owner) return;
 
+    const mailData = propertyPublishedTemplate({
+      ownerFirstName: owner.firstName,
+      propertyName: prop.propertyName,
+      portalUrl: `${process.env.PORTAL_URL}/owner/dashboard`,
+    });
+
+    await sendMail({
+      to: owner.email,
+      subject: mailData.subject,
+      text: mailData.text,
+      html: mailData.html,
+    });
+
+    console.log("✅ Property published email sent");
+  } catch (err) {
+    console.error("❌ Publish email failed:", err);
+  }
+}
 
 
 function parseResortOwner(body) {
@@ -171,7 +193,9 @@ export const createPropertyDraft = async (req, res) => {
     await session.withTransaction(async () => {
       let user = await User.findOne({
         $or: [{ email: owner.email.toLowerCase() }, { mobile: owner.mobile }],
-      }).select("+password").session(session);
+      })
+        .select("+password roles role primaryRole ownedProperties")
+        .session(session);
 
       if (!user) {
         createdNewUser = true;
@@ -182,28 +206,46 @@ export const createPropertyDraft = async (req, res) => {
 
         const hash = await bcrypt.hash(owner.password, 10);
 
-        user = (await User.create([{
-          name: `${owner.firstName} ${owner.lastName}`.trim(),
-          firstName: owner.firstName,
-          lastName: owner.lastName,
-          email: owner.email.toLowerCase(),
-          mobile: owner.mobile,
-          role: "resortOwner",
-          password: hash,
-        }], { session }))[0];
+        user = (await User.create(
+          [
+            {
+              name: `${owner.firstName} ${owner.lastName}`.trim(),
+              firstName: owner.firstName,
+              lastName: owner.lastName,
+              email: owner.email.toLowerCase(),
+              mobile: owner.mobile,
+              roles: ["resortOwner"],
+              primaryRole: "resortOwner",
+              password: hash,
+              ownedProperties: [],
+            },
+          ],
+          { session }
+        ))[0];
       } else {
         user.name = `${owner.firstName} ${owner.lastName}`.trim() || user.name;
         user.firstName = owner.firstName || user.firstName;
         user.lastName = owner.lastName || user.lastName;
         user.mobile = owner.mobile || user.mobile;
-        if (user.role !== "admin") user.role = "resortOwner";
+
+        const currentRoles = Array.isArray(user.roles)
+          ? user.roles
+          : (user.role ? [user.role] : []);
+
+        if (!currentRoles.includes("resortOwner") && !currentRoles.includes("admin")) {
+          user.roles = Array.from(new Set([...currentRoles, "resortOwner"]));
+          if (!user.primaryRole) user.primaryRole = "resortOwner";
+        }
+
         if (owner.password) {
           user.password = await bcrypt.hash(owner.password, 10);
         }
+
         await user.save({ session });
       }
 
-      // 🧩 Normalize room breakdown before saving
+      if (!Array.isArray(user.ownedProperties)) user.ownedProperties = [];
+
       let roomBreakdown = req.body.roomBreakdown || {};
       const ac = Number(roomBreakdown.ac || 0);
       const nonAc = Number(roomBreakdown.nonAc || 0);
@@ -256,7 +298,7 @@ export const createPropertyDraft = async (req, res) => {
       }
     });
 
-    if (createdNewUser && propertyDoc) {
+    if (propertyDoc && owner.password) {
       await sendOwnerCreationEmail(propertyDoc, {
         password: owner.password,
       });
@@ -371,10 +413,12 @@ export const attachPropertyMediaAndFinalize = async (req, res) => {
 
     await prop.save();
 
-    /* ================= EMAIL ================= */
-    if (wasDraft && prop.ownerWelcomeEmailSent !== true) {
-      await sendOwnerCreationEmail(prop);
-      prop.ownerWelcomeEmailSent = true;
+    if (
+      prop.publishNow === true &&
+      !prop.ownerPublishedEmailSent
+    ) {
+      await sendPropertyPublishedEmail(prop);
+      prop.ownerPublishedEmailSent = true;
       await prop.save();
     }
 
@@ -445,10 +489,10 @@ export const getFeaturedProperties = async (req, res) => {
       isDraft: false,
       publishNow: true,
       featured: true,
-      isBlocked: { $ne: true }, 
+      isBlocked: { $ne: true },
     })
-      .sort({ updatedAt: -1 }) 
-      .limit(10); 
+      .sort({ updatedAt: -1 })
+      .limit(10);
     res.status(200).json({
       success: true,
       data: properties,
@@ -601,9 +645,8 @@ export const updateProperty = async (req, res) => {
         const nonAc = Number(rb.nonAc || 0);
         const deluxe = Number(rb.deluxe || 0);
         const luxury = Number(rb.luxury || 0);
-        const hall = Number(rb.luxury || 0);
-        const total = ac + nonAc + deluxe + luxury;
-
+        const hall = Number(rb.hall || 0);
+        const total = ac + nonAc + deluxe + luxury + hall;
         updatedData.roomBreakdown = { ac, nonAc, deluxe, luxury, hall, total };
         updatedData.totalRooms = total;
       }
@@ -716,7 +759,8 @@ export const updateProperty = async (req, res) => {
                     lastName: incomingOwner.lastName,
                     email: incomingOwner.email.toLowerCase(),
                     mobile: incomingOwner.mobile,
-                    role: "resortOwner",
+                    roles: ["resortOwner"],
+                    primaryRole: "resortOwner",
                     password: hash,
                   },
                 ],
@@ -744,7 +788,9 @@ export const updateProperty = async (req, res) => {
               if (!exists) user.email = incomingOwner.email.toLowerCase();
             }
 
-            if (user.role !== "admin") user.role = "resortOwner";
+            if (!user.roles?.includes("admin")) {
+              user.roles = Array.from(new Set([...(user.roles || []), "resortOwner"]));
+            }
             await user.save({ session });
           }
 
@@ -797,9 +843,13 @@ export const updateProperty = async (req, res) => {
       }
     });
 
-
-    if (shouldSendEmail && updatedProperty) {
-      await sendOwnerCreationEmail(updatedProperty);
+    if (
+      updatedProperty.publishNow === true &&
+      !updatedProperty.ownerPublishedEmailSent
+    ) {
+      await sendPropertyPublishedEmail(updatedProperty);
+      updatedProperty.ownerPublishedEmailSent = true;
+      await updatedProperty.save();
     }
 
     res.status(200).json({
@@ -896,7 +946,18 @@ export const togglePublishProperty = async (req, res) => {
     const property = await Property.findById(id);
     if (!property) return res.status(404).json({ success: false, message: "Property not found" });
 
+    const wasPublished = property.publishNow;
+
     property.publishNow = !property.publishNow;
+
+    if (
+      property.publishNow === true &&
+      !property.ownerPublishedEmailSent
+    ) {
+      await sendPropertyPublishedEmail(property);
+      property.ownerPublishedEmailSent = true;
+    }
+
     await property.save();
 
     res.json({ success: true, data: property, message: property.publishNow ? "Property published" : "Property unpublished" });

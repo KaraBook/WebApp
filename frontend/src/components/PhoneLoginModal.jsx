@@ -67,12 +67,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
     setSending(true);
     try {
-      await axios({
-        method: SummaryApi.travellerPrecheck.method,
-        url: baseURL + SummaryApi.travellerPrecheck.url,
-        data: { mobile: phone },
-      });
-
       const confirmation = await firebaseSendOtp(`+91${phone}`);
 
       setConfirmResult(confirmation);
@@ -121,33 +115,20 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       const credential = await confirmResult.confirm(code);
       const idToken = await credential.user.getIdToken(true);
 
-      const check = await axios.post(
-        baseURL + SummaryApi.travellerCheck.url,
+      const resp = await axios.post(
+        baseURL + SummaryApi.unifiedLogin.url,
         {},
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
 
-      if (check?.data?.exists) {
-        const resp = await axios.post(
-          baseURL + SummaryApi.travellerLogin.url,
-          {},
-          { headers: { Authorization: `Bearer ${idToken}` } }
-        );
+      setAuth({
+        user: resp.data.user,
+        accessToken: resp.data.accessToken,
+        refreshToken: resp.data.refreshToken,
+      });
 
-        setAuth({
-          user: resp.data.user,
-          accessToken: resp.data.accessToken,
-          refreshToken: resp.data.refreshToken,
-        });
-
-        toast.success("Welcome back!");
-        onOpenChange(false);
-      } else {
-        onOpenChange(false);
-        setTimeout(() => {
-          navigate("/signup", { state: { idToken } });
-        }, 0);
-      }
+      toast.success("Login successful!");
+      onOpenChange(false);
     } catch (err) {
       const errorCode = err?.code;
 
@@ -197,32 +178,20 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       const result = await signInWithPopup(auth, provider);
       const idToken = await result.user.getIdToken(true);
 
-      const check = await axios.post(
-        baseURL + SummaryApi.travellerCheckGoogle.url,
+      const resp = await axios.post(
+        baseURL + SummaryApi.unifiedLoginGoogle.url, // 👈 unified endpoint
         {},
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
 
-      if (check.data.exists) {
-        const resp = await axios.post(
-          baseURL + SummaryApi.travellerLoginGoogle.url,
-          {},
-          { headers: { Authorization: `Bearer ${idToken}` } }
-        );
+      setAuth({
+        user: resp.data.user,
+        accessToken: resp.data.accessToken,
+        refreshToken: resp.data.refreshToken,
+      });
 
-        setAuth(resp.data);
-        toast.success("Welcome back!");
-        onOpenChange(false);
-      } else {
-        onOpenChange(false);
-        navigate("/signup", {
-          state: {
-            idToken,
-            method: "google",
-            email: result.user.email
-          }
-        });
-      }
+      toast.success("Login successful!");
+      onOpenChange(false);
     } catch (err) {
       toast.error(
         err?.response?.data?.message || "Google login failed"

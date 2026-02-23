@@ -14,6 +14,16 @@ const baseFields = {
         "Property name must be 10+ chars, not only digits, and can include @ # & . ,",
     }),
 
+  ownerPassword: Joi.string()
+    .trim()
+    .min(6)
+    .max(72)
+    .allow("")
+    .optional()
+    .messages({
+      "string.min": "Owner password must be at least 6 characters",
+    }),
+
   resortOwner: Joi.object({
     firstName: Joi.string()
       .min(2)
@@ -182,7 +192,14 @@ const draftSchema = Joi.object(baseFields).custom((value, helpers) => {
   if (value.isRefundable === true && !value.refundNotes?.trim()) {
     return helpers.message("Refund notes are required when property is refundable");
   }
+  if (value.publishNow === true && !value.ownerPassword?.trim()) {
+    return helpers.message("Owner password is required to publish the property");
+  }
+  if (value.resortOwner?.email && value.resortOwner?.resortEmail) {
+    if (value.resortOwner.email.toLowerCase() === value.resortOwner.resortEmail.toLowerCase()) {
 
+    }
+  }
   if (value.isRefundable === false && value.refundNotes) {
     value.refundNotes = "";
   }

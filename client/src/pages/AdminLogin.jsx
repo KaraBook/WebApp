@@ -20,19 +20,18 @@ export default function AdminLogin() {
         data: { email, password },
       });
 
-      const { accessToken, refreshToken, role } = response.data.data;
+      const { accessToken, refreshToken, activeRole } = response.data.data;
+
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("role", role);
-
 
       toast.success("Logged in successfully!");
-      if (role === "property_admin") {
+
+      if (activeRole === "property_admin") {
         navigate("/properties");
       } else {
         navigate("/dashboard");
       }
-
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
     }

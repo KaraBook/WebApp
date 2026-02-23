@@ -18,6 +18,12 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
+const getRoles = (u) =>
+  Array.isArray(u?.roles) ? u.roles : (u?.role ? [u.role] : []);
+
+const hasRole = (u, role) => getRoles(u).includes(role);
+
+
 export const getOwnerDashboard = async (req, res) => {
   try {
     const ownerId = await getEffectiveOwnerId(req);
@@ -38,26 +44,24 @@ export const getOwnerDashboard = async (req, res) => {
     const bookings = await Booking.find({
       propertyId: { $in: propertyIds },
     })
-      .populate("userId", "firstName lastName email mobile role")
+      .populate("userId", "firstName lastName email mobile roles primaryRole")
       .populate("propertyId", "propertyName isRefundable cancellationPolicy coverImage")
       .lean();
 
-    /* ------------------ USER COUNT (ONLY TRAVELLER + MANAGER) ------------------ */
     const validUserRoles = ["traveller", "manager"];
 
     const uniqueUserIds = new Set(
       bookings
         .map((b) => b.userId)
-        .filter(
-          (u) =>
-            u &&
-            validUserRoles.includes(u.role) &&   // ONLY traveller + manager
-            u._id.toString() !== ownerId.toString() // exclude owner himself
-        )
+        .filter((u) => {
+          if (!u) return false;
+          if (u._id.toString() === ownerId.toString()) return false;
+          const roles = getRoles(u);
+          return roles.some((r) => ["traveller", "manager"].includes(r));
+        })
         .map((u) => u._id.toString())
     );
 
-    /* ------------------ STATUS HELPERS ------------------ */
     const isConfirmed = (b) =>
       b.paymentStatus === "paid" ||
       b.status === "confirmed" ||
@@ -141,7 +145,7 @@ export const getOwnerBookings = async (req, res) => {
 
     const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
       .populate("propertyId", "propertyName isRefundable cancellationPolicy coverImage")
-      .populate("userId", "firstName lastName email mobile");
+      .populate("userId", "firstName lastName email mobile roles primaryRole");
 
     res.json({ success: true, data: bookings });
   } catch (err) {
@@ -474,13 +478,10 @@ export const addBlockedDates = async (req, res) => {
         .json({ success: false, message: "Invalid date format" });
     }
 
-    const isOverlap = property.blockedDates.some((range) => {
+    const isOverlap = (property.blockedDates || []).some((range) => {
       const existingStart = new Date(range.start);
       const existingEnd = new Date(range.end);
-      return (
-        (startDate >= existingStart && startDate <= existingEnd) ||
-        (endDate >= existingStart && endDate <= existingEnd)
-      );
+      return startDate <= existingEnd && endDate >= existingStart;
     });
 
     if (isOverlap) {
@@ -731,13 +732,12 @@ export const createOfflineBooking = async (req, res) => {
       cursor.setDate(cursor.getDate() + 1);
     }
 
-    if (!booking.grandTotal || booking.grandTotal <= 0) {
+    if (!totalAmount || totalAmount <= 0) {
       return res.status(400).json({
         success: false,
-        message: "Invalid booking amount"
+        message: "Invalid booking amount",
       });
     }
-
     const normalizedMobile = normalizeMobile(traveller.mobile);
     if (!normalizedMobile || normalizedMobile.length !== 10) {
       return res.status(400).json({
@@ -760,6 +760,21 @@ export const createOfflineBooking = async (req, res) => {
         "pinCode",
       ];
 
+      const roles = getRoles(user);
+
+      if (roles.some(r => ["admin", "resortOwner", "manager", "property_admin"].includes(r))) {
+        return res.status(409).json({
+          success: false,
+          message: "This mobile belongs to an Owner/Admin account. Please use a different traveller number.",
+        });
+      }
+
+      if (!roles.includes("traveller")) {
+        user.roles = Array.from(new Set([...roles, "traveller"]));
+        if (!user.primaryRole) user.primaryRole = "traveller";
+        await user.save();
+      }
+
       let updated = false;
       fields.forEach((field) => {
         if (!user[field] && traveller[field]) {
@@ -774,14 +789,15 @@ export const createOfflineBooking = async (req, res) => {
         firstName: traveller.firstName,
         lastName: traveller.lastName,
         name: `${traveller.firstName} ${traveller.lastName}`.trim(),
-        email: traveller.email,
+        email: traveller.email?.toLowerCase().trim(),
         mobile: normalizedMobile,
         dateOfBirth: traveller.dateOfBirth ? new Date(traveller.dateOfBirth) : null,
         address: traveller.address,
         pinCode: traveller.pinCode,
         state: traveller.state,
         city: traveller.city,
-        role: "traveller",
+        roles: ["traveller"],
+        primaryRole: "traveller",
       });
     }
 
@@ -834,7 +850,10 @@ export const checkTravellerByMobile = async (req, res) => {
     if (!normalized || normalized.length !== 10)
       return res.status(400).json({ success: false, message: "Invalid mobile number" });
 
-    const traveller = await User.findOne({ mobile: normalized, role: "traveller" });
+    const traveller = await User.findOne({
+      mobile: normalized,
+      roles: "traveller",
+    });
 
     if (traveller) {
       return res.json({
@@ -872,14 +891,14 @@ export const checkOwnerByMobile = async (req, res) => {
 
     const owner = await User.findOne({
       mobile: normalized,
-      role: { $in: ["resortOwner", "owner", "propertyOwner", "admin"] }
-    });
+      roles: { $in: ["resortOwner", "manager", "admin"] },
+    }).select("roles primaryRole");
 
     if (owner) {
       return res.json({
         success: true,
         exists: true,
-        role: owner.role,
+        role: owner.primaryRole || (owner.roles?.[0] || null),
         message: "Number belongs to a resort owner"
       });
     }
@@ -899,8 +918,12 @@ export const getBookedDates = async (req, res) => {
 
     const bookings = await Booking.find({
       propertyId: id,
-      paymentStatus: "paid",
-      cancelled: { $ne: true }   // 👈 this is the key line
+      cancelled: { $ne: true },
+      $or: [
+        { paymentStatus: "paid" },
+        { status: "confirmed" },
+        { paymentId: { $exists: true, $ne: null } },
+      ],
     }).select("checkIn checkOut");
 
     const formatted = bookings.map((b) => ({
@@ -936,23 +959,20 @@ export const getOwnerBookedUsers = async (req, res) => {
 
     const propertyIds = properties.map(p => p._id);
 
-    /* 2️⃣ Bookings for owner properties */
     const bookings = await Booking.find({
       propertyId: { $in: propertyIds },
       paymentStatus: { $in: ["paid", "initiated"] },
     })
-      .populate("userId", "firstName lastName email mobile city state role createdAt")
+      .populate("userId", "firstName lastName email mobile city state roles primaryRole createdAt")
       .populate("propertyId", "propertyName")
       .lean();
 
     const usersMap = {};
 
-    /* 3️⃣ ONLY TRAVELLERS FROM BOOKINGS */
     bookings.forEach((b) => {
       if (!b.userId) return;
 
-      // 🚫 HARD BLOCK: prevent owners/admins leaking
-      if (b.userId.role !== "traveller") return;
+      if (!hasRole(b.userId, "traveller")) return;
 
       const uid = b.userId._id.toString();
 
@@ -984,11 +1004,10 @@ export const getOwnerBookedUsers = async (req, res) => {
       }
     });
 
-    /* 4️⃣ Managers created by THIS owner ONLY */
     const managers = await User.find({
-      role: "manager",
+      roles: "manager",
       createdBy: ownerId,
-    }).lean();
+    }).select("name firstName lastName email mobile city state roles primaryRole createdAt").lean();
 
     managers.forEach((m) => {
       const uid = m._id.toString();
@@ -996,8 +1015,8 @@ export const getOwnerBookedUsers = async (req, res) => {
       if (!usersMap[uid]) {
         usersMap[uid] = {
           userId: m._id,
-          firstName: m.name,
-          lastName: "",
+          firstName: m.firstName || m.name || "",
+          lastName: m.lastName || "",
           email: m.email,
           mobile: m.mobile,
           city: m.city,
@@ -1063,10 +1082,19 @@ export const ownerCancelBooking = async (req, res) => {
 
     const property = booking.propertyId;
 
-    if (property.ownerUserId.toString() !== ownerId.toString()) {
+    const owner = await User.findById(ownerId).select("mobile email").lean();
+
+    const authorized =
+      String(property.ownerUserId) === String(ownerId) ||
+      (owner?.mobile &&
+        normalizeMobile(owner.mobile) === normalizeMobile(property?.resortOwner?.mobile)) ||
+      (owner?.email &&
+        owner.email.toLowerCase() === String(property?.resortOwner?.email || "").toLowerCase());
+
+    if (!authorized) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized to cancel this booking"
+        message: "Not authorized to cancel this booking",
       });
     }
 
@@ -1077,9 +1105,15 @@ export const ownerCancelBooking = async (req, res) => {
       });
     }
 
-    const refundAmount = Math.round(
-      (booking.grandTotal * refundPercent) / 100
-    );
+    const baseAmount = Number(booking.grandTotal ?? booking.totalAmount ?? 0);
+    if (!baseAmount || baseAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid booking amount for refund",
+      });
+    }
+
+    const refundAmount = Math.round((baseAmount * refundPercent) / 100);
 
     let refund = null;
     if (booking.paymentId && refundAmount > 0) {
