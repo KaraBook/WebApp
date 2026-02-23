@@ -41,9 +41,8 @@ export default function Checkout() {
     const isMobile = useIsMobile();
     const [pricing, setPricing] = useState(null);
     const [creatingOrder, setCreatingOrder] = useState(false);
-    const [openingRazorpay, setOpeningRazorpay] = useState(false);
     const [verifyingPayment, setVerifyingPayment] = useState(false);
-    const showFullLoader = creatingOrder || openingRazorpay || verifyingPayment;
+    const showFullLoader = creatingOrder || verifyingPayment;
 
     const hasFood =
         Array.isArray(property?.foodAvailability) &&
@@ -249,14 +248,7 @@ export default function Checkout() {
             setCreatingOrder(false);
             const loaded = await loadRazorpayScript();
             if (!loaded) {
-                setOpeningRazorpay(false);
-                return toast.error("Razorpay SDK failed to load");
-            }
-            setOpeningRazorpay(true);
-
-
-            if (!loaded) {
-                setOpeningRazorpay(false);
+                setCreatingOrder(false);
                 return toast.error("Razorpay SDK failed to load");
             }
 
@@ -269,7 +261,6 @@ export default function Checkout() {
                 order_id: order.id,
                 handler: async (response) => {
                     try {
-                        setOpeningRazorpay(false);
                         setVerifyingPayment(true);
 
                         const verifyRes = await Axios.post(
@@ -312,12 +303,11 @@ export default function Checkout() {
 
             const rzp = new window.Razorpay(options);
             rzp.on("modal.closed", function () {
-                setOpeningRazorpay(false);
                 setCreatingOrder(false);
                 setVerifyingPayment(false);
+                toast.info("Payment cancelled");
             });
             rzp.on("payment.failed", function () {
-                setOpeningRazorpay(false);
                 setCreatingOrder(false);
                 setVerifyingPayment(false);
                 toast.error("Payment failed. Please try again.");
@@ -325,7 +315,6 @@ export default function Checkout() {
             rzp.open();
         } catch (err) {
             setCreatingOrder(false);
-            setOpeningRazorpay(false);
             setVerifyingPayment(false);
 
             console.error(err);
