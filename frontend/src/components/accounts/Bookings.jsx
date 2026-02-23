@@ -225,7 +225,7 @@ export default function Bookings() {
                     "Check-out",
                     "Nights",
                     "Guests",
-                    "Amount",
+                    "Amount (₹)",
                     "Status",
                     "Actions",
                   ].map((h) => (
@@ -285,8 +285,8 @@ export default function Bookings() {
                           className="text-[#233b19] font-medium"
                         >
                           {typeof b.guests === "number"
-                            ? `${b.guests} Guests`
-                            : `${b.guests.adults + b.guests.children} Guests${b.guests.infants ? ` + ${b.guests.infants} Infants` : ""
+                            ? `${b.guests} `
+                            : `${b.guests.adults + b.guests.children} ${b.guests.infants ? ` + ${b.guests.infants} ` : ""
                             }`}
                         </button>
 
@@ -310,7 +310,7 @@ export default function Bookings() {
                       </td>
 
                       <td className="px-4 py-3 font-semibold">
-                        ₹{(b.grandTotal ?? b.totalAmount ?? 0).toLocaleString()}
+                        {(b.grandTotal ?? b.totalAmount ?? 0).toLocaleString()}
                       </td>
 
                       <td className="px-4 py-5 relative group cursor-default flex justify-center">

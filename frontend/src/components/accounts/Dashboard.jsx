@@ -114,13 +114,17 @@ export default function Dashboard() {
     ).length;
 
     const totalSpent = bookings
-        .filter(isPaidBooking)
+        .filter(
+            (b) =>
+                resolveBookingStatus(b) === "confirmed"
+        )
         .reduce((sum, b) => {
             const value =
                 b.grandTotal ??
                 b.totalAmount ??
                 b.amount ??
                 0;
+
             return sum + Number(value);
         }, 0);
 
