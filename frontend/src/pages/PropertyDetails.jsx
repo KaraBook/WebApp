@@ -96,17 +96,16 @@ export default function PropertyDetails() {
     Array.isArray(property?.foodAvailability) &&
     property.foodAvailability.length > 0;
 
-  const initialStart = new Date();
-  initialStart.setDate(initialStart.getDate() + 1);
-  initialStart.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  const initialEnd = new Date(initialStart);
-  initialEnd.setDate(initialEnd.getDate() + 1);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
   const [dateRange, setDateRange] = useState([
     {
-      startDate: initialStart,
-      endDate: initialEnd,
+      startDate: today,
+      endDate: tomorrow,
       key: "selection",
     },
   ]);
@@ -309,7 +308,28 @@ export default function PropertyDetails() {
     if (!user) return showAuthModal();
 
     const { startDate, endDate } = dateRange[0];
-    if (!startDate || !endDate) return toast.error("Please select your stay dates");
+
+    if (!startDate || !endDate) {
+      toast.error("Please select your stay dates");
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+   if (startDate.toDateString() === today.toDateString()) {
+      toast.error("Same-day bookings are not allowed. Please select a future date.");
+      return;
+    }
+
+    let curr = new Date(startDate);
+    while (curr <= endDate) {
+      if (isDateDisabled(curr)) {
+        toast.error("Selected dates include unavailable days. Please choose different dates.");
+        return;
+      }
+      curr.setDate(curr.getDate() + 1);
+    }
 
     navigate(`/checkout/${property._id}`, {
       state: { from: startDate, to: endDate, guests },
@@ -755,7 +775,6 @@ export default function PropertyDetails() {
                       showDateDisplay={false}
                       moveRangeOnFirstSelection={false}
                       rangeColors={["#04929f"]}
-                      minDate={tomorrow}
 
                       dayContentRenderer={(date) => {
                         const today = new Date();
