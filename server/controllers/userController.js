@@ -148,9 +148,8 @@ export const travellerLogin = async (req, res) => {
       });
     }
     if (!roles.includes("traveller")) {
-      return res.status(403).json({
-        message: "This account is not enabled for Traveller portal.",
-      });
+      user.roles = Array.from(new Set([...(user.roles || []), "traveller"]));
+      await user.save();
     }
     const tokens = issueTokens(user, "traveller");
     return res.status(200).json({

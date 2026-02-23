@@ -147,7 +147,11 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           setOtp(Array(6).fill(""));
           toast.error("Too many incorrect attempts. Please resend OTP.");
         } else {
-          toast.error("Incorrect OTP. Please check the 6-digit code.");
+          if (err.response?.data?.message) {
+            toast.error(err.response.data.message);
+          } else {
+            toast.error("Incorrect OTP. Please check the 6-digit code.");
+          }
         }
 
         return newAttempts;
