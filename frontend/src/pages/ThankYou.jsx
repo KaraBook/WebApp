@@ -4,6 +4,7 @@ import Axios from "../utils/Axios";
 import { format } from "date-fns";
 import { CheckCircle, Mail, Clock, Phone, FileText, Home, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { State } from "country-state-city";
 
 export default function ThankYou() {
     const { state } = useLocation();
@@ -96,7 +97,13 @@ export default function ThankYou() {
                         <div>
                             <p className="font-medium">{property.propertyName}</p>
                             <p className="text-sm text-gray-500">
-                                {property.city}, {property.state}
+                                <p className="text-sm text-gray-500">
+                                    {property.city},{" "}
+                                    {
+                                        State.getStateByCodeAndCountry(property.state, "IN")?.name
+                                        || property.state
+                                    }
+                                </p>
                             </p>
                         </div>
 

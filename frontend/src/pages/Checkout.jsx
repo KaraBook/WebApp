@@ -592,7 +592,18 @@ export default function Checkout() {
                 {/* MEALS */}
                 {hasFood && (
                     <div className="border rounded-[12px] p-5 mb-6">
-                        <h3 className="font-semibold mb-1 text-lg">Meals</h3>
+                        {property?.foodAvailability?.length > 0 && (
+                            <div className="text-sm">
+                                <span className="text-gray-500">Meals offered:</span>
+                                <span className="ml-2 font-medium text-teal-700">
+                                    {property.foodAvailability
+                                        .map((item) =>
+                                            item.charAt(0).toUpperCase() + item.slice(1)
+                                        )
+                                        .join(", ")}
+                                </span>
+                            </div>
+                        )}
 
                         <div className="bg-green-50 border border-green-200 rounded-[8px] px-3 py-2 mb-4">
                             <p className="text-sm font-medium text-green-700">
