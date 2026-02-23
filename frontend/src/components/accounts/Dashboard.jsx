@@ -44,7 +44,8 @@ function getNights(checkIn, checkOut) {
 
     return Math.max(1, Math.round(diff));
 }
-
+const getTravellerNetSpent = (b) =>
+    (b.grandTotal || b.totalAmount || 0) - (b.refundAmount || 0);
 
 
 export default function Dashboard() {
@@ -113,20 +114,18 @@ export default function Dashboard() {
         b => resolveBookingStatus(b) === "cancelled"
     ).length;
 
-    const totalSpent = bookings
-        .filter(
-            (b) =>
-                resolveBookingStatus(b) === "confirmed"
-        )
+    const grossSpent = bookings
+        .filter(b => resolveBookingStatus(b) === "confirmed")
         .reduce((sum, b) => {
-            const value =
-                b.grandTotal ??
-                b.totalAmount ??
-                b.amount ??
-                0;
-
-            return sum + Number(value);
+            return sum + (b.grandTotal || b.totalAmount || 0);
         }, 0);
+
+    const totalRefunded = bookings.reduce(
+        (sum, b) => sum + (b.refundAmount || 0),
+        0
+    );
+
+    const netSpent = grossSpent - totalRefunded;
 
     const uniqueVisited = new Set(
         bookings.map(b => b.propertyId?._id || b.propertyId)
@@ -206,8 +205,8 @@ export default function Dashboard() {
                 <div className="col-span-2 md:col-span-1">
                     <StatCard
                         title="Total Spent"
-                        value={`₹${totalSpent.toLocaleString("en-IN")}`}
-                        subtitle="Confirmed bookings"
+                        value={`₹${netSpent.toLocaleString("en-IN")}`}
+                        subtitle={`Spent ₹${grossSpent.toLocaleString("en-IN")} • Refunded ₹${totalRefunded.toLocaleString("en-IN")}`}
                         icon={<Wallet />}
                         dark
                     />

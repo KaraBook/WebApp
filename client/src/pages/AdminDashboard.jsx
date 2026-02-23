@@ -15,6 +15,13 @@ import {
 
 import MobileBookingCard from "@/components/MobileBookingCard.jsx";
 
+
+const isConfirmedBooking = (b) =>
+  b.paymentStatus === "paid" && !b.cancelled;
+
+const getNetAmount = (b) =>
+  (b.grandTotal || b.totalAmount || 0) - (b.refundAmount || 0);
+
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const navigate = useNavigate();
@@ -29,13 +36,14 @@ const DashboardPage = () => {
   const getMonthRevenue = (bookings, year, month) => {
     return bookings
       .filter((b) => {
-        if (b.paymentStatus !== "paid") return false;
-        if (b.cancelled === true) return false;
+        if (!isConfirmedBooking(b)) return false;
 
         const d = new Date(b.createdAt);
         return d.getFullYear() === year && d.getMonth() === month;
       })
-      .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+      .reduce((sum, b) => {
+        return sum + getNetAmount(b);
+      }, 0);
   };
 
   const fetchDashboardData = async () => {
@@ -64,10 +72,16 @@ const DashboardPage = () => {
       );
 
 
-      const totalRevenue = confirmed.reduce(
-        (acc, b) => acc + (b.totalAmount || 0),
+      const grossRevenue = bookings
+        .filter(isConfirmedBooking)
+        .reduce((sum, b) => sum + (b.grandTotal || b.totalAmount || 0), 0);
+
+      const totalRefunds = bookings.reduce(
+        (sum, b) => sum + (b.refundAmount || 0),
         0
       );
+
+      const netRevenue = grossRevenue - totalRefunds;
 
       const now = new Date();
       const currentYear = now.getFullYear();
@@ -135,7 +149,9 @@ const DashboardPage = () => {
         totalUsers: users.length,
         totalProperties: properties.length,
 
-        totalRevenue,
+        grossRevenue,
+        totalRefunds,
+        netRevenue,
         currentMonthRevenue,
         prevMonthRevenue,
 
@@ -294,8 +310,9 @@ const DashboardPage = () => {
         {/* FULL WIDTH ON MOBILE */}
         <div className="col-span-2 sm:col-span-2 lg:col-span-1">
           <StatCard
-            title="Total Revenue"
-            value={formatCurrency(stats.totalRevenue)}
+            title="Net Revenue"
+            value={formatCurrency(stats.netRevenue)}
+            subtitle={`Gross ₹${stats.grossRevenue?.toLocaleString("en-IN")} • Refunds ₹${stats.totalRefunds?.toLocaleString("en-IN")}`}
             icon={Wallet}
             variant="dark"
             growthText={stats.growthText}
