@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, Inbox, Map } from "lucide-react";
+import axios from "axios";
+import SummaryApi, { baseURL } from "@/common/SummaryApi";
 
 export default function ListYourProperty() {
   const [form, setForm] = useState({
@@ -12,14 +14,69 @@ export default function ListYourProperty() {
     message: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handlePhoneChange = (e) => {
+    let value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setForm((prev) => ({ ...prev, mobile: value }));
+  };
+
+  const handlePhonePaste = (e) => {
     e.preventDefault();
-    // API call later
-    console.log("Property Enquiry:", form);
+    const pasted = e.clipboardData.getData("text");
+    const cleaned = pasted.replace(/\D/g, "").slice(0, 10);
+    setForm((prev) => ({ ...prev, mobile: cleaned }));
+  };
+
+  const validate = () => {
+    const err = {};
+
+    if (!form.name.trim()) err.name = "Name required";
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) err.email = "Invalid email";
+    if (!/^[6-9]\d{9}$/.test(form.mobile)) err.mobile = "Invalid mobile";
+    if (!form.propertyName.trim()) err.propertyName = "Property name required";
+    if (!form.address.trim()) err.address = "Address required";
+
+    setErrors(err);
+    return Object.keys(err).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validate()) return;
+
+    try {
+      setLoading(true);
+
+      await axios({
+        method: SummaryApi.propertyLead.method,
+        url: baseURL + SummaryApi.propertyLead.url,
+        data: form,
+      });
+
+      setSuccess(true);
+
+      setForm({
+        name: "",
+        email: "",
+        mobile: "",
+        propertyName: "",
+        address: "",
+        message: "",
+      });
+
+    } catch (err) {
+      alert("Unable to submit request");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,18 +96,18 @@ export default function ListYourProperty() {
 
             <div className="space-y-3 text-sm">
               <a
-                href="tel:+919604520520"
+                href="tel: +919156480600"
                 className="flex gap-2 items-center"
               >
                 <Phone className="w-4 h-4" />
-                +91 9604520520
+                +91 91564 80600
               </a>
               <a
-                href="mailto:partners@karabook.com"
+                href="mailto:web.karabook@gmail.com"
                 className="flex gap-2 items-center"
               >
                 <Inbox className="w-4 h-4" />
-                partners@karabook.com
+                web.karabook@gmail.com
               </a>
               <p className="flex gap-2 items-center">
                 <Map className="w-4 h-4" />
@@ -87,11 +144,17 @@ export default function ListYourProperty() {
               <input
                 type="tel"
                 name="mobile"
+                value={form.mobile}
+                onChange={handlePhoneChange}
+                onPaste={handlePhonePaste}
+                inputMode="numeric"
+                maxLength={10}
                 placeholder="Mobile Number"
-                required
                 className="w-full border rounded-lg px-4 py-3 text-sm"
-                onChange={handleChange}
               />
+              {errors.mobile && (
+                <p className="text-red-500 text-xs">{errors.mobile}</p>
+              )}
 
               <input
                 type="text"
@@ -119,9 +182,17 @@ export default function ListYourProperty() {
                 onChange={handleChange}
               />
 
-              <Button className="w-full bg-primary text-white py-3 rounded-lg">
-                Submit Request
+              <Button
+                disabled={loading}
+                className="w-full bg-primary text-white py-3 rounded-lg disabled:opacity-60"
+              >
+                {loading ? "Submitting..." : "Submit Request"}
               </Button>
+              {success && (
+                <p className="text-green-600 text-sm text-center">
+                  Thank you! Our onboarding team will contact you shortly.
+                </p>
+              )}
 
               <p className="text-xs text-gray-500 text-center mt-2">
                 By submitting this form, you agree to be contacted by the

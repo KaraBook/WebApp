@@ -134,7 +134,7 @@ export function bookingConfirmationTemplate({
             </div>
 
             <p style="margin-top:24px;">We look forward to hosting you. Have a great stay!</p>
-            <p style="margin-top:16px;font-size:13px;color:#666;">Need help? Contact us anytime at support@bookmysaty.in</p>
+            <p style="margin-top:16px;font-size:13px;color:#666;">Need help? Contact us anytime at web.karabook@gmail.com</p>
           </div>
         </div>
       </div>

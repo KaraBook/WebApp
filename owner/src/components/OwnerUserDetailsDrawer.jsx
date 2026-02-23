@@ -24,6 +24,28 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
 
   if (!user) return null;
 
+  const formatRoleLabel = (role) => {
+  switch (role) {
+    case "resortOwner":
+      return "Resort Owner";
+    case "manager":
+      return "Manager";
+    case "admin":
+      return "Administrator";
+    case "property_admin":
+      return "Property Admin";
+    case "traveller":
+      return "Traveller";
+    default:
+      return role;
+  }
+};
+
+const roleText =
+  Array.isArray(user.roles) && user.roles.length > 0
+    ? user.roles.map(formatRoleLabel).join(", ")
+    : "Traveller";
+
   const fullName =
     `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Guest";
 
@@ -35,7 +57,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
 
         <DrawerContent className="h-[75vh] rounded-t-2xl">
           <Header fullName={fullName} user={user} onClose={onClose} />
-          <Body user={user} fullName={fullName} />
+          <Body user={user} fullName={fullName} /><Body user={user} fullName={fullName} roleText={roleText} />
         </DrawerContent>
       </Drawer>
     );
@@ -64,7 +86,7 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
         <div className="flex flex-col h-full">
           <Header fullName={fullName} user={user} onClose={onClose} />
           <div className="flex-1 overflow-y-auto">
-            <Body user={user} fullName={fullName} />
+            <Body user={user} fullName={fullName} roleText={roleText} />
           </div>
         </div>
       </div>
@@ -91,7 +113,7 @@ function Header({ fullName, user, onClose }) {
   );
 }
 
-function Body({ user, fullName }) {
+function Body({ user, fullName, roleText }) {
   return (
     <div className="px-4 py-4 space-y-5 text-sm">
       {/* Avatar */}
@@ -143,7 +165,7 @@ function Body({ user, fullName }) {
       </Section>
 
       <Section title="Account">
-        <Row icon={<Shield size={14} />} text={user.role || "Traveller"} />
+        <Row icon={<Shield size={14} />} text={roleText} />
         <Row
           icon={<Calendar size={14} />}
           text={`Joined on ${formatDate(user.createdAt)}`}

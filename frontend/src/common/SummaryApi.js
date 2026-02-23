@@ -129,6 +129,14 @@ const SummaryApi = {
     url: (id) => `/api/bookings/cancel/${id}`,
     method: "post"
   },
+  sendContact: {
+    url: "/api/contact",
+    method: "post",
+  },
+  propertyLead: {
+    url: "/api/property-lead",
+    method: "post",
+  },
 };
 
 export default SummaryApi;

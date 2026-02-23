@@ -12,6 +12,7 @@ import reviewRoute from "./routes/reviewRoutes.js";
 import adminRoutes from "./routes/admin.js";
 import ownerRoutes from "./routes/owner.routes.js";
 import locationRoutes from "./routes/locationRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -76,6 +77,7 @@ app.use("/api/reviews", reviewRoute);
 app.use("/api/admin", adminRoutes);
 app.use("/api/owner", ownerRoutes);
 app.use("/api", locationRoutes);
+app.use("/api", contactRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
