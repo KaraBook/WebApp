@@ -30,6 +30,8 @@ const DashboardPage = () => {
     return bookings
       .filter((b) => {
         if (b.paymentStatus !== "paid") return false;
+        if (b.cancelled === true) return false;
+
         const d = new Date(b.createdAt);
         return d.getFullYear() === year && d.getMonth() === month;
       })
