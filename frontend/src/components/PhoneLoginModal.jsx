@@ -115,47 +115,49 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       const credential = await confirmResult.confirm(code);
       const idToken = await credential.user.getIdToken(true);
 
-      const resp = await axios.post(
-        baseURL + SummaryApi.unifiedLogin.url,
-        {},
-        { headers: { Authorization: `Bearer ${idToken}` } }
-      );
+      try {
+        const resp = await axios.post(
+          baseURL + SummaryApi.travellerLogin.url,
+          {},
+          { headers: { Authorization: `Bearer ${idToken}` } }
+        );
+        setAuth({
+          user: resp.data.user,
+          accessToken: resp.data.accessToken,
+          refreshToken: resp.data.refreshToken,
+        });
 
-      setAuth({
-        user: resp.data.user,
-        accessToken: resp.data.accessToken,
-        refreshToken: resp.data.refreshToken,
-      });
+        toast.success("Login successful!");
+        onOpenChange(false);
 
-      toast.success("Login successful!");
-      onOpenChange(false);
-    } catch (err) {
-      const errorCode = err?.code;
+      } catch (err) {
 
-      if (errorCode === "auth/too-many-requests") {
-        toast.error("Too many incorrect attempts. Please wait before trying again.");
-        setTimer(0);
-        setOtp(Array(6).fill(""));
-        return;
-      }
+        const errorCode = err.response?.data?.code;
 
-      setAttempts((prev) => {
-        const newAttempts = prev + 1;
-
-        if (newAttempts >= 3) {
-          setTimer(0);
-          setOtp(Array(6).fill(""));
-          toast.error("Too many incorrect attempts. Please resend OTP.");
-        } else {
-          if (err.response?.data?.message) {
-            toast.error(err.response.data.message);
-          } else {
-            toast.error("Incorrect OTP. Please check the 6-digit code.");
-          }
+        if (errorCode === "USER_NOT_FOUND") {
+          navigate("/signup", {
+            state: { idToken }
+          });
+          onOpenChange(false);
+          return;
         }
 
-        return newAttempts;
-      });
+        if (errorCode === "ROLE_EXTENSION_REQUIRED") {
+          navigate("/signup", {
+            state: {
+              idToken,
+              existingUser: err.response.data.user
+            }
+          });
+          onOpenChange(false);
+          return;
+        }
+
+        toast.error(err.response?.data?.message || "Login failed");
+      }
+
+    } catch (err) {
+      toast.error("Invalid OTP");
     } finally {
       setVerifying(false);
     }

@@ -72,6 +72,7 @@ export default function Signup() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
   const isGoogle = state?.method === "google"
+  const existingUser = state?.existingUser;
 
   const schema = z.object(
     isGoogle
@@ -109,6 +110,14 @@ export default function Signup() {
     if (!state?.idToken) navigate("/");
     setStates(getIndianStates());
   }, [state, navigate]);
+
+  useEffect(() => {
+    if (existingUser) {
+      setValue("firstName", existingUser.firstName);
+      setValue("lastName", existingUser.lastName);
+      setValue("email", existingUser.email);
+    }
+  }, [existingUser, setValue]);
 
   const handleStateChange = (stateCode, onChange) => {
     const selectedState = states.find((s) => s.isoCode === stateCode);
@@ -189,6 +198,12 @@ export default function Signup() {
 
         <CardContent className="grid gap-4">
 
+
+          {existingUser && (
+            <div className="bg-blue-50 text-blue-700 p-3 rounded-md text-sm">
+              We found your existing account. Please complete the remaining details to enable Traveller access.
+            </div>
+          )}
           {/* NAME ROW */}
           <div className="flex justify-between flex-wrap gap-2">
 
@@ -199,6 +214,7 @@ export default function Signup() {
                 className="mt-1 rounded-[10px]"
                 placeholder="John"
                 {...register("firstName")}
+                disabled={!!existingUser}
               />
               {errors.firstName && (
                 <p className="text-sm text-destructive">{errors.firstName.message}</p>
@@ -212,6 +228,7 @@ export default function Signup() {
                 className="mt-1 rounded-[10px]"
                 placeholder="Doe"
                 {...register("lastName")}
+                disabled={!!existingUser}
               />
               {errors.lastName && (
                 <p className="text-sm text-destructive">{errors.lastName.message}</p>
@@ -229,7 +246,7 @@ export default function Signup() {
               type="email"
               className="mt-1 rounded-[10px]"
               placeholder="john@example.com"
-              readOnly={isGoogle}
+              readOnly={isGoogle || !!existingUser}
               {...register("email")}
             />
             {errors.email && (

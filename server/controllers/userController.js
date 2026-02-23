@@ -133,35 +133,43 @@ export const refreshToken = async (req, res) => {
 export const travellerLogin = async (req, res) => {
   try {
     const { firebaseUser } = req;
-    const normalized = normalizeMobile(firebaseUser?.phone_number);
-    if (!normalized || normalized.length !== 10) {
+    const mobile = normalizeMobile(firebaseUser?.phone_number);
+
+    if (!mobile || mobile.length !== 10) {
       return res.status(400).json({ message: "Invalid phone token" });
     }
-    const user = await User.findOne({ mobile: normalized.trim() });
+
+    const user = await User.findOne({ mobile: mobile.trim() });
+
     if (!user) {
-      return res.status(404).json({ message: "User not found. Please sign up first." });
-    }
-    const roles = user.roles || [];
-    if (roles.includes("admin") && !roles.includes("traveller")) {
-      return res.status(403).json({
-        message: "Admins cannot log in via traveller portal.",
+      return res.status(404).json({
+        code: "USER_NOT_FOUND",
+        message: "User not found. Please sign up.",
       });
     }
-    if (!roles.includes("traveller")) {
-      user.roles = Array.from(new Set([...(user.roles || []), "traveller"]));
-      await user.save();
+
+    const roles = user.roles || [];
+
+    if (roles.includes("traveller")) {
+      const tokens = issueTokens(user, "traveller");
+
+      return res.json({
+        ...tokens,
+        activeRole: "traveller",
+        roles,
+        user: publicUser(user),
+      });
     }
-    const tokens = issueTokens(user, "traveller");
-    return res.status(200).json({
-      message: "Traveller login successful",
-      ...tokens,
-      activeRole: "traveller",
-      roles,
+
+    return res.status(403).json({
+      code: "ROLE_EXTENSION_REQUIRED",
+      message: "Complete traveller registration",
       user: publicUser(user),
     });
+
   } catch (err) {
     console.error("Traveller login error:", err);
-    return res.status(500).json({ message: "Login failed", error: err.message });
+    return res.status(500).json({ message: "Login failed" });
   }
 };
 
@@ -229,17 +237,17 @@ export const travellerSignup = async (req, res) => {
       $or: [{ mobile: mobile.trim() }, { email: emailLower }],
     });
     if (user) {
-      user.roles = Array.from(new Set([...(user.roles || []), "traveller"]));
-      user.firstName = firstName;
-      user.lastName = lastName;
-      user.name = `${firstName} ${lastName}`.trim();
-      user.email = emailLower;
+      const roles = user.roles || [];
+
+      if (!roles.includes("traveller")) {
+        user.roles.push("traveller");
+      }
+
       user.state = state;
       user.city = city;
       user.dateOfBirth = new Date(dateOfBirth);
       user.address = address;
       user.pinCode = pinCode;
-      user.mobile = mobile.trim();
 
       await user.save();
 
