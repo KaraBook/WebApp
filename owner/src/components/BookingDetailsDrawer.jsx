@@ -57,6 +57,9 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     } = booking;
 
     const uiStatus = normalizeBookingStatus(booking);
+    const refundPercent = booking?.ownerRefundPercent ?? 0;
+    const refundAmount = booking?.refundAmount ?? 0;
+    const isCancelled = booking?.cancelled === true;
 
     const adults = guests?.adults || 0;
     const children = guests?.children || 0;
@@ -123,7 +126,10 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         safeTax={safeTax}
                         safeGrandTotal={safeGrandTotal}
                         orderId={orderId}
-                        formatDate={formatDate}
+                        formatDate={formatDate} 
+                        isCancelled={isCancelled}
+                        refundPercent={refundPercent}
+                        refundAmount={refundAmount}
                     />
                 </DrawerContent>
             </Drawer>
@@ -150,7 +156,7 @@ md:top-1/2 md:left-1/2
 md:-translate-x-1/2 md:-translate-y-1/2
 
 w-full md:w-[420px]
-h-full md:max-h-[85vh]
+h-full md:max-h-[90vh]
 
 bg-white shadow-2xl md:rounded-xl
 transition-all duration-300
@@ -187,6 +193,9 @@ ${open
                             safeGrandTotal={safeGrandTotal}
                             orderId={orderId}
                             formatDate={formatDate}
+                            isCancelled={isCancelled}
+                            refundPercent={refundPercent}
+                            refundAmount={refundAmount}
                         />
                     </div>
                 </div>
@@ -198,7 +207,7 @@ ${open
 
 function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
     return (
-        <div className="px-4 py-4 border-b relative">
+        <div className="px-3 py-3 border-b relative">
             <h2 className="text-[17px] font-semibold">{userName}</h2>
 
             <div className="flex items-center justify-between mt-1">
@@ -223,7 +232,7 @@ function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
 
             <button
                 onClick={onClose}
-                className="absolute top-3 right-3 p-2 rounded-md text-gray-500 hover:bg-gray-100"
+                className="absolute top-2 right-3 p-2 rounded-md text-gray-500 hover:bg-gray-100"
             >
                 <X className="h-4 w-4" />
             </button>
@@ -249,10 +258,13 @@ function Body(props) {
         safeGrandTotal,
         orderId,
         formatDate,
+        isCancelled,
+        refundPercent,
+        refundAmount,
     } = props;
 
     return (
-        <div className="px-4 py-4 space-y-4 text-sm overflow-y-auto">
+        <div className="px-4 py-4 space-y-3 text-sm overflow-y-auto">
 
             <BookingSummaryBlock
                 checkIn={checkIn}
@@ -296,7 +308,29 @@ function Body(props) {
                 <Key label="Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
                 <Key label="Tax" value={`₹${safeTax.toLocaleString("en-IN")}`} />
                 <Key label="Grand Total" value={`₹${safeGrandTotal.toLocaleString("en-IN")}`} bold />
-                <Key label="Order ID" value={orderId} mono />
+
+                {isCancelled && (
+                    <>
+                        <Separator />
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-2 mt-2 space-y-1">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Refund Percentage</span>
+                                <span className="font-semibold text-red-600">
+                                    {refundPercent}%
+                                </span>
+                            </div>
+
+                            <div className="flex justify-between text-sm">
+                                <span className="text-muted-foreground">Refund Amount</span>
+                                <span className="font-semibold text-green-600">
+                                    ₹{refundAmount?.toLocaleString("en-IN")}
+                                </span>
+                            </div>
+                        </div>
+                    </>
+                )}
+
+               <Key label="Order ID" value={orderId?.toUpperCase()} mono />
             </Section>
         </div>
     );
@@ -306,7 +340,7 @@ function Body(props) {
 function Section({ title, children }) {
     return (
         <div>
-            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-3">
+            <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-2">
                 {title}
             </h4>
             <div className="space-y-2">{children}</div>
@@ -347,7 +381,7 @@ function BookingSummaryBlock({
     const totalGuests = adults + children;
 
     return (
-        <div className="rounded-xl border bg-gray-50 px-4 py-3 space-y-3">
+        <div className="rounded-xl border bg-gray-50 px-4 py-3 space-y-2">
             <div className="text-[11px] font-semibold uppercase text-muted-foreground">
                 Check-in – Check-out
             </div>

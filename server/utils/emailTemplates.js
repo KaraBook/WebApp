@@ -4,7 +4,7 @@ export function propertyCreatedTemplate({
   ownerPassword,
   propertyName,
   createdNewUser,
-  portalUrl = "https://karabookdev.cloud/owner/login",
+  portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
 }) {
   const greeting = ownerFirstName ? `Hi ${ownerFirstName},` : "Hi,";
 
@@ -63,7 +63,7 @@ export function bookingConfirmationTemplate({
   paymentMethod,
   orderId,
   taxRate = 18,
-  portalUrl = "https://karabookdev.cloud",
+  portalUrl = process.env.TRAVELLER_PORTAL_URL,
 }) {
   const formatIndiaDate = (date) =>
     new Date(date).toLocaleDateString("en-IN", {
@@ -146,7 +146,7 @@ export function bookingConfirmationTemplate({
 export function propertyPublishedTemplate({
   ownerFirstName,
   propertyName,
-  portalUrl = "https://karabookdev.cloud/owner/dashboard",
+  portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
 }) {
   const greeting = ownerFirstName ? `Hi ${ownerFirstName},` : "Hi,";
 
@@ -171,5 +171,56 @@ export function propertyPublishedTemplate({
       `Your property "${propertyName}" is now live on Karabook.\n\n` +
       `You can start receiving bookings.\n\n` +
       `Dashboard: ${portalUrl}`,
+  };
+}
+
+
+export function ownerBookingNotificationTemplate({
+  ownerName,
+  propertyName,
+  travellerName,
+  checkIn,
+  checkOut,
+  nights,
+  guests,
+  grandTotal,
+ portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
+}) {
+  const formatDate = (d) =>
+    new Date(d).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+  const money = (v) => `₹${Number(v || 0).toLocaleString("en-IN")}`;
+
+  return {
+    subject: `New Booking Received – ${propertyName}`,
+    html: `
+      <div style="font-family:Inter,Arial,sans-serif;line-height:1.6">
+        <h2>New Booking Alert 🎉</h2>
+
+        <p>Hi ${ownerName},</p>
+
+        <p>You have received a new booking for <strong>${propertyName}</strong>.</p>
+
+        <table style="margin-top:15px">
+          <tr><td><strong>Traveller:</strong></td><td>${travellerName}</td></tr>
+          <tr><td><strong>Check-in:</strong></td><td>${formatDate(checkIn)}</td></tr>
+          <tr><td><strong>Check-out:</strong></td><td>${formatDate(checkOut)}</td></tr>
+          <tr><td><strong>Nights:</strong></td><td>${nights}</td></tr>
+          <tr><td><strong>Guests:</strong></td><td>${guests}</td></tr>
+          <tr><td><strong>Total Paid:</strong></td><td>${money(grandTotal)}</td></tr>
+        </table>
+
+        <div style="margin-top:20px;">
+          <a href="${portalUrl}"
+            style="background:#00919e;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none">
+            View Booking in Dashboard
+          </a>
+        </div>
+      </div>
+    `
   };
 }

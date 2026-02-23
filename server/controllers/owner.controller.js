@@ -73,20 +73,88 @@ export const getOwnerDashboard = async (req, res) => {
     const isCancelled = (b) =>
       b.status === "cancelled" || b.cancelled === true;
 
-    /* ------------------ STATS ------------------ */
+    const confirmedBookings = bookings.filter(isConfirmed);
+
+    const grossRevenue = confirmedBookings.reduce(
+      (sum, b) =>
+        sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
+      0
+    );
+
+    const totalRefunds = bookings.reduce(
+      (sum, b) =>
+        sum + Number(b.refundAmount || 0),
+      0
+    );
+
+    const netRevenue = grossRevenue - totalRefunds;
+
+    /* ------------------ MONTHLY REVENUE ------------------ */
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const prevMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+    const getMonthRevenue = (year, month) =>
+      confirmedBookings
+        .filter((b) => {
+          const d = new Date(b.createdAt);
+          return d.getFullYear() === year && d.getMonth() === month;
+        })
+        .reduce(
+          (sum, b) =>
+            sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
+          0
+        );
+
+    const currentMonthRevenue = getMonthRevenue(currentYear, currentMonth);
+    const prevMonthRevenue = getMonthRevenue(prevMonthYear, prevMonth);
+
+    /* ------------------ GROWTH ------------------ */
+
+    let growthPercent = null;
+    let growthPositive = true;
+    let growthText = "";
+
+    if (prevMonthRevenue > 0 && currentMonthRevenue > 0) {
+      growthPercent =
+        ((currentMonthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100;
+
+      growthPositive = growthPercent >= 0;
+      growthText = `${growthPositive ? "+" : ""}${growthPercent.toFixed(1)}% from last month`;
+    } else if (prevMonthRevenue > 0 && currentMonthRevenue === 0) {
+      growthPositive = false;
+      growthText = "-100% from last month";
+    } else if (prevMonthRevenue === 0 && currentMonthRevenue > 0) {
+      growthPositive = true;
+      growthText = "New revenue this month";
+    } else {
+      growthPositive = true;
+      growthText = "No revenue data yet";
+    }
+
+    /* ------------------ FINAL STATS ------------------ */
+
     const stats = {
       totalProperties: properties.length,
       totalBookings: bookings.length,
+      totalUsers: uniqueUserIds.size,
 
-      totalUsers: uniqueUserIds.size, // ✅ CORRECT COUNT
-
-      confirmed: bookings.filter(isConfirmed).length,
+      confirmed: confirmedBookings.length,
       pending: bookings.filter(isPending).length,
       cancelled: bookings.filter(isCancelled).length,
 
-      totalRevenue: bookings
-        .filter(isConfirmed)
-        .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
+      grossRevenue,
+      totalRefunds,
+      netRevenue,
+      currentMonthRevenue,
+      prevMonthRevenue,
+      growthPercent,
+      growthPositive,
+      growthText,
     };
 
     /* ------------------ RESPONSE ------------------ */

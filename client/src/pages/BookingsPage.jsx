@@ -130,7 +130,10 @@ const BookingsPage = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
-        const status = params.get("status");
+        let status = params.get("status");
+
+        if (status === "paid") status = "confirmed";
+        if (status === "initiated") status = "pending";
 
         if (status && ["confirmed", "pending", "cancelled"].includes(status)) {
             setSelectedFilter(status);
@@ -221,7 +224,10 @@ const BookingsPage = () => {
         const base = bookings
             .filter((b) => {
                 if (selectedFilter === "confirmed")
-                    return b.paymentStatus === "paid" && b.cancelled !== true;
+                    return (
+                        (b.paymentStatus === "paid" || b.paymentStatus === "confirmed") &&
+                        b.cancelled !== true
+                    );
 
                 if (selectedFilter === "pending")
                     return b.paymentStatus === "initiated" && b.cancelled !== true;

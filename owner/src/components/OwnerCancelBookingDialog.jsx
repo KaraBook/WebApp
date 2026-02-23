@@ -33,12 +33,22 @@ export default function OwnerCancelBookingDialog({ open, booking, onClose }) {
     const confirmCancel = async () => {
         try {
             setLoading(true);
-            await api.post(
+
+            const res = await api.post(
                 SummaryApi.ownerCancelBooking.url(booking._id),
                 { reason, notes, refundPercent }
             );
             toast.success("Booking cancelled successfully");
-            onClose(true);
+            const updatedBooking = {
+                ...booking,
+                cancelled: true,
+                status: "cancelled",
+                ownerRefundPercent: refundPercent,
+                refundAmount: res?.data?.refundAmount || 0,
+            };
+
+            onClose(true, updatedBooking);
+
         } catch {
             toast.error("Cancellation failed");
         } finally {

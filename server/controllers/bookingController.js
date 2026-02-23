@@ -2,7 +2,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import Booking from "../models/Booking.js";
 import { sendMail } from "../utils/mailer.js";
-import { bookingConfirmationTemplate } from "../utils/emailTemplates.js";
+import { bookingConfirmationTemplate, ownerBookingNotificationTemplate } from "../utils/emailTemplates.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
@@ -296,7 +296,14 @@ const runBookingBackgroundTasks = async (bookingId) => {
   try {
 
     const booking = await Booking.findById(bookingId)
-      .populate("propertyId")
+      .populate({
+        path: "propertyId",
+        populate: {
+          path: "ownerUserId",
+          model: "User",
+          select: "firstName lastName email mobile"
+        }
+      })
       .populate("userId", "firstName lastName email mobile");
 
     if (!booking) return;
@@ -357,6 +364,33 @@ Amount Paid: ₹${booking.grandTotal}`;
 
       await sendWhatsAppText(booking.userId.mobile, msg);
       console.log("📱 WhatsApp sent");
+    }
+
+
+    // ================= OWNER EMAIL =================
+    if (booking.propertyId?.ownerUserId?.email) {
+
+      const owner = booking.propertyId.ownerUserId;
+
+      const ownerMail = ownerBookingNotificationTemplate({
+        ownerName: owner.firstName || "Owner",
+        propertyName: booking.propertyId.propertyName,
+        travellerName: `${booking.userId.firstName} ${booking.userId.lastName}`,
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        nights: booking.totalNights,
+        guests: `${booking.guests.adults} Adults, ${booking.guests.children} Children`,
+        grandTotal: booking.grandTotal,
+        portalUrl: `${process.env.OWNER_PORTAL_URL}/bookings/${booking._id}`,
+      });
+
+      await sendMail({
+        to: owner.email,
+        subject: ownerMail.subject,
+        html: ownerMail.html,
+      });
+
+      console.log("📩 Owner booking notification sent");
     }
 
   } catch (err) {

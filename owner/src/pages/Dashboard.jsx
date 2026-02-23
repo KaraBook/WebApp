@@ -407,6 +407,42 @@ export default function Dashboard() {
   };
 
 
+  const recalculateStats = (bookings) => {
+    const isConfirmed = (b) =>
+      b.paymentStatus === "paid" ||
+      b.status === "confirmed" ||
+      Boolean(b.paymentId);
+
+    const isCancelled = (b) =>
+      b.cancelled === true || b.status === "cancelled";
+
+    const isPending = (b) =>
+      !isConfirmed(b) && !isCancelled(b);
+
+    const confirmedBookings = bookings.filter(isConfirmed);
+
+    const grossRevenue = confirmedBookings.reduce(
+      (sum, b) => sum + Number(b.totalAmount || 0),
+      0
+    );
+
+    const totalRefunds = bookings.reduce(
+      (sum, b) => sum + Number(b.refundAmount || 0),
+      0
+    );
+
+    const netRevenue = grossRevenue - totalRefunds;
+
+    return {
+      ...data.stats,
+      totalBookings: bookings.length,
+      confirmed: confirmedBookings.length,
+      pending: bookings.filter(isPending).length,
+      cancelled: bookings.filter(isCancelled).length,
+      netRevenue,
+    };
+  };
+
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -469,9 +505,13 @@ export default function Dashboard() {
           <div className="col-span-2 md:col-span-1">
             <StatCard
               icon={IndianRupee}
-              label="Total Revenue"
-              value={`₹${stats?.totalRevenue?.toLocaleString("en-IN")}`}
-              caption="From all bookings"
+              label="Net Revenue"
+              value={`₹${stats?.netRevenue?.toLocaleString("en-IN") || 0}`}
+              caption={
+                stats?.growthText
+                  ? stats.growthText
+                  : "From confirmed bookings"
+              }
               variant="primary"
               onClick={() => navigate("/bookings?time=all&status=confirmed")}
             />
@@ -622,10 +662,24 @@ export default function Dashboard() {
       <OwnerCancelBookingDialog
         open={openCancelDialog}
         booking={selectedBooking}
-        onClose={(refresh) => {
+        onClose={(refresh, updatedBooking) => {
           setOpenCancelDialog(false);
-          if (refresh) {
 
+          if (refresh && updatedBooking) {
+            setData((prev) => {
+              if (!prev) return prev;
+              const updatedBookings = prev.bookings.map((b) =>
+                b._id === updatedBooking._id
+                  ? { ...b, ...updatedBooking }
+                  : b
+              );
+
+              return {
+                ...prev,
+                bookings: updatedBookings,
+                stats: recalculateStats(updatedBookings),
+              };
+            });
           }
         }}
       />

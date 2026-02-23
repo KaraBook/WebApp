@@ -261,7 +261,7 @@ const DashboardPage = () => {
             variant="dark"
           />
         </Link>
-        <Link to="/bookings?status=paid">
+        <Link to="/bookings?status=confirmed">
           <StatCard
             title="Confirmed"
             value={stats.confirmed}
