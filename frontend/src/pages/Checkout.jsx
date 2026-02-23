@@ -10,6 +10,7 @@ import { DateRange } from "react-date-range";
 import { ArrowLeft } from "lucide-react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+import { State } from "country-state-city";
 
 function useIsMobile() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -37,7 +38,6 @@ export default function Checkout() {
     const [bookedDates, setBookedDates] = useState([]);
     const [blockedDates, setBlockedDates] = useState([]);
     const guestRef = useRef(null);
-    const [includeMeals, setIncludeMeals] = useState(false);
     const isMobile = useIsMobile();
     const [pricing, setPricing] = useState(null);
     const [creatingOrder, setCreatingOrder] = useState(false);
@@ -186,7 +186,7 @@ export default function Checkout() {
                         checkIn: toLocalYMD(startDate),
                         checkOut: toLocalYMD(endDate),
                         guests: guestData,
-                        meals: includeMeals ? mealCounts : null,
+                        meals: mealCounts,
                     }
                 );
 
@@ -217,16 +217,9 @@ export default function Checkout() {
             return;
         }
 
-        if (includeMeals) {
-            if (totalMealsSelected < 1) {
-                toast.error("Select at least 1 meal");
-                return;
-            }
-
-            if (totalMealsSelected > totalGuests) {
-                toast.error("Meal count cannot exceed total guests");
-                return;
-            }
+        if (totalMealsSelected > totalGuests) {
+            toast.error("Meal count cannot exceed total guests");
+            return;
         }
 
         try {
@@ -247,7 +240,7 @@ export default function Checkout() {
                     checkOut: toLocalYMD(endDate),
                     guests: guestData,
                     contactNumber: contact,
-                    meals: includeMeals ? mealCounts : null,
+                    meals: mealCounts,
                 },
             );
 
@@ -607,60 +600,52 @@ export default function Checkout() {
                     <div className="border rounded-[12px] p-5 mb-6">
                         <h3 className="font-semibold mb-1 text-lg">Meals</h3>
 
-                        <p className="text-xs text-gray-500 mb-3">
-                            Available: {property.foodAvailability.join(", ")}
-                        </p>
+                        <div className="bg-green-50 border border-green-200 rounded-[8px] px-3 py-2 mb-4">
+                            <p className="text-sm font-medium text-green-700">
+                                🍳 Breakfast is complimentary
+                            </p>
+                        </div>
 
-                        <label className="flex items-center gap-3 mb-4 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={includeMeals}
-                                onChange={(e) => {
-                                    setIncludeMeals(e.target.checked);
-                                    if (!e.target.checked) {
-                                        setMealCounts({ veg: 0, nonVeg: 0 });
-                                    }
-                                }}
-                            />
-                            <span className="text-sm font-medium">Include Meals</span>
-                        </label>
+                        {(property.foodAvailability.includes("lunch") ||
+                            property.foodAvailability.includes("dinner")) && (
+                                <div className="space-y-4">
 
-                        {includeMeals && (
-                            <div className="space-y-4">
+                                    <p className="text-xs text-gray-500">
+                                        Add meals (optional)
+                                    </p>
 
-                                {/* Veg */}
-                                <MealCounter
-                                    label="Veg Guests"
-                                    value={mealCounts.veg}
-                                    onChange={(val) =>
-                                        setMealCounts((prev) => ({
-                                            ...prev,
-                                            veg: val,
-                                        }))
-                                    }
-                                    max={totalGuests - mealCounts.nonVeg}
-                                />
+                                    <MealCounter
+                                        label="Veg Guests"
+                                        value={mealCounts.veg}
+                                        onChange={(val) =>
+                                            setMealCounts((prev) => ({
+                                                ...prev,
+                                                veg: val,
+                                            }))
+                                        }
+                                        max={totalGuests - mealCounts.nonVeg}
+                                    />
 
-                                {/* Non-Veg */}
-                                <MealCounter
-                                    label="Non-Veg Guests"
-                                    value={mealCounts.nonVeg}
-                                    onChange={(val) =>
-                                        setMealCounts((prev) => ({
-                                            ...prev,
-                                            nonVeg: val,
-                                        }))
-                                    }
-                                    max={totalGuests - mealCounts.veg}
-                                />
+                                    <MealCounter
+                                        label="Non-Veg Guests"
+                                        value={mealCounts.nonVeg}
+                                        onChange={(val) =>
+                                            setMealCounts((prev) => ({
+                                                ...prev,
+                                                nonVeg: val,
+                                            }))
+                                        }
+                                        max={totalGuests - mealCounts.veg}
+                                    />
 
-                                <p className="text-xs text-gray-500">
-                                    Select meals for 1 to {totalGuests} guests
-                                </p>
-                            </div>
-                        )}
+                                    <p className="text-xs text-gray-500">
+                                        You can add meals for up to {totalGuests} guests
+                                    </p>
+                                </div>
+                            )}
                     </div>
                 )}
+
 
                 {/* Contact */}
                 <div className="border rounded-[12px] p-5 mb-6">
@@ -713,7 +698,11 @@ export default function Checkout() {
                         <div>
                             <h4 className="font-semibold">{property.propertyName}</h4>
                             <p className="text-sm text-gray-600">
-                                {property.city}, {property.state}
+                                {property.city},{" "}
+                                {
+                                    State.getStateByCodeAndCountry(property.state, "IN")?.name
+                                    || property.state
+                                }
                             </p>
                         </div>
                     </div>
@@ -785,7 +774,7 @@ export default function Checkout() {
                     )}
 
                     {/* Meals */}
-                    {includeMeals && (
+                    {(mealCounts.veg > 0 || mealCounts.nonVeg > 0) && (
                         <>
                             <hr />
                             <div className="text-sm">
