@@ -6,12 +6,14 @@ import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams  } from "react-router-dom";
 import { State } from "country-state-city";
 
 export default function PropertyCard({ property }) {
   const { user, showAuthModal, wishlist, setWishlist, accessToken } =
     useAuthStore();
+  const [searchParams] = useSearchParams();
+  const detailsUrl = `/properties/${property._id}?${searchParams.toString()}`;
 
   const inWishlist = useMemo(
     () => wishlist.includes(property._id),
@@ -66,7 +68,7 @@ export default function PropertyCard({ property }) {
 
       {/* IMAGE */}
       <div className="relative">
-        <Link to={`/properties/${property._id}`}>
+        <Link to={detailsUrl}>
           <img
             src={property.coverImage}
             alt={property.propertyName}
@@ -114,7 +116,7 @@ export default function PropertyCard({ property }) {
       {/* CONTENT */}
       <CardContent className="px-4 pt-3 pb-2 flex-1">
         <div className="flex justify-between items-start gap-2">
-          <Link to={`/properties/${property._id}`}>
+          <Link to={detailsUrl}>
             <h3 className="text-[15px] font-semibold text-gray-900 leading-tight">
               {property.propertyName || "Property Name"}
             </h3>
@@ -150,7 +152,7 @@ export default function PropertyCard({ property }) {
           <span className="text-sm text-gray-500 font-normal ml-1">/N</span>
         </div>
 
-        <Link to={`/properties/${property._id}`}>
+        <Link to={detailsUrl}>
           <Button
             variant="outline"
             className="

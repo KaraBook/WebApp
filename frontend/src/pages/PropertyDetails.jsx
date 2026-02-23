@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { State } from "country-state-city";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
@@ -61,15 +61,27 @@ export default function PropertyDetails() {
   const [loading, setLoading] = useState(true);
   const { wishlist, setWishlist, user, showAuthModal, accessToken } = useAuthStore();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const urlCheckIn = searchParams.get("checkIn");
+  const urlCheckOut = searchParams.get("checkOut");
+  const urlGuests = searchParams.get("guests");
   const [reviews, setReviews] = useState([]);
   const isDesktop = useIsDesktop();
   const [newReview, setNewReview] = useState({
     rating: 0,
     comment: "",
   });
-  const [guests, setGuests] = useState({
-    adults: 1,
-    children: 0,
+  const [guests, setGuests] = useState(() => {
+    if (urlGuests) {
+      try {
+        return JSON.parse(urlGuests);
+      } catch {
+        return { adults: 1, children: 0 };
+      }
+    }
+
+    return { adults: 1, children: 0 };
   });
 
   const maxGuests = property?.maxGuests || 1;
@@ -102,13 +114,25 @@ export default function PropertyDetails() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const [dateRange, setDateRange] = useState([
-    {
-      startDate: today,
-      endDate: tomorrow,
-      key: "selection",
-    },
-  ]);
+  const [dateRange, setDateRange] = useState(() => {
+    if (urlCheckIn && urlCheckOut) {
+      return [
+        {
+          startDate: new Date(urlCheckIn),
+          endDate: new Date(urlCheckOut),
+          key: "selection",
+        },
+      ];
+    }
+
+    return [
+      {
+        startDate: today,
+        endDate: tomorrow,
+        key: "selection",
+      },
+    ];
+  });
 
   const calendarRef = useRef(null);
   const guestRef = useRef(null);
@@ -317,7 +341,7 @@ export default function PropertyDetails() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-   if (startDate.toDateString() === today.toDateString()) {
+    if (startDate.toDateString() === today.toDateString()) {
       toast.error("Same-day bookings are not allowed. Please select a future date.");
       return;
     }

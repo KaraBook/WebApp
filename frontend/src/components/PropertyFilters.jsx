@@ -21,7 +21,12 @@ function FilterLabel({ icon: Icon, text }) {
 
 
 
-export default function PropertyFilters({ onFilter, defaultValues = {}, enableStickyGlass = false, }) {
+export default function PropertyFilters({
+    onFilter,
+    defaultValues = {},
+    enableStickyGlass = false,
+    isHomePage = false
+}) {
     const [locationTree, setLocationTree] = useState([]);
 
     const [states, setStates] = useState([]);
@@ -96,7 +101,9 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
     useEffect(() => {
         if (!selectedState || !locationTree.length) return;
 
-        const stateObj = locationTree.find((s) => s.state === selectedState.value);
+        const stateObj = locationTree.find(
+            (s) => s.state === selectedState.value
+        );
         if (!stateObj) return;
 
         const cityOptions = stateObj.cities.map((c) => ({
@@ -105,17 +112,25 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
         }));
 
         setCities(cityOptions);
-        setSelectedCity(null);
-        setAreas([]);
-        setSelectedArea(null);
+
+        if (selectedCity && !cityOptions.find(c => c.value === selectedCity.value)) {
+            setSelectedCity(null);
+            setAreas([]);
+            setSelectedArea(null);
+        }
     }, [selectedState, locationTree]);
 
 
     useEffect(() => {
         if (!selectedState || !selectedCity || !locationTree.length) return;
 
-        const stateObj = locationTree.find((s) => s.state === selectedState.value);
-        const cityObj = stateObj?.cities.find((c) => c.city === selectedCity.value);
+        const stateObj = locationTree.find(
+            (s) => s.state === selectedState.value
+        );
+
+        const cityObj = stateObj?.cities.find(
+            (c) => c.city === selectedCity.value
+        );
 
         if (!cityObj) return;
 
@@ -125,6 +140,13 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
         }));
 
         setAreas(areaOptions);
+
+        if (
+            selectedArea &&
+            !areaOptions.find(a => a.value === selectedArea.value)
+        ) {
+            setSelectedArea(null);
+        }
     }, [selectedCity, selectedState, locationTree]);
 
     useEffect(() => {
@@ -208,6 +230,48 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
             checkOut: dateRange[0].endDate,
             guests,
         });
+    };
+
+
+    const resetFilters = () => {
+        setSelectedState(null);
+        setSelectedCity(null);
+        setSelectedArea(null);
+
+        setCities([]);
+        setAreas([]);
+
+        setGuests({
+            adults: 1,
+            children: 0,
+            infants: 0,
+        });
+
+        setDateRange([
+            {
+                startDate: new Date(),
+                endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+                key: "selection",
+            },
+        ]);
+
+        setShowGuestBox(false);
+        setShowCalendar(false);
+
+        if (!isHomePage) {
+            onFilter({
+                state: "",
+                city: "",
+                area: "",
+                checkIn: null,
+                checkOut: null,
+                guests: {
+                    adults: 1,
+                    children: 0,
+                    infants: 0,
+                },
+            });
+        }
     };
 
     const selectStyles = {
@@ -350,7 +414,7 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
                 </div>
                 {showCalendar && (
                     <div
-  className="
+                        className="
     absolute top-[71px]
     left-1/2 -translate-x-1/2
     md:left-0 md:translate-x-0
@@ -359,10 +423,10 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
     p-1 md:p-3
     shadow-2xl
     border border-gray-100
-    pl-[35px] md:pl-[42px]
+    pl-[16px] md:pl-[16px]
     z-[999999]
   "
->
+                    >
 
                         <DateRange
                             ranges={dateRange}
@@ -493,25 +557,20 @@ export default function PropertyFilters({ onFilter, defaultValues = {}, enableSt
                 )}
             </div>
 
-
-            {/* Search Button */}
             <button
                 onClick={applyFilters}
-                className="
-    bg-primary w-full md:w-auto
-    rounded-[8px]
-    text-white
-    px-6 py-2
-    mt-3 md:mt-6
-    font-semibold
-    transition-all duration-300
-    shadow-md
-    flex items-center justify-center gap-2
-  "
+                className="bg-primary text-white rounded-[8px] px-4 py-2 font-semibold shadow-md flex items-center gap-2 mt-6"
             >
                 <Search className="w-4 h-4" />
                 Search
             </button>
+            <button
+                onClick={resetFilters}
+                className="border border-gray-300 text-gray-700 rounded-[8px] px-4 py-2 font-medium hover:bg-gray-100 transition mt-6"
+            >
+                Reset
+            </button>
+
         </div>
     );
 }

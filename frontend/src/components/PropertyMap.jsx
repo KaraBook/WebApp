@@ -13,16 +13,19 @@ function extractCoords(link) {
   if (!link) return null;
 
   let match = link.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
-  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
-
-  match = link.match(/!4d(-?\d+\.\d+)!3d(-?\d+\.\d+)/);
-  if (match) return [parseFloat(match[2]), parseFloat(match[1])];
+  if (match) {
+    return [parseFloat(match[1]), parseFloat(match[2])];
+  }
 
   match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
+  if (match) {
+    return [parseFloat(match[1]), parseFloat(match[2])];
+  }
 
   match = link.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if (match) return [parseFloat(match[1]), parseFloat(match[2])];
+  if (match) {
+    return [parseFloat(match[1]), parseFloat(match[2])];
+  }
 
   return null;
 }
@@ -43,13 +46,19 @@ export default function PropertyMap({ link }) {
     <MapContainer
       center={coords}
       zoom={15}
+      maxZoom={19}
       scrollWheelZoom={false}
-      style={{ height: "100%", width: "100%", borderRadius: "14px" }}
+      dragging={true}
+      doubleClickZoom={true}
+      zoomControl={true}
+      attributionControl={false}
+      style={{ height: "100%", width: "100%", borderRadius: "14px", zIndex: 0, position: "relative" }}
     >
       <TileLayer
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
       <Marker position={coords}>
         <Popup>Property Location</Popup>
       </Marker>

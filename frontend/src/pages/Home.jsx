@@ -119,7 +119,7 @@ export default function Home() {
           </p>
           <Button
             onClick={() => navigate("/properties")}
-            className="bg-[#FBB017] text-black text-[16px] mt-6 px-10 py-6 rounded-[10px] font-semibold hover:text-white">
+            className="bg-[#FBB017] text-black text-[16px] mt-2 md:mt-6 px-10 py-6 rounded-[10px] font-semibold hover:text-white">
             Find Your Stay
           </Button>
 
@@ -134,7 +134,10 @@ export default function Home() {
         >
           <div className="hidden md:block absolute -bottom-[20px] w-full px-4 z-10">
             <div className="max-w-6xl mx-auto">
-              <PropertyFilters onFilter={handleFilter} />
+              <PropertyFilters
+                onFilter={handleFilter}
+                isHomePage
+              />
             </div>
           </div>
         </motion.div>
@@ -197,6 +200,7 @@ export default function Home() {
                   handleFilter(filters);
                   setShowMobileFilters(false);
                 }}
+                isHomePage
               />
             </div>
           </div>

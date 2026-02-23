@@ -219,6 +219,10 @@
   }
 }
 
+.rdrMonthAndYearWrapper{
+  margin-left: -40px;
+}
+
 
 .mobile-property-gallery {
   height: 260px;

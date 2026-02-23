@@ -4,7 +4,7 @@ import SummaryApi from "../common/SummaryApi";
 import { toast } from "sonner";
 import PropertyCard from "../components/PropertyCard";
 import PropertyFilters from "../components/PropertyFilters";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import PropertyTopFilters from "@/components/PropertyTopFilters";
 import { Star, SlidersHorizontal } from "lucide-react";
 import PropertyFilterPopup from "@/components/PropertyFilterPopup";
@@ -24,6 +24,7 @@ export default function Properties() {
   const [searchParams] = useSearchParams();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showFilterPopup, setShowFilterPopup] = useState(false);
+  const navigate = useNavigate();
 
   const propertyTypeFromUrl = searchParams.get("propertyType");
 
@@ -198,16 +199,28 @@ export default function Properties() {
             }
   `}
         >
-          {/* 👇 THIS is the overflow controller */}
           <div className="pt-10 bg-white rounded-2xl ">
-            {/* 👇 REAL CONTENT — NO CLIPPING */}
             <div className="bg-white rounded-2xl shadow-sm">
               <PropertyFilters
                 onFilter={(filters) => {
-                  fetchProperties(filters);
-                  setShowMobileFilters(false);
+                  const params = new URLSearchParams();
+
+                  if (filters.state) params.set("state", filters.state);
+                  if (filters.city) params.set("city", filters.city);
+                  if (filters.area) params.set("area", filters.area);
+
+                  if (filters.checkIn)
+                    params.set("checkIn", filters.checkIn.toISOString());
+                  if (filters.checkOut)
+                    params.set("checkOut", filters.checkOut.toISOString());
+
+                  if (filters.guests)
+                    params.set("guests", JSON.stringify(filters.guests));
+
+                  navigate(`/properties?${params.toString()}`);
                 }}
                 defaultValues={defaultValues}
+                enableStickyGlass
               />
             </div>
           </div>
@@ -217,9 +230,25 @@ export default function Properties() {
 
       {/* Sticky Filters (Desktop only) */}
       <div className="hidden md:block md:sticky md:top-[70px] z-[50]">
-        <div className="max-w-6xl mx-auto px-4 -mt-[50px]">
+        <div className="max-w-7xl mx-auto px-4 -mt-[50px]">
           <PropertyFilters
-            onFilter={fetchProperties}
+            onFilter={(filters) => {
+              const params = new URLSearchParams();
+
+              if (filters.state) params.set("state", filters.state);
+              if (filters.city) params.set("city", filters.city);
+              if (filters.area) params.set("area", filters.area);
+
+              if (filters.checkIn)
+                params.set("checkIn", filters.checkIn.toISOString());
+              if (filters.checkOut)
+                params.set("checkOut", filters.checkOut.toISOString());
+
+              if (filters.guests)
+                params.set("guests", JSON.stringify(filters.guests));
+
+              navigate(`/properties?${params.toString()}`);
+            }}
             defaultValues={defaultValues}
             enableStickyGlass
           />
