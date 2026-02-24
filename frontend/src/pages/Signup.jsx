@@ -73,6 +73,8 @@ export default function Signup() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const isGoogle = state?.method === "google"
   const existingUser = state?.existingUser;
+  const redirectTo = state?.redirectTo;
+  const checkoutState = state?.checkoutState;
 
   const schema = z.object(
     isGoogle
@@ -178,7 +180,11 @@ export default function Signup() {
         description: "Welcome! You are now logged in.",
       });
 
-      navigate("/");
+      if (redirectTo) {
+        navigate(redirectTo, { state: checkoutState });
+      } else {
+        navigate("/");
+      }
 
 
     } catch (err) {

@@ -144,19 +144,19 @@ export default function ListYourProperty() {
               <input
                 type="text"
                 name="name"
-                placeholder="Full Name"
-                required
-                className="w-full border rounded-lg px-4 py-3 text-sm"
+                value={form.name}
                 onChange={handleChange}
+                placeholder="Full Name"
+                className="w-full border rounded-lg px-4 py-3 text-sm"
               />
 
               <input
                 type="email"
                 name="email"
-                placeholder="Email Address"
-                required
-                className="w-full border rounded-lg px-4 py-3 text-sm"
+                value={form.email}
                 onChange={handleChange}
+                placeholder="Email Address"
+                className="w-full border rounded-lg px-4 py-3 text-sm"
               />
 
               <input
@@ -177,27 +177,28 @@ export default function ListYourProperty() {
               <input
                 type="text"
                 name="propertyName"
-                placeholder="Property Name"
-                required
-                className="w-full border rounded-lg px-4 py-3 text-sm"
+                value={form.propertyName}
                 onChange={handleChange}
+                placeholder="Property Name"
+                className="w-full border rounded-lg px-4 py-3 text-sm"
               />
 
               <textarea
                 name="address"
-                placeholder="Property Address"
-                rows={3}
-                required
-                className="w-full border rounded-lg px-4 py-3 text-sm"
+                value={form.address}
                 onChange={handleChange}
+                rows={3}
+                placeholder="Property Address"
+                className="w-full border rounded-lg px-4 py-3 text-sm"
               />
 
               <textarea
                 name="message"
-                placeholder="Message (optional)"
-                rows={3}
-                className="w-full border rounded-lg px-4 py-3 text-sm"
+                value={form.message}
                 onChange={handleChange}
+                rows={3}
+                placeholder="Message (optional)"
+                className="w-full border rounded-lg px-4 py-3 text-sm"
               />
 
               <Button

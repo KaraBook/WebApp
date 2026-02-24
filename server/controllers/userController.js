@@ -307,7 +307,8 @@ export const uploadTravellerAvatar = async (req, res) => {
 
     const BASE_URL = process.env.BACKEND_BASE_URL || "";
 
-    user.avatarUrl = `${BASE_URL}/${file.path.replace(/\\/g, "/")}`;
+    const relativePath = file.path.split("uploads")[1].replace(/\\/g, "/");
+    user.avatarUrl = `${process.env.BACKEND_BASE_URL}/uploads${relativePath}`;
     await user.save();
 
     return res.status(200).json({
@@ -824,7 +825,8 @@ export const removeTravellerAvatar = async (req, res) => {
     }
 
     try {
-      const filePath = user.avatarUrl.split("/").slice(-2).join("/"); // uploads/avatar.png
+      const url = new URL(user.avatarUrl);
+      const filePath = url.pathname;
       const fullPath = path.join(process.cwd(), filePath);
 
       if (fs.existsSync(fullPath)) {

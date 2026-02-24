@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Phone, Shield, Loader2 } from "lucide-react";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-export default function PhoneLoginModal({ open, onOpenChange }) {
+export default function PhoneLoginModal({ open, onOpenChange, redirectData }) {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
 
@@ -130,13 +130,22 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
         toast.success("Login successful!");
         onOpenChange(false);
 
+        if (redirectData?.redirectTo) {
+          navigate(redirectData.redirectTo, {
+            state: redirectData.checkoutState,
+          });
+        }
+
       } catch (err) {
 
         const errorCode = err.response?.data?.code;
 
         if (errorCode === "USER_NOT_FOUND") {
           navigate("/signup", {
-            state: { idToken }
+            state: {
+              idToken,
+              ...redirectData,
+            }
           });
           onOpenChange(false);
           return;
@@ -206,7 +215,8 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           state: {
             idToken,
             method: "google",
-            email
+            email,
+            ...redirectData,
           }
         });
         onOpenChange(false);

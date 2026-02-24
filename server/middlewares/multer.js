@@ -56,22 +56,17 @@ const IMAGE_TYPES = [
 const PDF_TYPE = "application/pdf";
 
 const fileFilter = (req, file, cb) => {
-  if (file.fieldname === "shopAct") {
-    if (
-      IMAGE_TYPES.includes(file.mimetype) ||
-      file.mimetype === PDF_TYPE
-    ) {
-      return cb(null, true);
-    }
-    return cb(
-      new Error("Shop Act must be an image (JPG, PNG, WEBP) or PDF")
-    );
-  }
 
-  if (!IMAGE_TYPES.includes(file.mimetype)) {
-    return cb(
-      new Error("Only JPG, PNG or WEBP images are allowed")
-    );
+  const isImage = IMAGE_TYPES.includes(file.mimetype);
+  const isPDF = file.mimetype === PDF_TYPE;
+
+  if (file.fieldname === "shopAct") {
+    if (isImage || isPDF) return cb(null, true);
+
+    return cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", "INVALID_FILE_TYPE"));
+  }
+  if (!isImage) {
+    return cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", "INVALID_IMAGE_TYPE"));
   }
 
   cb(null, true);
@@ -81,9 +76,9 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, 
+    fileSize: 2 * 1024 * 1024, 
     files: 20,
-  },
+  }
 });
 
 export default upload;

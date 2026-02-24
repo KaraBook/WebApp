@@ -13,14 +13,20 @@ export const useAuthStore = create(
       refreshToken: null,
       wishlist: [],
 
-      updateUser: (partial) =>
-        set((state) => ({
-          user: { ...state.user, ...partial }
-        })),
-
       loginModalOpen: false,
-      showAuthModal: () => set({ loginModalOpen: true }),
-      hideAuthModal: () => set({ loginModalOpen: false }),
+      redirectData: null,
+
+      showAuthModal: (data = null) =>
+        set({
+          loginModalOpen: true,
+          redirectData: data,
+        }),
+
+      hideAuthModal: () =>
+        set({
+          loginModalOpen: false,
+          redirectData: null,
+        }),
 
       setAuth: ({ user, accessToken, refreshToken }) => {
         set({ user, accessToken, refreshToken, loginModalOpen: false });

@@ -306,7 +306,10 @@ export default function PropertyDetails() {
   };
 
   const toggleWishlist = async () => {
-    if (!user) return showAuthModal();
+    if (!user) {
+      showAuthModal();
+      return;
+    }
     try {
       const res = await Axios.post(
         SummaryApi.toggleWishlist.url,
@@ -329,7 +332,20 @@ export default function PropertyDetails() {
 
 
   const handleReserve = () => {
-    if (!user) return showAuthModal();
+    if (!user) {
+      const { startDate, endDate } = dateRange[0];
+
+      showAuthModal({
+        redirectTo: `/checkout/${property._id}`,
+        checkoutState: {
+          from: startDate,
+          to: endDate,
+          guests,
+        },
+      });
+
+      return;
+    }
 
     const { startDate, endDate } = dateRange[0];
 

@@ -42,6 +42,22 @@ export default function Profile() {
     const file = e.target.files[0];
     if (!file) return;
 
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Only JPG, PNG or WEBP images are allowed");
+      fileRef.current.value = "";
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image must be smaller than 2MB");
+      fileRef.current.value = "";
+      return;
+    }
+
+    const localPreview = URL.createObjectURL(file);
+    setAvatarPreview(localPreview);
+
     setUploading(true);
     const formData = new FormData();
     formData.append("image", file);
@@ -49,7 +65,8 @@ export default function Profile() {
     try {
       const res = await Axios.post(
         SummaryApi.uploadTravellerAvatar.url,
-        formData
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       const url = res.data.avatarUrl + "?t=" + Date.now();
@@ -60,9 +77,15 @@ export default function Profile() {
       fileRef.current.value = "";
 
       toast.success("Profile photo updated");
+
     } catch (err) {
-      console.error(err);
-      toast.error("Upload failed");
+      const msg =
+        err?.response?.data?.message ||
+        "Image upload failed. Please try another image.";
+
+      toast.error(msg);
+      setAvatarPreview(profile?.avatarUrl || "");
+
     } finally {
       setUploading(false);
     }
@@ -119,8 +142,10 @@ export default function Profile() {
           {avatarPreview ? (
             <img
               src={avatarPreview}
-              className="w-[140px] h-[140px] md:w-[180px] md:h-[150px]
-        rounded-[12px] object-cover border shadow-sm"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+              className="w-[140px] h-[140px] md:w-[180px] md:h-[150px] rounded-[12px] object-cover border shadow-sm"
             />
           ) : (
             <div

@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,18 +8,21 @@ import Axios from "@/utils/Axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { toast } from "sonner";
 import { sendOtp as firebaseSendOtp } from "/firebase";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
-    getIndianStates,
-    getCitiesByState,
-} from "@/utils/locationUtils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getIndianStates, getCitiesByState } from "@/utils/locationUtils";
 import { DialogClose } from "@/components/ui/dialog";
+
+
+const parseApiError = (err) => {
+    const res = err?.response?.data;
+    if (!res) return "Network error. Please check your internet connection.";
+    if (res.message) return res.message;
+    if (res.errors && typeof res.errors === "object") {
+        const firstError = Object.values(res.errors)[0];
+        if (firstError) return firstError;
+    }
+    return "Something went wrong. Please try again.";
+};
 
 
 export default function EditProfileDialog({ open, onClose, profile, onUpdated }) {
@@ -79,7 +77,17 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
             setTimer(60);
             toast.success("OTP sent successfully");
         } catch (err) {
-            toast.error("Cannot send OTP");
+            const code = err?.code;
+
+            let msg = "Failed to send OTP";
+
+            if (code === "auth/too-many-requests")
+                msg = "You have requested OTP too many times. Please wait.";
+
+            else if (code === "auth/network-request-failed")
+                msg = "Network error. Please check internet connection.";
+
+            toast.error(msg);
         } finally {
             setSending(false);
         }
@@ -108,33 +116,92 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
             onUpdated({ ...profile, mobile: res.data.mobile });
             setEditingMobile(false);
         } catch (err) {
-            toast.error(err?.response?.data?.message || "Invalid OTP");
+
+            const code = err?.code || err?.response?.data?.code;
+
+            let msg = "OTP verification failed";
+
+            switch (code) {
+                case "auth/invalid-verification-code":
+                    msg = "Incorrect OTP. Please try again.";
+                    break;
+
+                case "auth/code-expired":
+                    msg = "OTP expired. Please request a new one.";
+                    break;
+
+                case "auth/too-many-requests":
+                    msg = "Too many attempts. Please wait a few minutes.";
+                    break;
+
+                case "auth/network-request-failed":
+                    msg = "Network error. Check your internet connection.";
+                    break;
+
+                default:
+                    msg = err?.response?.data?.message || "Invalid OTP";
+            }
+            toast.error(msg);
             setOtp("");
         } finally {
             setVerifying(false);
         }
     };
 
-    /* ================= AUTO VERIFY ================= */
     useEffect(() => {
         if (otp.length === 6 && !verifying) {
             verifyOtpAndUpdate(otp);
         }
     }, [otp]);
 
-    /* ================= SAVE PROFILE ================= */
+
+    const validateForm = () => {
+
+        if (!form.firstName.trim())
+            return "First name is required";
+
+        if (!form.lastName.trim())
+            return "Last name is required";
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(form.email))
+            return "Please enter a valid email address";
+
+        if (!form.address.trim())
+            return "Address is required";
+
+        if (!/^\d{6}$/.test(form.pinCode))
+            return "Pin code must be 6 digits";
+
+        if (!form.state)
+            return "Please select a state";
+
+        if (!form.city)
+            return "Please select a city";
+
+        return null;
+    };
+
+
     const handleSave = async () => {
+
+        const error = validateForm();
+        if (error) {
+            toast.error(error);
+            return;
+        }
+
         try {
             setSaving(true);
             const res = await Axios.put(
                 SummaryApi.updateTravellerProfile.url,
                 form
             );
-            toast.success("Profile updated");
+            toast.success("Profile updated successfully");
             onUpdated(res.data.user);
             onClose();
         } catch (err) {
-            toast.error(err?.response?.data?.message || "Update failed");
+            toast.error(parseApiError(err));
         } finally {
             setSaving(false);
         }
