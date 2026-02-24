@@ -183,22 +183,31 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const idToken = await result.user.getIdToken(true);
-
       const resp = await axios.post(
         baseURL + SummaryApi.travellerLoginGoogle.url,
         {},
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
-
       setAuth({
         user: resp.data.user,
         accessToken: resp.data.accessToken,
         refreshToken: resp.data.refreshToken,
       });
-
       toast.success("Login successful!");
       onOpenChange(false);
     } catch (err) {
+      const errorCode = err.response?.data?.code;
+      if (errorCode === "USER_NOT_FOUND") {
+        navigate("/signup", {
+          state: {
+            idToken,
+            method: "google",
+            email: result?.user?.email
+          }
+        });
+        onOpenChange(false);
+        return;
+      }
       toast.error(
         err?.response?.data?.message || "Google login failed"
       );

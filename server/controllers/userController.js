@@ -861,7 +861,12 @@ export const travellerLoginGoogle = async (req, res) => {
   if (!email) return res.status(400).json({ message: "No email" });
 
   const user = await User.findOne({ email: email.toLowerCase().trim() });
-  if (!user) return res.status(404).json({ message: "Not registered" });
+  if (!user) {
+    return res.status(404).json({
+      code: "USER_NOT_FOUND",
+      message: "User not registered. Please sign up.",
+    });
+  }
 
   if (!user.roles.includes("traveller")) {
     user.roles.push("traveller");
