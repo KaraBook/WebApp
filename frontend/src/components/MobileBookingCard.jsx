@@ -150,6 +150,7 @@ export default function MobileBookingCard({
                     className="py-3 gap-3"
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!canRate(booking)) return;
                       onRate(booking);
                     }}
                   >
@@ -175,7 +176,7 @@ export default function MobileBookingCard({
                   className="py-3 gap-3 text-red-600"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onCancel(booking);   
+                    onCancel(booking);
                   }}
                 >
                   <XCircle className="w-4 h-4" />

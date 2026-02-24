@@ -28,14 +28,6 @@ function resolveBookingStatus(b) {
 }
 
 
-function canViewInvoice(b) {
-    return (
-        b?.paymentStatus === "paid" ||
-        b?.status === "paid" ||
-        !!b?.paymentId
-    );
-}
-
 function getNights(checkIn, checkOut) {
     if (!checkIn || !checkOut) return "—";
 
@@ -245,6 +237,7 @@ export default function Dashboard() {
                                 setBookingDialogOpen(true);
                             }}
                             onRate={(booking) => {
+                                if (!canRate(booking)) return;
                                 setRateBooking(booking);
                                 setRateDialogOpen(true);
                             }}
