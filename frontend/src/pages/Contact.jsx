@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import axios from "axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
+import { toast } from "sonner";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -15,7 +16,6 @@ export default function Contact() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -87,9 +87,7 @@ export default function Contact() {
           message: form.message.trim(),
         },
       });
-
-      setSuccess(true);
-      setErrors({});
+      toast.success("Message sent successfully! We'll contact you soon.");
 
       setForm({
         name: "",
@@ -97,15 +95,15 @@ export default function Contact() {
         phone: "",
         message: "",
       });
-
+      setErrors({});
     } catch (error) {
       console.error(error);
-      alert("Unable to send message. Please try again.");
+
+      toast.error("Unable to send message. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fafafa] to-[#f2f2f0]">
@@ -237,12 +235,6 @@ export default function Contact() {
             >
               {loading ? "Sending..." : "Send Message"}
             </Button>
-
-            {success && (
-              <p className="text-green-600 text-sm text-center">
-                Your message has been sent. We will contact you soon.
-              </p>
-            )}
 
           </div>
         </div>

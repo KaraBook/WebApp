@@ -114,13 +114,16 @@ export default function Dashboard() {
         b => resolveBookingStatus(b) === "cancelled"
     ).length;
 
-    const grossSpent = bookings
-        .filter(b => resolveBookingStatus(b) === "confirmed")
-        .reduce((sum, b) => {
-            return sum + (b.grandTotal || b.totalAmount || 0);
-        }, 0);
+    const confirmedBookings = bookings.filter(
+        b => resolveBookingStatus(b) === "confirmed"
+    );
 
-    const totalRefunded = bookings.reduce(
+    const grossSpent = confirmedBookings.reduce(
+        (sum, b) => sum + (b.grandTotal || b.totalAmount || 0),
+        0
+    );
+
+    const totalRefunded = confirmedBookings.reduce(
         (sum, b) => sum + (b.refundAmount || 0),
         0
     );

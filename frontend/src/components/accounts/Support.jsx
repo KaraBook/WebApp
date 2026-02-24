@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Mail, HelpCircle } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
+import SummaryApi, { baseURL } from "@/common/SummaryApi";
 
 export default function Support() {
   const [form, setForm] = useState({
@@ -15,18 +17,54 @@ export default function Support() {
     message: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.subject || !form.message) {
+
+    if (!form.name.trim() || !form.email.trim() || !form.subject.trim() || !form.message.trim()) {
       toast.error("Please fill all fields");
       return;
     }
-    toast.success("Support request sent successfully!");
-    setForm({ name: "", email: "", subject: "", message: "" });
+
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) {
+      toast.error("Enter valid email address");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await axios({
+        method: SummaryApi.sendContact.method,
+        url: baseURL + SummaryApi.sendContact.url,
+        data: {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: "-",
+          message: `Subject: ${form.subject}\n\n${form.message}`,
+        },
+      });
+
+      toast.success("Support request sent successfully!");
+
+      setForm({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to send support request. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const faqs = [
@@ -138,9 +176,10 @@ export default function Support() {
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="bg-primary hover:bg-primary text-white px-6 py-2 rounded-[8px]"
+                disabled={loading}
+                className="bg-primary hover:bg-primary text-white px-6 py-2 rounded-[8px] disabled:opacity-60"
               >
-                Send Message
+                {loading ? "Sending..." : "Send Message"}
               </Button>
             </div>
           </form>

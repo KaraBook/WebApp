@@ -79,7 +79,7 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
                     {/* PROGRESS DOTS */}
                     <div className="flex justify-center gap-2 py-3">
                         {[0, 1, 2, 3, 4].map(i => (
-                            <div key={i} className={`w-2 h-2 rounded-full ${step === i ? "bg-red-500" : "bg-gray-300"}`} />
+                            <div key={i} className={`w-2 h-2 rounded-full ${step === i ? "bg-primary" : "bg-gray-300"}`} />
                         ))}
                     </div>
 
@@ -236,6 +236,7 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
                             </>
                         )}
 
+
                         {/* ================= FOOTER ================= */}
                         <div className="flex justify-between pt-4">
                             <Button variant="outline" onClick={() => step === 0 ? onClose(false) : setStep(step - 1)}>
@@ -243,7 +244,7 @@ export default function CancelBookingDialog({ open, booking, onClose }) {
                             </Button>
 
                             <Button
-                                className="bg-red-600 hover:bg-red-700"
+                                className="bg-primary text-white"
                                 disabled={
                                     (step === 1 && !reason) ||
                                     (step === 4 && !agree) ||

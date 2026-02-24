@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Phone, Inbox, Map } from "lucide-react";
 import axios from "axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
+import { toast } from "sonner";
 
 export default function ListYourProperty() {
   const [form, setForm] = useState({
@@ -15,7 +16,6 @@ export default function ListYourProperty() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -38,10 +38,14 @@ export default function ListYourProperty() {
     const err = {};
 
     if (!form.name.trim()) err.name = "Name required";
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) err.email = "Invalid email";
-    if (!/^[6-9]\d{9}$/.test(form.mobile)) err.mobile = "Invalid mobile";
-    if (!form.propertyName.trim()) err.propertyName = "Property name required";
-    if (!form.address.trim()) err.address = "Address required";
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim()))
+      err.email = "Invalid email";
+    if (!/^[6-9]\d{9}$/.test(form.mobile))
+      err.mobile = "Invalid mobile";
+    if (!form.propertyName.trim())
+      err.propertyName = "Property name required";
+    if (!form.address.trim())
+      err.address = "Address required";
 
     setErrors(err);
     return Object.keys(err).length === 0;
@@ -58,10 +62,20 @@ export default function ListYourProperty() {
       await axios({
         method: SummaryApi.propertyLead.method,
         url: baseURL + SummaryApi.propertyLead.url,
-        data: form,
+        data: {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          mobile: form.mobile.trim(),
+          propertyName: form.propertyName.trim(),
+          address: form.address.trim(),
+          message: form.message.trim(),
+        },
       });
 
-      setSuccess(true);
+      toast.success(
+        "Request submitted successfully! Our onboarding team will contact you shortly.",
+        { duration: 4000 }
+      );
 
       setForm({
         name: "",
@@ -72,8 +86,12 @@ export default function ListYourProperty() {
         message: "",
       });
 
+      setErrors({});
+
     } catch (err) {
-      alert("Unable to submit request");
+      console.error(err);
+
+      toast.error("Unable to submit request. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -188,11 +206,6 @@ export default function ListYourProperty() {
               >
                 {loading ? "Submitting..." : "Submit Request"}
               </Button>
-              {success && (
-                <p className="text-green-600 text-sm text-center">
-                  Thank you! Our onboarding team will contact you shortly.
-                </p>
-              )}
 
               <p className="text-xs text-gray-500 text-center mt-2">
                 By submitting this form, you agree to be contacted by the
