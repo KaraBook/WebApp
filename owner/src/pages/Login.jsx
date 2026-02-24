@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/auth/AuthContext";
 import api from "@/api/axios";
 import SummaryApi from "@/common/SummaryApi";
-import { auth, sendOtp } from "@/firebase";
+import { auth, sendOtp, clearRecaptcha } from "@/firebase";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -102,13 +102,19 @@ export default function OwnerLogin() {
       toast.success("OTP sent successfully");
       setTimeout(() => otpInputRef.current?.focus(), 50);
     } catch (err) {
-      let message = "Failed to send OTP.";
+      let message = "We couldn't send the verification code. Please try again.";
 
       if (err.code === "auth/too-many-requests") {
-        message =
-          "Too many OTP requests. Please wait before trying again.";
-      } else if (err.code === "auth/invalid-phone-number") {
-        message = "Invalid phone number format.";
+        message = "Too many attempts. Please wait a few minutes before retrying.";
+      }
+      else if (err.code === "auth/invalid-phone-number") {
+        message = "Please enter a valid mobile number.";
+      }
+      else if (err.code === "auth/network-request-failed") {
+        message = "Network error. Please check your internet connection.";
+      }
+      else if (err.code === "auth/internal-error") {
+        message = "Verification service unavailable. Please refresh and try again.";
       }
 
       toast.error(message);
@@ -198,6 +204,7 @@ export default function OwnerLogin() {
   };
 
   const changeNumber = () => {
+    clearRecaptcha();
     setPhase("mobile");
     setOtp("");
     setConfirmRes(null);
