@@ -179,10 +179,14 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
 
   const handleGoogleLogin = async () => {
+    let idToken = null;
+    let email = null;
+
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken(true);
+      idToken = await result.user.getIdToken(true);
+      email = result.user.email;
       const resp = await axios.post(
         baseURL + SummaryApi.travellerLoginGoogle.url,
         {},
@@ -202,7 +206,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
           state: {
             idToken,
             method: "google",
-            email: result?.user?.email
+            email
           }
         });
         onOpenChange(false);
