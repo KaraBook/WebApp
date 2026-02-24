@@ -44,7 +44,6 @@ export default function OwnerLogin() {
 
   const [secondsLeft, setSecondsLeft] = useState(60);
 
-  const otpInputRef = useRef(null);
   const autoVerifyLock = useRef(false);
 
   const mobile10 = useMemo(() => normalize10(mobile), [mobile]);
@@ -57,6 +56,14 @@ export default function OwnerLogin() {
     const t = setInterval(() => setSecondsLeft((p) => p - 1), 1000);
     return () => clearInterval(t);
   }, [phase, secondsLeft]);
+
+
+  useEffect(() => {
+  if (otp.length === 6 && confirmRes && !verifying && !autoVerifyLock.current) {
+    autoVerifyLock.current = true;
+    verifyOtp(otp);
+  }
+}, [otp]);
 
 
   const backendOwnerPrecheck = async () => {
@@ -198,7 +205,6 @@ export default function OwnerLogin() {
       autoVerifyLock.current = false;
 
       toast.success("OTP resent");
-      setTimeout(() => otpInputRef.current?.focus(), 50);
     } catch (err) {
       toast.error(
         err?.response?.data?.message ||
@@ -252,6 +258,8 @@ export default function OwnerLogin() {
 
 
   return (
+    <>
+    <div id="recaptcha-container" style={{ position: "fixed", top: "-10000px" }} />
     <div className="min-h-screen bg-[#f2f4f8] flex items-center justify-center px-0">
 
       <div className="w-full max-w-full bg-white shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col lg:flex-row">
@@ -477,5 +485,6 @@ export default function OwnerLogin() {
         </div>
       </div>
     </div>
+    </>
   );
 }

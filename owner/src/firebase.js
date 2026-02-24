@@ -30,17 +30,17 @@ export const getRecaptcha = async () => {
   }
 
   recaptchaVerifier = new RecaptchaVerifier(
-    auth,
     container,
     {
       size: "invisible",
-      callback: () => {},
+      callback: () => { },
       "expired-callback": () => {
         clearRecaptcha();
-      }
-    }
+      },
+    },
+    auth
   );
-
+  
   await recaptchaVerifier.render();
   return recaptchaVerifier;
 };
@@ -52,7 +52,7 @@ export const sendOtp = async (phoneNumber) => {
 
 export const clearRecaptcha = () => {
   if (recaptchaVerifier) {
-    try { recaptchaVerifier.clear(); } catch {}
+    try { recaptchaVerifier.clear(); } catch { }
     recaptchaVerifier = null;
   }
 };
