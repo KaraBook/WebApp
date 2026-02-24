@@ -15,22 +15,25 @@ Axios.interceptors.request.use((config) => {
 
 
 Axios.interceptors.response.use(
-  (r) => r,
+  (response) => response,
   async (error) => {
     const original = error.config;
 
-    const isVerifyPaymentCall =
-      original?.url?.includes("verify") || original?.url?.includes("verify-payment");
+    if (!original) return Promise.reject(error);
 
-    if (isVerifyPaymentCall) {
+    const isMultipart =
+      original.headers?.["Content-Type"]?.includes("multipart/form-data");
+
+    if (isMultipart) {
       return Promise.reject(error);
     }
 
     if (error?.response?.status === 401 && !original._retry) {
       original._retry = true;
+
       try {
         const { refreshToken, setTokens } = useAuthStore.getState();
-        if (!refreshToken) throw new Error("no refreshToken");
+        if (!refreshToken) throw new Error("No refresh token");
 
         const resp = await axios({
           baseURL,
@@ -45,6 +48,7 @@ Axios.interceptors.response.use(
         setTokens({ accessToken: newAccess, refreshToken: newRefresh });
 
         original.headers.Authorization = `Bearer ${newAccess}`;
+
         return Axios(original);
       } catch {
         return Promise.reject(error);
