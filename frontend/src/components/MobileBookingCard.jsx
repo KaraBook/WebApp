@@ -1,21 +1,6 @@
-import {
-  Calendar,
-  Moon,
-  Users,
-  MoreVertical,
-  Eye,
-  FileDown,
-  Star,
-  Phone,
-  XCircle,
-} from "lucide-react";
+import { Calendar, Moon, Users, MoreVertical, Eye, FileDown, Star, Phone, XCircle} from "lucide-react";
 import { format } from "date-fns";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import RateBookingDialog from "./RateBookingDialog";
 import { canViewInvoice, canRate } from "@/utils/bookingPermissions";

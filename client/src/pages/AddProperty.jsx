@@ -414,8 +414,7 @@ const AddProperty = () => {
             await Axios({
                 url,
                 method,
-                data: fd,
-                headers: { "Content-Type": "multipart/form-data" },
+                data: fd
             });
 
             toast.success("Property created successfully!");

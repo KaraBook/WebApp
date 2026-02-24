@@ -22,13 +22,14 @@ Axios.interceptors.request.use(
   (config) => {
     const isRefreshCall = config.url?.includes(REFRESH_URL);
 
-    if (!isRefreshCall) {
-      const accessToken = localStorage.getItem("accessToken");
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
-      } else {
-        delete config.headers.Authorization;
-      }
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (!isRefreshCall && accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+      delete config.headers["content-type"];
     }
 
     return config;
