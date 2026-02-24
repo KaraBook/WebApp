@@ -17,9 +17,11 @@ let recaptchaVerifier = null;
 export const getRecaptcha = async () => {
   if (!recaptchaVerifier) {
     recaptchaVerifier = new RecaptchaVerifier(
+      auth,
       "recaptcha-container",
-      { size: "invisible" },
-      auth
+      {
+        size: "invisible",
+      }
     );
     await recaptchaVerifier.render();
   }

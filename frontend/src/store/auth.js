@@ -36,12 +36,6 @@ export const useAuthStore = create(
       setWishlist: (ids) => set({ wishlist: ids }),
 
       clearAuth: async () => {
-        try {
-          await signOut(auth);
-        } catch (e) {
-          console.warn("Firebase signout failed:", e.message);
-        }
-
         set({
           user: null,
           accessToken: null,
