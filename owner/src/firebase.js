@@ -50,4 +50,7 @@ export const resetRecaptcha = () => {
   try {
     if (recaptchaWidgetId !== null) window.grecaptcha?.reset(recaptchaWidgetId);
   } catch {}
+
+  const el = document.getElementById("recaptcha-container");
+  if (el) el.innerHTML = "";
 };

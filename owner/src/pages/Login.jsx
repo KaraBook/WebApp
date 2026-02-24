@@ -14,6 +14,15 @@ import OtpBoxes from "@/components/OtpBoxes";
 
 const OTP_LEN = 6;
 
+const OTP_COOLDOWN_MS = 10 * 60 * 1000;
+
+const getCooldownUntil = () => Number(localStorage.getItem("otpCooldownUntil") || 0);
+const setCooldown = () => localStorage.setItem("otpCooldownUntil", String(Date.now() + OTP_COOLDOWN_MS));
+const clearCooldown = () => localStorage.removeItem("otpCooldownUntil");
+
+const isCoolingDown = () => Date.now() < getCooldownUntil();
+const cooldownLeftSec = () => Math.ceil((getCooldownUntil() - Date.now()) / 1000);
+
 const onlyDigits = (v) => (v || "").replace(/\D/g, "");
 const normalize10 = (v) => onlyDigits(v).slice(-10);
 
@@ -45,6 +54,7 @@ export default function OwnerLogin() {
   const [secondsLeft, setSecondsLeft] = useState(60);
 
   const autoVerifyLock = useRef(false);
+  const sendLock = useRef(false);
 
   const mobile10 = useMemo(() => normalize10(mobile), [mobile]);
   const fullPhone = useMemo(() => (mobile10.length === 10 ? `+91${mobile10}` : ""), [mobile10]);
@@ -90,15 +100,25 @@ export default function OwnerLogin() {
   };
 
   const startOtpFlow = async () => {
-    if (loading) return;
+    if (sendLock.current) return;
+
+    if (isCoolingDown()) {
+      toast.error(`Too many attempts. Try again in ${cooldownLeftSec()} seconds.`);
+      return;
+    }
+
     if (mobile10.length !== 10) {
       toast.error("Please enter a valid 10-digit mobile number");
       return;
     }
 
+    sendLock.current = true;
     setLoading(true);
+
     try {
       await backendOwnerPrecheck();
+
+      resetRecaptcha();
 
       const confirmation = await sendOtp(fullPhone);
 
@@ -112,24 +132,26 @@ export default function OwnerLogin() {
     } catch (err) {
       console.log("SEND OTP ERROR:", err?.code, err?.message, err);
       console.log("SEND OTP ERROR response:", err?.response?.data);
+
+      resetRecaptcha();
+
       let message = "We couldn't send the verification code. Please try again.";
 
-      if (err.code === "auth/too-many-requests") {
-        message = "Too many attempts. Please wait a few minutes before retrying.";
-      }
-      else if (err.code === "auth/invalid-phone-number") {
+      if (err?.code === "auth/too-many-requests") {
+        setCooldown();
+        message = "Too many attempts. Please wait 10 minutes before retrying.";
+      } else if (err?.code === "auth/invalid-phone-number") {
         message = "Please enter a valid mobile number.";
-      }
-      else if (err.code === "auth/network-request-failed") {
+      } else if (err?.code === "auth/network-request-failed") {
         message = "Network error. Please check your internet connection.";
-      }
-      else if (err.code === "auth/internal-error") {
+      } else if (err?.code === "auth/internal-error") {
         message = "Verification service unavailable. Please refresh and try again.";
       }
 
       toast.error(message);
     } finally {
       setLoading(false);
+      sendLock.current = false;
     }
   };
 
@@ -211,11 +233,16 @@ export default function OwnerLogin() {
     } catch (err) {
       console.log("RESEND OTP ERROR:", err?.code, err?.message, err);
       console.log("RESEND OTP ERROR response:", err?.response?.data);
-      toast.error(
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to resend OTP"
-      );
+
+      resetRecaptcha();
+
+      if (err?.code === "auth/too-many-requests") {
+        setCooldown();
+        toast.error("Too many attempts. Please wait 10 minutes before retrying.");
+        return;
+      }
+
+      toast.error(err?.response?.data?.message || err?.message || "Failed to resend OTP");
     } finally {
       setLoading(false);
     }
