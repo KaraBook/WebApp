@@ -1,18 +1,8 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    CalendarCheck,
-    Clock,
-    Users,
-    MoreVertical,
-} from "lucide-react";
-
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { CalendarCheck, Clock, Users, MoreVertical } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage } from "@/utils/whatsappMessage";
 
 
 function normalizeBookingStatus(booking) {
@@ -42,7 +32,34 @@ export default function MobileBookingsList({
 }) {
     const navigate = useNavigate();
 
-    /* ---------- Pagination ---------- */
+    const sendWhatsappMessage = (b) => {
+        const phone = b?.userId?.mobile;
+        if (!phone) return;
+
+        const status = normalizeBookingStatus(b);
+        let message = "";
+
+        if (status === "confirmed") {
+            message = buildBookingWhatsappMessage(b);
+        } else if (status === "cancelled") {
+            message = buildCancelledWhatsappMessage(b);
+        } else {
+            const name =
+                `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim() || "Guest";
+            const property = b.propertyId?.propertyName || "our property";
+
+            message = `Hello ${name},
+
+We noticed your booking request for *${property}* is still pending.
+
+If you need help completing your booking or payment, please reply here 😊`;
+        }
+
+        const encoded = encodeURIComponent(message);
+        const url = `https://wa.me/91${phone}?text=${encoded}`;
+        window.open(url, "_blank");
+    };
+
     const PER_PAGE = 4;
     const [page, setPage] = useState(1);
 
@@ -146,6 +163,20 @@ export default function MobileBookingsList({
                                                 onSelect={() => navigator.clipboard.writeText(mobile)}
                                             >
                                                 Copy Mobile
+                                            </DropdownMenuItem>
+
+                                            <DropdownMenuItem
+                                                className="p-[14px] text-[16px]"
+                                                onSelect={(e) => {
+                                                    e.preventDefault();
+                                                    sendWhatsappMessage(b);
+                                                }}
+                                            >
+                                                {normalizeBookingStatus(b) === "cancelled"
+                                                    ? "Message Cancelled Guest"
+                                                    : normalizeBookingStatus(b) === "confirmed"
+                                                        ? "Send Welcome Message"
+                                                        : "Send Payment Reminder"}
                                             </DropdownMenuItem>
 
                                             {/* LAST LINE */}

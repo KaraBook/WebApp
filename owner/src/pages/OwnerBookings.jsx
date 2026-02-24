@@ -20,6 +20,23 @@ import InvoicePreview from "@/components/InvoicePreview";
 import BookingDetailsDrawer from "@/components/BookingDetailsDrawer";
 import MobileFiltersDrawer from "@/components/MobileFiltersDrawer";
 import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
+import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage, encodeWhatsapp } from "@/utils/whatsappMessage";
+
+
+function getBookingStatus(b) {
+  if (b?.cancelled === true) return "cancelled";
+
+  if (
+    b?.paymentStatus === "paid" ||
+    b?.paymentStatus === "captured" ||
+    b?.status === "confirmed" ||
+    b?.paymentId
+  ) {
+    return "confirmed";
+  }
+
+  return "pending";
+}
 
 
 export default function OwnerBookings() {
@@ -96,6 +113,40 @@ export default function OwnerBookings() {
     } catch (err) {
       toast.error("Failed to fetch bookings");
     }
+  };
+
+
+  const sendWhatsappMessage = (b) => {
+    const phone = b?.userId?.mobile;
+    if (!phone) {
+      toast.error("Guest phone number not available");
+      return;
+    }
+
+    const bookingStatus = getBookingStatus(b);
+    let message = "";
+
+    if (bookingStatus === "confirmed") {
+      message = buildBookingWhatsappMessage(b);
+    }
+    else if (bookingStatus === "cancelled") {
+      message = buildCancelledWhatsappMessage(b);
+    }
+    else {
+      const name =
+        `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim() || "Guest";
+      const property = b.propertyId?.propertyName || "our property";
+
+      message = `Hello ${name},
+
+We noticed your booking request for *${property}* is still pending.
+
+If you need help completing your booking or payment, please reply here 😊`;
+    }
+
+    const encoded = encodeWhatsapp(message);
+    const url = `https://wa.me/91${phone}?text=${encoded}`;
+    window.open(url, "_blank");
   };
 
   useEffect(() => {
@@ -470,6 +521,19 @@ export default function OwnerBookings() {
                               }
                             >
                               Copy Phone
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onSelect={(e) => {
+                                e.preventDefault();
+                                sendWhatsappMessage(b);
+                              }}
+                            >
+                              {getBookingStatus(b) === "cancelled"
+                                ? "Message Cancelled Guest"
+                                : getBookingStatus(b) === "confirmed"
+                                  ? "Send Welcome Message"
+                                  : "Send Payment Reminder"}
                             </DropdownMenuItem>
 
                             {b.cancelled ? (

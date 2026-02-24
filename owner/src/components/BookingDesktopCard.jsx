@@ -1,6 +1,8 @@
 import { MoreVertical, Calendar, Moon, Users, Phone, Mail, MailCheck } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
+import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage } from "@/utils/whatsappMessage";
+
 
 
 function normalizeBookingStatus(b) {
@@ -36,6 +38,29 @@ export default function BookingDesktopCard({
   const email = b.userId?.email;
   const property = b.propertyId?.propertyName;
   const bookingStatus = normalizeBookingStatus(b);
+
+  const handleWhatsapp = () => {
+    const phone = b.userId?.mobile;
+    if (!phone) return;
+
+    let message;
+
+    if (bookingStatus === "cancelled") {
+      message = buildCancelledWhatsappMessage(b);
+    } else if (bookingStatus === "confirmed") {
+      message = buildBookingWhatsappMessage(b);
+    } else {
+      message = `Hello ${name || "Guest"},
+
+We noticed your booking request for *${property}* is pending.
+
+If you need any help completing your booking or payment, feel free to reply here 😊`;
+    }
+
+    const encoded = encodeURIComponent(message);
+    const url = `https://wa.me/91${phone}?text=${encoded}`;
+    window.open(url, "_blank");
+  };
 
   const formatDate = (d) =>
     new Date(d).toLocaleDateString("en-GB", {
@@ -168,13 +193,19 @@ export default function BookingDesktopCard({
               Copy Phone
             </DropdownMenuItem>
 
-            <DropdownMenuItem onSelect={() => onWhatsapp(b)}>
-              WhatsApp Chat
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                handleWhatsapp();
+              }}
+            >
+              {bookingStatus === "cancelled"
+                ? "Message Cancelled Guest"
+                : bookingStatus === "confirmed"
+                  ? "Send Welcome Message"
+                  : "Send Reminder"}
             </DropdownMenuItem>
 
-            <DropdownMenuItem onSelect={() => onResend(b)}>
-              Resend Links (WA + Email)
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

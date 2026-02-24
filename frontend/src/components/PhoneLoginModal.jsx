@@ -185,7 +185,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       const idToken = await result.user.getIdToken(true);
 
       const resp = await axios.post(
-        baseURL + SummaryApi.unifiedLoginGoogle.url, // 👈 unified endpoint
+        baseURL + SummaryApi.travellerLoginGoogle.url,
         {},
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
