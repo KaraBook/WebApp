@@ -13,13 +13,14 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 let recaptchaVerifier = null;
+let recaptchaWidgetId = null;
 
 export const getRecaptcha = async () => {
-  if (recaptchaVerifier) {
-    try {
-      recaptchaVerifier.clear();
-    } catch {}
-  }
+  const container = document.getElementById("recaptcha-container");
+  if (!container) throw new Error("Recaptcha container missing");
+
+  // ✅ reuse existing verifier
+  if (recaptchaVerifier) return recaptchaVerifier;
 
   recaptchaVerifier = new RecaptchaVerifier(
     auth,
@@ -28,12 +29,15 @@ export const getRecaptcha = async () => {
       size: "invisible",
       callback: () => {},
       "expired-callback": () => {
-        clearRecaptcha();
+        // expire => reset widget, do not destroy verifier
+        try {
+          if (recaptchaWidgetId !== null) window.grecaptcha?.reset(recaptchaWidgetId);
+        } catch {}
       },
     }
   );
 
-  await recaptchaVerifier.render();
+  recaptchaWidgetId = await recaptchaVerifier.render();
   return recaptchaVerifier;
 };
 
@@ -42,9 +46,8 @@ export const sendOtp = async (phoneNumber) => {
   return signInWithPhoneNumber(auth, phoneNumber, verifier);
 };
 
-export const clearRecaptcha = () => {
-  if (recaptchaVerifier) {
-    try { recaptchaVerifier.clear(); } catch { }
-    recaptchaVerifier = null;
-  }
+export const resetRecaptcha = () => {
+  try {
+    if (recaptchaWidgetId !== null) window.grecaptcha?.reset(recaptchaWidgetId);
+  } catch {}
 };
