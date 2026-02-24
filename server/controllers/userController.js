@@ -20,8 +20,8 @@ const issueTokens = (user, activeRole) => {
 
   const accessToken = jwt.sign(
     {
-      id: user._id,          
-      ownerId: effectiveOwnerId, 
+      id: user._id,
+      ownerId: effectiveOwnerId,
       roles,
       activeRole,
     },
@@ -408,33 +408,52 @@ export const updateTravellerProfile = async (req, res) => {
 export const resortOwnerLogin = async (req, res) => {
   try {
     const { firebaseUser } = req;
-    const mobile = normalizeMobile(firebaseUser?.phone_number);
-    if (!mobile || mobile.length !== 10) {
-      return res.status(400).json({ message: "Invalid phone verification token" });
+
+    if (!firebaseUser?.phone_number) {
+      return res.status(400).json({
+        message: "Phone verification failed. Please try again.",
+      });
     }
+
+    let digits = firebaseUser.phone_number.replace(/\D/g, "");
+
+    const mobile = digits.slice(-10);
+
+    if (!mobile || mobile.length !== 10) {
+      return res.status(400).json({
+        message: "Invalid phone verification token",
+      });
+    }
+
+
     const user = await User.findOne({ mobile: mobile.trim() });
+
     if (!user) {
       return res.status(404).json({
         message:
           "No account found for this mobile number. Please contact support to register your property.",
       });
     }
+
     const roles = user.roles || [];
+
     if (!roles.some((r) => ["admin", "resortOwner", "manager"].includes(r))) {
       return res.status(403).json({
         message: "Access denied. Only Owners/Managers/Admins can use this portal.",
       });
     }
 
+
     let ownerId = user._id;
 
-    if (user.roles?.includes("manager") && user.createdBy) {
+    if (roles.includes("manager") && user.createdBy) {
       ownerId = user.createdBy;
     }
 
+
     const property = await Property.findOne({
-      ownerId: ownerId,
-    }).select("status propertyName");
+      ownerUserId: ownerId, 
+    }).select("isDraft status propertyName");
 
     if (!property) {
       return res.status(403).json({
@@ -444,7 +463,8 @@ export const resortOwnerLogin = async (req, res) => {
       });
     }
 
-    if (property.status === "draft") {
+
+    if (property.isDraft === true) {
       return res.status(403).json({
         code: "PROPERTY_UNDER_REVIEW",
         message:
@@ -470,9 +490,11 @@ export const resortOwnerLogin = async (req, res) => {
 
 
     const activeRole =
-      roles.includes("manager") ? "manager" :
-        roles.includes("resortOwner") ? "resortOwner" :
-          "admin";
+      roles.includes("manager")
+        ? "manager"
+        : roles.includes("resortOwner")
+        ? "resortOwner"
+        : "admin";
 
     const tokens = issueTokens(user, activeRole);
 
