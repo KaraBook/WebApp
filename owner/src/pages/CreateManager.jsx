@@ -111,9 +111,11 @@ export default function CreateManager() {
     return (
         <div className="min-h-[calc(100vh-64px)] w-full bg-slate-50">
             <div className="mx-auto max-w-6xl px-4 py-8">
-                <div className="mb-6">
-                    <h1 className="text-2xl font-semibold tracking-tight">Create Manager</h1>
-                    <p className="text-sm text-slate-600">
+                <div className="mb-8 text-center">
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        Create Manager
+                    </h1>
+                    <p className="text-sm text-slate-600 mt-1">
                         Add a manager who can log in using email & password.
                     </p>
                 </div>
@@ -181,8 +183,7 @@ export default function CreateManager() {
                                     {/* Password */}
                                     <Field
                                         label="Password"
-                                        icon={<Lock className="h-4 w-4" />}
-                                        helper="Min 8 chars, upper + lower + number."
+                                        icon={<Lock className="h-4 w-4 text-slate-400" />}
                                         error={errors.password?.message}
                                         hasRightIcon
                                     >
@@ -190,6 +191,7 @@ export default function CreateManager() {
                                             type={showPass ? "text" : "password"}
                                             placeholder="Create a strong password"
                                             {...register("password")}
+                                            className="h-11"
                                         />
 
                                         <button
@@ -199,25 +201,35 @@ export default function CreateManager() {
                                         >
                                             {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                                         </button>
+                                    </Field>
 
-                                        <div className="mt-2">
-                                            <div className="h-2 w-full rounded-full bg-slate-200">
-                                                <div
-                                                    className={`h-2 rounded-full transition-all ${passStrength <= 1
+                                    {/* Strength Section OUTSIDE Field */}
+                                    <div className="mt-3">
+                                        <div className="h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
+                                            <div
+                                                className={`h-full transition-all ${passStrength <= 1
                                                         ? "bg-red-500"
                                                         : passStrength <= 3
                                                             ? "bg-yellow-500"
                                                             : "bg-green-500"
-                                                        }`}
-                                                    style={{ width: `${(passStrength / 5) * 100}%` }}
-                                                />
-                                            </div>
+                                                    }`}
+                                                style={{ width: `${(passStrength / 5) * 100}%` }}
+                                            />
+                                        </div>
 
-                                            <p className="mt-1 text-xs text-slate-500">
-                                                {passStrength <= 1 ? "Weak" : passStrength <= 3 ? "Medium" : "Strong"} password
+                                        <div className="flex justify-between mt-1">
+                                            <p className="text-xs text-slate-500">
+                                                {passStrength <= 1
+                                                    ? "Weak password"
+                                                    : passStrength <= 3
+                                                        ? "Medium strength"
+                                                        : "Strong password"}
+                                            </p>
+                                            <p className="text-xs text-slate-400">
+                                                Min 8 chars, upper + lower + number
                                             </p>
                                         </div>
-                                    </Field>
+                                    </div>
 
 
                                     {/* Confirm Password */}
