@@ -48,7 +48,6 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
 
   useEffect(() => {
     if (!open) {
-      auth.signOut().catch(() => { });
       try {
         clearRecaptcha();
         setStep("phone");
@@ -224,11 +223,7 @@ export default function PhoneLoginModal({ open, onOpenChange }) {
       <DialogContent className="sm:max-w-md w-[95%] z-[9999999] p-0 rounded-[12px] border-none overflow-hidden">
         {/* CLOSE */}
         <button
-          onClick={async () => {
-            try {
-              await auth.signOut();
-            } catch { }
-
+          onClick={() => {
             clearRecaptcha();
             onOpenChange(false);
           }}
