@@ -1,4 +1,3 @@
-// src/firebase.js
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -18,26 +17,26 @@ export const auth = getAuth(app);
 
 let recaptchaVerifier = null;
 
-/**
- * Create reCAPTCHA ONCE
- */
 export const initRecaptcha = () => {
-  if (recaptchaVerifier) return recaptchaVerifier;
+  if (recaptchaVerifier) {
+    recaptchaVerifier.clear();
+  }
 
   recaptchaVerifier = new RecaptchaVerifier(
-    auth,
     "recaptcha-container",
     {
       size: "invisible",
-    }
+      callback: () => {},
+      "expired-callback": () => {
+        recaptchaVerifier.clear();
+      },
+    },
+    auth
   );
 
   return recaptchaVerifier;
 };
 
-/**
- * Send OTP safely
- */
 export const sendOtp = async (phoneNumber) => {
   const verifier = initRecaptcha();
   return signInWithPhoneNumber(auth, phoneNumber, verifier);

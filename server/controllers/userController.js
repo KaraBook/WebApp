@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { normalizeMobile } from "../utils/phone.js";
+import Property from "../models/Property.js";
 import fs from "fs";
 import path from "path";
 
@@ -413,8 +414,51 @@ export const resortOwnerLogin = async (req, res) => {
         message: "Access denied. Only Owners/Managers/Admins can use this portal.",
       });
     }
-    const activeRole = roles.includes("manager") ? "manager" : (roles.includes("resortOwner") ? "resortOwner" : "admin");
+
+    const property = await Property.findOne({
+      ownerId: user._id,
+    }).select("status propertyName");
+
+    if (!property) {
+      return res.status(403).json({
+        code: "NO_PROPERTY_ASSIGNED",
+        message:
+          "No property is assigned to this account yet. Please contact KaraBook support.",
+      });
+    }
+
+    if (property.status === "draft") {
+      return res.status(403).json({
+        code: "PROPERTY_UNDER_REVIEW",
+        message:
+          "Your property is currently under review. You will get access once it is approved.",
+      });
+    }
+
+    if (property.status === "rejected") {
+      return res.status(403).json({
+        code: "PROPERTY_REJECTED",
+        message:
+          "Your property submission was rejected. Please contact support for assistance.",
+      });
+    }
+
+    if (property.status === "archived") {
+      return res.status(403).json({
+        code: "PROPERTY_ARCHIVED",
+        message:
+          "This property is currently inactive. Dashboard access has been disabled.",
+      });
+    }
+
+
+    const activeRole =
+      roles.includes("manager") ? "manager" :
+        roles.includes("resortOwner") ? "resortOwner" :
+          "admin";
+
     const tokens = issueTokens(user, activeRole);
+
     return res.status(200).json({
       message: "Login successful",
       ...tokens,

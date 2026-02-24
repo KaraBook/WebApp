@@ -102,11 +102,16 @@ export default function OwnerLogin() {
       toast.success("OTP sent successfully");
       setTimeout(() => otpInputRef.current?.focus(), 50);
     } catch (err) {
-      toast.error(
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to send OTP"
-      );
+      let message = "Failed to send OTP.";
+
+      if (err.code === "auth/too-many-requests") {
+        message =
+          "Too many OTP requests. Please wait before trying again.";
+      } else if (err.code === "auth/invalid-phone-number") {
+        message = "Invalid phone number format.";
+      }
+
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -126,17 +131,27 @@ export default function OwnerLogin() {
 
       const data = await backendOwnerLogin(idToken);
 
-      loginWithTokens(data);
+      if (!data.accessToken) {
+        toast.error(data.message || "Access denied");
+        return;
+      }
 
-      navigate("/dashboard", { replace: true });
+      loginWithTokens(data);
+      navigate("/dashboard");
 
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Invalid OTP. Please try again.";
-      toast.error(msg);
+      let message = "Invalid OTP. Please try again.";
 
+      if (err.code === "auth/invalid-verification-code") {
+        message = "Incorrect OTP. Please check and try again.";
+      } else if (err.code === "auth/code-expired") {
+        message = "OTP expired. Please request a new one.";
+      } else if (err.code === "auth/too-many-requests") {
+        message =
+          "Too many attempts. Please wait a few minutes before trying again.";
+      }
+
+      toast.error(message);
       autoVerifyLock.current = false;
     } finally {
       setVerifying(false);
