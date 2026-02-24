@@ -21,6 +21,12 @@ function normalizeBookingStatus(b) {
 }
 
 
+const formatCurrency = (value) => {
+  const num = Number(value);
+  if (isNaN(num)) return "₹0";
+  return `₹${num.toLocaleString("en-IN")}`;
+};
+
 export default function BookingDesktopCard({
   booking,
   onOpen,
@@ -62,12 +68,16 @@ If you need any help completing your booking or payment, feel free to reply here
     window.open(url, "_blank");
   };
 
-  const formatDate = (d) =>
-    new Date(d).toLocaleDateString("en-GB", {
+  const formatDate = (d) => {
+    if (!d) return "—";
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return "—";
+    return date.toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "short",
       year: "numeric",
     });
+  };
 
   return (
     <div
@@ -130,7 +140,7 @@ If you need any help completing your booking or payment, feel free to reply here
         </div>
 
         <div className="text-[14px] w-[26%] font-semibold text-gray-900">
-          ₹{b.totalAmount?.toLocaleString("en-IN")}
+          {formatCurrency(b.totalAmount)}
         </div>
 
         <div className="w-[26%]">
