@@ -21,6 +21,7 @@ export const requireAuth = async (req, res, next) => {
 
     req.user = {
       id: user._id,
+      ownerId: payload.ownerId, 
       roles,
       primaryRole: user.primaryRole,
       activeRole,

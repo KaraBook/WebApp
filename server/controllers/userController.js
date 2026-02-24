@@ -7,24 +7,34 @@ import fs from "fs";
 import path from "path";
 
 const issueTokens = (user, activeRole) => {
+
   const roles = Array.isArray(user.roles)
     ? user.roles
     : (user.role ? [user.role] : []);
+
+  let effectiveOwnerId = user._id;
+
+  if (roles.includes("manager") && user.createdBy) {
+    effectiveOwnerId = user.createdBy;
+  }
+
   const accessToken = jwt.sign(
     {
-      id: user._id,
-      ownerId: effectiveOwnerId,
+      id: user._id,          
+      ownerId: effectiveOwnerId, 
       roles,
       activeRole,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "6h" }
   );
+
   const refreshToken = jwt.sign(
     { id: user._id },
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "30d" }
   );
+
   return { accessToken, refreshToken };
 };
 
