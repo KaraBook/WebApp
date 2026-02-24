@@ -13,6 +13,13 @@ export const useAuthStore = create(
       refreshToken: null,
       wishlist: [],
 
+      updateUser: (newData) =>
+        set((state) => ({
+          user: state.user
+            ? { ...state.user, ...newData }
+            : state.user,
+        })),
+
       loginModalOpen: false,
       redirectData: null,
 
