@@ -409,15 +409,13 @@ export default function Dashboard() {
 
   const recalculateStats = (bookings) => {
     const isConfirmed = (b) =>
-      b.paymentStatus === "paid" ||
-      b.status === "confirmed" ||
-      Boolean(b.paymentId);
+      b.paymentStatus === "paid";
 
     const isCancelled = (b) =>
-      b.cancelled === true || b.status === "cancelled";
+      b.cancelled === true;
 
     const isPending = (b) =>
-      !isConfirmed(b) && !isCancelled(b);
+      b.paymentStatus === "initiated";
 
     const confirmedBookings = bookings.filter(isConfirmed);
 
