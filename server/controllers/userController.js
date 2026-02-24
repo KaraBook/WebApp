@@ -13,6 +13,7 @@ const issueTokens = (user, activeRole) => {
   const accessToken = jwt.sign(
     {
       id: user._id,
+      ownerId: effectiveOwnerId,
       roles,
       activeRole,
     },
@@ -415,8 +416,14 @@ export const resortOwnerLogin = async (req, res) => {
       });
     }
 
+    let ownerId = user._id;
+
+    if (user.roles?.includes("manager") && user.createdBy) {
+      ownerId = user.createdBy;
+    }
+
     const property = await Property.findOne({
-      ownerId: user._id,
+      ownerId: ownerId,
     }).select("status propertyName");
 
     if (!property) {
