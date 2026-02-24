@@ -15,18 +15,33 @@ export const auth = getAuth(app);
 let recaptchaVerifier = null;
 
 export const getRecaptcha = async () => {
-  if (!recaptchaVerifier) {
-    recaptchaVerifier = new RecaptchaVerifier(
-      auth,                        
-      "recaptcha-container",        
-      {
-        size: "invisible",
-      }
-    );
 
-    await recaptchaVerifier.render(); 
+  const container = document.getElementById("recaptcha-container");
+  if (!container) throw new Error("Recaptcha container missing");
+
+  if (recaptchaVerifier) {
+    try {
+      await recaptchaVerifier.render();
+      return recaptchaVerifier;
+    } catch {
+      recaptchaVerifier.clear();
+      recaptchaVerifier = null;
+    }
   }
 
+  recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    container,
+    {
+      size: "invisible",
+      callback: () => {},
+      "expired-callback": () => {
+        clearRecaptcha();
+      }
+    }
+  );
+
+  await recaptchaVerifier.render();
   return recaptchaVerifier;
 };
 
@@ -37,12 +52,7 @@ export const sendOtp = async (phoneNumber) => {
 
 export const clearRecaptcha = () => {
   if (recaptchaVerifier) {
-    try {
-      recaptchaVerifier.clear();
-    } catch {}
+    try { recaptchaVerifier.clear(); } catch {}
     recaptchaVerifier = null;
   }
-
-  const container = document.getElementById("recaptcha-container");
-  if (container) container.innerHTML = "";
 };

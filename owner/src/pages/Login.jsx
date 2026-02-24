@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
+import OtpBoxes from "@/components/OtpBoxes";
 
 const OTP_LEN = 6;
 
@@ -100,7 +101,6 @@ export default function OwnerLogin() {
       autoVerifyLock.current = false;
 
       toast.success("OTP sent successfully");
-      setTimeout(() => otpInputRef.current?.focus(), 50);
     } catch (err) {
       let message = "We couldn't send the verification code. Please try again.";
 
@@ -146,19 +146,33 @@ export default function OwnerLogin() {
       navigate("/dashboard");
 
     } catch (err) {
-      let message = "Invalid OTP. Please try again.";
 
-      if (err.code === "auth/invalid-verification-code") {
-        message = "Incorrect OTP. Please check and try again.";
-      } else if (err.code === "auth/code-expired") {
-        message = "OTP expired. Please request a new one.";
-      } else if (err.code === "auth/too-many-requests") {
-        message =
-          "Too many attempts. Please wait a few minutes before trying again.";
+      let message;
+
+      switch (err.code) {
+        case "auth/invalid-verification-code":
+          message = "The code you entered is incorrect.";
+          break;
+
+        case "auth/code-expired":
+          message = "This code has expired. Please request a new one.";
+          setSecondsLeft(0);
+          break;
+
+        case "auth/session-expired":
+          message = "Session expired. Please resend OTP.";
+          setConfirmRes(null);
+          break;
+
+        case "auth/too-many-requests":
+          message = "Too many attempts. Please wait 5 minutes.";
+          break;
+
+        default:
+          message = "Verification failed. Please try again.";
       }
 
       toast.error(message);
-      autoVerifyLock.current = false;
     } finally {
       setVerifying(false);
     }
@@ -167,13 +181,6 @@ export default function OwnerLogin() {
   const onOtpChange = (val) => {
     const clean = onlyDigits(val).slice(0, OTP_LEN);
     setOtp(clean);
-
-    if (clean.length === OTP_LEN && !autoVerifyLock.current) {
-      autoVerifyLock.current = true;
-      verifyOtp(clean);
-    } else if (clean.length < OTP_LEN) {
-      autoVerifyLock.current = false;
-    }
   };
 
   const resendOtp = async () => {
@@ -246,7 +253,6 @@ export default function OwnerLogin() {
 
   return (
     <div className="min-h-screen bg-[#f2f4f8] flex items-center justify-center px-0">
-      <div id="recaptcha-container" />
 
       <div className="w-full max-w-full bg-white shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden flex flex-col lg:flex-row">
 
@@ -366,15 +372,20 @@ export default function OwnerLogin() {
                       <label className="text-sm text-gray-700">
                         One-Time Password
                       </label>
-                      <input
-                        ref={otpInputRef}
-                        value={otp}
-                        onChange={(e) => onOtpChange(e.target.value)}
-                        inputMode="numeric"
-                        maxLength={OTP_LEN}
-                        placeholder="••••••"
-                        className="mt-2 h-11 w-full rounded-lg border text-center tracking-[0.35em] font-semibold"
-                      />
+                      <p className="text-sm text-gray-600 mt-2 text-center">
+                        Enter the 6-digit code sent to
+                        <span className="font-semibold">
+                          {" "}+91 {mobile10.slice(0, 3)}****{mobile10.slice(7)}
+                        </span>
+                      </p>
+
+                      <button
+                        onClick={changeNumber}
+                        className="text-sm text-primary underline text-center w-full mt-1"
+                      >
+                        Change number
+                      </button>
+                      <OtpBoxes value={otp} setValue={setOtp} length={6} />
                     </div>
 
                     <div className="flex justify-between text-xs text-gray-500">
@@ -389,8 +400,8 @@ export default function OwnerLogin() {
 
                     <button
                       onClick={() => verifyOtp(otp)}
-                      disabled={otp.length !== OTP_LEN || verifying}
-                      className="w-full h-11 rounded-lg bg-primary text-white font-medium disabled:opacity-50"
+                      disabled={otp.length !== 6 || verifying}
+                      className="w-full h-12 rounded-xl bg-primary text-white font-semibold disabled:opacity-50 mt-4"
                     >
                       {verifying ? "Verifying..." : "Verify & Continue"}
                     </button>
