@@ -22,23 +22,23 @@ function normalizeBookingStatus(b) {
 
 
 const safeFormatDate = (d) => {
-  if (!d) return "—";
+    if (!d) return "—";
 
-  const date = new Date(d);
-  if (isNaN(date.getTime())) return "—";
+    const date = new Date(d);
+    if (isNaN(date.getTime())) return "—";
 
-  return date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+    return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
 };
 
 
 const formatCurrency = (value) => {
-  const num = Number(value);
-  if (isNaN(num)) return "₹0";
-  return `₹${num.toLocaleString("en-IN")}`;
+    const num = Number(value);
+    if (isNaN(num)) return "₹0";
+    return `₹${num.toLocaleString("en-IN")}`;
 };
 
 
@@ -60,6 +60,20 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
 
     if (!booking) return null;
 
+    const cleanNumber = (v) => {
+        const n = Number(v);
+        return isNaN(n) ? 0 : n;
+    };
+
+    const safeBooking = {
+        ...booking,
+        totalAmount: cleanNumber(booking?.totalAmount),
+        taxAmount: cleanNumber(booking?.taxAmount),
+        grandTotal: cleanNumber(booking?.grandTotal),
+        refundAmount: cleanNumber(booking?.refundAmount),
+        ownerRefundPercent: cleanNumber(booking?.ownerRefundPercent),
+    };
+
     const {
         createdAt,
         userId,
@@ -76,7 +90,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         orderId,
         contactNumber,
         contactEmail,
-    } = booking;
+    } = safeBooking;
 
     const uiStatus = normalizeBookingStatus(booking);
     const refundPercent = booking?.ownerRefundPercent ?? 0;
@@ -228,7 +242,7 @@ function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
             <div className="flex items-center justify-between mt-1">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock size={14} />
-                    Booking created on {safeFormatDate(createdAt)}
+                    Booking created on {formatDate(createdAt)}
                 </div>
 
                 <span
@@ -320,7 +334,7 @@ function Body(props) {
             <Separator />
 
             <Section title="Payment Information">
-               <Key label="Amount" value={formatCurrency(totalAmount)} />
+                <Key label="Amount" value={formatCurrency(totalAmount)} />
                 <Key label="Tax" value={formatCurrency(safeTax)} />
                 <Key label="Grand Total" value={formatCurrency(safeGrandTotal)} bold />
 
@@ -338,14 +352,14 @@ function Body(props) {
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Refund Amount</span>
                                 <span className="font-semibold text-green-600">
-                                   {formatCurrency(refundAmount)}
+                                    {formatCurrency(refundAmount)}
                                 </span>
                             </div>
                         </div>
                     </>
                 )}
 
-               <Key label="Order ID" value={orderId?.toUpperCase()} mono />
+                <Key label="Order ID" value={orderId?.toUpperCase()} mono />
             </Section>
         </div>
     );
