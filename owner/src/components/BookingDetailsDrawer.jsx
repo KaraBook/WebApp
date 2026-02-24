@@ -20,6 +20,28 @@ function normalizeBookingStatus(b) {
     return "pending";
 }
 
+
+const safeFormatDate = (d) => {
+  if (!d) return "—";
+
+  const date = new Date(d);
+  if (isNaN(date.getTime())) return "—";
+
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+
+const formatCurrency = (value) => {
+  const num = Number(value);
+  if (isNaN(num)) return "₹0";
+  return `₹${num.toLocaleString("en-IN")}`;
+};
+
+
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
     const [isMobile, setIsMobile] = useState(
         window.matchMedia("(max-width: 767px)").matches
@@ -76,13 +98,6 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     const userPhone =
         contactNumber || userId?.mobile || "—";
 
-    const formatDate = (d) =>
-        new Date(d).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        });
-
     const safeTax =
         typeof taxAmount === "number"
             ? taxAmount
@@ -106,7 +121,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         userName={userName}
                         createdAt={createdAt}
                         uiStatus={uiStatus}
-                        formatDate={formatDate}
+                        formatDate={safeFormatDate}
                         onClose={onClose}
                     />
 
@@ -126,7 +141,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         safeTax={safeTax}
                         safeGrandTotal={safeGrandTotal}
                         orderId={orderId}
-                        formatDate={formatDate} 
+                        formatDate={safeFormatDate}
                         isCancelled={isCancelled}
                         refundPercent={refundPercent}
                         refundAmount={refundAmount}
@@ -172,7 +187,7 @@ ${open
                         userName={userName}
                         createdAt={createdAt}
                         uiStatus={uiStatus}
-                        formatDate={formatDate}
+                        formatDate={safeFormatDate}
                         onClose={onClose}
                     />
                     <div className="flex-1 overflow-y-auto">
@@ -192,7 +207,7 @@ ${open
                             safeTax={safeTax}
                             safeGrandTotal={safeGrandTotal}
                             orderId={orderId}
-                            formatDate={formatDate}
+                            formatDate={safeFormatDate}
                             isCancelled={isCancelled}
                             refundPercent={refundPercent}
                             refundAmount={refundAmount}
@@ -213,7 +228,7 @@ function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
             <div className="flex items-center justify-between mt-1">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Clock size={14} />
-                    Booking created on {formatDate(createdAt)}
+                    Booking created on {safeFormatDate(createdAt)}
                 </div>
 
                 <span
@@ -274,7 +289,7 @@ function Body(props) {
                 children={children}
                 veg={veg}
                 nonVeg={nonVeg}
-                formatDate={formatDate}
+                formatDate={safeFormatDate}
             />
             <Separator />
 
@@ -305,9 +320,9 @@ function Body(props) {
             <Separator />
 
             <Section title="Payment Information">
-                <Key label="Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
-                <Key label="Tax" value={`₹${safeTax.toLocaleString("en-IN")}`} />
-                <Key label="Grand Total" value={`₹${safeGrandTotal.toLocaleString("en-IN")}`} bold />
+               <Key label="Amount" value={formatCurrency(totalAmount)} />
+                <Key label="Tax" value={formatCurrency(safeTax)} />
+                <Key label="Grand Total" value={formatCurrency(safeGrandTotal)} bold />
 
                 {isCancelled && (
                     <>
@@ -323,7 +338,7 @@ function Body(props) {
                             <div className="flex justify-between text-sm">
                                 <span className="text-muted-foreground">Refund Amount</span>
                                 <span className="font-semibold text-green-600">
-                                    ₹{refundAmount?.toLocaleString("en-IN")}
+                                   {formatCurrency(refundAmount)}
                                 </span>
                             </div>
                         </div>
