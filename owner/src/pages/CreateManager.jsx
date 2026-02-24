@@ -140,7 +140,7 @@ export default function CreateManager() {
                                             icon={<User className="h-4 w-4 text-slate-500" />}
                                             error={errors.firstName?.message}
                                         >
-                                            <Input placeholder="e.g., Savnee" {...register("firstName")} />
+                                            <Input placeholder="e.g., Jhon" {...register("firstName")} />
                                         </Field>
 
                                         <Field
@@ -148,7 +148,7 @@ export default function CreateManager() {
                                             icon={<User className="h-4 w-4 text-slate-500" />}
                                             error={errors.lastName?.message}
                                         >
-                                            <Input placeholder="e.g., Botre" {...register("lastName")} />
+                                            <Input placeholder="e.g., Doe" {...register("lastName")} />
                                         </Field>
                                     </div>
 

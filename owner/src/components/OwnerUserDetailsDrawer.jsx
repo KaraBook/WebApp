@@ -42,8 +42,8 @@ export default function OwnerUserDetailsDrawer({ open, user, onClose }) {
 };
 
 const roleText =
-  Array.isArray(user.roles) && user.roles.length > 0
-    ? user.roles.map(formatRoleLabel).join(", ")
+  user.relationshipRole === "manager"
+    ? "Manager"
     : "Traveller";
 
   const fullName =

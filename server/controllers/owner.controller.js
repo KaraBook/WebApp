@@ -13,6 +13,19 @@ const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
 const ALLOWED_BOOKING_USER_ROLES = ["traveller"];
 
+const getRelationshipRole = (user, ownerId, booking = null) => {
+  const roles = getRoles(user);
+
+  if (roles.includes("manager") && String(user.createdBy) === String(ownerId)) {
+    return "manager";
+  }
+  if (booking) {
+    return "traveller";
+  }
+
+  return "traveller";
+};
+
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -1044,23 +1057,24 @@ export const getOwnerBookedUsers = async (req, res) => {
 
       const uid = b.userId._id.toString();
 
-      if (!usersMap[uid]) {
-        usersMap[uid] = {
-          userId: b.userId._id,
-          firstName: b.userId.firstName,
-          lastName: b.userId.lastName,
-          email: b.userId.email,
-          mobile: b.userId.mobile,
-          city: b.userId.city,
-          state: b.userId.state,
-          roles: b.userId.roles || [],
-          primaryRole: b.userId.primaryRole || null,
-          createdAt: b.userId.createdAt,
-          totalBookings: 0,
-          lastBookingDate: b.createdAt,
-          properties: new Set(),
-        };
-      }
+      const relationshipRole = getRelationshipRole(b.userId, ownerId, b);
+
+      usersMap[uid] = {
+        userId: b.userId._id,
+        firstName: b.userId.firstName,
+        lastName: b.userId.lastName,
+        email: b.userId.email,
+        mobile: b.userId.mobile,
+        city: b.userId.city,
+        state: b.userId.state,
+        roles: b.userId.roles || [],
+        primaryRole: b.userId.primaryRole || null,
+        relationshipRole,
+        createdAt: b.userId.createdAt,
+        totalBookings: 0,
+        lastBookingDate: b.createdAt,
+        properties: new Set(),
+      };
 
       usersMap[uid].totalBookings += 1;
 
@@ -1092,6 +1106,7 @@ export const getOwnerBookedUsers = async (req, res) => {
           state: m.state,
           roles: m.roles || [],
           primaryRole: m.primaryRole || null,
+          relationshipRole: "manager",
           createdAt: m.createdAt,
           totalBookings: 0,
           lastBookingDate: null,

@@ -60,12 +60,11 @@ export default function OwnerUsers() {
                 u.city?.toLowerCase().includes(q) ||
                 u.state?.toLowerCase().includes(q);
 
-            const role = u.role || "traveller";
+            const role = u.relationshipRole || "traveller";
 
             const matchesRole =
                 roleFilter === "all" ||
                 (roleFilter === "traveller" && role === "traveller") ||
-                (roleFilter === "owner" && ["owner", "resortOwner", "propertyOwner"].includes(role)) ||
                 (roleFilter === "manager" && role === "manager");
 
             return matchesSearch && matchesRole;
@@ -98,12 +97,8 @@ export default function OwnerUsers() {
 
     const getRoleLabel = (role) => ({
         traveller: "Traveller",
-        owner: "Owner",
-        resortOwner: "Owner",
-        propertyOwner: "Owner",
         manager: "Manager",
-        admin: "Admin",
-    }[role] || "User");
+    }[role] || "Traveller");
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -225,7 +220,7 @@ export default function OwnerUsers() {
                                         <div>
                                             <p className="font-medium">{getFullName(u)}</p>
                                             <p className="text-xs text-gray-500">
-                                                {getRoleLabel(u.role)}
+                                                {getRoleLabel(u.relationshipRole)}
                                             </p>
                                         </div>
                                     </div>
