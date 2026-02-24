@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import axios from "axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebase";
 
 export const useAuthStore = create(
   persist(
@@ -33,10 +35,20 @@ export const useAuthStore = create(
 
       setWishlist: (ids) => set({ wishlist: ids }),
 
-      clearAuth: () => {
-        set({ user: null, accessToken: null, refreshToken: null, wishlist: [] });
-      },
+      clearAuth: async () => {
+        try {
+          await signOut(auth);
+        } catch (e) {
+          console.warn("Firebase signout failed:", e.message);
+        }
 
+        set({
+          user: null,
+          accessToken: null,
+          refreshToken: null,
+          wishlist: [],
+        });
+      },
       init: async () => {
         const { accessToken, refreshToken } = get();
         let token = accessToken;

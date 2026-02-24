@@ -17,9 +17,9 @@ let recaptchaVerifier = null;
 export const getRecaptcha = async () => {
   if (!recaptchaVerifier) {
     recaptchaVerifier = new RecaptchaVerifier(
-      auth,                     
-      "recaptcha-container",    
-      { size: "invisible" }     
+      "recaptcha-container",
+      { size: "invisible" },
+      auth
     );
     await recaptchaVerifier.render();
   }
@@ -33,7 +33,15 @@ export const sendOtp = async (phoneNumber) => {
 
 export const clearRecaptcha = () => {
   if (recaptchaVerifier) {
-    recaptchaVerifier.clear();
+    try {
+      recaptchaVerifier.clear();
+    } catch (e) {
+      console.warn("Recaptcha clear error:", e.message);
+    }
     recaptchaVerifier = null;
+  }
+  const container = document.getElementById("recaptcha-container");
+  if (container) {
+    container.innerHTML = "";
   }
 };
