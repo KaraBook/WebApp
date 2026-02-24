@@ -825,9 +825,8 @@ export const removeTravellerAvatar = async (req, res) => {
     }
 
     try {
-      const url = new URL(user.avatarUrl);
-      const filePath = url.pathname;
-      const fullPath = path.join(process.cwd(), filePath);
+      const filename = user.avatarUrl.split("/uploads/")[1];
+      const fullPath = path.join(process.cwd(), "uploads", filename);
 
       if (fs.existsSync(fullPath)) {
         fs.unlinkSync(fullPath);

@@ -65,13 +65,13 @@ export default function Profile() {
     try {
       const res = await Axios.post(
         SummaryApi.uploadTravellerAvatar.url,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        formData
       );
 
       const url = res.data.avatarUrl + "?t=" + Date.now();
 
       setAvatarPreview(url);
+      setProfile((p) => ({ ...p, avatarUrl: url }));
       updateUser({ avatarUrl: url });
 
       fileRef.current.value = "";
@@ -112,6 +112,7 @@ export default function Profile() {
       await Axios.delete(SummaryApi.removeTravellerAvatar.url);
 
       setAvatarPreview("");
+      setProfile((p) => ({ ...p, avatarUrl: "" }));
       updateUser({ avatarUrl: "" });
 
       fileRef.current.value = "";
