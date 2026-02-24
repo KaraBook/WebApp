@@ -11,6 +11,7 @@ import BookingDetailsDrawer from "../BookingDetailsDrawer";
 import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
 import CancelBookingDialog from "../CancelBookingModal";
+import { canViewInvoice, canRate } from "@/utils/bookingPermissions";
 
 
 function resolveBookingStatus(b) {
@@ -345,7 +346,7 @@ export default function Dashboard() {
                                                         Review submitted
                                                     </DropdownMenuItem>
                                                 ) : (
-                                                    canViewInvoice(b) && (
+                                                    canRate(b) && (
                                                         <DropdownMenuItem
                                                             onClick={() => {
                                                                 setRateBooking(b);

@@ -12,6 +12,7 @@ import BookingDetailsDrawer from "../BookingDetailsDrawer";
 import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
 import CancelBookingDialog from "../CancelBookingModal";
+import { canViewInvoice, canRate } from "@/utils/bookingPermissions";
 
 
 function resolveBookingStatus(b) {
@@ -28,13 +29,6 @@ function resolveBookingStatus(b) {
   return "pending";
 }
 
-function canViewInvoice(b) {
-  return (
-    b?.paymentStatus === "paid" ||
-    b?.status === "paid" ||
-    !!b?.paymentId
-  );
-}
 
 
 export default function Bookings() {
@@ -382,8 +376,8 @@ export default function Bookings() {
                               <DropdownMenuItem
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (b.paymentStatus !== "paid") {
-                                    toast.error("You can rate only after payment is completed.");
+                                  if (!canRate(b)) {
+                                    toast.error("You can rate only after completing your stay.");
                                     return;
                                   }
                                   setRatingBooking(b);

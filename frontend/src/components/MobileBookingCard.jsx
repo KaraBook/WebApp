@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import RateBookingDialog from "./RateBookingDialog";
+import { canViewInvoice, canRate } from "@/utils/bookingPermissions";
 
 
 function resolveBookingStatus(b) {
@@ -117,9 +118,7 @@ export default function MobileBookingCard({
               </DropdownMenuItem>
 
               {(
-                booking?.paymentStatus === "paid" ||
-                booking?.status === "paid" ||
-                !!booking?.paymentId
+                canViewInvoice(booking)
               ) ? (
                 <DropdownMenuItem asChild className="py-3 gap-3">
                   <Link to={`/account/invoice/${booking._id}`}>
@@ -146,9 +145,7 @@ export default function MobileBookingCard({
                   Review submitted
                 </DropdownMenuItem>
               ) : (
-                (booking?.paymentStatus === "paid" ||
-                  booking?.status === "paid" ||
-                  !!booking?.paymentId) && (
+                canRate(booking) && (
                   <DropdownMenuItem
                     className="py-3 gap-3"
                     onClick={(e) => {
