@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import axios from "axios";
 import SummaryApi, { baseURL } from "@/common/SummaryApi";
 import { signOut } from "firebase/auth";
-import { auth } from "@/firebase";
+import { auth } from "../../firebase"
 
 export const useAuthStore = create(
   persist(
