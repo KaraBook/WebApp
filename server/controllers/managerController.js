@@ -1,6 +1,8 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { normalizeMobile } from "../utils/phone.js";
+import { sendMail } from "../utils/mailer.js";
+import { managerAccountCreatedTemplate } from "../utils/emailTemplates.js";
 
 const nameRegex = /^[a-zA-Z][a-zA-Z\s'.-]{1,49}$/;
 
@@ -9,6 +11,8 @@ export const createManager = async (req, res) => {
     const ownerId = req.user.id;
 
     const { firstName, lastName, name, email, mobile, password } = req.body;
+
+    const plainPassword = password;
 
     if (!email || !mobile || !password || (!name && (!firstName || !lastName))) {
       return res.status(400).json({
@@ -71,6 +75,22 @@ export const createManager = async (req, res) => {
 
       password: hashed,
     });
+
+    try {
+      const emailTemplate = managerAccountCreatedTemplate({
+        managerName: manager.name,
+        managerEmail: manager.email,
+        managerPassword: plainPassword,
+      });
+
+      await sendMail({
+        to: manager.email,
+        subject: emailTemplate.subject,
+        html: emailTemplate.html,
+      });
+    } catch (mailErr) {
+      console.error("Manager email failed:", mailErr);
+    }
 
     return res.status(201).json({
       success: true,

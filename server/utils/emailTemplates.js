@@ -224,3 +224,40 @@ export function ownerBookingNotificationTemplate({
     `
   };
 }
+
+
+export function managerAccountCreatedTemplate({
+  managerName,
+  managerEmail,
+  managerPassword,
+  portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
+}) {
+  return {
+    subject: "Your KaraBook Manager Account is Ready",
+    html: `
+      <div style="font-family:Inter,Arial,sans-serif;line-height:1.6;color:#111">
+        <h2>Welcome to KaraBook 🎉</h2>
+
+        <p>Hi <strong>${managerName}</strong>,</p>
+
+        <p>Your manager account has been created. You can now access the KaraBook dashboard.</p>
+
+        <div style="background:#f5f7f8;padding:16px;border-radius:8px;margin:16px 0">
+          <p><strong>Login Email:</strong> ${managerEmail}</p>
+          <p><strong>Password:</strong> ${managerPassword}</p>
+        </div>
+
+        <p>Please change your password after first login.</p>
+
+        <a href="${portalUrl}"
+           style="display:inline-block;background:#00919e;color:#fff;padding:12px 18px;border-radius:8px;text-decoration:none">
+           Login to Dashboard
+        </a>
+
+        <p style="margin-top:20px;font-size:13px;color:#666">
+          If you did not expect this email, please contact support.
+        </p>
+      </div>
+    `,
+  };
+}
