@@ -15,32 +15,24 @@ export const auth = getAuth(app);
 let recaptchaVerifier = null;
 
 export const getRecaptcha = async () => {
-
-  const container = document.getElementById("recaptcha-container");
-  if (!container) throw new Error("Recaptcha container missing");
-
   if (recaptchaVerifier) {
     try {
-      await recaptchaVerifier.render();
-      return recaptchaVerifier;
-    } catch {
       recaptchaVerifier.clear();
-      recaptchaVerifier = null;
-    }
+    } catch {}
   }
 
   recaptchaVerifier = new RecaptchaVerifier(
-    container,
+    auth,
+    "recaptcha-container",
     {
       size: "invisible",
-      callback: () => { },
+      callback: () => {},
       "expired-callback": () => {
         clearRecaptcha();
       },
-    },
-    auth
+    }
   );
-  
+
   await recaptchaVerifier.render();
   return recaptchaVerifier;
 };
