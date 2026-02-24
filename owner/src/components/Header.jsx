@@ -17,6 +17,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   const isManager = user?.role === "manager";
+  const closeDropdown = () => setDropdownOpen(false);
 
   useEffect(() => {
     (async () => {
@@ -37,9 +38,13 @@ export default function Header() {
         setDropdownOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("pointerdown", handleClickOutside);
+    return () => document.removeEventListener("pointerdown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    setDropdownOpen(false);
+  }, [location.pathname]);
 
   const fullName = isManager
     ? `${user?.firstName} (Manager)`
@@ -114,8 +119,8 @@ export default function Header() {
                   key={item.label}
                   onClick={handlePropertyClick}
                   className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
-                      ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     }`}
                 >
                   Property
@@ -128,8 +133,8 @@ export default function Header() {
                 key={item.path}
                 to={item.path}
                 className={`text-[14px] px-3 py-2.5 rounded-[8px] transition ${active
-                    ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  ? "font-semibold text-gray-900 bg-gray-100 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                   }`}
               >
                 {item.label}
@@ -147,7 +152,10 @@ export default function Header() {
             ref={dropdownRef}
           >
             <div
-              onClick={() => setDropdownOpen((p) => !p)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setDropdownOpen((p) => !p);
+              }}
               className="h-9 w-9 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-sm cursor-pointer border"
             >
               {avatarInitial}
@@ -165,6 +173,7 @@ export default function Header() {
               <div className="absolute w-[93vw] -right-[58px] md:w-[15vw] md:right-0 top-11 bg-white border border-gray-200 shadow-lg rounded-xl w-44 py-2 z-50">
                 <Link
                   to="/my-profile"
+                  onClick={closeDropdown}
                   className="flex items-center gap-2 px-4 py-3 md:py-2 hover:bg-gray-50 text-[14px]"
                 >
                   <User size={16} /> My Profile
@@ -173,6 +182,7 @@ export default function Header() {
                 {!isManager && (
                   <Link
                     to="/manager/create"
+                    onClick={closeDropdown}
                     className="flex items-center gap-2 px-4 py-3 md:py-2 hover:bg-gray-50 text-[14px]"
                   >
                     ➕ Add Manager
@@ -180,7 +190,10 @@ export default function Header() {
                 )}
 
                 <button
-                  onClick={logout}
+                  onClick={() => {
+                    closeDropdown();
+                    logout();
+                  }}
                   className="flex items-center gap-2 px-4 py-3 md:py-2 hover:bg-gray-50 text-[14px] text-red-600 w-full text-left"
                 >
                   <LogOut size={16} /> Logout
