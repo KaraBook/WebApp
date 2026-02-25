@@ -188,9 +188,7 @@ export default function EditProperty() {
           baseGuests: p.baseGuests,
           checkIn: p.checkInTime,
           checkOut: p.checkOutTime,
-          food: (p.foodAvailability || []).map(f =>
-            f.trim().toLowerCase().replace(/^\w/, c => c.toUpperCase())
-          ),
+          food: (p.foodAvailability || []).map(f => f.trim().toLowerCase()),
           amenities: p.amenities || [],
           isRefundable: p.isRefundable ?? true,
           refundNotes: p.refundNotes || "",
@@ -214,15 +212,28 @@ export default function EditProperty() {
   }, [id]);
 
   const toggle = (key, val) => {
+    let updated = form[key].includes(val)
+      ? form[key].filter((x) => x !== val)
+      : [...form[key], val];
+
+    if (key === "food" && updated.length === 0) {
+      toast.warning("At least one food option is required");
+      return;
+    }
+
     setForm({
       ...form,
-      [key]: form[key].includes(val)
-        ? form[key].filter((x) => x !== val)
-        : [...form[key], val],
+      [key]: updated,
     });
   };
 
   const save = async () => {
+
+    if (!form.food || form.food.length === 0) {
+      toast.error("Please select at least one food option (Breakfast, Lunch, or Dinner)");
+      setTab("details");
+      return;
+    }
     try {
       setLoading(true);
 
@@ -321,9 +332,26 @@ export default function EditProperty() {
                   <Utensils size={16} /> Food Options
                 </Label>
                 <div className="flex flex-wrap md:flex-nowrap gap-3 mt-3">
-                  <FoodPill icon={Coffee} label="Breakfast" active={form.food.includes("Breakfast")} onClick={() => toggle("food", "Breakfast")} />
-                  <FoodPill icon={Sun} label="Lunch" active={form.food.includes("Lunch")} onClick={() => toggle("food", "Lunch")} />
-                  <FoodPill icon={Moon} label="Dinner" active={form.food.includes("Dinner")} onClick={() => toggle("food", "Dinner")} />
+                  <FoodPill
+                    icon={Coffee}
+                    label="Breakfast"
+                    active={form.food.includes("breakfast")}
+                    onClick={() => toggle("food", "breakfast")}
+                  />
+
+                  <FoodPill
+                    icon={Sun}
+                    label="Lunch"
+                    active={form.food.includes("lunch")}
+                    onClick={() => toggle("food", "lunch")}
+                  />
+
+                  <FoodPill
+                    icon={Moon}
+                    label="Dinner"
+                    active={form.food.includes("dinner")}
+                    onClick={() => toggle("food", "dinner")}
+                  />
                 </div>
               </div>
             </>
