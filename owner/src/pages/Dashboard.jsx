@@ -464,7 +464,7 @@ export default function Dashboard() {
             label="Users"
             value={stats?.totalUsers}
             caption="Total travellers"
-            onClick={() => navigate("/users")}
+            onClick={() => navigate("/users?role=traveller")}
           />
 
           <StatCard

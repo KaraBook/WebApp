@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../api/axios";
 import SummaryApi from "../common/SummaryApi";
 import { MoreVertical, Mail, Phone, Eye, Copy, ChevronDown, Users } from "lucide-react";
@@ -26,6 +27,7 @@ export default function OwnerUsers() {
 
 
     const [search, setSearch] = useState("");
+    const [searchParams] = useSearchParams();
     const [roleFilter, setRoleFilter] = useState("all");
 
     const getFullName = (u) =>
@@ -46,6 +48,14 @@ export default function OwnerUsers() {
     useEffect(() => {
         fetchUsers();
     }, []);
+
+    useEffect(() => {
+        const roleFromUrl = searchParams.get("role");
+
+        if (roleFromUrl && ["traveller", "owner", "manager"].includes(roleFromUrl)) {
+            setRoleFilter(roleFromUrl);
+        }
+    }, [searchParams]);
 
     /* ================= FILTER + SEARCH ================= */
     const filteredUsers = useMemo(() => {
