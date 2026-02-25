@@ -245,9 +245,10 @@ export default function OfflineBooking() {
               children: guestCount.children,
             },
             meals: {
+              includeMeals: hasLunchOrDinner,
               veg: meals.veg,
-              nonVeg: meals.nonVeg,
-            },
+              nonVeg: meals.nonVeg
+            }
           },
           { signal: controller.signal }
         );
@@ -482,7 +483,7 @@ export default function OfflineBooking() {
       checkOutStr,
       nights,
       price,
-      totalAmount,
+      previewGrandTotal: pricingPreview?.grandTotal,
     });
 
     setLoading(true);

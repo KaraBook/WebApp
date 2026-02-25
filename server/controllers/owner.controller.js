@@ -816,12 +816,6 @@ export const createOfflineBooking = async (req, res) => {
       }
     }
 
-    if (!grandTotal || grandTotal <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid booking amount",
-      });
-    }
     const normalizedMobile = normalizeMobile(traveller.mobile);
     if (!normalizedMobile || normalizedMobile.length !== 10) {
       return res.status(400).json({
