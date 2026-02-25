@@ -1013,13 +1013,25 @@ export const getPublishedProperties = async (req, res) => {
         filter.pricingPerNightWeekdays.$lte = Number(maxPrice);
       }
     }
-
     let sortQuery = { createdAt: -1 };
 
     if (sort === "price_asc") {
-      sortQuery = { pricingPerNightWeekdays: 1 };
-    } else if (sort === "price_desc") {
-      sortQuery = { pricingPerNightWeekdays: -1 };
+      sortQuery = { pricingPerNightWeekdays: 1, averageRating: -1 };
+    }
+    else if (sort === "price_desc") {
+      sortQuery = { pricingPerNightWeekdays: -1, averageRating: -1 };
+    }
+
+    else if (sort === "rating_desc") {
+      sortQuery = {
+        averageRating: -1,
+        reviewCount: -1,
+        createdAt: -1,
+      };
+    }
+
+    else if (sort === "latest") {
+      sortQuery = { createdAt: -1 };
     }
 
     const properties = await Property.find(filter).sort(sortQuery);

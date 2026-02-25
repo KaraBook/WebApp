@@ -183,4 +183,11 @@ const propertySchema = new mongoose.Schema({
 
 propertySchema.index({ isDraft: 1 });
 
+propertySchema.index({ averageRating: -1, reviewCount: -1 });
+propertySchema.index({ pricingPerNightWeekdays: 1 });
+propertySchema.index({ createdAt: -1 });
+propertySchema.index({ state: 1, city: 1 });
+propertySchema.index({ maxGuests: 1 });
+propertySchema.index({ publishNow: 1, isDraft: 1, isBlocked: 1 });
+
 export default mongoose.model("Property", propertySchema);

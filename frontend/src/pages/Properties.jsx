@@ -33,7 +33,7 @@ export default function Properties() {
       ? PROPERTY_TYPE_LABELS[propertyTypeFromUrl] || "All Types"
       : "All Types",
     price: "All Prices",
-    sort: "Recommended",
+    sort: "Recently Added",
   });
 
   const fetchProperties = async (filters = {}) => {
@@ -94,14 +94,18 @@ export default function Properties() {
     else if (topFilters.price === "₹10,000+") {
       filters.minPrice = 10000;
     }
-
     if (topFilters.sort === "Price: Low to High") {
       filters.sort = "price_asc";
     }
     else if (topFilters.sort === "Price: High to Low") {
       filters.sort = "price_desc";
     }
-
+    else if (topFilters.sort === "Highest Rated") {
+      filters.sort = "rating_desc";
+    }
+    else if (topFilters.sort === "Recently Added") {
+      filters.sort = "latest";
+    }
     fetchProperties(filters);
   }, [searchParams, topFilters]);
 

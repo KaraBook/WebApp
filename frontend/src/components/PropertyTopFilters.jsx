@@ -41,7 +41,7 @@ export default function PropertyTopFilters({ total, value, onChange }) {
             icon
             label={value.sort}
             options={[
-              "Recommended",
+              "Recently Added",
               "Price: Low to High",
               "Price: High to Low",
               "Highest Rated",
