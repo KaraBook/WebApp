@@ -413,7 +413,6 @@ export const updateOwnerProperty = async (req, res) => {
     }
 
     const files = req.files || {};
-    const BASE_URL = process.env.BACKEND_BASE_URL || "";
 
     let removed = [];
 
@@ -446,22 +445,18 @@ export const updateOwnerProperty = async (req, res) => {
     }
 
     if (files.coverImage?.[0]) {
-      updatedData.coverImage = `${BASE_URL}/${files.coverImage[0].path.replace(
-        /\\/g,
-        "/"
-      )}`;
+      const file = files.coverImage[0];
+      updatedData.coverImage = `/uploads/properties/cover/${file.filename}`;
     }
 
     if (files.shopAct?.[0]) {
-      updatedData.shopAct = `${BASE_URL}/${files.shopAct[0].path.replace(
-        /\\/g,
-        "/"
-      )}`;
+      const file = files.shopAct[0];
+      updatedData.shopAct = `/uploads/properties/shopAct/${file.filename}`;
     }
 
     if (files.galleryPhotos?.length > 0) {
       const newGallery = files.galleryPhotos.map(
-        (file) => `${BASE_URL}/${file.path.replace(/\\/g, "/")}`
+        (file) => `/uploads/properties/gallery/${file.filename}`
       );
 
       updatedData.galleryPhotos = [
