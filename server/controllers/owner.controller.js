@@ -78,6 +78,13 @@ export const getOwnerDashboard = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const isConfirmed = (b) =>
+      b.paymentStatus === "paid" &&
+      b.status === "confirmed" &&
+      b.cancelled !== true;
+
+    const confirmedBookings = bookings.filter(isConfirmed);
+
     const isRevenueBooking = (b) => {
       if (b.cancelled === true) return false;
       if (b.paymentStatus !== "paid") return false;
@@ -116,7 +123,7 @@ export const getOwnerDashboard = async (req, res) => {
     const getMonthRevenue = (year, month) =>
       confirmedBookings
         .filter((b) => {
-          const d = new Date(b.createdAt);
+          const d = new Date(b.checkOut);
           return d.getFullYear() === year && d.getMonth() === month;
         })
         .reduce(

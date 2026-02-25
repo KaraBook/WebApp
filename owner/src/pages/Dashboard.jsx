@@ -255,17 +255,11 @@ export default function Dashboard() {
 
         const all = res.data?.data?.bookings || [];
 
-        const upcoming = all.filter(b => {
-          const checkOut = new Date(b.checkOut);
-          checkOut.setHours(0, 0, 0, 0);
-          return checkOut >= today;
-        });
-
         const dashboardData = res.data?.data;
 
         setData({
-          stats: dashboardData.stats,   // ✅ BACKEND STATS ONLY
-          bookings: upcoming.sort(
+          stats: dashboardData.stats,
+          bookings: dashboardData.bookings.sort(
             (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
           ),
         });
@@ -674,8 +668,7 @@ export default function Dashboard() {
 
               return {
                 ...prev,
-                bookings: updatedBookings,
-                stats: recalculateStats(updatedBookings),
+                bookings: updatedBookings
               };
             });
           }
