@@ -166,19 +166,14 @@ function StatCard({
 }
 
 function normalizeBookingStatus(b) {
-  if (b.cancelled === true || b.status === "cancelled")
-    return "cancelled";
-
+  if (b.cancelled || b.status === "cancelled") return "cancelled";
   if (
-    b.paymentStatus === "paid" &&
-    b.status === "confirmed" &&
-    b.cancelled !== true
-  )
+    b.paymentStatus === "paid" ||
+    b.status === "confirmed" ||
+    Boolean(b.paymentId)
+  ) {
     return "confirmed";
-
-  if (b.paymentStatus === "initiated" && b.cancelled !== true)
-    return "pending";
-
+  }
   return "pending";
 }
 
@@ -412,7 +407,39 @@ export default function Dashboard() {
   };
 
 
+  const recalculateStats = (bookings) => {
+    const isConfirmed = (b) =>
+      b.paymentStatus === "paid";
 
+    const isCancelled = (b) =>
+      b.cancelled === true;
+
+    const isPending = (b) =>
+      b.paymentStatus === "initiated";
+
+    const confirmedBookings = bookings.filter(isConfirmed);
+
+    const grossRevenue = confirmedBookings.reduce(
+      (sum, b) => sum + Number(b.totalAmount || 0),
+      0
+    );
+
+    const totalRefunds = bookings.reduce(
+      (sum, b) => sum + Number(b.refundAmount || 0),
+      0
+    );
+
+    const netRevenue = grossRevenue - totalRefunds;
+
+    return {
+      ...data.stats,
+      totalBookings: bookings.length,
+      confirmed: confirmedBookings.length,
+      pending: bookings.filter(isPending).length,
+      cancelled: bookings.filter(isCancelled).length,
+      netRevenue,
+    };
+  };
 
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -633,36 +660,24 @@ export default function Dashboard() {
       <OwnerCancelBookingDialog
         open={openCancelDialog}
         booking={selectedBooking}
-        onClose={async (refresh) => {
+        onClose={(refresh, updatedBooking) => {
           setOpenCancelDialog(false);
 
-          if (refresh) {
-            setLoadingDashboard(true);
+          if (refresh && updatedBooking) {
+            setData((prev) => {
+              if (!prev) return prev;
+              const updatedBookings = prev.bookings.map((b) =>
+                b._id === updatedBooking._id
+                  ? { ...b, ...updatedBooking }
+                  : b
+              );
 
-            try {
-              const res = await api.get(SummaryApi.getOwnerDashboard.url);
-
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-
-              const all = res.data?.data?.bookings || [];
-
-              const upcoming = all.filter(b => {
-                const checkOut = new Date(b.checkOut);
-                checkOut.setHours(0, 0, 0, 0);
-                return checkOut >= today;
-              });
-
-              setData({
-                stats: res.data.data.stats,
-                bookings: upcoming.sort(
-                  (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
-                ),
-              });
-
-            } finally {
-              setLoadingDashboard(false);
-            }
+              return {
+                ...prev,
+                bookings: updatedBookings,
+                stats: recalculateStats(updatedBookings),
+              };
+            });
           }
         }}
       />
