@@ -79,16 +79,27 @@ export default function Home() {
   }, []);
 
   const handleFilter = (filters) => {
-    const query = new URLSearchParams({
-      state: filters.state || "",
-      city: filters.city || "",
-      area: filters.area || "",
-      guests: JSON.stringify(filters.guests || {}),
-      checkIn: filters.checkIn?.toISOString(),
-      checkOut: filters.checkOut?.toISOString(),
-    }).toString();
+    const params = new URLSearchParams();
 
-    navigate(`/properties?${query}`);
+    if (filters.state)
+      params.set("state", filters.state);
+
+    if (filters.city)
+      params.set("city", filters.city);
+
+    if (filters.area)
+      params.set("area", filters.area);
+
+    if (filters.guests)
+      params.set("guests", JSON.stringify(filters.guests));
+
+    if (filters.checkIn)
+      params.set("checkIn", new Date(filters.checkIn).toISOString());
+
+    if (filters.checkOut)
+      params.set("checkOut", new Date(filters.checkOut).toISOString());
+
+    navigate(`/properties?${params.toString()}`);
   };
 
   return (
