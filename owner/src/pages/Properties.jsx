@@ -94,7 +94,7 @@ export default function Properties() {
 
               {/* PUBLISH STATUS */}
               <span
-                className={`px-3 py-2 rounded-[8px] text-[12px] font-medium
+                className={`px-3 py-1 rounded-[8px] text-[12px] font-medium
           ${publishNow
                     ? "bg-emerald-100 text-emerald-700"
                     : "bg-gray-200 text-gray-600"
@@ -104,13 +104,13 @@ export default function Properties() {
               </span>
 
               {/* PROPERTY TYPE */}
-              <span className="px-3 py-2 rounded-[8px] text-[12px] font-medium bg-blue-100 text-blue-700 capitalize">
+              <span className="px-3 py-1 rounded-[8px] text-[12px] font-medium bg-blue-100 text-blue-700 capitalize">
                 {propertyType}
               </span>
 
               {/* KYC STATUS */}
               <span
-                className={`px-3 py-2 rounded-[8px] text-[12px] font-medium
+                className={`px-3 py-1 rounded-[8px] text-[12px] font-medium
           ${kycVerified
                     ? "bg-emerald-100 text-emerald-700"
                     : "bg-red-100 text-red-700"
@@ -249,6 +249,7 @@ export default function Properties() {
               </div>
 
               {locationLink && (
+                <div className="p-4">
                 <a
                   href={locationLink}
                   target="_blank"
@@ -262,6 +263,7 @@ export default function Properties() {
                     View Map
                   </Button>
                 </a>
+                </div>
               )}
             </div>
 
