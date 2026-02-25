@@ -1037,14 +1037,13 @@ export const getPublishedProperties = async (req, res) => {
       sortQuery = { createdAt: -1 };
     }
 
-    // ================= AVAILABILITY FILTER =================
-
     if (checkIn && checkOut) {
       const start = new Date(checkIn);
       const end = new Date(checkOut);
 
       const overlappingBookings = await Booking.find({
         paymentStatus: "paid",
+        cancelled: { $ne: true },
         checkIn: { $lt: end },
         checkOut: { $gt: start },
       }).select("propertyId");
