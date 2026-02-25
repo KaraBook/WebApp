@@ -43,6 +43,7 @@ export default function Properties() {
     description,
     addressLine1,
     addressLine2,
+    locationLink,
     maxGuests,
     baseGuests,
     minStayNights,
@@ -86,9 +87,38 @@ export default function Properties() {
 
           {/* LEFT: NAME + LOCATION */}
           <div>
-            <h1 className="text-[26px] md:text-[26px] font-bold text-gray-900">
-              {propertyName}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-[26px] md:text-[26px] font-bold text-gray-900">
+                {propertyName}
+              </h1>
+
+              {/* PUBLISH STATUS */}
+              <span
+                className={`px-3 py-2 rounded-[8px] text-[12px] font-medium
+          ${publishNow
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-gray-200 text-gray-600"
+                  }`}
+              >
+                {publishNow ? "Published" : "Unpublished"}
+              </span>
+
+              {/* PROPERTY TYPE */}
+              <span className="px-3 py-2 rounded-[8px] text-[12px] font-medium bg-blue-100 text-blue-700 capitalize">
+                {propertyType}
+              </span>
+
+              {/* KYC STATUS */}
+              <span
+                className={`px-3 py-2 rounded-[8px] text-[12px] font-medium
+          ${kycVerified
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-red-100 text-red-700"
+                  }`}
+              >
+                {kycVerified ? "KYC Verified" : "KYC Pending"}
+              </span>
+            </div>
 
             <p className="flex items-center gap-2 text-sm mt-1 text-gray-600">
               <MapPin className="w-4 h-4" />
@@ -98,33 +128,6 @@ export default function Properties() {
 
           {/* RIGHT: BADGES */}
           <div className="flex flex-wrap items-center gap-2">
-
-            {/* PUBLISH STATUS */}
-            <span
-              className={`px-3 py-2 rounded-[8px] text-[12px] font-medium
-          ${publishNow
-                  ? "bg-emerald-100 text-emerald-700"
-                  : "bg-gray-200 text-gray-600"
-                }`}
-            >
-              {publishNow ? "Published" : "Unpublished"}
-            </span>
-
-            {/* PROPERTY TYPE */}
-            <span className="px-3 py-2 rounded-[8px] text-[12px] font-medium bg-blue-100 text-blue-700 capitalize">
-              {propertyType}
-            </span>
-
-            {/* KYC STATUS */}
-            <span
-              className={`px-3 py-2 rounded-[8px] text-[12px] font-medium
-          ${kycVerified
-                  ? "bg-emerald-100 text-emerald-700"
-                  : "bg-red-100 text-red-700"
-                }`}
-            >
-              {kycVerified ? "KYC Verified" : "KYC Pending"}
-            </span>
 
             <Link to={property ? `/edit-property/${property._id}` : "#"}>
               <Button>Edit Property</Button>
@@ -244,6 +247,22 @@ export default function Properties() {
                 <p><strong>City:</strong> {city}</p>
                 <p><strong>Area:</strong> {area}</p>
               </div>
+
+              {locationLink && (
+                <a
+                  href={locationLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    size="sm"
+                    className="flex items-center gap-2 bg-primary text-white"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    View Map
+                  </Button>
+                </a>
+              )}
             </div>
 
           </div>
@@ -256,7 +275,7 @@ export default function Properties() {
             <div className="flex items-center gap-2">
               <FileSpreadsheet className="w-4 h-4" />
               <h2 className="uppercase text-[18px] font-[600] tracking-[1.1px]">
-                  Policies and Rules
+                Policies and Rules
               </h2>
             </div>
 
