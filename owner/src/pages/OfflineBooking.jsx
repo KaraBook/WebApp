@@ -327,22 +327,6 @@ export default function OfflineBooking() {
       return toast.error("Invalid mobile number");
     }
 
-    try {
-      const ownerCheck = await api.post(SummaryApi.checkOwnerByMobile.url, {
-        mobile: traveller.mobile,
-      });
-
-      if (ownerCheck.data.exists) {
-        setAllowForm(false);
-        setPopupTitle("Not Allowed");
-        setPopupMsg("This mobile belongs to a property owner.");
-        setShowPopup(true);
-        return;
-      }
-    } catch {
-      // ignore owner check failure
-    }
-
     setChecking(true);
 
     try {
@@ -374,7 +358,7 @@ export default function OfflineBooking() {
         });
 
         setPopupTitle("Traveller Found");
-        setPopupMsg("Traveller details auto-filled.");
+        setPopupMsg("Existing user found. Details auto-filled.");
       } else {
         setTraveller((p) => ({
           ...p,
@@ -389,8 +373,8 @@ export default function OfflineBooking() {
         setCities([]);
         setSelectedStateCode("");
 
-        setPopupTitle("New Traveller");
-        setPopupMsg("Please fill traveller details.");
+        setPopupTitle("New Guest");
+        setPopupMsg("Enter guest details.");
       }
 
       setShowPopup(true);

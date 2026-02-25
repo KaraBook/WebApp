@@ -816,7 +816,7 @@ export const createOfflineBooking = async (req, res) => {
       }
     }
 
-    if (!totalAmount || totalAmount <= 0) {
+    if (!grandTotal || grandTotal <= 0) {
       return res.status(400).json({
         success: false,
         message: "Invalid booking amount",
@@ -874,16 +874,9 @@ export const createOfflineBooking = async (req, res) => {
 
       const roles = getRoles(user);
 
-      if (roles.some(r => ["admin", "resortOwner", "manager", "property_admin"].includes(r))) {
-        return res.status(409).json({
-          success: false,
-          message: "This mobile belongs to an Owner/Admin account. Please use a different traveller number.",
-        });
-      }
-
       if (!roles.includes("traveller")) {
-        user.roles = Array.from(new Set([...roles, "traveller"]));
-        if (!user.primaryRole) user.primaryRole = "traveller";
+        user.roles = [...new Set([...roles, "traveller"])];
+        user.primaryRole = user.primaryRole || "traveller";
         await user.save();
       }
 
