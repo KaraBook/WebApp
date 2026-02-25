@@ -52,6 +52,7 @@ const cardFade = {
 
 export default function Home() {
   const [properties, setProperties] = useState([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
   const navigate = useNavigate();
   const prevRef = useRef(null);
   const nextRef = useRef(null);
@@ -67,14 +68,24 @@ export default function Home() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
+        setFeaturedLoading(true);
+
         const res = await Axios.get(SummaryApi.getFeaturedProperties.url);
+
         if (res.data.success) {
-          setProperties(res.data.data);
+          setProperties(res.data.data || []);
+        } else {
+          setProperties([]);
         }
+
       } catch (err) {
         console.error("Failed to fetch featured properties:", err);
+        setProperties([]);
+      } finally {
+        setFeaturedLoading(false);
       }
     };
+
     fetchFeatured();
   }, []);
 
@@ -369,11 +380,11 @@ export default function Home() {
         <FindByExperience />
       </motion.section>
 
-      <div className="mt-12 md:mt-20">
+      <div className="mt-12 md:mt-20 md:mb-20">
         <WhyChooseUs />
       </div>
 
-
+   {!featuredLoading && properties.length > 0 && (
       <section className="w-full bg-white py-8 mt-2 md:mt-0 md:py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col justify-center items-center md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10">
@@ -424,13 +435,13 @@ export default function Home() {
               <div className="flex items-center justify-end p-4 gap-3">
                 <button
                   onClick={() => swiperInstance?.slidePrev()}
-                  className="hidden md:flex h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
+                  className="hidden md:flex text-[28px] h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
                 >
                   ‹
                 </button>
                 <button
                   onClick={() => swiperInstance?.slideNext()}
-                  className="hidden md:flex h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
+                  className="hidden md:flex text-[28px] h-11 w-11 items-center justify-center rounded-full border border-slate-400 bg-white shadow-sm hover:shadow-md transition"
                 >
                   ›
                 </button>
@@ -448,6 +459,7 @@ export default function Home() {
 
         </div>
       </section>
+   )}
 
 
       <div>
