@@ -646,9 +646,11 @@ export const uploadOwnerAvatar = async (req, res) => {
   if (!req.file?.path) {
     return res.status(400).json({ message: "No file uploaded" });
   }
+  const relativePath =
+    "/uploads/" +
+    req.file.path.split("uploads")[1].replace(/\\/g, "/");
 
-  const BASE_URL = process.env.BACKEND_BASE_URL || "";
-  user.avatarUrl = `${BASE_URL}/${req.file.path.replace(/\\/g, "/")}`;
+  user.avatarUrl = `${process.env.BACKEND_BASE_URL}${relativePath}`;
   await user.save();
 
   res.json({ avatarUrl: user.avatarUrl });
