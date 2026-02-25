@@ -702,17 +702,53 @@ export const removeBlockedDates = async (req, res) => {
 
 export const createRazorpayOrder = async (req, res) => {
   try {
-    const { bookingId, amount } = req.body;
+    const { bookingId } = req.body;
+
+    if (!bookingId) {
+      return res.status(400).json({
+        success: false,
+        message: "Booking ID required"
+      });
+    }
+
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found"
+      });
+    }
+
+    if (!booking.grandTotal || booking.grandTotal <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid booking amount"
+      });
+    }
 
     const order = await razorpay.orders.create({
-      amount: amount * 100,
+      amount: Math.round(booking.grandTotal * 100), 
       currency: "INR",
-      receipt: bookingId,
+      receipt: bookingId.toString(),
+      payment_capture: 1
     });
 
-    res.json({ success: true, order });
+    booking.orderId = order.id;
+    await booking.save();
+
+    return res.json({
+      success: true,
+      order
+    });
+
   } catch (err) {
-    res.status(500).json({ success: false, message: "Order create failed" });
+    console.error("RAZORPAY ORDER ERROR:", err); 
+    return res.status(500).json({
+      success: false,
+      message: "Order create failed",
+      error: err.message
+    });
   }
 };
 
