@@ -206,10 +206,10 @@ export default function EditProperty() {
         const normalize = (img) => (img || "").replace(/^\/+/, "");
         const toUrl = (img) => {
           if (!img) return null;
-
           if (img.startsWith("http")) return img;
-
-          return `${import.meta.env.VITE_ASSETS_BASE_URL}/${img.replace(/^\/+/, "")}`;
+          const BASE = import.meta.env.VITE_ASSETS_BASE_URL;
+          if (!BASE) return img; 
+          return `${BASE.replace(/\/$/, "")}/${img.replace(/^\/+/, "")}`;
         };
 
         const existing = (p.galleryPhotos || []).map((path) => ({
