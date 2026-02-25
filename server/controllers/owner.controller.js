@@ -76,12 +76,12 @@ export const getOwnerDashboard = async (req, res) => {
     );
 
     const isConfirmed = (b) =>
-      b.paymentStatus === "paid" ||
-      b.status === "confirmed" ||
-      Boolean(b.paymentId);
+      b.paymentStatus === "paid" &&
+      b.status === "confirmed" &&
+      b.cancelled !== true;
 
     const isPending = (b) =>
-      !isConfirmed(b) && b.status !== "cancelled";
+      b.paymentStatus === "initiated" && b.cancelled !== true;
 
     const isCancelled = (b) =>
       b.status === "cancelled" || b.cancelled === true;
