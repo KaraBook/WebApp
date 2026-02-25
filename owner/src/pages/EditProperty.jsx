@@ -139,6 +139,7 @@ export default function EditProperty() {
   const [galleryImageFiles, setGalleryImageFiles] = useState([]);
   const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
   const [removedGalleryImages, setRemovedGalleryImages] = useState([]);
+  const [descriptionError, setDescriptionError] = useState("");
 
   const [propertyName, setPropertyName] = useState("");
 
@@ -228,6 +229,20 @@ export default function EditProperty() {
   };
 
   const save = async () => {
+
+    const descLength = form.description.trim().length;
+
+    if (descLength < 30) {
+      toast.error("Property description must be at least 30 characters");
+      setTab("details");
+      return;
+    }
+
+    if (descLength > 1000) {
+      toast.error("Property description cannot exceed 1000 characters");
+      setTab("details");
+      return;
+    }
 
     if (!form.food || form.food.length === 0) {
       toast.error("Please select at least one food option (Breakfast, Lunch, or Dinner)");
@@ -321,10 +336,33 @@ export default function EditProperty() {
                   <FileText size={16} /> Property Description
                 </Label>
                 <Textarea
-                  className="mt-2"
+                  className={`mt-2 ${descriptionError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                   value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setForm({ ...form, description: val });
+
+                    if (val.trim().length < 30) {
+                      setDescriptionError("Description must be at least 30 characters");
+                    } else if (val.trim().length > 1000) {
+                      setDescriptionError("Description cannot exceed 1000 characters");
+                    } else {
+                      setDescriptionError("");
+                    }
+                  }}
                 />
+                <div className="flex justify-between items-center mt-2">
+                  <p className={`text-xs ${descriptionError ? "text-red-500" : "text-gray-500"}`}>
+                    {descriptionError || "Describe your property clearly (30–1000 characters)."}
+                  </p>
+
+                  <span className={`text-xs font-medium ${form.description.length < 30 || form.description.length > 1000
+                    ? "text-red-500"
+                    : "text-gray-400"
+                    }`}>
+                    {form.description.length}/1000
+                  </span>
+                </div>
               </div>
 
               <div className="bg-white rounded-2xl border shadow-sm p-4 md:p-6">
