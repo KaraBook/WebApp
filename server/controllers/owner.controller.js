@@ -75,13 +75,15 @@ export const getOwnerDashboard = async (req, res) => {
       .populate("propertyId", "propertyName isRefundable cancellationPolicy coverImage")
       .lean();
 
-    const validUserRoles = ["traveller", "manager"];
-
-    const uniqueUserIds = new Set();
+    const uniqueTravellerIds = new Set();
 
     bookings.forEach((b) => {
-      if (b.userId && b.userId._id) {
-        uniqueUserIds.add(b.userId._id.toString());
+      if (!b.userId) return;
+
+      const relationshipRole = getRelationshipRole(b.userId, ownerId);
+
+      if (relationshipRole === "traveller") {
+        uniqueTravellerIds.add(b.userId._id.toString());
       }
     });
 
@@ -182,7 +184,7 @@ export const getOwnerDashboard = async (req, res) => {
     const stats = {
       totalProperties: properties.length,
       totalBookings: bookings.length,
-      totalUsers: uniqueUserIds.size,
+      totalUsers: uniqueTravellerIds.size,
 
       confirmed: confirmedBookings.length,
       pending: bookings.filter(isPending).length,
