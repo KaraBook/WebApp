@@ -10,7 +10,7 @@ export default function AboutUs() {
     <section className="w-full">
 
       {/* HERO ONLY */}
-      <div className="relative w-full h-[85vh] overflow-hidden">
+      <div className="relative w-full h-[85vh] overflow-hidden mb-[42px]">
 
         {/* BACKGROUND IMAGE */}
         <img
