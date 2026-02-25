@@ -78,17 +78,26 @@ export const getOwnerDashboard = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const isConfirmed = (b) =>
-      b.paymentStatus === "paid" &&
-      b.status === "confirmed" &&
-      b.cancelled !== true;
+    const isConfirmed = (b) => {
+      if (b.cancelled === true) return false;
 
+      return (
+        b.paymentStatus === "paid" ||
+        b.status === "confirmed" ||
+        Boolean(b.paymentId)
+      );
+    };
     const confirmedBookings = bookings.filter(isConfirmed);
 
     const isRevenueBooking = (b) => {
       if (b.cancelled === true) return false;
-      if (b.paymentStatus !== "paid") return false;
-      if (b.status !== "confirmed") return false;
+
+      const isPaid =
+        b.paymentStatus === "paid" ||
+        b.status === "confirmed" ||
+        Boolean(b.paymentId);
+
+      if (!isPaid) return false;
 
       const checkout = new Date(b.checkOut);
       checkout.setHours(0, 0, 0, 0);
