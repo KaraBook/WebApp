@@ -140,6 +140,7 @@ export default function EditProperty() {
   const [galleryImagePreviews, setGalleryImagePreviews] = useState([]);
   const [removedGalleryImages, setRemovedGalleryImages] = useState([]);
   const [descriptionError, setDescriptionError] = useState("");
+  const [existingGalleryImages, setExistingGalleryImages] = useState([]);
 
   const [propertyName, setPropertyName] = useState("");
 
@@ -200,10 +201,18 @@ export default function EditProperty() {
           ],
         });
 
-        setCoverImagePreview(p.coverImage || null);
-        setShopActPreview(p.shopAct || null);
-        setExistingGalleryImages(p.galleryPhotos || []);
-        setGalleryImagePreviews(p.galleryPhotos || []);
+        const BASE_URL = import.meta.env.VITE_ASSETS_BASE_URL || "";
+
+        const normalize = (img) => (img || "").replace(/^\/+/, "");
+        const toUrl = (img) => img.startsWith("http") ? img : `${BASE_URL}/${normalize(img)}`;
+
+        const existing = (p.galleryPhotos || []).map((path) => ({
+          path: normalize(path),
+          url: toUrl(path)
+        }));
+
+        setExistingGalleryImages(existing);
+        setGalleryImagePreviews(existing.map(x => x.url));
         setPropertyName(p.propertyName || "");
       } catch {
         toast.error("Failed to load");
@@ -231,10 +240,9 @@ export default function EditProperty() {
 
   const save = async () => {
     const descLength = form.description.trim().length;
-
+    
     const finalGalleryCount =
-      (existingGalleryImages.length - removedGalleryImages.length) +
-      galleryImageFiles.length;
+      existingGalleryImages.length + galleryImageFiles.length;
 
     const hasExistingCover = !!coverImagePreview;
 
@@ -865,7 +873,8 @@ export default function EditProperty() {
 
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                   {galleryImagePreviews.map((img, i) => {
-                    const isExisting = existingGalleryImages.includes(img);
+                    const existingItem = existingGalleryImages.find(x => x.url === img);
+                    const isExisting = !!existingItem;
 
                     return (
                       <div key={i} className="relative h-28 rounded-xl overflow-hidden border">
@@ -879,8 +888,8 @@ export default function EditProperty() {
                             setGalleryImageFiles(prev => prev.filter((_, idx) => idx !== i));
 
                             if (isExisting) {
-                              setRemovedGalleryImages(prev => [...prev, img]);
-                              setExistingGalleryImages(prev => prev.filter(p => p !== img));
+                              setRemovedGalleryImages(prev => [...prev, existingItem.path]);
+                              setExistingGalleryImages(prev => prev.filter(p => p.url !== img));
                             }
                           }}
                           className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"

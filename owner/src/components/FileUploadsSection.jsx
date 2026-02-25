@@ -135,21 +135,12 @@ const FileUploadsSection = ({
           </div>
 
           {coverImagePreview && (
-            <div className="relative w-20 h-20 mt-3">
+            <div className="w-20 h-20 mt-3">
               <img
                 src={coverImagePreview}
                 alt="Cover"
-                className="w-full h-full object-cover rounded"
+                className="w-full h-full object-cover rounded border"
               />
-              <Button
-                type="button"
-                size="icon"
-                variant="destructive"
-                onClick={handleRemoveCoverImage}
-                className="absolute top-1 right-1 p-1 h-5 w-5"
-              >
-                <RxCross2 size={12} />
-              </Button>
             </div>
           )}
         </div>
@@ -180,21 +171,12 @@ const FileUploadsSection = ({
           </div>
 
           {shopActPreview && (
-            <div className="relative w-20 h-20 mt-3">
+            <div className="w-20 h-20 mt-3">
               <img
                 src={shopActPreview}
                 alt="Shop Act"
-                className="w-full h-full object-cover rounded"
+                className="w-full h-full object-cover rounded border"
               />
-              <Button
-                type="button"
-                size="icon"
-                variant="destructive"
-                onClick={handleRemoveShopAct}
-                className="absolute top-1 right-1 p-1 h-5 w-5"
-              >
-                <RxCross2 size={12} />
-              </Button>
             </div>
           )}
         </div>
