@@ -213,6 +213,14 @@ export default function EditProperty() {
 
         setExistingGalleryImages(existing);
         setGalleryImagePreviews(existing.map(x => x.url));
+
+        if (p.coverImage) {
+          setCoverImagePreview(toUrl(p.coverImage));
+        }
+
+        if (p.shopAct) {
+          setShopActPreview(toUrl(p.shopAct));
+        }
         setPropertyName(p.propertyName || "");
       } catch {
         toast.error("Failed to load");
@@ -240,7 +248,7 @@ export default function EditProperty() {
 
   const save = async () => {
     const descLength = form.description.trim().length;
-    
+
     const finalGalleryCount =
       existingGalleryImages.length + galleryImageFiles.length;
 
