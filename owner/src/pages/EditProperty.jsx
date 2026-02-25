@@ -204,7 +204,13 @@ export default function EditProperty() {
         const BASE_URL = import.meta.env.VITE_ASSETS_BASE_URL || "";
 
         const normalize = (img) => (img || "").replace(/^\/+/, "");
-        const toUrl = (img) => img.startsWith("http") ? img : `${BASE_URL}/${normalize(img)}`;
+        const toUrl = (img) => {
+          if (!img) return null;
+
+          if (img.startsWith("http")) return img;
+
+          return `${import.meta.env.VITE_ASSETS_BASE_URL}/${img.replace(/^\/+/, "")}`;
+        };
 
         const existing = (p.galleryPhotos || []).map((path) => ({
           path: normalize(path),
