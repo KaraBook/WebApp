@@ -75,34 +75,36 @@ export const getOwnerDashboard = async (req, res) => {
         .map((u) => u._id.toString())
     );
 
-    const isConfirmed = (b) =>
-      b.paymentStatus === "paid" &&
-      b.status === "confirmed" &&
-      b.cancelled !== true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
+    const isRevenueBooking = (b) => {
+      if (b.cancelled === true) return false;
+      if (b.paymentStatus !== "paid") return false;
+      if (b.status !== "confirmed") return false;
+
+      const checkout = new Date(b.checkOut);
+      checkout.setHours(0, 0, 0, 0);
+
+      return checkout < today;
+    };
     const isPending = (b) =>
       b.paymentStatus === "initiated" && b.cancelled !== true;
 
     const isCancelled = (b) =>
       b.status === "cancelled" || b.cancelled === true;
 
-    const confirmedBookings = bookings.filter(isConfirmed);
+    const revenueBookings = bookings.filter(isRevenueBooking);
 
-    const grossRevenue = confirmedBookings.reduce(
+    const netRevenue = revenueBookings.reduce(
       (sum, b) =>
         sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
       0
     );
 
-    const totalRefunds = bookings.reduce(
-      (sum, b) =>
-        sum + Number(b.refundAmount || 0),
-      0
-    );
+    const grossRevenue = netRevenue;
+    const totalRefunds = 0;
 
-    const netRevenue = grossRevenue - totalRefunds;
-
-    /* ------------------ MONTHLY REVENUE ------------------ */
 
     const now = new Date();
     const currentYear = now.getFullYear();
