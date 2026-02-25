@@ -203,18 +203,21 @@ export default function EditProperty() {
 
         const BASE_URL = import.meta.env.VITE_ASSETS_BASE_URL || "";
 
-        const normalize = (img) => (img || "").replace(/^\/+/, "");
+        const toDbPath = (p) => {
+          if (!p) return "";
+          return p.startsWith("/") ? p : `/${p}`;
+        };
         const toUrl = (img) => {
           if (!img) return null;
           if (img.startsWith("http")) return img;
           const BASE = import.meta.env.VITE_ASSETS_BASE_URL;
-          if (!BASE) return img; 
+          if (!BASE) return img;
           return `${BASE.replace(/\/$/, "")}/${img.replace(/^\/+/, "")}`;
         };
 
         const existing = (p.galleryPhotos || []).map((path) => ({
-          path: normalize(path),
-          url: toUrl(path)
+          path: toDbPath(path),
+          url: toUrl(path),
         }));
 
         setExistingGalleryImages(existing);
@@ -323,9 +326,8 @@ export default function EditProperty() {
         fd.append("galleryPhotos", file);
       });
 
-      removedGalleryImages.forEach(img => {
-        const clean = img.replace(/^https?:\/\/[^/]+\//, "");
-        fd.append("removedGalleryImages[]", clean);
+      removedGalleryImages.forEach((p) => {
+        fd.append("removedGalleryImages[]", p);
       });
 
       await api.put(
