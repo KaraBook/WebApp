@@ -380,12 +380,12 @@ export default function Home() {
         <FindByExperience />
       </motion.section>
 
-      <div className="mt-12 md:mt-20 md:mb-20">
+      <div className="mt-12 md:mt-20 md:mb-[50px]">
         <WhyChooseUs />
       </div>
 
    {!featuredLoading && properties.length > 0 && (
-      <section className="w-full bg-white py-8 mt-2 md:mt-0 md:py-20">
+      <section className="w-full bg-white py-8 mt-2 md:mt-0 md:py-0">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col justify-center items-center md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10">
             <div>
