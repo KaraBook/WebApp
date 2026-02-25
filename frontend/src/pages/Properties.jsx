@@ -71,6 +71,9 @@ export default function Properties() {
     if (state) filters.state = state;
     if (city) filters.city = city;
 
+    const amenity = searchParams.get("amenity");
+    if (amenity) filters.amenity = amenity;
+
     const checkIn = searchParams.get("checkIn");
     const checkOut = searchParams.get("checkOut");
 

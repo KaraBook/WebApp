@@ -20,7 +20,7 @@ const EXPERIENCES = [
     title: "Bungalows with Pool",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=70&auto=format",
     icon: Droplets,
-    query: "experience=pool",
+    query: "amenity=pool",
   },
   {
     title: "Hill View Cottages",
@@ -32,7 +32,7 @@ const EXPERIENCES = [
     title: "Pet-Friendly Stays",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=70&auto=format",
     icon: PawPrint,
-    query: "petFriendly=true",
+    query: "amenity=petFriendlyAmenity",
   },
   {
     title: "Farmstays",

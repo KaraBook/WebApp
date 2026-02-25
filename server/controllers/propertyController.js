@@ -981,12 +981,17 @@ export const getPublishedProperties = async (req, res) => {
       sort,
       checkIn,
       checkOut,
+      amenity
     } = req.query;
 
     const filter = {
       isDraft: false,
       publishNow: true,
     };
+
+    if (amenity) {
+      filter.amenities = { $in: [amenity] };
+    }
 
     if (state) filter.state = new RegExp(`^${state}$`, "i");
     if (city) filter.city = new RegExp(`^${city}$`, "i");
