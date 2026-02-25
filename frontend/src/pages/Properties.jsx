@@ -39,9 +39,15 @@ export default function Properties() {
   const fetchProperties = async (filters = {}) => {
     setLoading(true);
 
-    if (filters.guests) {
-      filters.guests = JSON.stringify(filters.guests);
+    const apiParams = { ...filters };
+
+    if (apiParams.guests) {
+      apiParams.guests = JSON.stringify(apiParams.guests);
     }
+
+    const res = await Axios.get(SummaryApi.getPublishedProperties.url, {
+      params: apiParams,
+    });
 
     try {
       const res = await Axios.get(SummaryApi.getPublishedProperties.url, {
@@ -64,6 +70,14 @@ export default function Properties() {
     const city = searchParams.get("city");
     if (state) filters.state = state;
     if (city) filters.city = city;
+
+    const checkIn = searchParams.get("checkIn");
+    const checkOut = searchParams.get("checkOut");
+
+    if (checkIn && checkOut) {
+      filters.checkIn = checkIn;
+      filters.checkOut = checkOut;
+    }
 
     const propertyType = searchParams.get("propertyType");
     const minPrice = searchParams.get("minPrice");
@@ -321,7 +335,13 @@ export default function Properties() {
           if (filters.recommendation === "new") {
             apiFilters.sort = "latest";
           }
-          fetchProperties(apiFilters);
+          const params = new URLSearchParams(searchParams);
+
+          Object.entries(apiFilters).forEach(([k, v]) => {
+            params.set(k, v);
+          });
+
+          navigate(`/properties?${params.toString()}`);
           setShowFilterPopup(false);
         }}
       />

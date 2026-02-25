@@ -8,6 +8,7 @@ import { normalizeMobile } from "../utils/phone.js";
 import { sendMail } from "../utils/mailer.js";
 import { propertyCreatedTemplate, propertyPublishedTemplate } from "../utils/emailTemplates.js";
 import get from "lodash.get";
+import Booking from "../models/Booking.js";
 
 
 const toPublicPath = (filePath) => {
@@ -978,6 +979,8 @@ export const getPublishedProperties = async (req, res) => {
       minPrice,
       maxPrice,
       sort,
+      checkIn,
+      checkOut,
     } = req.query;
 
     const filter = {
@@ -1032,6 +1035,38 @@ export const getPublishedProperties = async (req, res) => {
 
     else if (sort === "latest") {
       sortQuery = { createdAt: -1 };
+    }
+
+    // ================= AVAILABILITY FILTER =================
+
+    if (checkIn && checkOut) {
+      const start = new Date(checkIn);
+      const end = new Date(checkOut);
+
+      const overlappingBookings = await Booking.find({
+        paymentStatus: "paid",
+        checkIn: { $lt: end },
+        checkOut: { $gt: start },
+      }).select("propertyId");
+
+      const bookedIds = overlappingBookings.map((b) => b.propertyId);
+
+      const blockedProperties = await Property.find({
+        blockedDates: {
+          $elemMatch: {
+            start: { $lt: end },
+            end: { $gt: start },
+          },
+        },
+      }).select("_id");
+
+      const blockedIds = blockedProperties.map((p) => p._id);
+
+      const unavailableIds = [...bookedIds, ...blockedIds];
+
+      if (unavailableIds.length > 0) {
+        filter._id = { $nin: unavailableIds };
+      }
     }
 
     const properties = await Property.find(filter).sort(sortQuery);

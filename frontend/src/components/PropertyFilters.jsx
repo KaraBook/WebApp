@@ -43,6 +43,10 @@ export default function PropertyFilters({
     const [isSticky, setIsSticky] = useState(false);
     const STICKY_TOP = 70;
 
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
     useEffect(() => {
         if (!enableStickyGlass) return;
 
@@ -68,14 +72,20 @@ export default function PropertyFilters({
     const [showGuestBox, setShowGuestBox] = useState(false);
     const [showCalendar, setShowCalendar] = useState(false);
 
+    const initialStart = new Date();
+    initialStart.setDate(initialStart.getDate() + 1);
+    initialStart.setHours(0, 0, 0, 0);
+
+    const initialEnd = new Date(initialStart);
+    initialEnd.setDate(initialStart.getDate() + 1);
+
     const [dateRange, setDateRange] = useState([
         {
-            startDate: new Date(),
-            endDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+            startDate: initialStart,
+            endDate: initialEnd,
             key: "selection",
         },
     ]);
-
     useEffect(() => {
         async function loadLocations() {
             try {
@@ -431,7 +441,7 @@ export default function PropertyFilters({
                         <DateRange
                             ranges={dateRange}
                             onChange={(item) => setDateRange([item.selection])}
-                            minDate={new Date()}
+                            minDate={tomorrow}
                             moveRangeOnFirstSelection={false}
                             showSelectionPreview={false}
                             showDateDisplay={false}
@@ -446,7 +456,7 @@ export default function PropertyFilters({
                                 const startDate = dateRange[0].startDate;
                                 const endDate = dateRange[0].endDate;
 
-                                const isPast = date < today;
+                                const isPast = date < tomorrow;
 
                                 const isSelected =
                                     startDate &&

@@ -105,15 +105,6 @@ export function bookingConfirmationTemplate({
 </tr>
 
 <tr>
-  <td style="padding:6px 0;">CGST:</td>
-  <td>${formattedCGST}</td>
-</tr>
-<tr>
-  <td style="padding:6px 0;">SGST:</td>
-  <td>${formattedSGST}</td>
-</tr>
-
-<tr>
   <td style="border-top:1px solid #eee;padding-top:10px">
     <strong>Total Paid</strong>
   </td>
