@@ -91,6 +91,7 @@ export default function OfflineBooking() {
 
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
+  const [pricingPreview, setPricingPreview] = useState(null);
 
   const [traveller, setTraveller] = useState({
     firstName: "",
@@ -138,23 +139,6 @@ export default function OfflineBooking() {
     const diffMs = end - start;
     return Math.round(diffMs / (1000 * 60 * 60 * 24));
   };
-
-  const calculateTotal = () => {
-    let total = 0;
-    let d = normalize(dateRange[0].startDate);
-    const end = normalize(dateRange[0].endDate);
-
-    while (d < end) {
-      const day = d.getDay();
-      const isWeekend = day === 0 || day === 6;
-
-      total += isWeekend ? Number(price.weekend) : Number(price.weekday);
-      d.setDate(d.getDate() + 1);
-    }
-
-    return total;
-  };
-
 
 
   // ---------- EFFECTS ----------
@@ -238,6 +222,57 @@ export default function OfflineBooking() {
 
     loadData();
   }, [propertyId]);
+
+
+  useEffect(() => {
+    if (!propertyId) return;
+
+    const nights = getNights();
+    if (nights <= 0) return;
+
+    const controller = new AbortController();
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await api.post(
+          SummaryApi.ownerPreviewPricing.url,
+          {
+            propertyId,
+            checkIn: formatLocalDateString(dateRange[0].startDate),
+            checkOut: formatLocalDateString(dateRange[0].endDate),
+            guests: {
+              adults: guestCount.adults,
+              children: guestCount.children,
+            },
+            meals: {
+              veg: meals.veg,
+              nonVeg: meals.nonVeg,
+            },
+          },
+          { signal: controller.signal }
+        );
+
+        setPricingPreview(res.data.pricing);
+      } catch (err) {
+        if (err.name !== "CanceledError") {
+          console.log("Pricing preview failed", err);
+        }
+      }
+    }, 350);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [
+    propertyId,
+    dateRange[0].startDate,
+    dateRange[0].endDate,
+    guestCount.adults,
+    guestCount.children,
+    meals.veg,
+    meals.nonVeg,
+  ]);
 
   useEffect(() => {
     const close = (e) => {
@@ -446,8 +481,9 @@ export default function OfflineBooking() {
       return toast.error("Please select a valid date range");
     }
 
-    const totalAmount = calculateTotal();
-    if (totalAmount <= 0) return toast.error("Invalid booking amount");
+    if (!pricingPreview?.grandTotal) {
+      return toast.error("Pricing not ready. Please wait a moment.");
+    }
 
     const checkIn = dateRange[0].startDate;
     const checkOut = dateRange[0].endDate;
@@ -477,15 +513,16 @@ export default function OfflineBooking() {
           adults: guestCount.adults,
           children: guestCount.children,
         },
-        meals,
+        meals: {
+          veg: meals.veg,
+          nonVeg: meals.nonVeg
+        },
       });
 
       const bId = res.data.booking._id;
 
-      // 2) Create Razorpay order
       const orderRes = await api.post(SummaryApi.ownerCreateOrder.url, {
-        bookingId: bId,
-        amount: totalAmount,
+        bookingId: bId
       });
 
       const { order } = orderRes.data;
@@ -832,7 +869,7 @@ export default function OfflineBooking() {
 
                 <Card className="border border-gray-200">
 
-                  <CardContent className="pt-2 space-y-3">
+                  <CardContent className="pt-1 space-y-3">
 
                     <div className="flex items-center justify-between mb-1">
                       <h1 className="text-[20px] font-semibold text-black">
@@ -903,10 +940,76 @@ export default function OfflineBooking() {
 
                 {/* Total */}
                 <div>
-                  <Label>Total Price</Label>
-                  <div className="border rounded-lg p-2 mt-1 bg-gray-50">
-                    ₹{calculateTotal().toLocaleString()}
-                  </div>
+                  {pricingPreview && (
+                    <div className="mt-4 space-y-2 text-sm border-t pt-3">
+
+                      {/* Room Charges */}
+                      <div className="font-semibold">Room Charges</div>
+
+                      {pricingPreview.room.weekdayNights > 0 && (
+                        <div className="flex justify-between">
+                          <span>
+                            Weekday ({pricingPreview.room.weekdayNights} × ₹{pricingPreview.room.weekdayRate})
+                          </span>
+                          <span>₹{pricingPreview.room.roomWeekdayAmount.toLocaleString()}</span>
+                        </div>
+                      )}
+
+                      {pricingPreview.room.weekendNights > 0 && (
+                        <div className="flex justify-between">
+                          <span>
+                            Weekend ({pricingPreview.room.weekendNights} × ₹{pricingPreview.room.weekendRate})
+                          </span>
+                          <span>₹{pricingPreview.room.roomWeekendAmount.toLocaleString()}</span>
+                        </div>
+                      )}
+
+                      {/* Extra Guests */}
+                      {(pricingPreview.extraGuests.extraAdults > 0 ||
+                        pricingPreview.extraGuests.extraChildren > 0) && (
+                          <>
+                            <div className="font-semibold mt-2">Extra Guest Charges</div>
+
+                            {pricingPreview.extraGuests.extraAdults > 0 && (
+                              <div className="flex justify-between">
+                                <span>
+                                  Adults ({pricingPreview.extraGuests.extraAdults} × ₹{pricingPreview.extraGuests.extraAdultRate} × {pricingPreview.totalNights} nights)
+                                </span>
+                                <span>₹{pricingPreview.extraGuests.extraAdultAmount.toLocaleString()}</span>
+                              </div>
+                            )}
+
+                            {pricingPreview.extraGuests.extraChildren > 0 && (
+                              <div className="flex justify-between">
+                                <span>
+                                  Children ({pricingPreview.extraGuests.extraChildren} × ₹{pricingPreview.extraGuests.extraChildRate} × {pricingPreview.totalNights} nights)
+                                </span>
+                                <span>₹{pricingPreview.extraGuests.extraChildAmount.toLocaleString()}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                      {/* GST */}
+                      {pricingPreview.tax > 0 && (
+                        <>
+                          <div className="flex justify-between mt-2">
+                            <span>CGST</span>
+                            <span>₹{pricingPreview.cgst.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>SGST</span>
+                            <span>₹{pricingPreview.sgst.toLocaleString()}</span>
+                          </div>
+                        </>
+                      )}
+
+                      <div className="flex justify-between font-semibold border-t pt-2 mt-2">
+                        <span>Total Payable</span>
+                        <span>₹{pricingPreview.grandTotal.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {guestRules.baseGuests > 0 && (

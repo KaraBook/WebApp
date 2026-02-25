@@ -138,6 +138,10 @@ const SummaryApi = {
         url: (id) => `${BASE_URL}/api/owner/bookings/cancel/${id}`,
         method: "POST",
     },
+    ownerPreviewPricing: {
+        url: `${BASE_URL}/api/owner/pricing-preview`,
+        method: "POST",
+    },
 
 };
 

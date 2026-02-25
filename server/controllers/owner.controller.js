@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { normalizeMobile } from "../utils/phone.js";
 import Razorpay from "razorpay";
 import { getEffectiveOwnerId } from "../utils/getEffectiveOwner.js";
+import { computePricing } from "../utils/pricing.js";
 
 
 const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
@@ -815,43 +816,6 @@ export const createOfflineBooking = async (req, res) => {
       }
     }
 
-    let totalAmount = 0;
-    let cursor = new Date(start);
-
-    while (cursor < end) {
-      const day = cursor.getDay();
-      const isWeekend = day === 0 || day === 6;
-
-      let nightlyBase = isWeekend
-        ? Number(property.pricingPerNightWeekend)
-        : Number(property.pricingPerNightWeekdays);
-
-      if (!nightlyBase || nightlyBase <= 0) {
-        return res.status(400).json({
-          success: false,
-          message: "Property pricing not configured",
-        });
-      }
-
-      const baseGuests = Number(property.baseGuests || 0);
-      const extraAdultCharge = Number(property.extraAdultCharge || 0);
-      const extraChildCharge = Number(property.extraChildCharge || 0);
-
-      const baseUsedByAdults = Math.min(adults, baseGuests);
-      const remainingBaseSlots = Math.max(0, baseGuests - baseUsedByAdults);
-
-      const extraAdults = Math.max(0, adults - baseGuests);
-      const extraChildren = Math.max(0, children - remainingBaseSlots);
-
-      nightlyBase +=
-        extraAdults * extraAdultCharge +
-        extraChildren * extraChildCharge;
-
-      totalAmount += nightlyBase;
-
-      cursor.setDate(cursor.getDate() + 1);
-    }
-
     if (!totalAmount || totalAmount <= 0) {
       return res.status(400).json({
         success: false,
@@ -863,6 +827,34 @@ export const createOfflineBooking = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid traveller mobile number",
+      });
+    }
+
+    const pricing = computePricing(
+      {
+        checkIn,
+        checkOut,
+        guests: { adults, children },
+        meals: meals?.includeMeals
+          ? { veg: meals.veg || 0, nonVeg: meals.nonVeg || 0 }
+          : { veg: 0, nonVeg: 0 },
+        totalNights
+      },
+      property
+    );
+
+    const {
+      subtotal,
+      tax,
+      cgst,
+      sgst,
+      grandTotal
+    } = pricing;
+
+    if (!grandTotal || grandTotal <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid booking amount",
       });
     }
 
@@ -937,7 +929,11 @@ export const createOfflineBooking = async (req, res) => {
         }
         : { includeMeals: false },
       totalNights,
-      totalAmount,
+      totalAmount: subtotal,
+      taxAmount: tax,
+      cgstAmount: cgst,
+      sgstAmount: sgst,
+      grandTotal,
       bookedBy: ownerId,
       isOffline: true,
       paymentMethod: "razorpay",

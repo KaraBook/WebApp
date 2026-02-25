@@ -18,7 +18,7 @@ import {
   getOwnerBookedUsers,
   ownerCancelBooking
 } from "../controllers/owner.controller.js";
-import { getBookingInvoice } from "../controllers/bookingController.js";
+import { getBookingInvoice, previewPricing } from "../controllers/bookingController.js";
 import { createManager } from "../controllers/managerController.js";
 import upload from "../middlewares/multer.js";
 
@@ -49,6 +49,7 @@ router.post("/check-owner-mobile", requireAuth, checkOwnerByMobile);
 router.get("/property/:id/booked-dates", requireAuth, getBookedDates);
 router.post("/offline-booking/create-order", requireAuth, createRazorpayOrder);
 router.get("/booked-users", requireAuth, getOwnerBookedUsers);
+router.post("/pricing-preview", requireAuth, previewPricing);
 router.post("/offline-booking/verify", requireAuth, verifyRazorpayPayment);
 router.post("/manager/create", requireAuth, createManager);
 
