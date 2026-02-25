@@ -318,17 +318,13 @@ export default function EditProperty() {
       });
 
       removedGalleryImages.forEach(img => {
-        fd.append("removedGalleryImages[]", img);
+        const clean = img.replace(/^https?:\/\/[^/]+\//, "");
+        fd.append("removedGalleryImages[]", clean);
       });
 
       await api.put(
         SummaryApi.updateOwnerProperty(id).url,
-        fd,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        }
+        fd
       );
 
       toast.success("Property updated successfully");

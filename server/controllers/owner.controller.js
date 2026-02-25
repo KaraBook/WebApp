@@ -347,6 +347,20 @@ export const updateOwnerProperty = async (req, res) => {
     ];
 
     const body = req.body;
+
+    const parseJSON = (val, fallback) => {
+      try {
+        if (typeof val === "string") return JSON.parse(val);
+        return val ?? fallback;
+      } catch {
+        return fallback;
+      }
+    };
+
+    body.roomBreakdown = parseJSON(body.roomBreakdown, {});
+    body.amenities = parseJSON(body.amenities, []);
+    body.foodAvailability = parseJSON(body.foodAvailability, []);
+    body.cancellationPolicy = parseJSON(body.cancellationPolicy, []);
     const updatedData = {};
 
     allowedFields.forEach((field) => {
