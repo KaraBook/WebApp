@@ -37,7 +37,6 @@ const normalize = (date) => {
   return d;
 };
 
-// 👉 IMPORTANT: LOCAL DATE STRING (no toISOString – avoids -1 day bug in IST)
 const formatLocalDateString = (date) => {
   const d = new Date(date);
   return [
@@ -57,6 +56,7 @@ export default function OfflineBooking() {
   const [cities, setCities] = useState([]);
   const [selectedStateCode, setSelectedStateCode] = useState("");
   const [foodPreference, setFoodPreference] = useState("veg");
+  const [foodAvailability, setFoodAvailability] = useState([]);
 
   const [disabledDays, setDisabledDays] = useState([]);
   const [guestCount, setGuestCount] = useState({
@@ -103,6 +103,11 @@ export default function OfflineBooking() {
     state: "",
     city: "",
   });
+
+
+  const hasLunchOrDinner =
+    foodAvailability.includes("lunch") ||
+    foodAvailability.includes("dinner");
 
   const [dateRange, setDateRange] = useState([
     {
@@ -186,6 +191,8 @@ export default function OfflineBooking() {
             extraAdultCharge: Number(prop.extraAdultCharge || 0),
             extraChildCharge: Number(prop.extraChildCharge || 0),
           });
+
+          setFoodAvailability(prop.foodAvailability || []);
         }
 
         const blockedRes = await api.get(
@@ -263,7 +270,6 @@ export default function OfflineBooking() {
     ]);
   };
 
-  // ---------- FORM HANDLERS ----------
 
   const handleChange = (key, val) => {
     setTraveller((prev) => ({ ...prev, [key]: val }));
@@ -395,7 +401,7 @@ export default function OfflineBooking() {
       const totalMeals = next.veg + next.nonVeg;
       const totalGuests = guestCount.adults + guestCount.children;
       if (totalMeals > totalGuests) {
-        toast.error(`Meals cannot exceed ${totalGuests} guests`);
+        toast.error("Meal guests cannot exceed total guests");
         return m;
       }
       return next;
@@ -434,11 +440,9 @@ export default function OfflineBooking() {
     const checkIn = dateRange[0].startDate;
     const checkOut = dateRange[0].endDate;
 
-    // LOCAL YYYY-MM-DD (no timezone shift)
     const checkInStr = formatLocalDateString(checkIn);
     const checkOutStr = formatLocalDateString(checkOut);
 
-    // Debug log – mirrors backend computation context
     console.log("📘 OFFLINE BOOKING DEBUG", {
       rawStart: checkIn,
       rawEnd: checkOut,
@@ -452,7 +456,6 @@ export default function OfflineBooking() {
     setLoading(true);
 
     try {
-      // 1) Create offline booking (server will recompute and validate price)
       const res = await api.post(SummaryApi.ownerOfflineBooking.url, {
         traveller,
         propertyId,
@@ -822,22 +825,26 @@ export default function OfflineBooking() {
                     </CardTitle>
                   </CardHeader>
 
-                  <CardContent className="pt-1 space-y-3">
-                    {/* Include Meals */}
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={meals.includeMeals}
-                        onChange={(e) =>
-                          setMeals((m) => ({ ...m, includeMeals: e.target.checked }))
-                        }
-                      />
-                      Include Meals
-                    </label>
+                  <CardContent className="pt-2 space-y-3">
 
-                    {meals.includeMeals && (
+                    {/* Complimentary Breakfast */}
+                    <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                      <span className="text-sm font-medium text-green-800">
+                        Breakfast
+                      </span>
+                      <span className="text-xs font-semibold text-green-700">
+                        Complimentary
+                      </span>
+                    </div>
+
+                    {/* Show counters ONLY if lunch/dinner available */}
+                    {hasLunchOrDinner && (
                       <>
-                        {/* Veg */}
+                        <div className="text-xs text-gray-500">
+                          Select meal preference for guests
+                        </div>
+
+                        {/* Veg Counter */}
                         <div className="flex items-center justify-between">
                           <span>Veg Guests</span>
                           <div className="flex items-center gap-3">
@@ -851,7 +858,7 @@ export default function OfflineBooking() {
                           </div>
                         </div>
 
-                        {/* Non Veg */}
+                        {/* Non Veg Counter */}
                         <div className="flex items-center justify-between">
                           <span>Non-Veg Guests</span>
                           <div className="flex items-center gap-3">
@@ -866,11 +873,11 @@ export default function OfflineBooking() {
                         </div>
 
                         <p className="text-xs text-gray-500">
-                          Total meals selected: {meals.veg + meals.nonVeg} /{" "}
-                          {guestCount.adults + guestCount.children}
+                          {meals.veg + meals.nonVeg} of {guestCount.adults + guestCount.children} guests selected
                         </p>
                       </>
                     )}
+
                   </CardContent>
                 </Card>
 

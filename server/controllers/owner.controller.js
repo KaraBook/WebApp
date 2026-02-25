@@ -803,14 +803,14 @@ export const createOfflineBooking = async (req, res) => {
       });
     }
 
-    if (meals?.includeMeals) {
+    if (meals) {
       const veg = Number(meals.veg || 0);
       const nonVeg = Number(meals.nonVeg || 0);
 
-      if (veg + nonVeg !== totalGuests) {
+      if (veg + nonVeg > totalGuests) {
         return res.status(400).json({
           success: false,
-          message: "Meal count must match total guests",
+          message: "Meal guests cannot exceed total guests",
         });
       }
     }
