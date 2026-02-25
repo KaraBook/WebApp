@@ -202,6 +202,7 @@ export default function EditProperty() {
 
         setCoverImagePreview(p.coverImage || null);
         setShopActPreview(p.shopAct || null);
+        setExistingGalleryImages(p.galleryPhotos || []);
         setGalleryImagePreviews(p.galleryPhotos || []);
         setPropertyName(p.propertyName || "");
       } catch {
@@ -229,8 +230,13 @@ export default function EditProperty() {
   };
 
   const save = async () => {
-
     const descLength = form.description.trim().length;
+
+    const finalGalleryCount =
+      (existingGalleryImages.length - removedGalleryImages.length) +
+      galleryImageFiles.length;
+
+    const hasExistingCover = !!coverImagePreview;
 
     if (descLength < 30) {
       toast.error("Property description must be at least 30 characters");
@@ -238,52 +244,83 @@ export default function EditProperty() {
       return;
     }
 
-    if (descLength > 1000) {
-      toast.error("Property description cannot exceed 1000 characters");
+    if (!form.food || form.food.length === 0) {
+      toast.error("Please select at least one food option");
       setTab("details");
       return;
     }
 
-    if (!form.food || form.food.length === 0) {
-      toast.error("Please select at least one food option (Breakfast, Lunch, or Dinner)");
-      setTab("details");
+    if (!hasExistingCover && !coverImageFile) {
+      toast.error("Please upload a cover image.");
+      setTab("media");
       return;
     }
+
+    if (finalGalleryCount < 3) {
+      toast.error("At least 3 gallery photos are required.");
+      setTab("media");
+      return;
+    }
+
+
     try {
       setLoading(true);
 
-      const payload = {
-        ...form,
-        checkInTime: form.checkIn,
-        checkOutTime: form.checkOut,
-        pricingPerNightWeekdays: form.weekday,
-        pricingPerNightWeekend: form.weekend,
-        extraAdultCharge: form.extraAdult,
-        extraChildCharge: form.extraChild,
-        roomBreakdown: form.room,
-        foodAvailability: form.food,
-        bedrooms: form.bedrooms,
-        bathrooms: form.bathrooms,
-        isRefundable: form.isRefundable,
-        refundNotes: form.refundNotes,
-        cancellationPolicy: form.cancellationPolicy,
-      };
+      const fd = new FormData();
 
-      delete payload.checkIn;
-      delete payload.checkOut;
-      delete payload.weekday;
-      delete payload.weekend;
-      delete payload.extraAdult;
-      delete payload.extraChild;
-      delete payload.room;
-      delete payload.food;
+      fd.append("description", form.description);
+      fd.append("maxGuests", form.maxGuests);
+      fd.append("baseGuests", form.baseGuests);
+      fd.append("pricingPerNightWeekdays", form.weekday);
+      fd.append("pricingPerNightWeekend", form.weekend);
+      fd.append("extraAdultCharge", form.extraAdult);
+      fd.append("extraChildCharge", form.extraChild);
+      fd.append("checkInTime", form.checkIn);
+      fd.append("checkOutTime", form.checkOut);
+      fd.append("minStayNights", form.minStayNights);
+      fd.append("bedrooms", form.bedrooms);
+      fd.append("bathrooms", form.bathrooms);
 
-      await api.put(SummaryApi.updateOwnerProperty(id).url, payload);
+      fd.append("isRefundable", form.isRefundable);
+      fd.append("refundNotes", form.refundNotes);
 
-      toast.success("Saved");
+      fd.append("roomBreakdown", JSON.stringify(form.room));
+      fd.append("amenities", JSON.stringify(form.amenities));
+      fd.append("foodAvailability", JSON.stringify(form.food));
+      fd.append("cancellationPolicy", JSON.stringify(form.cancellationPolicy));
+
+      if (coverImageFile) {
+        fd.append("coverImage", coverImageFile);
+      }
+
+      if (shopActFile) {
+        fd.append("shopAct", shopActFile);
+      }
+
+      galleryImageFiles.forEach(file => {
+        fd.append("galleryPhotos", file);
+      });
+
+      removedGalleryImages.forEach(img => {
+        fd.append("removedGalleryImages[]", img);
+      });
+
+      await api.put(
+        SummaryApi.updateOwnerProperty(id).url,
+        fd,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      toast.success("Property updated successfully");
       navigate(-1);
-    } catch {
-      toast.error("Failed");
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update property");
     } finally {
       setLoading(false);
     }
@@ -711,6 +748,26 @@ export default function EditProperty() {
                     type="file"
                     className="hidden"
                     id="coverUpload"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      if (!file.type.startsWith("image/")) {
+                        toast.error("Cover must be an image file");
+                        return;
+                      }
+
+                      if (file.size > 5 * 1024 * 1024) {
+                        toast.error("Cover image must be less than 5MB");
+                        return;
+                      }
+
+                      setCoverImageFile(file);
+                      setCoverImagePreview(URL.createObjectURL(file));
+
+                      toast.success("New cover selected. Click Save to update.");
+                    }}
                   />
                   <Button
                     variant="outline"
@@ -730,16 +787,45 @@ export default function EditProperty() {
 
                   <div className="rounded-xl border overflow-hidden h-48 bg-gray-100 flex items-center justify-center">
                     {shopActPreview ? (
-                      <img
-                        src={shopActPreview}
-                        className="w-full h-full object-cover"
-                      />
+                      shopActPreview.endsWith(".pdf") ? (
+                        <div className="flex flex-col items-center text-gray-600">
+                          <FileText size={40} />
+                          <p className="text-sm mt-2">PDF Document</p>
+                        </div>
+                      ) : (
+                        <img src={shopActPreview} className="w-full h-full object-cover" />
+                      )
                     ) : (
                       <span className="text-gray-400">No document uploaded</span>
                     )}
                   </div>
 
-                  <input type="file" className="hidden" id="shopActUpload" />
+                  <input
+                    type="file"
+                    className="hidden"
+                    id="shopActUpload"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      const allowed = ["image/jpeg", "image/png", "image/jpg", "application/pdf"];
+
+                      if (!allowed.includes(file.type)) {
+                        toast.error("Only JPG, PNG or PDF allowed");
+                        return;
+                      }
+
+                      if (file.size > 8 * 1024 * 1024) {
+                        toast.error("File must be less than 8MB");
+                        return;
+                      }
+
+                      setShopActFile(file);
+                      setShopActPreview(URL.createObjectURL(file));
+                      toast.success("New document selected. Click Save to update.");
+                    }}
+                  />
                   <Button
                     variant="outline"
                     className="mt-3"
@@ -778,17 +864,32 @@ export default function EditProperty() {
                 />
 
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  {galleryImagePreviews.map((img, i) => (
-                    <div
-                      key={i}
-                      className="h-28 rounded-xl overflow-hidden border"
-                    >
-                      <img
-                        src={img}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  ))}
+                  {galleryImagePreviews.map((img, i) => {
+                    const isExisting = existingGalleryImages.includes(img);
+
+                    return (
+                      <div key={i} className="relative h-28 rounded-xl overflow-hidden border">
+                        <img src={img} className="w-full h-full object-cover" />
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setGalleryImagePreviews(prev => prev.filter((_, idx) => idx !== i));
+
+                            setGalleryImageFiles(prev => prev.filter((_, idx) => idx !== i));
+
+                            if (isExisting) {
+                              setRemovedGalleryImages(prev => [...prev, img]);
+                              setExistingGalleryImages(prev => prev.filter(p => p !== img));
+                            }
+                          }}
+                          className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    );
+                  })}
 
                   {/* ADD MORE */}
                   <div
