@@ -64,8 +64,7 @@ export default function OwnerUsers() {
 
             const matchesRole =
                 roleFilter === "all" ||
-                (roleFilter === "traveller" && role === "traveller") ||
-                (roleFilter === "manager" && role === "manager");
+                roleFilter === role;
 
             return matchesSearch && matchesRole;
         });
@@ -98,6 +97,7 @@ export default function OwnerUsers() {
     const getRoleLabel = (role) => ({
         traveller: "Traveller",
         manager: "Manager",
+        owner: "Owner",
     }[role] || "Traveller");
 
     return (

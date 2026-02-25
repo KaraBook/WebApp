@@ -13,13 +13,27 @@ const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
 const ALLOWED_BOOKING_USER_ROLES = ["traveller"];
 
-const getRelationshipRole = (user, ownerId, booking = null) => {
+const getRelationshipRole = (user, ownerId) => {
+  if (!user) return "traveller";
+
   const roles = getRoles(user);
 
-  if (roles.includes("manager") && String(user.createdBy) === String(ownerId)) {
+  if (String(user._id) === String(ownerId)) {
+    return "owner";
+  }
+
+  if (
+    roles.includes("manager") &&
+    user.createdBy &&
+    String(user.createdBy) === String(ownerId)
+  ) {
     return "manager";
   }
-  if (booking) {
+
+  if (roles.includes("resortOwner")) {
+    return "traveller";
+  }
+  if (roles.includes("manager")) {
     return "traveller";
   }
 
@@ -63,17 +77,13 @@ export const getOwnerDashboard = async (req, res) => {
 
     const validUserRoles = ["traveller", "manager"];
 
-    const uniqueUserIds = new Set(
-      bookings
-        .map((b) => b.userId)
-        .filter((u) => {
-          if (!u) return false;
-          if (u._id.toString() === ownerId.toString()) return false;
-          const roles = getRoles(u);
-          return roles.some((r) => ["traveller", "manager"].includes(r));
-        })
-        .map((u) => u._id.toString())
-    );
+    const uniqueUserIds = new Set();
+
+    bookings.forEach((b) => {
+      if (b.userId && b.userId._id) {
+        uniqueUserIds.add(b.userId._id.toString());
+      }
+    });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1071,11 +1081,11 @@ export const getOwnerBookedUsers = async (req, res) => {
     bookings.forEach((b) => {
       if (!b.userId) return;
 
-      if (!hasRole(b.userId, "traveller")) return;
+      if (!b.userId) return;
 
       const uid = b.userId._id.toString();
 
-      const relationshipRole = getRelationshipRole(b.userId, ownerId, b);
+      const relationshipRole = getRelationshipRole(b.userId, ownerId);
 
       usersMap[uid] = {
         userId: b.userId._id,
