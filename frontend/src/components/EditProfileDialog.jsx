@@ -184,19 +184,22 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
 
     const handleSave = async () => {
-
         const error = validateForm();
-        if (error) {
-            toast.error(error);
-            return;
-        }
+        if (error) return toast.error(error);
 
         try {
             setSaving(true);
-            const res = await Axios.put(
-                SummaryApi.updateTravellerProfile.url,
-                form
-            );
+
+            const payload = {
+                ...form,
+                email: form.email.trim().toLowerCase(),
+                dateOfBirth: form.dateOfBirth
+                    ? new Date(form.dateOfBirth).toISOString().slice(0, 10)
+                    : "",
+            };
+
+            const res = await Axios.put(SummaryApi.updateTravellerProfile.url, payload);
+
             toast.success("Profile updated successfully");
             onUpdated(res.data.user);
             onClose();

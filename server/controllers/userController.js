@@ -374,33 +374,50 @@ export const updateTravellerMobile = async (req, res) => {
 
 
 export const updateTravellerProfile = async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (!user) return res.status(404).json({ message: "User not found" });
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-  const {
-    firstName,
-    lastName,
-    email,
-    dateOfBirth,
-    address,
-    city,
-    state,
-    pinCode
-  } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      dateOfBirth,
+      address,
+      city,
+      state,
+      pinCode
+    } = req.body;
 
-  user.firstName = firstName;
-  user.lastName = lastName;
-  user.name = `${firstName} ${lastName}`;
-  user.email = email;
-  user.dateOfBirth = dateOfBirth;
-  user.address = address;
-  user.city = city;
-  user.state = state;
-  user.pinCode = pinCode;
+    const parsedDOB = new Date(dateOfBirth);
 
-  await user.save();
+    if (isNaN(parsedDOB.getTime())) {
+      return res.status(400).json({
+        message: "Invalid date format. Use YYYY-MM-DD",
+      });
+    }
 
-  res.json({ user });
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.name = `${firstName} ${lastName}`.trim();
+    user.email = email.toLowerCase().trim();
+    user.dateOfBirth = parsedDOB;
+    user.address = address;
+    user.city = city;
+    user.state = state;
+    user.pinCode = pinCode;
+
+    await user.save();
+
+    res.json({
+      message: "Profile updated successfully",
+      user: publicUser(user),
+    });
+
+  } catch (err) {
+    console.error("Traveller profile update error:", err);
+    res.status(500).json({ message: "Failed to update profile" });
+  }
 };
 
 
@@ -452,7 +469,7 @@ export const resortOwnerLogin = async (req, res) => {
 
 
     const property = await Property.findOne({
-      ownerUserId: ownerId, 
+      ownerUserId: ownerId,
     }).select("isDraft status propertyName");
 
     if (!property) {
@@ -493,8 +510,8 @@ export const resortOwnerLogin = async (req, res) => {
       roles.includes("manager")
         ? "manager"
         : roles.includes("resortOwner")
-        ? "resortOwner"
-        : "admin";
+          ? "resortOwner"
+          : "admin";
 
     const tokens = issueTokens(user, activeRole);
 
