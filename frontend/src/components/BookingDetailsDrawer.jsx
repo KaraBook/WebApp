@@ -90,7 +90,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
 
                 <DrawerContent className="h-[65vh] rounded-t-2xl">
                     <Header
-                        userName={userName}
+                        bookingId={booking?._id}
                         createdAt={createdAt}
                         uiStatus={uiStatus}
                         formatDate={formatDate}
@@ -138,7 +138,7 @@ ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
                 className={`
 fixed z-[9999999]
 left-1/2 top-1/2
-w-[38vw] max-w-[620px]
+w-[480px] max-w-[620px]
 max-h-[90vh]
 bg-white rounded-2xl shadow-2xl
 transition-all duration-300
@@ -151,7 +151,7 @@ ${open
             >
                 <div className="flex flex-col max-h-[90vh]">
                     <Header
-                        userName={userName}
+                        bookingId={booking?._id}
                         createdAt={createdAt}
                         uiStatus={uiStatus}
                         formatDate={formatDate}
@@ -182,40 +182,65 @@ ${open
     );
 }
 
-/* ================= SHARED UI (SAME AS OWNER) ================= */
 
-function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
+function Header({ bookingId, createdAt, uiStatus, formatDate, onClose }) {
+
+    const shortId = bookingId
+        ? bookingId.toString().slice(-6).toUpperCase()
+        : "—";
+
+    const statusStyle =
+        uiStatus === "confirmed"
+            ? "bg-emerald-100 text-emerald-700"
+            : uiStatus === "cancelled"
+            ? "bg-gray-100 text-gray-600"
+            : "bg-yellow-100 text-yellow-700";
+
     return (
-        <div className="px-4 py-4 border-b relative">
-            <h2 className="text-[17px] font-semibold">{userName}</h2>
+        <div className="border-b">
 
-            <div className="flex items-center justify-between mt-1">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            {/* TOP ROW */}
+            <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+                <h2 className="text-[18px] font-semibold">
+                    Booking Details
+                </h2>
+
+                <button
+                    onClick={onClose}
+                    className="p-2 rounded-md text-gray-500 hover:bg-gray-100 transition"
+                >
+                    <X size={18} />
+                </button>
+            </div>
+
+            {/* META ROW */}
+            <div className="px-5 pb-4 flex items-center flex-wrap gap-2 text-sm text-muted-foreground">
+
+                <div className="flex items-center gap-2">
                     <Clock size={14} />
-                    Booking created on {formatDate(createdAt)}
+                    <span>
+                        Booking created on{" "}
+                        <b className="text-gray-800">
+                            {formatDate(createdAt)}
+                        </b>
+                    </span>
                 </div>
 
+                <span className="text-gray-300">•</span>
+
+                <span>
+                    #KB-<b className="text-gray-800">{shortId}</b>
+                </span>
+
+                <span className="text-gray-300">|</span>
+
                 <span
-                    className={`
-px-3 py-1 rounded-full text-xs font-medium capitalize
-${uiStatus === "confirmed"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : uiStatus === "cancelled"
-                                ? "bg-gray-100 text-gray-600"
-                                : "bg-yellow-100 text-yellow-700"
-                        }
-`}
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${statusStyle}`}
                 >
                     {uiStatus}
                 </span>
-            </div>
 
-            <button
-                onClick={onClose}
-                className="absolute top-2 right-3 p-2 rounded-md text-gray-500 hover:bg-gray-100"
-            >
-                <span>X</span>
-            </button>
+            </div>
         </div>
     );
 }
