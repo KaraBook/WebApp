@@ -10,17 +10,17 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     );
 
     useEffect(() => {
-    if (!open) {
-      document.body.style.overflow = "";
-      return;
-    }
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+        if (!open) {
+            document.body.style.overflow = "";
+            return;
+        }
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [open]);
 
-  if (!open || !booking) return null;
+    if (!open || !booking) return null;
 
     const {
         createdAt,
@@ -127,21 +127,29 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     onClose();
                 }}
                 className={`
-fixed inset-0 z-[9999999]
-bg-black/40 backdrop-blur-sm
+fixed inset-0 z-[9999998]
+bg-black/50 backdrop-blur-[2px]
+transition-opacity duration-300
 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
 `}
             />
 
             <div
                 className={`
-fixed z-[9999999] top-0 right-0 h-full w-[420px]
-bg-white shadow-2xl
-transition-transform duration-300
-${open ? "translate-x-0" : "translate-x-full"}
+fixed z-[9999999]
+left-1/2 top-1/2
+w-[95vw] max-w-[620px]
+max-h-[90vh]
+bg-white rounded-2xl shadow-2xl
+transition-all duration-300
+overflow-hidden
+${open
+                        ? "opacity-100 scale-100 -translate-x-1/2 -translate-y-1/2"
+                        : "opacity-0 scale-95 -translate-x-1/2 -translate-y-[40%] pointer-events-none"
+                    }
 `}
             >
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col max-h-[90vh]">
                     <Header
                         userName={userName}
                         createdAt={createdAt}
@@ -150,7 +158,7 @@ ${open ? "translate-x-0" : "translate-x-full"}
                         onClose={onClose}
                     />
 
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto p-1">
                         <Body
                             propertyName={property?.propertyName}
                             checkIn={checkIn}
