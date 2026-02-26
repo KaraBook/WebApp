@@ -138,7 +138,7 @@ ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
                 className={`
 fixed z-[9999999]
 left-1/2 top-1/2
-w-[65vw] max-w-[620px]
+w-[38vw] max-w-[620px]
 max-h-[90vh]
 bg-white rounded-2xl shadow-2xl
 transition-all duration-300
