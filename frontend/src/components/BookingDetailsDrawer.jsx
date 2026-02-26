@@ -127,7 +127,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     onClose();
                 }}
                 className={`
-fixed inset-0 z-[9999998]
+fixed inset-0 z-[9999999]
 bg-black/50 backdrop-blur-[2px]
 transition-opacity duration-300
 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
@@ -138,7 +138,7 @@ ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
                 className={`
 fixed z-[9999999]
 left-1/2 top-1/2
-w-[95vw] max-w-[620px]
+w-[65vw] max-w-[620px]
 max-h-[90vh]
 bg-white rounded-2xl shadow-2xl
 transition-all duration-300
