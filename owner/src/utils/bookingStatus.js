@@ -26,9 +26,9 @@ export function getBookingStatus(b) {
             today.setHours(0, 0, 0, 0);
 
             const checkout = new Date(b.checkOut);
-            checkout.setHours(23, 59, 59, 999);
+            checkout.setHours(0, 0, 0, 0);
 
-            if (checkout <= today) {
+            if (today > checkout) {
                 return BOOKING_STATUS.COMPLETED;
             }
         }
