@@ -3,24 +3,17 @@ export function getBookingStatus(b) {
 
   if (b.cancelled === true) return "cancelled";
 
-  const razorpaySuccess =
-    b.paymentStatus === "captured" ||   
-    b.paymentStatus === "paid" ||
-    b.paymentStatus === "success" ||
-    b.status === "confirmed" ||
-    b.status === "paid" ||
-    !!b.paymentId ||
-    !!b.razorpay_payment_id;
+  const isConfirmed =
+    b.paymentStatus === "paid" &&
+    b.status === "confirmed";
 
-  if (razorpaySuccess) {
-    if (b.checkOut && new Date(b.checkOut) < new Date()) {
-      return "completed";
-    }
+  if (!isConfirmed) return "pending";
 
-    return "confirmed";
+  if (b.checkOut && new Date(b.checkOut) < new Date()) {
+    return "completed";
   }
 
-  return "pending";
+  return "confirmed";
 }
 
 

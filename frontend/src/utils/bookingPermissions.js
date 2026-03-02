@@ -3,11 +3,11 @@ export function isCancelled(b) {
 }
 
 export function isPaid(b) {
+  if (!b) return false;
+
   return (
-    b?.paymentStatus === "paid" ||
-    b?.status === "paid" ||
-    b?.status === "confirmed" ||
-    !!b?.paymentId
+    b.paymentStatus === "paid" &&
+    b.status === "confirmed"
   );
 }
 
