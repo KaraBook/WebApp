@@ -86,10 +86,15 @@ export const getOwnerDashboard = async (req, res) => {
     const isCompleted = (b) => {
       if (b.cancelled === true) return false;
 
+      if (!b.checkOut) return false;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
       const checkout = new Date(b.checkOut);
       checkout.setHours(0, 0, 0, 0);
 
-      return checkout < today;
+      return today > checkout;
     };
 
     const today = new Date();

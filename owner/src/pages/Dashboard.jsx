@@ -403,12 +403,12 @@ export default function Dashboard() {
           />
 
           <StatCard
-            icon={Clock}
-            label="Pending"
-            value={stats?.pending}
-            caption="Awaiting"
-            variant="warning"
-            onClick={() => navigate("/bookings?time=all&status=pending")}
+            icon={CalendarCheck}
+            label="Completed"
+            value={stats?.completed}
+            caption="Guests checked-out"
+            variant="default"
+            onClick={() => navigate("/bookings?time=past&status=completed")}
           />
 
           <StatCard
