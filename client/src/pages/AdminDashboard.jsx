@@ -36,13 +36,17 @@ const DashboardPage = () => {
   const getMonthRevenue = (bookings, year, month) => {
     return bookings
       .filter((b) => {
-        if (!isConfirmedBooking(b)) return false;
+        if (b.paymentStatus !== "paid") return false;
+        if (b.cancelled) return false;
 
         const d = new Date(b.createdAt);
         return d.getFullYear() === year && d.getMonth() === month;
       })
       .reduce((sum, b) => {
-        return sum + getNetAmount(b);
+        const amount = b.grandTotal || b.totalAmount || 0;
+        const refund = b.refundAmount || 0;
+
+        return sum + (amount - refund);
       }, 0);
   };
 
@@ -72,16 +76,14 @@ const DashboardPage = () => {
       );
 
 
-      const grossRevenue = bookings
-        .filter(isConfirmedBooking)
-        .reduce((sum, b) => sum + (b.grandTotal || b.totalAmount || 0), 0);
+      const revenue = bookings
+        .filter((b) => b.paymentStatus === "paid" && b.cancelled !== true)
+        .reduce((sum, b) => {
+          const amount = b.grandTotal || b.totalAmount || 0;
+          const refund = b.refundAmount || 0;
 
-      const totalRefunds = bookings.reduce(
-        (sum, b) => sum + (b.refundAmount || 0),
-        0
-      );
-
-      const netRevenue = grossRevenue - totalRefunds;
+          return sum + (amount - refund);
+        }, 0);
 
       const now = new Date();
       const currentYear = now.getFullYear();
@@ -149,9 +151,7 @@ const DashboardPage = () => {
         totalUsers: users.length,
         totalProperties: properties.length,
 
-        grossRevenue,
-        totalRefunds,
-        netRevenue,
+        revenue,
         currentMonthRevenue,
         prevMonthRevenue,
 
@@ -311,8 +311,8 @@ const DashboardPage = () => {
         <div className="col-span-2 sm:col-span-2 lg:col-span-1">
           <StatCard
             title="Net Revenue"
-            value={formatCurrency(stats.netRevenue)}
-            subtitle={`Gross ₹${stats.grossRevenue?.toLocaleString("en-IN")} • Refunds ₹${stats.totalRefunds?.toLocaleString("en-IN")}`}
+            value={formatCurrency(stats.revenue)}
+            subtitle="Total confirmed booking revenue"
             icon={Wallet}
             variant="dark"
             growthText={stats.growthText}
