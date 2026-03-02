@@ -141,6 +141,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     <div className="shrink-0">
                         <Header
                             bookingId={booking?._id}
+                            booking={booking}
                             createdAt={createdAt}
                             formatDate={formatDate}
                             onClose={onClose}
@@ -208,6 +209,7 @@ ${open
                 <div className="flex flex-col max-h-[90vh]">
                     <Header
                         bookingId={booking?._id}
+                        booking={booking}
                         createdAt={createdAt}
                         formatDate={formatDate}
                         onClose={onClose}
