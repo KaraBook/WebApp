@@ -14,27 +14,17 @@ const genTempPassword = () => crypto.randomBytes(7).toString("base64url");
 
 const ALLOWED_BOOKING_USER_ROLES = ["traveller"];
 
-const getRelationshipRole = (user, ownerId) => {
+const getRelationshipRole = (user, ownerId, bookingOwnerId) => {
   if (!user) return "traveller";
 
-  const roles = getRoles(user);
-
-  if (String(user._id) === String(ownerId)) {
-    return "owner";
-  }
-
   if (
-    roles.includes("manager") &&
     user.createdBy &&
     String(user.createdBy) === String(ownerId)
   ) {
     return "manager";
   }
 
-  if (roles.includes("resortOwner")) {
-    return "traveller";
-  }
-  if (roles.includes("manager")) {
+  if (String(bookingOwnerId) === String(ownerId)) {
     return "traveller";
   }
 
@@ -81,7 +71,11 @@ export const getOwnerDashboard = async (req, res) => {
     bookings.forEach((b) => {
       if (!b.userId) return;
 
-      const relationshipRole = getRelationshipRole(b.userId, ownerId);
+      const relationshipRole = getRelationshipRole(
+        b.userId,
+        ownerId,
+        b.propertyId?.ownerUserId
+      );
 
       if (relationshipRole === "traveller") {
         uniqueTravellerIds.add(b.userId._id.toString());
