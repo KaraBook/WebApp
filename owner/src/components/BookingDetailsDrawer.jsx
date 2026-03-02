@@ -119,8 +119,8 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                     <Header
                         userName={userName}
                         createdAt={createdAt}
-                        uiStatus={uiStatus}
-                        formatDate={safeFormatDate}
+                        statusMeta={statusMeta}
+                        formatDate={formatDate}
                         onClose={onClose}
                     />
 
@@ -144,6 +144,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         isCancelled={isCancelled}
                         refundPercent={refundPercent}
                         refundAmount={refundAmount}
+                        uiStatus={uiStatus}
                     />
                 </DrawerContent>
             </Drawer>
@@ -185,7 +186,7 @@ ${open
                     <Header
                         userName={userName}
                         createdAt={createdAt}
-                        uiStatus={uiStatus}
+                        statusMeta={statusMeta}
                         formatDate={safeFormatDate}
                         onClose={onClose}
                     />
@@ -210,6 +211,7 @@ ${open
                             isCancelled={isCancelled}
                             refundPercent={refundPercent}
                             refundAmount={refundAmount}
+                            uiStatus={uiStatus}
                         />
                     </div>
                 </div>
@@ -219,7 +221,8 @@ ${open
 }
 
 
-function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
+function Header({ userName, createdAt, statusMeta, formatDate, onClose }) {
+    if (!statusMeta) return null;
     return (
         <div className="px-3 py-3 border-b relative">
             <h2 className="text-[17px] font-semibold">{userName}</h2>
@@ -247,7 +250,7 @@ function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
     );
 }
 
-function Body(props) {
+function Body({ uiStatus, ...props }) {
     const {
         propertyId,
         checkIn,
@@ -281,7 +284,7 @@ function Body(props) {
                 children={children}
                 veg={veg}
                 nonVeg={nonVeg}
-                formatDate={safeFormatDate}
+                formatDate={formatDate}
             />
             <Separator />
 
