@@ -70,6 +70,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         contactEmail,
         cancelled,
         paymentId,
+        refundAmount = 0,
     } = booking;
 
     const status = getBookingStatus(booking);
@@ -115,6 +116,8 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         typeof grandTotal === "number"
             ? grandTotal
             : (totalAmount || 0) + safeTax;
+
+    const finalPaid = safeGrandTotal - (refundAmount || 0);
 
 
     const host =
@@ -167,6 +170,9 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                             hostName={hostName}
                             hostPhone={hostPhone}
                             hostEmail={hostEmail}
+                            refundAmount={refundAmount}
+                            finalPaid={finalPaid}
+                            cancelled={cancelled}
                         />
                     </div>
 
@@ -235,6 +241,9 @@ ${open
                             hostName={hostName}
                             hostPhone={hostPhone}
                             hostEmail={hostEmail}
+                            refundAmount={refundAmount}
+                            finalPaid={finalPaid}
+                            cancelled={cancelled}
                         />
                     </div>
                 </div>
@@ -320,7 +329,8 @@ function Body(props) {
         formatDate,
         hostName,
         hostPhone,
-        hostEmail
+        hostEmail,
+        cancelled
     } = props;
 
     return (
@@ -444,11 +454,41 @@ function Body(props) {
 
             <div className="pb-14 md:pb-0">
                 <Section title="Payment Information">
+
                     <Key label="Payment Method" value={paymentMethod} />
-                    <Key label="Amount" value={`₹${totalAmount?.toLocaleString("en-IN")}`} />
-                    <Key label="Tax" value={`₹${safeTax.toLocaleString("en-IN")}`} />
-                    <Key label="Grand Total" value={`₹${safeGrandTotal.toLocaleString("en-IN")}`} bold />
+
+                    <Key
+                        label="Amount"
+                        value={`₹${totalAmount?.toLocaleString("en-IN")}`}
+                    />
+
+                    <Key
+                        label="Tax"
+                        value={`₹${safeTax.toLocaleString("en-IN")}`}
+                    />
+
+                    <Key
+                        label="Grand Total"
+                        value={`₹${safeGrandTotal.toLocaleString("en-IN")}`}
+                    />
+
+                    {cancelled && refundAmount > 0 && (
+                        <Key
+                            label="Refund Amount"
+                            value={`- ₹${refundAmount.toLocaleString("en-IN")}`}
+                        />
+                    )}
+
+                    {cancelled && (
+                        <Key
+                            label="Final Paid"
+                            value={`₹${finalPaid.toLocaleString("en-IN")}`}
+                            bold
+                        />
+                    )}
+
                     <Key label="Order ID" value={orderId} mono />
+
                 </Section>
             </div>
         </div>
