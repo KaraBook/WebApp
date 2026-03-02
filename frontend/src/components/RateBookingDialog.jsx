@@ -52,7 +52,7 @@ export default function RateBookingDialog({ open, booking, onClose }) {
       );
 
       toast.success("Review submitted!");
-      onClose();
+      onClose(booking._id);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to submit review");
     }
@@ -107,11 +107,10 @@ export default function RateBookingDialog({ open, booking, onClose }) {
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
-                className={`w-8 h-8 cursor-pointer transition ${
-                  star <= rating
+                className={`w-8 h-8 cursor-pointer transition ${star <= rating
                     ? "text-yellow-500 fill-yellow-500"
                     : "text-gray-300 hover:text-gray-400"
-                }`}
+                  }`}
                 onClick={() => setRating(star)}
               />
             ))}

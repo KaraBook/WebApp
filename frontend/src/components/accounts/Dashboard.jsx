@@ -423,9 +423,23 @@ export default function Dashboard() {
             <RateBookingDialog
                 open={rateDialogOpen}
                 booking={rateBooking}
-                onClose={() => {
+                onClose={(bookingId) => {
                     setRateDialogOpen(false);
                     setRateBooking(null);
+
+                    if (bookingId) {
+                        setBookings(prev =>
+                            prev.map(b =>
+                                b._id === bookingId
+                                    ? { ...b, hasReview: true }
+                                    : b
+                            )
+                        );
+
+                        if (selectedBooking?._id === bookingId) {
+                            setSelectedBooking(prev => ({ ...prev, hasReview: true }));
+                        }
+                    }
                 }}
             />
 
@@ -475,18 +489,18 @@ function StatCard({ title, value, subtitle, icon, dark, onClick }) {
 
 
 function StatusChip({ booking }) {
-  const status = getBookingStatus(booking);
-  const colors = getStatusColors(status);
-  const label = getStatusLabel(status);
+    const status = getBookingStatus(booking);
+    const colors = getStatusColors(status);
+    const label = getStatusLabel(status);
 
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center justify-center min-w-[88px] min-h-[26px] rounded-full border px-3 text-xs font-medium",
-        colors.chip
-      )}
-    >
-      {label}
-    </span>
-  );
+    return (
+        <span
+            className={cn(
+                "inline-flex items-center justify-center min-w-[88px] min-h-[26px] rounded-full border px-3 text-xs font-medium",
+                colors.chip
+            )}
+        >
+            {label}
+        </span>
+    );
 }
