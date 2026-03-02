@@ -126,16 +126,24 @@ export const getOwnerDashboard = async (req, res) => {
     const isCancelled = (b) =>
       b.status === "cancelled" || b.cancelled === true;
 
-    const revenueBookings = bookings.filter(b => isCompleted(b));
-
-    const grossRevenue = revenueBookings.reduce(
-      (sum, b) => sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
-      0
-    );
-
     const totalRefunds = bookings
       .filter(b => b.cancelled === true && b.refundAmount && isCompleted(b))
       .reduce((sum, b) => sum + Number(b.refundAmount || 0), 0);
+
+    /* ------------------ REAL OWNER REVENUE ------------------ */
+
+    const paidRevenue = bookings
+      .filter(b =>
+        b.cancelled !== true &&
+        (
+          b.paymentStatus === "paid" ||
+          b.status === "confirmed" ||
+          Boolean(b.paymentId)
+        )
+      )
+      .reduce((sum, b) => {
+        return sum + Number(b.grandTotal ?? b.totalAmount ?? 0);
+      }, 0);
 
     const cancellationRevenue = bookings
       .filter(b => b.cancelled === true && b.refundAmount !== undefined)
@@ -146,8 +154,7 @@ export const getOwnerDashboard = async (req, res) => {
         return sum + retained;
       }, 0);
 
-
-    const netRevenue = grossRevenue + cancellationRevenue;
+    const netRevenue = paidRevenue + cancellationRevenue;
 
     const now = new Date();
     const currentYear = now.getFullYear();
