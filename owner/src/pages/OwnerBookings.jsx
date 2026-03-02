@@ -40,7 +40,11 @@ export default function OwnerBookings() {
 
   const [searchParams] = useSearchParams();
   const timeFromUrl = searchParams.get("time") || "upcoming";
-  const statusFromUrl = searchParams.get("status") || "all";
+  let statusFromUrl = searchParams.get("status") || "all";
+
+  if (statusFromUrl === "pending") {
+    statusFromUrl = "all";
+  }
 
   const [timeFilter, setTimeFilter] = useState(timeFromUrl);
   const [statusFilter, setStatusFilter] = useState(statusFromUrl);
@@ -120,15 +124,8 @@ export default function OwnerBookings() {
       message = buildCancelledWhatsappMessage(b);
     }
     else {
-      const name =
-        `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim() || "Guest";
-      const property = b.propertyId?.propertyName || "our property";
-
-      message = `Hello ${name},
-
-We noticed your booking request for *${property}* is still pending.
-
-If you need help completing your booking or payment, please reply here 😊`;
+      toast.info("Payment reminder is sent automatically by system.");
+      return;
     }
 
     const encoded = encodeWhatsapp(message);
@@ -152,9 +149,13 @@ If you need help completing your booking or payment, please reply here 😊`;
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
+    data = data.filter(
+      (b) => getBookingStatus(b) !== BOOKING_STATUS.PENDING
+    );
+
     if (statusFilter !== "all") {
       data = data.filter(
-       (b) => getBookingStatus(b) === statusFilter
+        (b) => getBookingStatus(b) === statusFilter
       );
     }
 
@@ -340,7 +341,6 @@ If you need help completing your booking or payment, please reply here 😊`;
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
                   <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
@@ -512,7 +512,7 @@ If you need help completing your booking or payment, please reply here 😊`;
                                     ? "Send Welcome Message"
                                     : status === BOOKING_STATUS.COMPLETED
                                       ? "Send Thank You Message"
-                                      : "Send Payment Reminder"}
+                                      : null}
                               </DropdownMenuItem>
 
                               {/* CANCEL LOGIC */}

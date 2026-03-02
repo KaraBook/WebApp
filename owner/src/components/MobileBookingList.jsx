@@ -24,18 +24,23 @@ export default function MobileBookingsList({
 
         if (status === BOOKING_STATUS.CONFIRMED) {
             message = buildBookingWhatsappMessage(b);
-        } else if (status === BOOKING_STATUS.CANCELLED) {
+        }
+        else if (status === BOOKING_STATUS.CANCELLED) {
             message = buildCancelledWhatsappMessage(b);
-        } else {
+        }
+        else if (status === BOOKING_STATUS.COMPLETED) {
             const name =
                 `${b.userId?.firstName || ""} ${b.userId?.lastName || ""}`.trim() || "Guest";
-            const property = b.propertyId?.propertyName || "our property";
 
-            message = `Hello ${name},
+            message = `Dear ${name},
 
-We noticed your booking request for *${property}* is still pending.
+Thank you for staying with us 🙏
 
-If you need help completing your booking or payment, please reply here 😊`;
+We hope you had a pleasant experience. We would love to host you again soon!`;
+        }
+        else {
+
+            return;
         }
 
         const encoded = encodeURIComponent(message);
@@ -46,12 +51,18 @@ If you need help completing your booking or payment, please reply here 😊`;
     const PER_PAGE = 4;
     const [page, setPage] = useState(1);
 
-    const totalPages = Math.ceil(bookings.length / PER_PAGE);
+    const visibleBookings = useMemo(() => {
+        return bookings.filter(
+            (b) => getBookingStatus(b) !== BOOKING_STATUS.PENDING
+        );
+    }, [bookings]);
 
     const paginated = useMemo(() => {
         const start = (page - 1) * PER_PAGE;
-        return bookings.slice(start, start + PER_PAGE);
-    }, [bookings, page]);
+        return visibleBookings.slice(start, start + PER_PAGE);
+    }, [visibleBookings, page]);
+
+    const totalPages = Math.ceil(visibleBookings.length / PER_PAGE);
 
     return (
         <div className="md:hidden space-y-4">
@@ -155,11 +166,20 @@ If you need help completing your booking or payment, please reply here 😊`;
                                                     sendWhatsappMessage(b);
                                                 }}
                                             >
-                                                {getBookingStatus(b) === BOOKING_STATUS.CANCELLED
-                                                    ? "Message Cancelled Guest"
-                                                    : [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.COMPLETED].includes(getBookingStatus(b))
-                                                        ? "Send Welcome Message"
-                                                        : "Send Payment Reminder"}
+                                                {(() => {
+                                                    const status = getBookingStatus(b);
+
+                                                    if (status === BOOKING_STATUS.CANCELLED)
+                                                        return "Message Cancelled Guest";
+
+                                                    if (status === BOOKING_STATUS.CONFIRMED)
+                                                        return "Send Welcome Message";
+
+                                                    if (status === BOOKING_STATUS.COMPLETED)
+                                                        return "Send Thank You Message";
+
+                                                    return null;
+                                                })()}
                                             </DropdownMenuItem>
 
                                             {/* LAST LINE */}

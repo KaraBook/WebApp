@@ -84,6 +84,10 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     }, [open]);
 
     if (!booking) return null;
+    if (getBookingStatus(booking) === BOOKING_STATUS.PENDING) {
+        onClose?.();
+        return null;
+    }
 
     const cleanNumber = (v) => {
         const n = Number(v);
@@ -113,7 +117,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     const uiStatus = getBookingStatus(booking);
     const statusMeta = getStatusMeta(booking) || {
         chip: "",
-        label: "Pending",
+        label: "Booking",
     };
     const refundPercent = booking?.ownerRefundPercent ?? 0;
     const refundAmount = booking?.refundAmount ?? 0;
