@@ -9,9 +9,7 @@ export function getOwnerBookingPermissions(booking) {
 
     canViewInvoice: status === BOOKING_STATUS.CONFIRMED,
 
-    canCancel:
-      status !== BOOKING_STATUS.CANCELLED &&
-      status !== BOOKING_STATUS.PENDING, 
+    canCancel: status === BOOKING_STATUS.CONFIRMED,
 
     canSendWelcomeMessage:
       status === BOOKING_STATUS.CONFIRMED,

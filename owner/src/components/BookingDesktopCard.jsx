@@ -40,8 +40,20 @@ export default function BookingDesktopCard({
 
     if (bookingStatus === BOOKING_STATUS.CANCELLED) {
       message = buildCancelledWhatsappMessage(b);
+
     } else if (bookingStatus === BOOKING_STATUS.CONFIRMED) {
       message = buildBookingWhatsappMessage(b);
+
+    } else if (bookingStatus === BOOKING_STATUS.COMPLETED) {
+      message = `Hello ${name || "Guest"},
+
+Thank you for staying with us at *${property}* 😊
+
+We hope you had a wonderful experience.  
+We would really appreciate your feedback and would love to host you again!
+
+Safe travels ✨`;
+
     } else {
       message = `Hello ${name || "Guest"},
 
@@ -67,7 +79,10 @@ If you need any help completing your booking or payment, feel free to reply here
   };
 
   return (
-    <div className="bg-white border rounded-2xl px-6 py-4 flex items-center justify-between shadow-sm hover:shadow-md transition cursor-pointer">
+    <div
+      onClick={() => onOpen?.(b)}
+      className="bg-white border rounded-2xl px-6 py-4 flex items-center justify-between shadow-sm hover:shadow-md transition cursor-pointer"
+    >
       {/* LEFT */}
       <div className="flex w-[30%] items-center gap-4 min-w-0">
         <div className="
@@ -148,7 +163,7 @@ If you need any help completing your booking or payment, feel free to reply here
             </DropdownMenuItem>
 
             {/* Invoice logic */}
-            {bookingStatus === BOOKING_STATUS.CONFIRMED ? (
+            {[BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.COMPLETED].includes(bookingStatus) ? (
               <DropdownMenuItem onSelect={() => onViewInvoice(b)}>
                 View Invoice
               </DropdownMenuItem>
@@ -159,16 +174,18 @@ If you need any help completing your booking or payment, feel free to reply here
             )}
 
             {/* Cancel logic */}
-            {bookingStatus === BOOKING_STATUS.CONFIRMED ? (
+            {bookingStatus === BOOKING_STATUS.CANCELLED && (
+              <DropdownMenuItem disabled className="text-gray-400 italic">
+                Cancelled
+              </DropdownMenuItem>
+            )}
+
+            {bookingStatus === BOOKING_STATUS.CONFIRMED && (
               <DropdownMenuItem
                 className="text-red-600 font-medium"
                 onSelect={() => onCancelBooking(b)}
               >
                 Cancel Booking
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem disabled className="text-gray-400 italic">
-                Cannot cancel
               </DropdownMenuItem>
             )}
 
@@ -188,9 +205,11 @@ If you need any help completing your booking or payment, feel free to reply here
             >
               {bookingStatus === BOOKING_STATUS.CANCELLED
                 ? "Message Cancelled Guest"
-                : bookingStatus === BOOKING_STATUS.CONFIRMED
-                  ? "Send Welcome Message"
-                  : "Send Reminder"}
+                : bookingStatus === BOOKING_STATUS.PENDING
+                  ? "Send Payment Reminder"
+                  : bookingStatus === BOOKING_STATUS.CONFIRMED
+                    ? "Send Welcome Message"
+                    : "Send Thank You Message"}
             </DropdownMenuItem>
 
           </DropdownMenuContent>

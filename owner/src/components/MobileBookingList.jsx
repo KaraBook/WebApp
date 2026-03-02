@@ -118,7 +118,7 @@ If you need help completing your booking or payment, please reply here 😊`;
                                                 View Booking
                                             </DropdownMenuItem>
 
-                                            {getBookingStatus(b) === BOOKING_STATUS.CONFIRMED ? (
+                                            {[BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.COMPLETED].includes(getBookingStatus(b)) ? (
                                                 <DropdownMenuItem
                                                     className="p-[14px] text-[16px]"
                                                     onSelect={() => navigate(`/invoice/${b._id}`)}
@@ -157,27 +157,39 @@ If you need help completing your booking or payment, please reply here 😊`;
                                             >
                                                 {getBookingStatus(b) === BOOKING_STATUS.CANCELLED
                                                     ? "Message Cancelled Guest"
-                                                    : getBookingStatus(b) === BOOKING_STATUS.CONFIRMED
+                                                    : [BOOKING_STATUS.CONFIRMED, BOOKING_STATUS.COMPLETED].includes(getBookingStatus(b))
                                                         ? "Send Welcome Message"
                                                         : "Send Payment Reminder"}
                                             </DropdownMenuItem>
 
                                             {/* LAST LINE */}
-                                            {b.cancelled ? (
-                                                <DropdownMenuItem
-                                                    disabled
-                                                    className="p-[14px] text-[16px] text-gray-400 italic"
-                                                >
-                                                    Cancelled
-                                                </DropdownMenuItem>
-                                           ) : getBookingStatus(b) === BOOKING_STATUS.CONFIRMED ? (
-                                                <DropdownMenuItem
-                                                    className="p-[14px] text-[16px] text-red-600"
-                                                    onSelect={() => onCancelBooking?.(b)}
-                                                >
-                                                    Cancel Booking
-                                                </DropdownMenuItem>
-                                            ) : null}
+                                            {(() => {
+                                                const status = getBookingStatus(b);
+
+                                                if (status === BOOKING_STATUS.CANCELLED) {
+                                                    return (
+                                                        <DropdownMenuItem
+                                                            disabled
+                                                            className="p-[14px] text-[16px] text-gray-400 italic"
+                                                        >
+                                                            Cancelled
+                                                        </DropdownMenuItem>
+                                                    );
+                                                }
+
+                                                if (status === BOOKING_STATUS.CONFIRMED) {
+                                                    return (
+                                                        <DropdownMenuItem
+                                                            className="p-[14px] text-[16px] text-red-600"
+                                                            onSelect={() => onCancelBooking?.(b)}
+                                                        >
+                                                            Cancel Booking
+                                                        </DropdownMenuItem>
+                                                    );
+                                                }
+
+                                                return null;
+                                            })()}
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </div>
