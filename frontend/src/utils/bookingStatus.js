@@ -3,29 +3,46 @@ export function getBookingStatus(b) {
 
   if (b.cancelled === true) return "cancelled";
 
-  const paid =
+  const razorpaySuccess =
+    b.paymentStatus === "captured" ||   
     b.paymentStatus === "paid" ||
+    b.paymentStatus === "success" ||
     b.status === "confirmed" ||
     b.status === "paid" ||
-    !!b.paymentId;
+    !!b.paymentId ||
+    !!b.razorpay_payment_id;
 
-  if (paid) return "confirmed";
+  if (razorpaySuccess) {
+    if (b.checkOut && new Date(b.checkOut) < new Date()) {
+      return "completed";
+    }
+
+    return "confirmed";
+  }
 
   return "pending";
 }
+
 
 export function getStatusLabel(status) {
   switch (status) {
     case "confirmed":
       return "Confirmed";
+
     case "pending":
       return "Pending";
+
     case "cancelled":
       return "Cancelled";
+
+    case "completed":
+      return "Completed";
+
     default:
       return "Pending";
   }
 }
+
 
 export function getStatusColors(status) {
   switch (status) {
@@ -45,9 +62,16 @@ export function getStatusColors(status) {
 
     case "cancelled":
       return {
-        dot: "bg-red-500",
-        chip: "border-red-300 bg-red-50 text-red-700",
-        soft: "bg-red-100 text-red-700",
+        dot: "bg-rose-500",
+        chip: "border-rose-300 bg-rose-50 text-rose-700",
+        soft: "bg-rose-100 text-rose-700",
+      };
+
+    case "completed":
+      return {
+        dot: "bg-blue-500",
+        chip: "border-blue-300 bg-blue-50 text-blue-700",
+        soft: "bg-blue-100 text-blue-700",
       };
 
     default:
