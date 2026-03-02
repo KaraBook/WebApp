@@ -233,29 +233,6 @@ export default function Dashboard() {
 
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
 
-  const recalculateStats = (bookings) => {
-
-    const confirmed = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.CONFIRMED);
-    const completed = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.COMPLETED);
-    const cancelled = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.CANCELLED);
-    const pending = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.PENDING);
-
-    const earningBookings = [...confirmed, ...completed];
-
-    const netRevenue = earningBookings.reduce(
-      (sum, b) => sum + Number(b.grandTotal || b.totalAmount || 0),
-      0
-    );
-
-    return {
-      totalBookings: bookings.length,
-      confirmed: confirmed.length,
-      pending: pending.length,
-      cancelled: cancelled.length,
-      netRevenue
-    };
-  };
-
   useEffect(() => {
     (async () => {
       try {
@@ -271,7 +248,7 @@ export default function Dashboard() {
         );
 
         setData({
-          stats: recalculateStats(sortedBookings),
+          stats: dashboardData.stats,
           bookings: sortedBookings,
         });
 
@@ -606,24 +583,28 @@ export default function Dashboard() {
       <OwnerCancelBookingDialog
         open={openCancelDialog}
         booking={selectedBooking}
-        onClose={(refresh, updatedBooking) => {
+        onClose={(refresh) => {
           setOpenCancelDialog(false);
 
-          if (refresh && updatedBooking) {
-            setData((prev) => {
-              if (!prev) return prev;
-              const updatedBookings = prev.bookings.map((b) =>
-                b._id === updatedBooking._id
-                  ? { ...b, ...updatedBooking, userId: b.userId, propertyId: b.propertyId, guests: b.guests, meals: b.meals }
-                  : b
-              );
+          if (refresh) {
+            (async () => {
+              try {
+                const res = await api.get(SummaryApi.getOwnerDashboard.url);
 
-              return {
-                ...prev,
-                bookings: updatedBookings,
-                stats: recalculateStats(updatedBookings)
-              };
-            });
+                const dashboardData = res.data?.data;
+
+                const sortedBookings = dashboardData.bookings.sort(
+                  (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
+                );
+
+                setData({
+                  stats: dashboardData.stats,
+                  bookings: sortedBookings,
+                });
+              } catch (err) {
+                console.error(err);
+              }
+            })();
           }
         }}
       />
