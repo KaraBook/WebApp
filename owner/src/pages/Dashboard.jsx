@@ -234,6 +234,39 @@ export default function Dashboard() {
 
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
 
+
+  /* put right after useNavigate() */
+
+  const recalculateStats = (bookings) => {
+
+    const confirmed = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.CONFIRMED);
+    const completed = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.COMPLETED);
+    const cancelled = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.CANCELLED);
+    const pending = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.PENDING);
+
+    const earningBookings = [...confirmed, ...completed];
+
+    const grossRevenue = earningBookings.reduce(
+      (sum, b) => sum + Number(b.grandTotal || b.totalAmount || 0),
+      0
+    );
+
+    const refunds = cancelled.reduce(
+      (sum, b) => sum + Number(b.refundAmount || 0),
+      0
+    );
+
+    const netRevenue = grossRevenue - refunds;
+
+    return {
+      totalBookings: bookings.length,
+      confirmed: confirmed.length,
+      pending: pending.length,
+      cancelled: cancelled.length,
+      netRevenue
+    };
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -242,15 +275,15 @@ export default function Dashboard() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const all = res.data?.data?.bookings || [];
-
         const dashboardData = res.data?.data;
 
+        const sortedBookings = dashboardData.bookings.sort(
+          (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
+        );
+
         setData({
-          stats: dashboardData.stats,
-          bookings: dashboardData.bookings.sort(
-            (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
-          ),
+          stats: recalculateStats(sortedBookings),
+          bookings: sortedBookings,
         });
 
       } catch (err) {
@@ -307,50 +340,35 @@ export default function Dashboard() {
     });
 
 
-  const isDatePending = (date) =>
-    bookings?.some(b =>
-      getBookingStatus(b) === "pending" &&
-      date >= new Date(b.checkIn) &&
-      date <= new Date(b.checkOut)
-    );
-
-  const isDateCancelled = (date) =>
-    bookings?.some(b =>
-      getBookingStatus(b) === "cancelled" &&
-      date >= new Date(b.checkIn) &&
-      date <= new Date(b.checkOut)
-    );
-
-
   const { stats, bookings } = data || {};
-  const getDateStatus = (date) => {
-    if (!bookings) return null;
 
-    const matches = bookings.filter((b) => {
+  const bookingDateMap = useMemo(() => {
+    if (!bookings) return {};
+
+    const map = {};
+
+    bookings.forEach((b) => {
+      const status = getBookingStatus(b);
+
       const start = new Date(b.checkIn);
       const end = new Date(b.checkOut);
 
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-
-      return date >= start && date <= end;
+      for (
+        let d = new Date(start);
+        d <= end;
+        d.setDate(d.getDate() + 1)
+      ) {
+        const key = d.toISOString().slice(0, 10);
+        map[key] = status;
+      }
     });
 
-    if (!matches.length) return null;
+    return map;
+  }, [bookings]);
 
-    if (matches.some(b => getBookingStatus(b) === BOOKING_STATUS.CONFIRMED))
-      return "confirmed";
-
-    if (matches.some(b => getBookingStatus(b) === BOOKING_STATUS.COMPLETED))
-      return "completed";
-
-    if (matches.some(b => getBookingStatus(b) === "pending"))
-      return "pending";
-
-    if (matches.some(b => getBookingStatus(b) === "cancelled"))
-      return "cancelled";
-
-    return null;
+  const getDateStatus = (date) => {
+    const key = date.toISOString().slice(0, 10);
+    return bookingDateMap[key] || null;
   };
 
 
@@ -360,22 +378,6 @@ export default function Dashboard() {
     const list = bookings || [];
     return list.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
   }, [bookings, currentPage]);
-
-  /* -------------------- Calendar -------------------- */
-  const today = new Date();
-  const monthLabel = today.toLocaleString("en-US", { month: "long", year: "numeric" });
-
-  const calendarDays = useMemo(() => {
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    const first = new Date(year, month, 1);
-    const last = new Date(year, month + 1, 0);
-
-    const arr = [];
-    for (let i = 0; i < first.getDay(); i++) arr.push(null);
-    for (let d = 1; d <= last.getDate(); d++) arr.push(new Date(year, month, d));
-    return arr;
-  }, [today]);
 
 
   if (loadingDashboard) {
@@ -392,40 +394,6 @@ export default function Dashboard() {
     setOpenCancelDialog(true);
   };
 
-
-  const recalculateStats = (bookings) => {
-    const isConfirmed = (b) =>
-      b.paymentStatus === "paid";
-
-    const isCancelled = (b) =>
-      b.cancelled === true;
-
-    const isPending = (b) =>
-      b.paymentStatus === "initiated";
-
-    const confirmedBookings = bookings.filter(isConfirmed);
-
-    const grossRevenue = confirmedBookings.reduce(
-      (sum, b) => sum + Number(b.totalAmount || 0),
-      0
-    );
-
-    const totalRefunds = bookings.reduce(
-      (sum, b) => sum + Number(b.refundAmount || 0),
-      0
-    );
-
-    const netRevenue = grossRevenue - totalRefunds;
-
-    return {
-      ...data.stats,
-      totalBookings: bookings.length,
-      confirmed: confirmedBookings.length,
-      pending: bookings.filter(isPending).length,
-      cancelled: bookings.filter(isCancelled).length,
-      netRevenue,
-    };
-  };
 
   return (
     <div className="bg-[#f5f5f7] min-h-[calc(100vh-56px)] px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -570,10 +538,10 @@ export default function Dashboard() {
                 fromDate={new Date()}
                 className="rounded-xl border"
                 modifiers={{
-                  confirmed: (d) => getDateStatus(d) === "confirmed",
-                  pending: (d) => getDateStatus(d) === "pending",
-                  cancelled: (d) => getDateStatus(d) === "cancelled",
-                  completed: (d) => getDateStatus(d) === "completed",
+                  confirmed: (d) => getDateStatus(d) === BOOKING_STATUS.CONFIRMED,
+                  pending: (d) => getDateStatus(d) === BOOKING_STATUS.PENDING,
+                  cancelled: (d) => getDateStatus(d) === BOOKING_STATUS.CANCELLED,
+                  completed: (d) => getDateStatus(d) === BOOKING_STATUS.COMPLETED,
                   blocked: isDateBlocked,
                 }}
 
@@ -591,9 +559,9 @@ export default function Dashboard() {
 
                       {/* status dot */}
                       <div className="absolute bottom-1 flex gap-[2px]">
-                        {getDateStatus(date) === "confirmed" && <Dot color="green" />}
-                        {getDateStatus(date) === "pending" && <Dot color="yellow" />}
-                        {getDateStatus(date) === "cancelled" && <Dot color="red" />}
+                        {getDateStatus(date) === BOOKING_STATUS.CONFIRMED && <Dot color="green" />}
+                        {getDateStatus(date) === BOOKING_STATUS.PENDING && <Dot color="yellow" />}
+                        {getDateStatus(date) === BOOKING_STATUS.CANCELLED && <Dot color="red" />}
                         {isDateBlocked(date) && <Dot color="blue" />}
                       </div>
                     </div>
@@ -663,7 +631,8 @@ export default function Dashboard() {
 
               return {
                 ...prev,
-                bookings: updatedBookings
+                bookings: updatedBookings,
+                stats: recalculateStats(updatedBookings)
               };
             });
           }

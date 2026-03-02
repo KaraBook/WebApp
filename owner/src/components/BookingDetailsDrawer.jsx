@@ -3,6 +3,7 @@ import { Drawer, DrawerContent, DrawerOverlay } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { Home, Calendar as CalendarIcon, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
 import { getBookingStatus, getStatusMeta } from "@/utils/bookingStatus";
+import PaymentChip from "@/components/PaymentChip";
 
 
 const safeFormatDate = (d) => {
@@ -294,11 +295,7 @@ function Header({ userName, createdAt, statusMeta, bookingId, formatDate, onClos
 
                     <span>|</span>
 
-                    <span
-                        className={`px-2 py-0.5 rounded-full text-[11px] font-medium border ${statusMeta.chip}`}
-                    >
-                        {statusMeta.label}
-                    </span>
+                   <PaymentChip booking={booking} small />
                 </div>
             </div>
 

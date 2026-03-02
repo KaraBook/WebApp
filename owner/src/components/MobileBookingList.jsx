@@ -3,20 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { CalendarCheck, Clock, Users, MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage } from "@/utils/whatsappMessage";
-
-
-
-function PaymentChip({ booking }) {
-    const s = normalizeBookingStatus(booking);
-    const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
-    const map = {
-        confirmed: `${base} bg-emerald-50 text-emerald-700`,
-        pending: `${base} bg-amber-50 text-amber-700`,
-        cancelled: `${base} bg-red-50 text-red-600`,
-    };
-    return <span className={map[s]}>{s}</span>;
-}
-
+import { getBookingStatus, BOOKING_STATUS } from "@/utils/bookingStatus";
 
 
 export default function MobileBookingsList({
@@ -31,12 +18,12 @@ export default function MobileBookingsList({
         const phone = b?.userId?.mobile;
         if (!phone) return;
 
-        const status = normalizeBookingStatus(b);
+        const status = getBookingStatus(b);
         let message = "";
 
-        if (status === "confirmed") {
+        if (status === BOOKING_STATUS.CONFIRMED) {
             message = buildBookingWhatsappMessage(b);
-        } else if (status === "cancelled") {
+        } else if (status === BOOKING_STATUS.CANCELLED) {
             message = buildCancelledWhatsappMessage(b);
         } else {
             const name =
@@ -130,7 +117,7 @@ If you need help completing your booking or payment, please reply here 😊`;
                                                 View Booking
                                             </DropdownMenuItem>
 
-                                            {normalizeBookingStatus(b) === "confirmed" ? (
+                                            {getBookingStatus(b) === BOOKING_STATUS.CONFIRMED ? (
                                                 <DropdownMenuItem
                                                     className="p-[14px] text-[16px]"
                                                     onSelect={() => navigate(`/invoice/${b._id}`)}
@@ -167,9 +154,9 @@ If you need help completing your booking or payment, please reply here 😊`;
                                                     sendWhatsappMessage(b);
                                                 }}
                                             >
-                                                {normalizeBookingStatus(b) === "cancelled"
+                                                {getBookingStatus(b) === BOOKING_STATUS.CANCELLED
                                                     ? "Message Cancelled Guest"
-                                                    : normalizeBookingStatus(b) === "confirmed"
+                                                    : getBookingStatus(b) === BOOKING_STATUS.CONFIRMED
                                                         ? "Send Welcome Message"
                                                         : "Send Payment Reminder"}
                                             </DropdownMenuItem>
@@ -182,7 +169,7 @@ If you need help completing your booking or payment, please reply here 😊`;
                                                 >
                                                     Cancelled
                                                 </DropdownMenuItem>
-                                            ) : b.paymentStatus === "paid" ? (
+                                           ) : getBookingStatus(b) === BOOKING_STATUS.CONFIRMED ? (
                                                 <DropdownMenuItem
                                                     className="p-[14px] text-[16px] text-red-600"
                                                     onSelect={() => onCancelBooking?.(b)}

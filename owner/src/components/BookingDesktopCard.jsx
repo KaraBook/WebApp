@@ -39,9 +39,9 @@ export default function BookingDesktopCard({
 
     let message;
 
-    if (bookingStatus === "cancelled") {
+    if (bookingStatus === BOOKING_STATUS.CANCELLED) {
       message = buildCancelledWhatsappMessage(b);
-    } else if (bookingStatus === "confirmed") {
+    } else if (bookingStatus === BOOKING_STATUS.CONFIRMED) {
       message = buildBookingWhatsappMessage(b);
     } else {
       message = `Hello ${name || "Guest"},
@@ -68,19 +68,7 @@ If you need any help completing your booking or payment, feel free to reply here
   };
 
   return (
-    <div
-      onClick={() => onOpen(b)}
-      className={`
-    bg-white
-    border
-    rounded-2xl px-6 py-4
-    flex items-center justify-between
-    shadow-sm
-    hover:shadow-md
-    transition cursor-pointer
-    ${statusMeta.chip}
-  `}
-    >
+    <div className="bg-white border rounded-2xl px-6 py-4 flex items-center justify-between shadow-sm hover:shadow-md transition cursor-pointer">
       {/* LEFT */}
       <div className="flex w-[30%] items-center gap-4 min-w-0">
         <div className="
@@ -161,7 +149,7 @@ If you need any help completing your booking or payment, feel free to reply here
             </DropdownMenuItem>
 
             {/* Invoice logic */}
-            {bookingStatus === "confirmed" ? (
+            {bookingStatus === BOOKING_STATUS.CONFIRMED ? (
               <DropdownMenuItem onSelect={() => onViewInvoice(b)}>
                 View Invoice
               </DropdownMenuItem>
@@ -172,7 +160,7 @@ If you need any help completing your booking or payment, feel free to reply here
             )}
 
             {/* Cancel logic */}
-            {bookingStatus !== "cancelled" && bookingStatus !== "pending" ? (
+            {bookingStatus === BOOKING_STATUS.CONFIRMED ? (
               <DropdownMenuItem
                 className="text-red-600 font-medium"
                 onSelect={() => onCancelBooking(b)}
@@ -199,7 +187,7 @@ If you need any help completing your booking or payment, feel free to reply here
                 handleWhatsapp();
               }}
             >
-              {bookingStatus === "cancelled"
+              {bookingStatus === BOOKING_STATUS.CANCELLED
                 ? "Message Cancelled Guest"
                 : bookingStatus === "confirmed"
                   ? "Send Welcome Message"

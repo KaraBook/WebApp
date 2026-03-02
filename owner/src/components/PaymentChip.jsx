@@ -1,16 +1,21 @@
-import { getBookingStatus } from "@/utils/bookingStatus";
+import { getStatusMeta } from "@/utils/bookingStatus";
 
-export default function PaymentChip({ booking }) {
-  const status = getBookingStatus(booking);
+export default function PaymentChip({ booking, small = false }) {
+  const meta = getStatusMeta(booking);
 
-  const base = "px-3 py-1 rounded-full text-[11px] font-medium capitalize";
+  if (!meta) return null;
 
-  const map = {
-    confirmed: `${base} bg-emerald-50 text-emerald-700`,
-    pending: `${base} bg-amber-50 text-amber-700`,
-    cancelled: `${base} bg-red-50 text-red-600`,
-    completed: `${base} bg-blue-50 text-blue-700`,
-  };
-
-  return <span className={map[status]}>{status}</span>;
+  return (
+    <span
+      className={`
+        inline-flex items-center justify-center
+        rounded-full border
+        ${small ? "px-2 py-0.5 text-[10px]" : "px-3 py-1 text-[11px]"}
+        font-medium
+        ${meta.chip}
+      `}
+    >
+      {meta.label}
+    </span>
+  );
 }
