@@ -28,7 +28,10 @@ export default function BookingDesktopCard({
   const email = b.userId?.email;
   const property = b.propertyId?.propertyName;
   const bookingStatus = getBookingStatus(b);
-  const statusMeta = getStatusMeta(b);
+  const statusMeta = getStatusMeta(b) || {
+    chip: "",
+    label: "",
+  };
 
   const handleWhatsapp = () => {
     const phone = b.userId?.mobile;

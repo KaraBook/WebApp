@@ -27,18 +27,18 @@ const formatCurrency = (value) => {
 
 
 function normalizeBooking(booking = {}) {
-  return {
-    ...booking,
-    guests: booking.guests || { adults: 0, children: 0, infants: 0 },
-    meals: booking.meals || { veg: 0, nonVeg: 0 },
-    totalAmount: Number(booking.totalAmount) || 0,
-    taxAmount: Number(booking.taxAmount) || 0,
-    grandTotal: Number(booking.grandTotal) || 0,
-    refundAmount: Number(booking.refundAmount) || 0,
-    ownerRefundPercent: Number(booking.ownerRefundPercent) || 0,
-    userId: booking.userId || {},
-    propertyId: booking.propertyId || {},
-  };
+    return {
+        ...booking,
+        guests: booking.guests || { adults: 0, children: 0, infants: 0 },
+        meals: booking.meals || { veg: 0, nonVeg: 0 },
+        totalAmount: Number(booking.totalAmount) || 0,
+        taxAmount: Number(booking.taxAmount) || 0,
+        grandTotal: Number(booking.grandTotal) || 0,
+        refundAmount: Number(booking.refundAmount) || 0,
+        ownerRefundPercent: Number(booking.ownerRefundPercent) || 0,
+        userId: booking.userId || {},
+        propertyId: booking.propertyId || {},
+    };
 }
 
 
@@ -86,7 +86,10 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     } = safeBooking;
 
     const uiStatus = getBookingStatus(booking);
-    const statusMeta = getStatusMeta(booking);
+    const statusMeta = getStatusMeta(booking) || {
+        chip: "",
+        label: "Pending",
+    };
     const refundPercent = booking?.ownerRefundPercent ?? 0;
     const refundAmount = booking?.refundAmount ?? 0;
     const isCancelled = booking?.cancelled === true;
