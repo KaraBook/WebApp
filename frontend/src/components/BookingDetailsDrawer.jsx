@@ -332,6 +332,7 @@ function Body(props) {
         hostEmail,
         cancelled, 
         refundAmount,
+        finalPaid
     } = props;
 
     return (
