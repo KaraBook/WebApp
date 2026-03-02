@@ -233,9 +233,6 @@ export default function Dashboard() {
 
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
 
-
-  /* put right after useNavigate() */
-
   const recalculateStats = (bookings) => {
 
     const confirmed = bookings.filter(b => getBookingStatus(b) === BOOKING_STATUS.CONFIRMED);
@@ -245,17 +242,10 @@ export default function Dashboard() {
 
     const earningBookings = [...confirmed, ...completed];
 
-    const grossRevenue = earningBookings.reduce(
+    const netRevenue = earningBookings.reduce(
       (sum, b) => sum + Number(b.grandTotal || b.totalAmount || 0),
       0
     );
-
-    const refunds = cancelled.reduce(
-      (sum, b) => sum + Number(b.refundAmount || 0),
-      0
-    );
-
-    const netRevenue = grossRevenue - refunds;
 
     return {
       totalBookings: bookings.length,
