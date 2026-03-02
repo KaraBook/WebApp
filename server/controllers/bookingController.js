@@ -736,11 +736,6 @@ export const cancelBooking = async (req, res) => {
         success: false,
         message: "Only paid bookings can be cancelled."
       });
-    } {
-      return res.status(400).json({
-        success: false,
-        message: "Pending bookings cannot be cancelled."
-      });
     }
 
     const now = new Date();

@@ -24,7 +24,7 @@ export function canRate(b) {
 
   if (b.paymentStatus !== "paid") return false;
   if (b.cancelled) return false;
-  if (!isPaid) return false;
+  if (!isPaid(b)) return false;
   if (now < checkout) return false;
   if (b.hasReview) return false;
 
