@@ -120,7 +120,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         userName={userName}
                         createdAt={createdAt}
                         statusMeta={statusMeta}
-                        formatDate={formatDate}
+                        formatDate={safeFormatDate}
                         onClose={onClose}
                     />
 
@@ -284,7 +284,7 @@ function Body({ uiStatus, ...props }) {
                 children={children}
                 veg={veg}
                 nonVeg={nonVeg}
-                formatDate={formatDate}
+                formatDate={safeFormatDate}
             />
             <Separator />
 
