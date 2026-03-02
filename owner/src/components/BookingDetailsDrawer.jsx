@@ -20,8 +20,8 @@ const safeFormatDate = (d) => {
 };
 
 const shortBookingId = (id) => {
-  if (!id) return "";
-  return `#KB-${String(id).slice(-6).toUpperCase()}`;
+    if (!id) return "";
+    return `#KB-${String(id).slice(-6).toUpperCase()}`;
 };
 
 
@@ -164,6 +164,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         bookingId={booking?._id}
                         formatDate={safeFormatDate}
                         onClose={onClose}
+                        booking={booking}
                     />
 
                     <Body
@@ -232,6 +233,7 @@ ${open
                         bookingId={booking?._id}
                         formatDate={safeFormatDate}
                         onClose={onClose}
+                        booking={booking}
                     />
                     <div className="flex-1 overflow-y-auto">
                         <Body
@@ -264,7 +266,7 @@ ${open
 }
 
 
-function Header({ userName, createdAt, statusMeta, bookingId, formatDate, onClose }) {
+function Header({ userName, createdAt, statusMeta, bookingId, formatDate, onClose, booking }) {
     if (!statusMeta) return null;
 
     return (
@@ -295,7 +297,7 @@ function Header({ userName, createdAt, statusMeta, bookingId, formatDate, onClos
 
                     <span>|</span>
 
-                   <PaymentChip booking={booking} small />
+                    <PaymentChip booking={booking} small />
                 </div>
             </div>
 
