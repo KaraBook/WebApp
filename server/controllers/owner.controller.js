@@ -42,6 +42,7 @@ const getRoles = (u) =>
 const hasRole = (u, role) => getRoles(u).includes(role);
 
 
+
 export const getOwnerDashboard = async (req, res) => {
   try {
     const ownerId = await getEffectiveOwnerId(req);
@@ -82,19 +83,32 @@ export const getOwnerDashboard = async (req, res) => {
       }
     });
 
+    const isCompleted = (b) => {
+      if (b.cancelled === true) return false;
+
+      const checkout = new Date(b.checkOut);
+      checkout.setHours(0, 0, 0, 0);
+
+      return checkout < today;
+    };
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const isConfirmed = (b) => {
       if (b.cancelled === true) return false;
 
-      return (
+      const paid =
         b.paymentStatus === "paid" ||
         b.status === "confirmed" ||
-        Boolean(b.paymentId)
-      );
+        Boolean(b.paymentId);
+
+      if (!paid) return false;
+
+      return !isCompleted(b);
     };
     const confirmedBookings = bookings.filter(isConfirmed);
+    const completedBookings = bookings.filter(isCompleted);
 
     const isPending = (b) =>
       b.paymentStatus === "initiated" && b.cancelled !== true;
@@ -178,6 +192,7 @@ export const getOwnerDashboard = async (req, res) => {
       totalUsers: uniqueTravellerIds.size,
 
       confirmed: confirmedBookings.length,
+      completed: completedBookings.length,
       pending: bookings.filter(isPending).length,
       cancelled: bookings.filter(isCancelled).length,
 
