@@ -126,28 +126,35 @@ export const getOwnerDashboard = async (req, res) => {
     const isCancelled = (b) =>
       b.status === "cancelled" || b.cancelled === true;
 
-    const revenueBookings = bookings.filter(b => isCompleted(b));
-
-    const grossRevenue = revenueBookings.reduce(
-      (sum, b) => sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
-      0
-    );
-
     const totalRefunds = bookings
       .filter(b => b.cancelled === true && b.refundAmount && isCompleted(b))
       .reduce((sum, b) => sum + Number(b.refundAmount || 0), 0);
 
-    const cancellationRevenue = bookings
-      .filter(b => b.cancelled === true && b.refundAmount !== undefined)
-      .reduce((sum, b) => {
-        const total = Number(b.grandTotal ?? b.totalAmount ?? 0);
-        const refund = Number(b.refundAmount || 0);
-        const retained = Math.max(total - refund, 0);
-        return sum + retained;
-      }, 0);
+    const paidRevenue = bookings
+  .filter(b =>
+    b.cancelled !== true &&
+    (
+      b.paymentStatus === "paid" ||
+      Boolean(b.paymentId)
+    )
+  )
+  .reduce((sum, b) => {
+    return sum + Number(b.grandTotal ?? b.totalAmount ?? 0);
+  }, 0);
 
+// 2️⃣ Cancellation retained amount (penalty income)
+const cancellationRevenue = bookings
+  .filter(b => b.cancelled === true && b.refundAmount !== undefined)
+  .reduce((sum, b) => {
+    const total = Number(b.grandTotal ?? b.totalAmount ?? 0);
+    const refund = Number(b.refundAmount || 0);
+    const retained = Math.max(total - refund, 0);
+    return sum + retained;
+  }, 0);
 
-    const netRevenue = grossRevenue + cancellationRevenue;
+// 3️⃣ Final Net Revenue
+const grossRevenue = paidRevenue;
+const netRevenue = paidRevenue + cancellationRevenue;
 
     const now = new Date();
     const currentYear = now.getFullYear();
