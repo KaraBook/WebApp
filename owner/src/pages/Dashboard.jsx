@@ -11,7 +11,6 @@ import MobileBookingsList from "@/components/MobileBookingList";
 import { Calendar } from "@/components/ui/calendar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import BookingDesktopCard from "@/components/BookingDesktopCard";
-import PaymentChip from "@/components/PaymentChip";
 import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
 import { getBookingStatus, BOOKING_STATUS } from "@/utils/bookingStatus";
 

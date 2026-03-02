@@ -2,8 +2,7 @@ import { MoreVertical, Calendar, Moon, Users, Phone, Mail, MailCheck } from "luc
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
 import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage } from "@/utils/whatsappMessage";
-import { getBookingStatus, getStatusMeta } from "@/utils/bookingStatus";
-
+import { getBookingStatus, getStatusMeta, BOOKING_STATUS } from "@/utils/bookingStatus";
 
 const formatCurrency = (value) => {
   const num = Number(value);
@@ -189,7 +188,7 @@ If you need any help completing your booking or payment, feel free to reply here
             >
               {bookingStatus === BOOKING_STATUS.CANCELLED
                 ? "Message Cancelled Guest"
-                : bookingStatus === "confirmed"
+                : bookingStatus === BOOKING_STATUS.CONFIRMED
                   ? "Send Welcome Message"
                   : "Send Reminder"}
             </DropdownMenuItem>
