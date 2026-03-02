@@ -126,25 +126,15 @@ export const getOwnerDashboard = async (req, res) => {
     const isCancelled = (b) =>
       b.status === "cancelled" || b.cancelled === true;
 
-    const isBookingRevenue = (b) => {
-      if (b.cancelled === true) return false;
+    const revenueBookings = bookings.filter(b => isCompleted(b));
 
-      return (
-        b.paymentStatus === "paid" ||
-        b.status === "confirmed" ||
-        Boolean(b.paymentId)
-      );
-    };
-
-    const bookingRevenueBookings = bookings.filter(isBookingRevenue);
-
-    const grossRevenue = bookingRevenueBookings.reduce(
+    const grossRevenue = revenueBookings.reduce(
       (sum, b) => sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
       0
     );
 
     const totalRefunds = bookings
-      .filter(b => b.cancelled === true && b.refundAmount)
+      .filter(b => b.cancelled === true && b.refundAmount && isCompleted(b))
       .reduce((sum, b) => sum + Number(b.refundAmount || 0), 0);
 
     const netRevenue = grossRevenue - totalRefunds;
