@@ -4,11 +4,7 @@ export function isCancelled(b) {
 
 export function isPaid(b) {
   if (!b) return false;
-
-  return (
-    b.paymentStatus === "paid" &&
-    b.status === "confirmed"
-  );
+  return b.paymentStatus === "paid";
 }
 
 export function isCompleted(b) {
@@ -26,11 +22,7 @@ export function canRate(b) {
   const now = new Date();
   const checkout = new Date(b.checkOut);
 
-  const isPaid =
-    b.paymentStatus === "paid" ||
-    b.status === "confirmed" ||
-    b.paymentId;
-
+  if (b.paymentStatus !== "paid") return false;
   if (b.cancelled) return false;
   if (!isPaid) return false;
   if (now < checkout) return false;

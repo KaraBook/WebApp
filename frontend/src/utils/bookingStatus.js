@@ -3,17 +3,14 @@ export function getBookingStatus(b) {
 
   if (b.cancelled === true) return "cancelled";
 
-  const isConfirmed =
-    b.paymentStatus === "paid" &&
-    b.status === "confirmed";
-
-  if (!isConfirmed) return "pending";
-
-  if (b.checkOut && new Date(b.checkOut) < new Date()) {
-    return "completed";
+  if (b.paymentStatus === "paid") {
+    if (b.checkOut && new Date(b.checkOut) < new Date()) {
+      return "completed";
+    }
+    return "confirmed";
   }
 
-  return "confirmed";
+  return "pending";
 }
 
 
