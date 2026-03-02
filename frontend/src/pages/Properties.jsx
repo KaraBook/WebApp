@@ -158,10 +158,10 @@ export default function Properties() {
         </div>
 
         {/* Floating images */}
-        <img src="/banimg1.jpg" className="hidden md:block w-[160px] rounded-[12px] absolute top-[10%] left-[18%]" />
-        <img src="/banimg1.jpg" className="hidden md:block w-[200px] rounded-[12px] absolute top-[48%] left-[10%]" />
-        <img src="/banimg1.jpg" className="hidden md:block w-[200px] rounded-[12px] absolute top-[10%] right-[16%]" />
-        <img src="/banimg1.jpg" className="hidden md:block w-[160px] rounded-[12px] absolute top-[54%] right-[10%]" />
+        <img src="/DiscoverImg1.jpg" className="hidden md:block w-[160px] rounded-[12px] absolute top-[10%] left-[18%]" />
+        <img src="/DiscoverImg.jpg" className="hidden md:block w-[200px] rounded-[12px] absolute top-[48%] left-[10%]" />
+        <img src="/DiscoverImg2.jpg" className="hidden md:block w-[200px] rounded-[12px] absolute top-[10%] right-[16%]" />
+        <img src="/DiscoverImg3.jpg" className="hidden md:block w-[160px] rounded-[12px] absolute top-[54%] right-[10%]" />
       </div>
 
 
