@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Drawer, DrawerContent, DrawerOverlay } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { Home, Calendar as CalendarIcon, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
-import { getBookingStatus, getStatusMeta } from "@/utils/bookingStatus";
+import { getBookingStatus, getStatusMeta, BOOKING_STATUS } from "@/utils/bookingStatus";
 import PaymentChip from "@/components/PaymentChip";
 
 
@@ -84,10 +84,9 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     }, [open]);
 
     if (!booking) return null;
-    if (getBookingStatus(booking) === BOOKING_STATUS.PENDING) {
-        onClose?.();
-        return null;
-    }
+
+    const bookingStatus = getBookingStatus(booking);
+    if (bookingStatus === BOOKING_STATUS.PENDING) return null;
 
     const cleanNumber = (v) => {
         const n = Number(v);

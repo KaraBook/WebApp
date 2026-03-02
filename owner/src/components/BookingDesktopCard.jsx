@@ -205,11 +205,9 @@ If you need any help completing your booking or payment, feel free to reply here
             >
               {bookingStatus === BOOKING_STATUS.CANCELLED
                 ? "Message Cancelled Guest"
-                : bookingStatus === BOOKING_STATUS.PENDING
-                  ? "Send Payment Reminder"
-                  : bookingStatus === BOOKING_STATUS.CONFIRMED
-                    ? "Send Welcome Message"
-                    : "Send Thank You Message"}
+                : bookingStatus === BOOKING_STATUS.CONFIRMED
+                  ? "Send Welcome Message"
+                  : "Send Thank You Message"}
             </DropdownMenuItem>
 
           </DropdownMenuContent>
