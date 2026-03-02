@@ -1,66 +1,90 @@
+
 export const BOOKING_STATUS = {
   CONFIRMED: "confirmed",
   PENDING: "pending",
   CANCELLED: "cancelled",
+  COMPLETED: "completed",
 };
 
-export function getBookingStatus(booking) {
-  if (!booking) return BOOKING_STATUS.PENDING;
 
-  if (booking.cancelled === true || booking.status === "cancelled") {
+export function getBookingStatus(b) {
+  if (!b) return BOOKING_STATUS.PENDING;
+
+  if (b.cancelled === true || b.status === "cancelled") {
     return BOOKING_STATUS.CANCELLED;
   }
 
-  if (
-    booking.paymentStatus === "paid" ||
-    booking.paymentStatus === "captured" ||
-    booking.status === "confirmed" ||
-    booking.status === "paid" ||
-    Boolean(booking.paymentId)
-  ) {
+  const isPaid =
+    b.paymentStatus === "paid" ||
+    b.paymentStatus === "captured" ||
+    b.status === "confirmed" ||
+    b.status === "paid" ||
+    Boolean(b.paymentId);
+
+  if (isPaid) {
+    if (b.checkOut) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const checkout = new Date(b.checkOut);
+      checkout.setHours(0, 0, 0, 0);
+
+      if (checkout < today) {
+        return BOOKING_STATUS.COMPLETED;
+      }
+    }
+
     return BOOKING_STATUS.CONFIRMED;
   }
 
   return BOOKING_STATUS.PENDING;
 }
 
-export function isConfirmed(booking) {
-  return getBookingStatus(booking) === BOOKING_STATUS.CONFIRMED;
-}
 
-export function isPending(booking) {
-  return getBookingStatus(booking) === BOOKING_STATUS.PENDING;
-}
-
-export function isCancelled(booking) {
-  return getBookingStatus(booking) === BOOKING_STATUS.CANCELLED;
-}
+export const isConfirmed = (b) => getBookingStatus(b) === BOOKING_STATUS.CONFIRMED;
+export const isPending = (b) => getBookingStatus(b) === BOOKING_STATUS.PENDING;
+export const isCancelled = (b) => getBookingStatus(b) === BOOKING_STATUS.CANCELLED;
+export const isCompleted = (b) => getBookingStatus(b) === BOOKING_STATUS.COMPLETED;
 
 
-export function getStatusMeta(booking) {
-  const status = getBookingStatus(booking);
+export function getStatusMeta(b) {
+  const status = getBookingStatus(b);
 
   const map = {
     confirmed: {
       label: "Confirmed",
-      chip: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+      chip: "border-emerald-300 bg-emerald-50 text-emerald-700",
       dot: "bg-emerald-500",
-      calendar: "bg-green-100 text-green-800",
+      soft: "bg-emerald-100 text-emerald-700",
+      calendar: "bg-emerald-100 text-emerald-800",
       iconColor: "text-emerald-600",
     },
+
     pending: {
       label: "Pending Payment",
-      chip: "bg-amber-50 text-amber-700 border border-amber-200",
-      dot: "bg-amber-400",
-      calendar: "bg-yellow-100 text-yellow-800",
+      chip: "border-amber-300 bg-amber-50 text-amber-700",
+      dot: "bg-amber-500",
+      soft: "bg-amber-100 text-amber-700",
+      calendar: "bg-amber-100 text-amber-800",
       iconColor: "text-amber-600",
     },
+
     cancelled: {
       label: "Cancelled",
-      chip: "bg-red-50 text-red-700 border border-red-200",
-      dot: "bg-red-500",
-      calendar: "bg-red-100 text-red-700",
-      iconColor: "text-red-600",
+      chip: "border-rose-300 bg-rose-50 text-rose-700",
+      dot: "bg-rose-500",
+      soft: "bg-rose-100 text-rose-700",
+      calendar: "bg-rose-100 text-rose-700",
+      iconColor: "text-rose-600",
+    },
+
+    completed: {
+      label: "Completed",
+      chip: "border-blue-300 bg-blue-50 text-blue-700",
+      dot: "bg-blue-500",
+      soft: "bg-blue-100 text-blue-700",
+      calendar: "bg-blue-100 text-blue-800",
+      iconColor: "text-blue-600",
     },
   };
 

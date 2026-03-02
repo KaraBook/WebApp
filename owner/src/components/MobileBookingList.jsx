@@ -5,11 +5,6 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage } from "@/utils/whatsappMessage";
 
 
-function normalizeBookingStatus(booking) {
-    if (booking.cancelled) return "cancelled";
-    if (["paid", "confirmed"].includes(booking.paymentStatus)) return "confirmed";
-    return "pending";
-}
 
 function PaymentChip({ booking }) {
     const s = normalizeBookingStatus(booking);

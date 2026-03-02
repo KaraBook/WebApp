@@ -280,7 +280,7 @@ function Header({ userName, createdAt, statusMeta, bookingId, formatDate, onClos
                 <div className="flex items-center gap-2">
                     <Clock size={14} />
                     <span>
-                        Booking created on {formatDate(createdAt)}
+                        Booking created on <b>{formatDate(createdAt)}</b>
                     </span>
 
                     {bookingId && (

@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import BookingDesktopCard from "@/components/BookingDesktopCard";
 import PaymentChip from "@/components/PaymentChip";
 import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
-import { getBookingStatus } from "@/utils/bookingStatus";
+import { getBookingStatus, BOOKING_STATUS } from "@/utils/bookingStatus";
 
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
@@ -338,8 +338,11 @@ export default function Dashboard() {
 
     if (!matches.length) return null;
 
-    if (matches.some(b => getBookingStatus(b) === "confirmed"))
+    if (matches.some(b => getBookingStatus(b) === BOOKING_STATUS.CONFIRMED))
       return "confirmed";
+
+    if (matches.some(b => getBookingStatus(b) === BOOKING_STATUS.COMPLETED))
+      return "completed";
 
     if (matches.some(b => getBookingStatus(b) === "pending"))
       return "pending";
@@ -570,13 +573,16 @@ export default function Dashboard() {
                   confirmed: (d) => getDateStatus(d) === "confirmed",
                   pending: (d) => getDateStatus(d) === "pending",
                   cancelled: (d) => getDateStatus(d) === "cancelled",
+                  completed: (d) => getDateStatus(d) === "completed",
                   blocked: isDateBlocked,
                 }}
+
                 modifiersClassNames={{
                   confirmed: "bg-emerald-100 text-emerald-800",
                   pending: "bg-amber-100 text-amber-800",
                   cancelled: "bg-red-100 text-red-700",
-                  blocked: "bg-blue-100 text-blue-700",
+                  completed: "bg-blue-100 text-blue-800",
+                  blocked: "bg-sky-100 text-sky-700",
                 }}
                 components={{
                   DayContent: ({ date }) => (
@@ -651,7 +657,7 @@ export default function Dashboard() {
               if (!prev) return prev;
               const updatedBookings = prev.bookings.map((b) =>
                 b._id === updatedBooking._id
-                 ? { ...b, ...updatedBooking, userId: b.userId, propertyId: b.propertyId, guests: b.guests, meals: b.meals }
+                  ? { ...b, ...updatedBooking, userId: b.userId, propertyId: b.propertyId, guests: b.guests, meals: b.meals }
                   : b
               );
 

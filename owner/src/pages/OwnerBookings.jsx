@@ -23,21 +23,6 @@ import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
 import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage, encodeWhatsapp } from "@/utils/whatsappMessage";
 
 
-function getBookingStatus(b) {
-  if (b?.cancelled === true) return "cancelled";
-
-  if (
-    b?.paymentStatus === "paid" ||
-    b?.paymentStatus === "captured" ||
-    b?.status === "confirmed" ||
-    b?.paymentId
-  ) {
-    return "confirmed";
-  }
-
-  return "pending";
-}
-
 
 export default function OwnerBookings() {
   const [bookings, setBookings] = useState([]);
