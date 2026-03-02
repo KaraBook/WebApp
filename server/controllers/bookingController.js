@@ -731,10 +731,12 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
-    if (
-      booking.paymentStatus !== "paid" ||
-      booking.status !== "confirmed"
-    ) {
+    if (booking.paymentStatus !== "paid") {
+      return res.status(400).json({
+        success: false,
+        message: "Only paid bookings can be cancelled."
+      });
+    } {
       return res.status(400).json({
         success: false,
         message: "Pending bookings cannot be cancelled."
