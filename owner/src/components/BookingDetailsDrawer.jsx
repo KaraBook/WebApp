@@ -18,6 +18,11 @@ const safeFormatDate = (d) => {
     });
 };
 
+const shortBookingId = (id) => {
+  if (!id) return "";
+  return `#KB-${String(id).slice(-6).toUpperCase()}`;
+};
+
 
 const formatCurrency = (value) => {
     const num = Number(value);
@@ -27,28 +32,38 @@ const formatCurrency = (value) => {
 
 
 function normalizeBooking(booking = {}) {
-  return {
-    ...booking,
+    return {
+        ...booking,
 
-    guests: {
-      adults: Number(booking?.guests?.adults || 0),
-      children: Number(booking?.guests?.children || 0),
-      infants: Number(booking?.guests?.infants || 0),
-    },
+        guests: {
+            adults: Number(booking?.guests?.adults || 0),
+            children: Number(booking?.guests?.children || 0),
+            infants: Number(booking?.guests?.infants || 0),
+        },
 
-    meals: {
-      veg: Number(booking?.meals?.veg || 0),
-      nonVeg: Number(booking?.meals?.nonVeg || 0),
-    },
+        meals: {
+            veg: Number(booking?.meals?.veg || 0),
+            nonVeg: Number(booking?.meals?.nonVeg || 0),
+        },
 
-    totalAmount: Number(booking?.totalAmount || 0),
-    taxAmount: Number(booking?.taxAmount || 0),
-    grandTotal: Number(booking?.grandTotal || booking?.totalAmount || 0),
+        totalAmount: Number(booking?.totalAmount || 0),
+        taxAmount: Number(booking?.taxAmount || 0),
+        grandTotal: Number(booking?.grandTotal || booking?.totalAmount || 0),
 
-    userId: booking.userId || {},
-    propertyId: booking.propertyId || {},
-  };
+        userId: booking.userId || {},
+        propertyId: booking.propertyId || {},
+    };
 }
+
+
+const toTitleCase = (str = "") => {
+    return str
+        .toLowerCase()
+        .split(" ")
+        .filter(Boolean)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+};
 
 
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
@@ -109,8 +124,12 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
     const veg = booking?.meals?.veg || 0;
     const nonVeg = booking?.meals?.nonVeg || 0;
 
-    const userName =
-        `${userId?.firstName || ""} ${userId?.lastName || ""}`.trim() || "Guest";
+    const rawName =
+        `${userId?.firstName || ""} ${userId?.lastName || ""}`.trim();
+
+    const userName = rawName
+        ? toTitleCase(rawName)
+        : "Traveller";
 
     const userEmail =
         userId?.email || contactEmail || "—";
@@ -141,6 +160,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
                         userName={userName}
                         createdAt={createdAt}
                         statusMeta={statusMeta}
+                        bookingId={booking?._id}
                         formatDate={safeFormatDate}
                         onClose={onClose}
                     />
@@ -208,6 +228,7 @@ ${open
                         userName={userName}
                         createdAt={createdAt}
                         statusMeta={statusMeta}
+                        bookingId={booking?._id}
                         formatDate={safeFormatDate}
                         onClose={onClose}
                     />
@@ -242,34 +263,57 @@ ${open
 }
 
 
-function Header({ userName, createdAt, statusMeta, formatDate, onClose }) {
+function Header({ userName, createdAt, statusMeta, bookingId, formatDate, onClose }) {
     if (!statusMeta) return null;
+
     return (
-        <div className="px-3 py-3 border-b relative">
-            <h2 className="text-[17px] font-semibold">{userName}</h2>
+        <div className="px-4 py-3 border-b relative">
 
-            <div className="flex items-center justify-between mt-1">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            {/* NAME */}
+            <h2 className="text-[18px] font-semibold tracking-wide">
+                {userName}
+            </h2>
+
+            {/* META LINE */}
+            <div className="flex items-center justify-between mt-1 text-xs text-muted-foreground">
+
+                <div className="flex items-center gap-2">
                     <Clock size={14} />
-                    Booking created on {formatDate(createdAt)}
-                </div>
+                    <span>
+                        Booking created on {formatDate(createdAt)}
+                    </span>
 
-                <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize border ${statusMeta.chip}`}
-                >
-                    {statusMeta.label}
-                </span>
+                    {bookingId && (
+                        <>
+                            <span>·</span>
+                            <span className="font-medium text-gray-700">
+                                {shortBookingId(bookingId)}
+                            </span>
+                        </>
+                    )}
+
+                    <span>|</span>
+
+                    <span
+                        className={`px-2 py-0.5 rounded-full text-[11px] font-medium border ${statusMeta.chip}`}
+                    >
+                        {statusMeta.label}
+                    </span>
+                </div>
             </div>
 
+            {/* CLOSE BUTTON */}
             <button
                 onClick={onClose}
                 className="absolute top-2 right-3 p-2 rounded-md text-gray-500 hover:bg-gray-100"
             >
                 <X className="h-4 w-4" />
             </button>
+
         </div>
     );
 }
+
 
 function Body({ uiStatus, ...props }) {
     const {
