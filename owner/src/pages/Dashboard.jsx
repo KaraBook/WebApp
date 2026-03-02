@@ -241,13 +241,9 @@ export default function Dashboard() {
 
         const dashboardData = res.data?.data;
 
-        const sortedBookings = dashboardData.bookings.sort(
-          (a, b) => new Date(a.checkIn) - new Date(b.checkIn)
-        );
-
         setData({
           stats: dashboardData.stats,
-          bookings: sortedBookings,
+          bookings: dashboardData.bookings,
         });
 
       } catch (err) {

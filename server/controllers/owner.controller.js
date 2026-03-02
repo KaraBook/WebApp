@@ -59,9 +59,14 @@ export const getOwnerDashboard = async (req, res) => {
 
     const propertyIds = properties.map((p) => p._id);
 
-    /* ------------------ BOOKINGS ------------------ */
     const bookings = await Booking.find({
       propertyId: { $in: propertyIds },
+      $or: [
+        { paymentStatus: "paid" },
+        { status: "confirmed" },
+        { paymentId: { $exists: true, $ne: null } },
+        { cancelled: true }
+      ]
     })
       .populate("userId", "firstName lastName email mobile roles primaryRole")
       .populate("propertyId", "propertyName ownerUserId isRefundable cancellationPolicy coverImage")
@@ -288,7 +293,15 @@ export const getOwnerBookings = async (req, res) => {
 
     const propertyIds = properties.map((p) => p._id);
 
-    const bookings = await Booking.find({ propertyId: { $in: propertyIds } })
+    const bookings = await Booking.find({
+      propertyId: { $in: propertyIds },
+      $or: [
+        { paymentStatus: "paid" },
+        { status: "confirmed" },
+        { paymentId: { $exists: true, $ne: null } },
+        { cancelled: true }
+      ]
+    })
       .populate("propertyId", "propertyName isRefundable cancellationPolicy coverImage")
       .populate("userId", "firstName lastName email mobile roles primaryRole");
 
