@@ -487,7 +487,7 @@ export default function Dashboard() {
             <StatCard
               icon={IndianRupee}
               label="Net Revenue"
-              value={`₹${stats?.netRevenue?.toLocaleString("en-IN") || 0}`}
+              value={`₹${(Number(stats?.netRevenue) || 0).toLocaleString("en-IN")}`}
               caption={
                 stats?.growthText
                   ? stats.growthText
