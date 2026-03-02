@@ -1,8 +1,9 @@
 import { getStatusMeta } from "@/utils/bookingStatus";
 
 export default function PaymentChip({ booking, small = false }) {
-  const meta = getStatusMeta(booking);
+  if (!booking) return null;
 
+  const meta = getStatusMeta(booking);
   if (!meta) return null;
 
   return (

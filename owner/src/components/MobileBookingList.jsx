@@ -4,6 +4,7 @@ import { CalendarCheck, Clock, Users, MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage } from "@/utils/whatsappMessage";
 import { getBookingStatus, BOOKING_STATUS } from "@/utils/bookingStatus";
+import PaymentChip from "@/components/PaymentChip";
 
 
 export default function MobileBookingsList({
