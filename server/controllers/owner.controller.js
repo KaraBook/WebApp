@@ -137,7 +137,17 @@ export const getOwnerDashboard = async (req, res) => {
       .filter(b => b.cancelled === true && b.refundAmount && isCompleted(b))
       .reduce((sum, b) => sum + Number(b.refundAmount || 0), 0);
 
-    const netRevenue = grossRevenue - totalRefunds;
+    const cancellationRevenue = bookings
+      .filter(b => b.cancelled === true && b.refundAmount !== undefined)
+      .reduce((sum, b) => {
+        const total = Number(b.grandTotal ?? b.totalAmount ?? 0);
+        const refund = Number(b.refundAmount || 0);
+        const retained = Math.max(total - refund, 0);
+        return sum + retained;
+      }, 0);
+
+
+    const netRevenue = grossRevenue + cancellationRevenue;
 
     const now = new Date();
     const currentYear = now.getFullYear();
