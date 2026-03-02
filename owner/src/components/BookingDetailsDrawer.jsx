@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Drawer, DrawerContent, DrawerOverlay } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
+import { Home, Calendar as CalendarIcon, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
 import { getBookingStatus, getStatusMeta } from "@/utils/bookingStatus";
 
 
@@ -403,7 +403,7 @@ function BookingSummaryBlock({
 
             {/* Dates */}
             <div className="flex items-start gap-3">
-                <Calendar size={18} className="mt-0.5 text-muted-foreground" />
+                <CalendarIcon size={18} className="mt-0.5 text-muted-foreground" />
                 <div>
                     <p className="font-medium">
                         {formatDate(checkIn)} – {formatDate(checkOut)}
