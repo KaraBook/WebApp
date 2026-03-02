@@ -186,8 +186,6 @@ function CalendarLegend() {
   return (
     <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
       <LegendItem color="green" label="Confirmed Booking" />
-      <LegendItem color="yellow" label="Pending Payment" />
-      <LegendItem color="red" label="Cancelled" />
       <LegendItem color="blue" label="Owner Blocked" />
     </div>
   );
@@ -316,6 +314,8 @@ export default function Dashboard() {
     bookings.forEach((b) => {
       const status = getBookingStatus(b);
 
+      if (status !== BOOKING_STATUS.CONFIRMED) return;
+
       const start = new Date(b.checkIn);
       const end = new Date(b.checkOut);
 
@@ -325,7 +325,7 @@ export default function Dashboard() {
         d.setDate(d.getDate() + 1)
       ) {
         const key = d.toISOString().slice(0, 10);
-        map[key] = status;
+        map[key] = BOOKING_STATUS.CONFIRMED;
       }
     });
 
@@ -505,17 +505,11 @@ export default function Dashboard() {
                 className="rounded-xl border"
                 modifiers={{
                   confirmed: (d) => getDateStatus(d) === BOOKING_STATUS.CONFIRMED,
-                  pending: (d) => getDateStatus(d) === BOOKING_STATUS.PENDING,
-                  cancelled: (d) => getDateStatus(d) === BOOKING_STATUS.CANCELLED,
-                  completed: (d) => getDateStatus(d) === BOOKING_STATUS.COMPLETED,
                   blocked: isDateBlocked,
                 }}
 
                 modifiersClassNames={{
                   confirmed: "bg-emerald-100 text-emerald-800",
-                  pending: "bg-amber-100 text-amber-800",
-                  cancelled: "bg-red-100 text-red-700",
-                  completed: "bg-blue-100 text-blue-800",
                   blocked: "bg-sky-100 text-sky-700",
                 }}
                 components={{
@@ -526,8 +520,6 @@ export default function Dashboard() {
                       {/* status dot */}
                       <div className="absolute bottom-1 flex gap-[2px]">
                         {getDateStatus(date) === BOOKING_STATUS.CONFIRMED && <Dot color="green" />}
-                        {getDateStatus(date) === BOOKING_STATUS.PENDING && <Dot color="yellow" />}
-                        {getDateStatus(date) === BOOKING_STATUS.CANCELLED && <Dot color="red" />}
                         {isDateBlocked(date) && <Dot color="blue" />}
                       </div>
                     </div>

@@ -159,6 +159,12 @@ If you need help completing your booking or payment, please reply here 😊`;
       );
     }
 
+    if (statusFilter === "completed") {
+      data = data.filter(
+        (b) => getBookingStatus(b) === BOOKING_STATUS.COMPLETED
+      );
+    }
+
     if (statusFilter === "pending") {
       data = data.filter(
         (b) => getBookingStatus(b) === BOOKING_STATUS.PENDING
@@ -315,17 +321,26 @@ If you need help completing your booking or payment, please reply here 😊`;
                   <SelectValue placeholder="Time" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="upcoming">Upcoming</SelectItem>
-                  <SelectItem value="past">Past</SelectItem>
                   <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="hidden md:block">
               <Select value={statusFilter} onValueChange={(val) => {
+                let newTime = timeFilter;
+
+                if (val === "completed") {
+                  newTime = "past";
+                  setTimeFilter("past");
+                }
+
                 setStatusFilter(val);
-                navigate(`/bookings?time=${timeFilter}&status=${val}`);
+                navigate(`/bookings?time=${newTime}&status=${val}`);
               }}>
                 <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
                   <SelectValue placeholder="Status" />
