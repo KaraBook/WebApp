@@ -63,7 +63,7 @@ export const getOwnerDashboard = async (req, res) => {
       propertyId: { $in: propertyIds },
     })
       .populate("userId", "firstName lastName email mobile roles primaryRole")
-      .populate("propertyId", "propertyName isRefundable cancellationPolicy coverImage")
+      .populate("propertyId", "propertyName ownerUserId isRefundable cancellationPolicy coverImage")
       .lean();
 
     const uniqueTravellerIds = new Set();
@@ -77,7 +77,7 @@ export const getOwnerDashboard = async (req, res) => {
         b.propertyId?.ownerUserId
       );
 
-      if (relationshipRole === "traveller") {
+      if (relationshipRole === "traveller" && b.userId?._id) {
         uniqueTravellerIds.add(b.userId._id.toString());
       }
     });
