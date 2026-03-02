@@ -2,23 +2,7 @@ import { MoreVertical, Calendar, Moon, Users, Phone, Mail, MailCheck } from "luc
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import PaymentChip from "@/components/PaymentChip";
 import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage } from "@/utils/whatsappMessage";
-
-
-
-function normalizeBookingStatus(b) {
-  if (b?.cancelled === true) return "cancelled";
-
-  if (
-    b?.paymentStatus === "paid" ||
-    b?.paymentStatus === "captured" ||
-    b?.status === "confirmed" ||
-    b?.status === "paid" ||
-    b?.paymentId
-  ) {
-    return "confirmed";
-  }
-  return "pending";
-}
+import { getBookingStatus, getStatusMeta } from "@/utils/bookingStatus";
 
 
 const formatCurrency = (value) => {
@@ -43,7 +27,8 @@ export default function BookingDesktopCard({
   const phone = b.userId?.mobile;
   const email = b.userId?.email;
   const property = b.propertyId?.propertyName;
-  const bookingStatus = normalizeBookingStatus(b);
+  const bookingStatus = getBookingStatus(b);
+  const statusMeta = getStatusMeta(b);
 
   const handleWhatsapp = () => {
     const phone = b.userId?.mobile;
@@ -82,14 +67,16 @@ If you need any help completing your booking or payment, feel free to reply here
   return (
     <div
       onClick={() => onOpen(b)}
-      className="
-        bg-white border border-emerald-200/60
-        rounded-2xl px-6 py-4
-        flex items-center justify-between
-        shadow-sm
-        hover:shadow-md
-        transition cursor-pointer
-      "
+      className={`
+    bg-white
+    border
+    rounded-2xl px-6 py-4
+    flex items-center justify-between
+    shadow-sm
+    hover:shadow-md
+    transition cursor-pointer
+    ${statusMeta.chip}
+  `}
     >
       {/* LEFT */}
       <div className="flex w-[30%] items-center gap-4 min-w-0">
@@ -182,16 +169,16 @@ If you need any help completing your booking or payment, feel free to reply here
             )}
 
             {/* Cancel logic */}
-            {bookingStatus === "cancelled" ? (
-              <DropdownMenuItem disabled className="text-red-500 italic">
-                Cancelled
-              </DropdownMenuItem>
-            ) : (
+            {bookingStatus !== "cancelled" && bookingStatus !== "pending" ? (
               <DropdownMenuItem
                 className="text-red-600 font-medium"
                 onSelect={() => onCancelBooking(b)}
               >
                 Cancel Booking
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem disabled className="text-gray-400 italic">
+                Cannot cancel
               </DropdownMenuItem>
             )}
 

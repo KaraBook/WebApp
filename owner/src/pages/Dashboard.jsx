@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import BookingDesktopCard from "@/components/BookingDesktopCard";
 import PaymentChip from "@/components/PaymentChip";
 import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
+import { getBookingStatus } from "@/utils/bookingStatus";
 
 function Pagination({ currentPage, totalPages, setCurrentPage }) {
   if (totalPages <= 1) return null;
@@ -165,18 +166,6 @@ function StatCard({
   );
 }
 
-function normalizeBookingStatus(b) {
-  if (b.cancelled || b.status === "cancelled") return "cancelled";
-  if (
-    b.paymentStatus === "paid" ||
-    b.status === "confirmed" ||
-    Boolean(b.paymentId)
-  ) {
-    return "confirmed";
-  }
-  return "pending";
-}
-
 
 
 function Dot({ color }) {
@@ -320,14 +309,14 @@ export default function Dashboard() {
 
   const isDatePending = (date) =>
     bookings?.some(b =>
-      normalizeBookingStatus(b) === "pending" &&
+      getBookingStatus(b) === "pending" &&
       date >= new Date(b.checkIn) &&
       date <= new Date(b.checkOut)
     );
 
   const isDateCancelled = (date) =>
     bookings?.some(b =>
-      normalizeBookingStatus(b) === "cancelled" &&
+      getBookingStatus(b) === "cancelled" &&
       date >= new Date(b.checkIn) &&
       date <= new Date(b.checkOut)
     );
@@ -349,13 +338,13 @@ export default function Dashboard() {
 
     if (!matches.length) return null;
 
-    if (matches.some(b => normalizeBookingStatus(b) === "confirmed"))
+    if (matches.some(b => getBookingStatus(b) === "confirmed"))
       return "confirmed";
 
-    if (matches.some(b => normalizeBookingStatus(b) === "pending"))
+    if (matches.some(b => getBookingStatus(b) === "pending"))
       return "pending";
 
-    if (matches.some(b => normalizeBookingStatus(b) === "cancelled"))
+    if (matches.some(b => getBookingStatus(b) === "cancelled"))
       return "cancelled";
 
     return null;
@@ -584,10 +573,10 @@ export default function Dashboard() {
                   blocked: isDateBlocked,
                 }}
                 modifiersClassNames={{
-                  confirmed: "bg-green-100 rounded-md text-green-800",
-                  blocked: "bg-blue-100 rounded-md text-blue-800",
-                  pending: "bg-yellow-100 rounded-md text-yellow-800",
-                  cancelled: "bg-red-200 rounded-md text-red-600",
+                  confirmed: "bg-emerald-100 text-emerald-800",
+                  pending: "bg-amber-100 text-amber-800",
+                  cancelled: "bg-red-100 text-red-700",
+                  blocked: "bg-blue-100 text-blue-700",
                 }}
                 components={{
                   DayContent: ({ date }) => (

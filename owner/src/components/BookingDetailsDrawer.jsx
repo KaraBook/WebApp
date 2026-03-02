@@ -2,23 +2,7 @@ import { useEffect, useState } from "react";
 import { Drawer, DrawerContent, DrawerOverlay } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { Home, Calendar, Moon, Users, Mail, Phone, Clock, X } from "lucide-react";
-
-
-function normalizeBookingStatus(b) {
-    if (b?.cancelled === true) return "cancelled";
-
-    if (
-        b?.paymentStatus === "paid" ||
-        b?.paymentStatus === "captured" ||
-        b?.status === "confirmed" ||
-        b?.status === "paid" ||
-        b?.paymentId
-    ) {
-        return "confirmed";
-    }
-
-    return "pending";
-}
+import { getBookingStatus, getStatusMeta } from "@/utils/bookingStatus";
 
 
 const safeFormatDate = (d) => {
@@ -92,7 +76,8 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         contactEmail,
     } = safeBooking;
 
-    const uiStatus = normalizeBookingStatus(booking);
+    const uiStatus = getBookingStatus(booking);
+    const statusMeta = getStatusMeta(booking);
     const refundPercent = booking?.ownerRefundPercent ?? 0;
     const refundAmount = booking?.refundAmount ?? 0;
     const isCancelled = booking?.cancelled === true;
@@ -246,16 +231,9 @@ function Header({ userName, createdAt, uiStatus, formatDate, onClose }) {
                 </div>
 
                 <span
-                    className={`
-            px-3 py-1 rounded-full text-xs font-medium capitalize
-            ${uiStatus === "confirmed"
-                            ? "bg-emerald-100 text-emerald-700"
-                            : uiStatus === "cancelled"
-                                ? "bg-red-100 text-red-700"
-                                : "bg-yellow-100 text-yellow-700"}
-          `}
+                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize border ${statusMeta.chip}`}
                 >
-                    {uiStatus}
+                    {statusMeta.label}
                 </span>
             </div>
 
@@ -338,21 +316,14 @@ function Body(props) {
                 <Key label="Tax" value={formatCurrency(safeTax)} />
                 <Key label="Grand Total" value={formatCurrency(safeGrandTotal)} bold />
 
-                {isCancelled && (
+                {!isCancelled && uiStatus === "confirmed" && (
                     <>
                         <Separator />
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-2 mt-2 space-y-1">
+                        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mt-2">
                             <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Refund Percentage</span>
-                                <span className="font-semibold text-red-600">
-                                    {refundPercent}%
-                                </span>
-                            </div>
-
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Refund Amount</span>
-                                <span className="font-semibold text-green-600">
-                                    {formatCurrency(refundAmount)}
+                                <span className="text-muted-foreground">Owner Revenue</span>
+                                <span className="font-bold text-emerald-700">
+                                    {formatCurrency(safeGrandTotal)}
                                 </span>
                             </div>
                         </div>
