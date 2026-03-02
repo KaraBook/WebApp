@@ -108,16 +108,14 @@ export default function Dashboard() {
         b => getBookingStatus(b) === "cancelled"
     ).length;
 
-    const confirmedBookings = bookings.filter(
-        b => getBookingStatus(b) === "confirmed"
-    );
+    const paidBookings = bookings.filter(b => b.paymentStatus === "paid");
 
-    const grossSpent = confirmedBookings.reduce(
+    const grossSpent = paidBookings.reduce(
         (sum, b) => sum + (b.grandTotal || b.totalAmount || 0),
         0
     );
 
-    const totalRefunded = confirmedBookings.reduce(
+    const totalRefunded = paidBookings.reduce(
         (sum, b) => sum + (b.refundAmount || 0),
         0
     );
@@ -125,9 +123,10 @@ export default function Dashboard() {
     const netSpent = grossSpent - totalRefunded;
 
     const uniqueVisited = new Set(
-        bookings.map(b => b.propertyId?._id || b.propertyId)
+        bookings
+            .filter(b => getBookingStatus(b) === "completed")
+            .map(b => b.propertyId?._id || b.propertyId)
     ).size;
-
 
     const recentBookings = bookings.slice(0, 5);
 
