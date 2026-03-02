@@ -27,18 +27,27 @@ const formatCurrency = (value) => {
 
 
 function normalizeBooking(booking = {}) {
-    return {
-        ...booking,
-        guests: booking.guests || { adults: 0, children: 0, infants: 0 },
-        meals: booking.meals || { veg: 0, nonVeg: 0 },
-        totalAmount: Number(booking.totalAmount) || 0,
-        taxAmount: Number(booking.taxAmount) || 0,
-        grandTotal: Number(booking.grandTotal) || 0,
-        refundAmount: Number(booking.refundAmount) || 0,
-        ownerRefundPercent: Number(booking.ownerRefundPercent) || 0,
-        userId: booking.userId || {},
-        propertyId: booking.propertyId || {},
-    };
+  return {
+    ...booking,
+
+    guests: {
+      adults: Number(booking?.guests?.adults || 0),
+      children: Number(booking?.guests?.children || 0),
+      infants: Number(booking?.guests?.infants || 0),
+    },
+
+    meals: {
+      veg: Number(booking?.meals?.veg || 0),
+      nonVeg: Number(booking?.meals?.nonVeg || 0),
+    },
+
+    totalAmount: Number(booking?.totalAmount || 0),
+    taxAmount: Number(booking?.taxAmount || 0),
+    grandTotal: Number(booking?.grandTotal || booking?.totalAmount || 0),
+
+    userId: booking.userId || {},
+    propertyId: booking.propertyId || {},
+  };
 }
 
 
@@ -330,20 +339,6 @@ function Body({ uiStatus, ...props }) {
                 <Key label="Amount" value={formatCurrency(totalAmount)} />
                 <Key label="Tax" value={formatCurrency(safeTax)} />
                 <Key label="Grand Total" value={formatCurrency(safeGrandTotal)} bold />
-
-                {!isCancelled && uiStatus === "confirmed" && (
-                    <>
-                        <Separator />
-                        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mt-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Owner Revenue</span>
-                                <span className="font-bold text-emerald-700">
-                                    {formatCurrency(safeGrandTotal)}
-                                </span>
-                            </div>
-                        </div>
-                    </>
-                )}
 
                 <Key label="Order ID" value={orderId?.toUpperCase()} mono />
             </Section>

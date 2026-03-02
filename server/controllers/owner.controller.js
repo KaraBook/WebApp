@@ -201,13 +201,36 @@ export const getOwnerDashboard = async (req, res) => {
       growthText,
     };
 
-    /* ------------------ RESPONSE ------------------ */
+    const safeBookings = bookings.map((b) => ({
+      ...b,
+
+      guests: {
+        adults: Number(b?.guests?.adults || 0),
+        children: Number(b?.guests?.children || 0),
+        infants: Number(b?.guests?.infants || 0),
+      },
+
+      meals: {
+        veg: Number(b?.meals?.veg || 0),
+        nonVeg: Number(b?.meals?.nonVeg || 0),
+      },
+
+      totalNights: Number(b?.totalNights || 0),
+
+      totalAmount: Number(b?.totalAmount || 0),
+      taxAmount: Number(b?.taxAmount || 0),
+      grandTotal: Number(b?.grandTotal || b?.totalAmount || 0),
+
+      contactNumber: b?.contactNumber || b?.userId?.mobile || "",
+      contactEmail: b?.contactEmail || b?.userId?.email || "",
+    }));
+
     return res.json({
       success: true,
       data: {
         stats,
         properties,
-        bookings,
+        bookings: safeBookings,
       },
     });
 
@@ -728,7 +751,7 @@ export const createRazorpayOrder = async (req, res) => {
     }
 
     const order = await razorpay.orders.create({
-      amount: Math.round(booking.grandTotal * 100), 
+      amount: Math.round(booking.grandTotal * 100),
       currency: "INR",
       receipt: bookingId.toString(),
       payment_capture: 1
@@ -743,7 +766,7 @@ export const createRazorpayOrder = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("RAZORPAY ORDER ERROR:", err); 
+    console.error("RAZORPAY ORDER ERROR:", err);
     return res.status(500).json({
       success: false,
       message: "Order create failed",
