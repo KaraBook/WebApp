@@ -97,19 +97,19 @@ export default function Dashboard() {
     const totalBookings = bookings.length;
 
     const confirmed = bookings.filter(
-        b => resolveBookingStatus(b) === "confirmed"
+        b => getBookingStatus(b) === "confirmed"
     ).length;
 
     const pending = bookings.filter(
-        b => resolveBookingStatus(b) === "pending"
+        b => getBookingStatus(b) === "pending"
     ).length;
 
     const cancelled = bookings.filter(
-        b => resolveBookingStatus(b) === "cancelled"
+        b => getBookingStatus(b) === "cancelled"
     ).length;
 
     const confirmedBookings = bookings.filter(
-        b => resolveBookingStatus(b) === "confirmed"
+        b => getBookingStatus(b) === "confirmed"
     );
 
     const grossSpent = confirmedBookings.reduce(
@@ -288,7 +288,7 @@ export default function Dashboard() {
                                     <td>{getNights(b.checkIn, b.checkOut)}</td>
                                     <td>{b.guests?.adults + (b.guests?.children || 0)}</td>
                                     <td>
-                                        <StatusChip status={resolveBookingStatus(b)} />
+                                        <StatusChip booking={b} />
                                     </td>
                                     <td className="text-gray-500">
                                         {format(new Date(b.createdAt), "dd MMM yyyy")}

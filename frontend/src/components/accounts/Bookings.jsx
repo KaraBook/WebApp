@@ -16,22 +16,6 @@ import { canViewInvoice, canRate, canCancel, isCancelled } from "@/utils/booking
 import { getBookingStatus, getStatusColors } from "@/utils/bookingStatus";
 
 
-function resolveBookingStatus(b) {
-  if (b.cancelled) return "cancelled";
-  if (
-    b.paymentStatus === "paid" ||
-    b.status === "paid" ||
-    b.status === "confirmed" ||
-    b.paymentId
-  ) {
-    return "confirmed";
-  }
-
-  return "pending";
-}
-
-
-
 export default function Bookings() {
   const { accessToken } = useAuthStore();
   const [bookings, setBookings] = useState([]);
@@ -93,13 +77,13 @@ export default function Bookings() {
     }
     if (statusFilter === "confirmed") {
       return (
-        resolveBookingStatus(b) === "confirmed" &&
+        getBookingStatus(b) === "confirmed" &&
         isUpcomingBooking(b)
       );
     }
     if (statusFilter === "pending") {
       return (
-        resolveBookingStatus(b) === "pending" &&
+        getBookingStatus(b) === "pending" &&
         isUpcomingBooking(b)
       );
     }
@@ -318,7 +302,7 @@ export default function Bookings() {
       pointer-events-none z-50
     "
                         >
-                          {resolveBookingStatus(b).toUpperCase()}
+                          {getBookingStatus(b).toUpperCase()}
                         </div>
                       </td>
 
