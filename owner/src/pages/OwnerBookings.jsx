@@ -21,6 +21,7 @@ import BookingDetailsDrawer from "@/components/BookingDetailsDrawer";
 import MobileFiltersDrawer from "@/components/MobileFiltersDrawer";
 import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
 import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage, encodeWhatsapp } from "@/utils/whatsappMessage";
+import { getBookingStatus, BOOKING_STATUS } from "@/utils/bookingStatus";
 
 
 
@@ -111,7 +112,7 @@ export default function OwnerBookings() {
     const bookingStatus = getBookingStatus(b);
     let message = "";
 
-    if (bookingStatus === "confirmed") {
+    if (bookingStatus === BOOKING_STATUS.CONFIRMED) {
       message = buildBookingWhatsappMessage(b);
     }
     else if (bookingStatus === "cancelled") {
@@ -152,19 +153,21 @@ If you need help completing your booking or payment, please reply here 😊`;
     }
 
     if (statusFilter === "confirmed") {
-      data = data.filter(b =>
-        b.paymentStatus === "paid" && !b.cancelled
+      data = data.filter(
+        (b) => getBookingStatus(b) === BOOKING_STATUS.CONFIRMED
       );
     }
 
     if (statusFilter === "pending") {
-      data = data.filter(b =>
-        ["pending", "initiated", "failed"].includes(b.paymentStatus)
+      data = data.filter(
+        (b) => getBookingStatus(b) === BOOKING_STATUS.PENDING
       );
     }
 
     if (statusFilter === "cancelled") {
-      data = data.filter(b => b.cancelled === true);
+      data = data.filter(
+        (b) => getBookingStatus(b) === BOOKING_STATUS.CANCELLED
+      );
     }
 
     if (timeFilter === "past") {
@@ -514,9 +517,9 @@ If you need help completing your booking or payment, please reply here 😊`;
                                 sendWhatsappMessage(b);
                               }}
                             >
-                              {getBookingStatus(b) === "cancelled"
+                              {getBookingStatus(b) === BOOKING_STATUS.CANCELLED
                                 ? "Message Cancelled Guest"
-                                : getBookingStatus(b) === "confirmed"
+                                : getBookingStatus(b) === BOOKING_STATUS.CONFIRMED
                                   ? "Send Welcome Message"
                                   : "Send Payment Reminder"}
                             </DropdownMenuItem>
