@@ -149,42 +149,32 @@ If you need help completing your booking or payment, please reply here 😊`;
         b.propertyId?.propertyName?.toLowerCase().includes(q)
     );
 
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    if (statusFilter !== "all") {
+      data = data.filter(
+        (b) => getBookingStatus(b) === statusFilter.toUpperCase()
+      );
+    }
+
     if (timeFilter === "upcoming") {
-      data = data.filter(b => new Date(b.checkOut) >= todayStart);
-    }
-
-    if (statusFilter === "confirmed") {
       data = data.filter(
-        (b) => getBookingStatus(b) === BOOKING_STATUS.CONFIRMED
-      );
-    }
-
-    if (statusFilter === "completed") {
-      data = data.filter(
-        (b) => getBookingStatus(b) === BOOKING_STATUS.COMPLETED
-      );
-    }
-
-    if (statusFilter === "pending") {
-      data = data.filter(
-        (b) => getBookingStatus(b) === BOOKING_STATUS.PENDING
-      );
-    }
-
-    if (statusFilter === "cancelled") {
-      data = data.filter(
-        (b) => getBookingStatus(b) === BOOKING_STATUS.CANCELLED
+        (b) => new Date(b.checkOut) >= todayStart
       );
     }
 
     if (timeFilter === "past") {
-      data = data.filter(b => new Date(b.checkOut) < todayStart);
+      data = data.filter(
+        (b) => new Date(b.checkOut) < todayStart
+      );
     }
 
     data.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
 
     setFiltered(data);
     setPage(1);
+
   }, [query, timeFilter, statusFilter, bookings]);
 
   useEffect(() => {
@@ -313,19 +303,20 @@ If you need help completing your booking or payment, please reply here 😊`;
 
             {/* Desktop only */}
             <div className="hidden md:block">
-              <Select value={timeFilter} onValueChange={(val) => {
-                setTimeFilter(val);
-                navigate(`/bookings?time=${val}&status=${statusFilter}`);
-              }}>
+              <Select
+                value={timeFilter}
+                onValueChange={(val) => {
+                  setTimeFilter(val);
+                  navigate(`/bookings?time=${val}&status=${statusFilter}`);
+                }}
+              >
                 <SelectTrigger className="w-[160px] bg-gray-50 border-gray-200">
                   <SelectValue placeholder="Time" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="upcoming">Upcoming</SelectItem>
+                  <SelectItem value="past">Past</SelectItem>
                   <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="confirmed">Confirmed</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -348,6 +339,7 @@ If you need help completing your booking or payment, please reply here 😊`;
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
