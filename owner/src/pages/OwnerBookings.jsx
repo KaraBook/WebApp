@@ -22,6 +22,7 @@ import MobileFiltersDrawer from "@/components/MobileFiltersDrawer";
 import OwnerCancelBookingDialog from "@/components/OwnerCancelBookingDialog";
 import { buildBookingWhatsappMessage, buildCancelledWhatsappMessage, encodeWhatsapp } from "@/utils/whatsappMessage";
 import { getBookingStatus, BOOKING_STATUS } from "@/utils/bookingStatus";
+import PaymentChip from "@/components/PaymentChip";
 
 
 
@@ -115,7 +116,7 @@ export default function OwnerBookings() {
     if (bookingStatus === BOOKING_STATUS.CONFIRMED) {
       message = buildBookingWhatsappMessage(b);
     }
-    else if (bookingStatus === "cancelled") {
+    else if (bookingStatus === BOOKING_STATUS.CANCELLED) {
       message = buildCancelledWhatsappMessage(b);
     }
     else {
@@ -195,42 +196,17 @@ If you need help completing your booking or payment, please reply here 😊`;
     page * pageSize
   );
 
-  // STATUS CHIP
-  const getStatusChip = (booking) => {
-    const base =
-      "px-3 py-1 rounded-full text-xs font-medium border inline-block";
-
-    if (booking.cancelled) {
-      return (
-        <span className={`${base} bg-red-50 border-red-200 text-red-600`}>
-          Cancelled
-        </span>
-      );
-    }
-
-    if (booking.paymentStatus === "paid") {
-      return (
-        <span className={`${base} bg-green-50 border-green-200 text-green-700`}>
-          Confirmed
-        </span>
-      );
-    }
-
-    return (
-      <span className={`${base} bg-yellow-50 border-yellow-200 text-yellow-800`}>
-        Pending
-      </span>
-    );
-  };
-
   const shortId = (id) => `#${String(id).slice(-6).toUpperCase()}`;
   const formatCurrency = (n) => `${Number(n).toLocaleString()}`;
   const formatDate = (d) => format(new Date(d), "dd MMM yyyy");
 
   const downloadInvoicePDF = async (booking) => {
     try {
-      if (booking.paymentStatus !== "paid") {
-        return toast.error("Invoice can only be downloaded for paid bookings.");
+      const status = getBookingStatus(booking);
+
+      if (status !== BOOKING_STATUS.CONFIRMED &&
+        status !== BOOKING_STATUS.COMPLETED) {
+        return toast.error("Invoice only available for paid bookings.");
       }
 
       toast.info("Generating Invoice…");
@@ -401,138 +377,139 @@ If you need help completing your booking or payment, please reply here 😊`;
                 </thead>
 
                 <tbody>
-                  {paginatedData.map((b, index) => (
+                  {paginatedData.map((b, index) => {
 
-                    <tr
-                      key={b._id}
-                      onClick={() => openBookingDialog(b)}
-                      className="
+                    const status = getBookingStatus(b);
+
+                    return (
+
+                      <tr
+                        key={b._id}
+                        onClick={() => openBookingDialog(b)}
+                        className="
     border-b
     hover:bg-gray-50
     transition
     cursor-pointer
   "
-                    >
-                      <td className="py-3 px-4 text-gray-500 font-medium">
-                        {(page - 1) * pageSize + index + 1}
-                      </td>
+                      >
+                        <td className="py-3 px-4 text-gray-500 font-medium">
+                          {(page - 1) * pageSize + index + 1}
+                        </td>
 
-                      <td className="py-3 px-4">
-                        <button
-                          onClick={() => openBookingDialog(b)}
-                          className="font-semibold text-primary hover:underline"
-                        >
-                          {shortBookingId(b._id)}
-                        </button>
-                      </td>
+                        <td className="py-3 px-4">
+                          <button
+                            onClick={() => openBookingDialog(b)}
+                            className="font-semibold text-primary hover:underline"
+                          >
+                            {shortBookingId(b._id)}
+                          </button>
+                        </td>
 
-                      {/* Traveller */}
-                      <td className="py-3 px-4">
-                        <button
-                          onClick={() => openBookingDialog(b)}
-                          className="font-semibold text-left text-black hover:underline"
-                        >
-                          {b?.userId?.firstName} {b?.userId?.lastName}
-                        </button>
+                        {/* Traveller */}
+                        <td className="py-3 px-4">
+                          <button
+                            onClick={() => openBookingDialog(b)}
+                            className="font-semibold text-left text-black hover:underline"
+                          >
+                            {b?.userId?.firstName} {b?.userId?.lastName}
+                          </button>
 
-                        <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                          <Phone size={12} /> {b?.userId?.mobile}
-                        </div>
-                      </td>
+                          <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                            <Phone size={12} /> {b?.userId?.mobile}
+                          </div>
+                        </td>
 
-                      {/* Dates */}
-                      <td className="py-3 px-4">{formatDate(b.checkIn)}</td>
-                      <td className="py-3 px-4">{formatDate(b.checkOut)}</td>
+                        {/* Dates */}
+                        <td className="py-3 px-4">{formatDate(b.checkIn)}</td>
+                        <td className="py-3 px-4">{formatDate(b.checkOut)}</td>
 
-                      <td className="py-3 px-4">{b.totalNights}</td>
+                        <td className="py-3 px-4">{b.totalNights}</td>
 
-                      <td className="py-3 px-4">
-                        {typeof b.guests === "number"
-                          ? `${b.guests}`
-                          : `${b.guests.adults + b.guests.children}`}
-                      </td>
+                        <td className="py-3 px-4">
+                          {typeof b.guests === "number"
+                            ? `${b.guests}`
+                            : `${b.guests.adults + b.guests.children}`}
+                        </td>
 
-                      <td className="py-3 px-4 font-medium">
-                        {formatCurrency(b.totalAmount)}
-                      </td>
+                        <td className="py-3 px-4 font-medium">
+                          {formatCurrency(b.totalAmount)}
+                        </td>
 
-                      <td className="py-3 px-4">
-                        {getStatusChip(b)}
-                      </td>
+                        <td className="py-3 px-4">
+                          <PaymentChip booking={b} />
+                        </td>
 
-                      <td className="py-3 px-4 text-xs text-gray-500">
-                        {formatDate(b.createdAt)}
-                      </td>
+                        <td className="py-3 px-4 text-xs text-gray-500">
+                          {formatDate(b.createdAt)}
+                        </td>
 
-                      <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>
-                            <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
-                          </DropdownMenuTrigger>
+                        <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <MoreVertical className="w-5 h-5 text-gray-600 cursor-pointer" />
+                            </DropdownMenuTrigger>
 
-                          <DropdownMenuContent className="w-48">
-                            <DropdownMenuItem onSelect={() => openBookingDialog(b)}>
-                              View Booking
-                            </DropdownMenuItem>
-
-                            {b.paymentStatus === "paid" ? (
-                              <>
-                                <DropdownMenuItem
-                                  onSelect={() => navigate(`/invoice/${b._id}`)}
-                                >
-                                  View Invoice
-                                </DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                  onSelect={() => openConfirm("invoice", b)}
-                                >
-                                  Download Invoice
-                                </DropdownMenuItem>
-                              </>
-                            ) : (
-                              <DropdownMenuItem disabled className="text-gray-400 italic">
-                                Invoice available after payment
+                            <DropdownMenuContent className="w-48">
+                              <DropdownMenuItem onSelect={() => openBookingDialog(b)}>
+                                View Booking
                               </DropdownMenuItem>
-                            )}
 
-                            <DropdownMenuItem
-                              onSelect={() =>
-                                navigator.clipboard.writeText(b.userId.email)
-                              }
-                            >
-                              Copy Email
-                            </DropdownMenuItem>
+                              {/* INVOICE ACTIONS */}
+                              {status === BOOKING_STATUS.CONFIRMED ||
+                                status === BOOKING_STATUS.COMPLETED ? (
+                                <>
+                                  <DropdownMenuItem
+                                    onSelect={() => navigate(`/invoice/${b._id}`)}
+                                  >
+                                    View Invoice
+                                  </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                              onSelect={() =>
-                                navigator.clipboard.writeText(b.userId.mobile)
-                              }
-                            >
-                              Copy Phone
-                            </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onSelect={() => openConfirm("invoice", b)}
+                                  >
+                                    Download Invoice
+                                  </DropdownMenuItem>
+                                </>
+                              ) : (
+                                <DropdownMenuItem disabled className="text-gray-400 italic">
+                                  Invoice available after payment
+                                </DropdownMenuItem>
+                              )}
 
-                            <DropdownMenuItem
-                              onSelect={(e) => {
-                                e.preventDefault();
-                                sendWhatsappMessage(b);
-                              }}
-                            >
-                              {getBookingStatus(b) === BOOKING_STATUS.CANCELLED
-                                ? "Message Cancelled Guest"
-                                : getBookingStatus(b) === BOOKING_STATUS.CONFIRMED
-                                  ? "Send Welcome Message"
-                                  : "Send Payment Reminder"}
-                            </DropdownMenuItem>
-
-                            {b.cancelled ? (
                               <DropdownMenuItem
-                                disabled
-                                className="text-gray-400 italic"
+                                onSelect={() =>
+                                  navigator.clipboard.writeText(b.userId.email)
+                                }
                               >
-                                Cancelled
+                                Copy Email
                               </DropdownMenuItem>
-                            ) : (
-                              b.paymentStatus === "paid" && (
+
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  navigator.clipboard.writeText(b.userId.mobile)
+                                }
+                              >
+                                Copy Phone
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onSelect={(e) => {
+                                  e.preventDefault();
+                                  sendWhatsappMessage(b);
+                                }}
+                              >
+                                {status === BOOKING_STATUS.CANCELLED
+                                  ? "Message Cancelled Guest"
+                                  : status === BOOKING_STATUS.CONFIRMED
+                                    ? "Send Welcome Message"
+                                    : status === BOOKING_STATUS.COMPLETED
+                                      ? "Send Thank You Message"
+                                      : "Send Payment Reminder"}
+                              </DropdownMenuItem>
+
+                              {/* CANCEL LOGIC */}
+                              {status === BOOKING_STATUS.CONFIRMED ? (
                                 <DropdownMenuItem
                                   className="text-red-600"
                                   onSelect={() =>
@@ -541,13 +518,17 @@ If you need help completing your booking or payment, please reply here 😊`;
                                 >
                                   Cancel Booking
                                 </DropdownMenuItem>
-                              )
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  ))}
+                              ) : status === BOOKING_STATUS.CANCELLED ? (
+                                <DropdownMenuItem disabled className="text-gray-400 italic">
+                                  Cancelled
+                                </DropdownMenuItem>
+                              ) : null}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
 
