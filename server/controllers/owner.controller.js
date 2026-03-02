@@ -96,38 +96,34 @@ export const getOwnerDashboard = async (req, res) => {
     };
     const confirmedBookings = bookings.filter(isConfirmed);
 
-    const isRevenueBooking = (b) => {
-      if (b.cancelled === true) return false;
-
-      const isPaid =
-        b.paymentStatus === "paid" ||
-        b.status === "confirmed" ||
-        Boolean(b.paymentId);
-
-      if (!isPaid) return false;
-
-      const checkout = new Date(b.checkOut);
-      checkout.setHours(0, 0, 0, 0);
-
-      return checkout < today;
-    };
     const isPending = (b) =>
       b.paymentStatus === "initiated" && b.cancelled !== true;
 
     const isCancelled = (b) =>
       b.status === "cancelled" || b.cancelled === true;
 
-    const revenueBookings = bookings.filter(isRevenueBooking);
+    const isBookingRevenue = (b) => {
+      if (b.cancelled === true) return false;
 
-    const netRevenue = revenueBookings.reduce(
-      (sum, b) =>
-        sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
+      return (
+        b.paymentStatus === "paid" ||
+        b.status === "confirmed" ||
+        Boolean(b.paymentId)
+      );
+    };
+
+    const bookingRevenueBookings = bookings.filter(isBookingRevenue);
+
+    const grossRevenue = bookingRevenueBookings.reduce(
+      (sum, b) => sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
       0
     );
 
-    const grossRevenue = netRevenue;
-    const totalRefunds = 0;
+    const totalRefunds = bookings
+      .filter(b => b.cancelled === true && b.refundAmount)
+      .reduce((sum, b) => sum + Number(b.refundAmount || 0), 0);
 
+    const netRevenue = grossRevenue - totalRefunds;
 
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -139,7 +135,7 @@ export const getOwnerDashboard = async (req, res) => {
     const getMonthRevenue = (year, month) =>
       confirmedBookings
         .filter((b) => {
-          const d = new Date(b.checkOut);
+          const d = new Date(b.createdAt);
           return d.getFullYear() === year && d.getMonth() === month;
         })
         .reduce(
