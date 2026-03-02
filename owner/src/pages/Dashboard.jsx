@@ -302,6 +302,11 @@ export default function Dashboard() {
 
   const { stats, bookings } = data || {};
 
+  const toLocalDateKey = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  };
+
   const bookingDateMap = useMemo(() => {
     if (!bookings) return {};
 
@@ -309,18 +314,16 @@ export default function Dashboard() {
 
     bookings.forEach((b) => {
       const status = getBookingStatus(b);
-
       if (status !== BOOKING_STATUS.CONFIRMED) return;
 
       const start = new Date(b.checkIn);
-      const end = new Date(b.checkOut);
+      start.setHours(0, 0, 0, 0);
 
-      for (
-        let d = new Date(start);
-        d <= end;
-        d.setDate(d.getDate() + 1)
-      ) {
-        const key = d.toISOString().slice(0, 10);
+      const end = new Date(b.checkOut);
+      end.setHours(0, 0, 0, 0);
+
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const key = toLocalDateKey(d);
         map[key] = BOOKING_STATUS.CONFIRMED;
       }
     });
@@ -329,7 +332,7 @@ export default function Dashboard() {
   }, [bookings]);
 
   const getDateStatus = (date) => {
-    const key = date.toISOString().slice(0, 10);
+    const key = toLocalDateKey(date);
     return bookingDateMap[key] || null;
   };
 
