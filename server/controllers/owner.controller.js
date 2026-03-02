@@ -1132,7 +1132,11 @@ export const getOwnerBookedUsers = async (req, res) => {
 
       const uid = b.userId._id.toString();
 
-      const relationshipRole = getRelationshipRole(b.userId, ownerId);
+      const relationshipRole = getRelationshipRole(
+        b.userId,
+        ownerId,
+        b.propertyId?.ownerUserId
+      );
 
       usersMap[uid] = {
         userId: b.userId._id,

@@ -52,7 +52,7 @@ export default function OwnerUsers() {
     useEffect(() => {
         const roleFromUrl = searchParams.get("role");
 
-        if (roleFromUrl && ["traveller", "owner", "manager"].includes(roleFromUrl)) {
+        if (roleFromUrl && ["traveller", "manager"].includes(roleFromUrl)) {
             setRoleFilter(roleFromUrl);
         }
     }, [searchParams]);
@@ -156,9 +156,7 @@ export default function OwnerUsers() {
                                         ? "All Users"
                                         : roleFilter === "traveller"
                                             ? "Traveller"
-                                            : roleFilter === "owner"
-                                                ? "Resort Owner"
-                                                : "Manager"}
+                                            : "Manager"}
                                 </span>
                             </div>
 
@@ -184,10 +182,6 @@ export default function OwnerUsers() {
 
                         <DropdownMenuItem onClick={() => setRoleFilter("traveller")}>
                             Traveller
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem onClick={() => setRoleFilter("owner")}>
-                            Resort Owner
                         </DropdownMenuItem>
 
                         <DropdownMenuItem onClick={() => setRoleFilter("manager")}>
