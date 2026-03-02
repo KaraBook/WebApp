@@ -1,0 +1,60 @@
+export function getBookingStatus(b) {
+  if (!b) return "pending";
+
+  if (b.cancelled === true) return "cancelled";
+
+  const paid =
+    b.paymentStatus === "paid" ||
+    b.status === "confirmed" ||
+    b.status === "paid" ||
+    !!b.paymentId;
+
+  if (paid) return "confirmed";
+
+  return "pending";
+}
+
+export function getStatusLabel(status) {
+  switch (status) {
+    case "confirmed":
+      return "Confirmed";
+    case "pending":
+      return "Pending";
+    case "cancelled":
+      return "Cancelled";
+    default:
+      return "Pending";
+  }
+}
+
+export function getStatusColors(status) {
+  switch (status) {
+    case "confirmed":
+      return {
+        dot: "bg-emerald-500",
+        chip: "border-emerald-300 bg-emerald-50 text-emerald-700",
+        soft: "bg-emerald-100 text-emerald-700",
+      };
+
+    case "pending":
+      return {
+        dot: "bg-amber-500",
+        chip: "border-amber-300 bg-amber-50 text-amber-700",
+        soft: "bg-amber-100 text-amber-700",
+      };
+
+    case "cancelled":
+      return {
+        dot: "bg-red-500",
+        chip: "border-red-300 bg-red-50 text-red-700",
+        soft: "bg-red-100 text-red-700",
+      };
+
+    default:
+      return {
+        dot: "bg-gray-400",
+        chip: "border-gray-300 bg-gray-50 text-gray-700",
+        soft: "bg-gray-100 text-gray-700",
+      };
+  }
+}

@@ -1,9 +1,10 @@
-import { Calendar, Moon, Users, MoreVertical, Eye, FileDown, Star, Phone, XCircle} from "lucide-react";
+import { Calendar, Moon, Users, MoreVertical, Eye, FileDown, Star, Phone, XCircle } from "lucide-react";
 import { format } from "date-fns";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import RateBookingDialog from "./RateBookingDialog";
-import { canViewInvoice, canRate } from "@/utils/bookingPermissions";
+import { canViewInvoice, canRate, canCancel, isCancelled } from "@/utils/bookingPermissions";
+import { getBookingStatus, getStatusLabel, getStatusColors } from "@/utils/bookingStatus";
 
 
 function resolveBookingStatus(b) {
@@ -21,12 +22,6 @@ function resolveBookingStatus(b) {
   return "pending";
 }
 
-function getStatusLabel(status) {
-  if (status === "confirmed") return "Confirmed";
-  if (status === "pending") return "Pending";
-  if (status === "cancelled") return "Cancelled";
-  return status;
-}
 
 
 
@@ -42,6 +37,8 @@ export default function MobileBookingCard({
     (1000 * 60 * 60 * 24)
   );
   const bookingStatus = resolveBookingStatus(booking);
+  const status = getBookingStatus(booking);
+  const colors = getStatusColors(status);
 
   return (
     <div onClick={() => onView(booking)} className="bg-white rounded-[14px] border shadow-sm p-4 flex flex-col gap-3">
@@ -57,18 +54,8 @@ export default function MobileBookingCard({
         </div>
 
         <div className="flex items-center gap-2">
-          <span
-            className={`
-    text-xs font-semibold px-2 py-[2px] rounded-full capitalize
-    ${bookingStatus === "confirmed"
-                ? "bg-green-100 text-green-700"
-                : bookingStatus === "pending"
-                  ? "bg-orange-100 text-orange-700"
-                  : "bg-red-100 text-red-700"
-              }
-  `}
-          >
-            {getStatusLabel(bookingStatus)}
+          <span className={`text-xs font-semibold px-2 py-[2px] rounded-full capitalize ${colors.soft}`}>
+            {getStatusLabel(status)}
           </span>
 
           {/* DROPDOWN */}
@@ -117,17 +104,16 @@ export default function MobileBookingCard({
                   className="py-3 gap-3 text-gray-400 cursor-not-allowed"
                 >
                   <FileDown className="w-4 h-4" />
-                  Invoice available after payment confirmation
+                  Invoice not available
                 </DropdownMenuItem>
               )}
-              {/* RATE / REVIEW */}
               {booking.hasReview ? (
                 <DropdownMenuItem
                   disabled
                   className="py-3 gap-3 text-green-600 cursor-not-allowed"
                 >
                   <Star className="w-4 h-4 fill-green-600 text-green-600" />
-                  Review submitted
+                  Review Submitted
                 </DropdownMenuItem>
               ) : (
                 canRate(booking) && (
@@ -135,7 +121,6 @@ export default function MobileBookingCard({
                     className="py-3 gap-3"
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!canRate(booking)) return;
                       onRate(booking);
                     }}
                   >
@@ -156,7 +141,7 @@ export default function MobileBookingCard({
                 Call Resort
               </DropdownMenuItem>
 
-              {!booking.cancelled && new Date(booking.checkIn) > new Date() ? (
+              {canCancel(booking) ? (
                 <DropdownMenuItem
                   className="py-3 gap-3 text-red-600"
                   onClick={(e) => {

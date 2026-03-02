@@ -267,7 +267,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {/* MOBILE */}
                     <div className="sm:col-span-2">
-                        <Label>Mobile Number</Label>
+                        <Label>Mobile Number</Label><span className="text-red-500"> *</span>
 
                         {!editingMobile ? (
                             <div className="flex items-center justify-between border rounded-md px-3 py-2">
@@ -341,37 +341,37 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
 
                     {/* OTHER FIELDS */}
                     <div>
-                        <Label>First Name</Label>
+                        <Label>First Name</Label><span className="text-red-500"> *</span>
                         <Input name="firstName" value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
                     </div>
 
                     <div>
-                        <Label>Last Name</Label>
+                        <Label>Last Name</Label><span className="text-red-500"> *</span>
                         <Input name="lastName" value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
                     </div>
 
                     <div>
-                        <Label>Email</Label>
+                        <Label>Email</Label><span className="text-red-500"> *</span>
                         <Input name="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                     </div>
 
                     <div>
-                        <Label>Date of Birth</Label>
+                        <Label>Date of Birth</Label><span className="text-red-500"> *</span>
                         <Input type="date" name="dateOfBirth" value={form.dateOfBirth} onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })} />
                     </div>
 
                     <div>
-                        <Label>Address</Label>
+                        <Label>Address</Label><span className="text-red-500"> *</span>
                         <Input name="address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
                     </div>
 
                     <div>
-                        <Label>Pin Code</Label>
+                        <Label>Pin Code</Label><span className="text-red-500"> *</span>
                         <Input name="pinCode" value={form.pinCode} onChange={(e) => setForm({ ...form, pinCode: e.target.value })} />
                     </div>
 
                     <div>
-                        <Label>State</Label>
+                        <Label>State</Label><span className="text-red-500"> *</span>
 
                         <Select
                             value={selectedStateCode}
@@ -392,7 +392,7 @@ export default function EditProfileDialog({ open, onClose, profile, onUpdated })
                     </div>
 
                     <div>
-                        <Label>City</Label>
+                        <Label>City</Label><span className="text-red-500"> *</span>
 
                         <Select
                             value={form.city}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Calendar, CheckCircle2, Clock, XCircle, Heart, Building2, Wallet, MoreVertical } from "lucide-react";
+import { Calendar, CheckCircle2, Clock, XCircle, Heart, Building2, Wallet, MoreVertical, Eye, PhoneCall, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/common/SummaryApi";
@@ -11,7 +11,8 @@ import BookingDetailsDrawer from "../BookingDetailsDrawer";
 import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
 import CancelBookingDialog from "../CancelBookingModal";
-import { canViewInvoice, canRate } from "@/utils/bookingPermissions";
+import { canViewInvoice, canRate, canCancel, isCancelled } from "@/utils/bookingPermissions";
+import { getBookingStatus, getStatusLabel, getStatusColors } from "@/utils/bookingStatus";
 
 
 function resolveBookingStatus(b) {
@@ -306,79 +307,98 @@ export default function Dashboard() {
                                             </DropdownMenuTrigger>
 
                                             <DropdownMenuContent align="end" className="w-48">
-                                                {/* View */}
+                                                {/* View Booking */}
                                                 <DropdownMenuItem
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setSelectedBooking(b);
-                                                        setBookingDialogOpen(true);
+                                                        setBookingDialogOpen?.(true);
                                                     }}
                                                 >
-                                                    View Booking
+                                                    <div className="flex items-center gap-2">
+                                                        <Eye size={16} />
+                                                        View Booking
+                                                    </div>
                                                 </DropdownMenuItem>
 
-                                                {/* Invoice */}
-                                                {canViewInvoice(b) ? (
-                                                    <DropdownMenuItem
-                                                        onClick={() => navigate(`/account/invoice/${b._id}`)}
-                                                    >
-                                                        View Invoice
+                                                {(
+                                                    canViewInvoice(b)
+                                                ) ? (
+                                                    <DropdownMenuItem asChild className="py-3 gap-3">
+                                                        <Link to={`/account/invoice/${b._id}`}>
+                                                            <FileDown className="w-4 h-4" />
+                                                            View Invoice
+                                                        </Link>
                                                     </DropdownMenuItem>
                                                 ) : (
                                                     <DropdownMenuItem
                                                         disabled
-                                                        className="text-gray-400 cursor-not-allowed"
+                                                        className="py-3 gap-3 text-gray-400 cursor-not-allowed"
                                                     >
-                                                        Invoice available after payment confirmation
+                                                        <FileDown className="w-4 h-4" />
+                                                        Invoice not available
                                                     </DropdownMenuItem>
                                                 )}
 
-                                                {/* Rate */}
+                                                {/* Rate / Review */}
                                                 {b.hasReview ? (
-                                                    <DropdownMenuItem disabled className="text-green-600">
-                                                        Review submitted
+                                                    <DropdownMenuItem disabled className="text-green-600 cursor-default">
+                                                        <div className="flex items-center gap-2">
+                                                            <Star size={16} className="fill-green-600 text-green-600" />
+                                                            Review Submitted
+                                                        </div>
                                                     </DropdownMenuItem>
                                                 ) : (
                                                     canRate(b) && (
                                                         <DropdownMenuItem
-                                                            onClick={() => {
-                                                                setRateBooking(b);
-                                                                setRateDialogOpen(true);
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setRateBooking?.(b);
+                                                                setRateDialogOpen?.(true);
                                                             }}
                                                         >
-                                                            Rate this Resort
+                                                            <div className="flex items-center gap-2">
+                                                                <Star size={16} className="text-yellow-500 fill-yellow-500" />
+                                                                Rate this Resort
+                                                            </div>
                                                         </DropdownMenuItem>
                                                     )
                                                 )}
 
-                                                {/* Call */}
-                                                {b.propertyId?.contactNumber && (
-                                                    <DropdownMenuItem
-                                                        onClick={() =>
-                                                            window.open(`tel:${b.propertyId.contactNumber}`)
-                                                        }
-                                                    >
+                                                {/* Call Resort */}
+                                                <DropdownMenuItem
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        window.open(`tel:${b.property?.contactNumber || b.propertyId?.contactNumber}`);
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <PhoneCall size={16} />
                                                         Call Resort
-                                                    </DropdownMenuItem>
-                                                )}
+                                                    </div>
+                                                </DropdownMenuItem>
 
                                                 {/* Cancel */}
-                                                {!b.cancelled && new Date(b.checkIn) > new Date() ? (
+                                                {canCancel(b) ? (
                                                     <DropdownMenuItem
                                                         className="text-red-600"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            setCancelBookingObj(b);
+                                                            setCancelBookingObj?.(b);
+                                                            setCancelBooking?.(b);
                                                         }}
                                                     >
-                                                        Cancel Booking
+                                                        <div className="flex items-center gap-2">
+                                                            <XCircle size={16} />
+                                                            Cancel Booking
+                                                        </div>
                                                     </DropdownMenuItem>
-                                                ) : b.cancelled ? (
-                                                    <DropdownMenuItem
-                                                        disabled
-                                                        className="text-gray-400 cursor-not-allowed"
-                                                    >
-                                                        Cancelled
+                                                ) : isCancelled(b) ? (
+                                                    <DropdownMenuItem disabled className="text-gray-400 cursor-not-allowed">
+                                                        <div className="flex items-center gap-2">
+                                                            <XCircle size={16} />
+                                                            Cancelled
+                                                        </div>
                                                     </DropdownMenuItem>
                                                 ) : null}
                                             </DropdownMenuContent>
@@ -454,35 +474,19 @@ function StatCard({ title, value, subtitle, icon, dark, onClick }) {
 }
 
 
-function StatusChip({ status }) {
-    const normalized =
-        status === "initiated" ? "pending" :
-            status === "paid" ? "confirmed" :
-                status || "pending";
+function StatusChip({ booking }) {
+  const status = getBookingStatus(booking);
+  const colors = getStatusColors(status);
+  const label = getStatusLabel(status);
 
-    const label =
-        normalized === "confirmed"
-            ? "Confirmed"
-            : normalized === "pending"
-                ? "Pending"
-                : "Cancelled";
-
-    const styles = {
-        confirmed: "border-green-300 bg-green-50 text-green-700",
-        pending: "border-orange-300 bg-orange-50 text-orange-700",
-        cancelled: "border-red-300 bg-red-50 text-red-700",
-    };
-
-    return (
-        <span
-            className={cn(
-                "inline-flex items-center justify-center",
-                "min-w-[88px] min-h-[26px]",
-                "rounded-full border px-3 text-xs font-medium capitalize",
-                styles[normalized] || styles.pending
-            )}
-        >
-            {label}
-        </span>
-    );
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center justify-center min-w-[88px] min-h-[26px] rounded-full border px-3 text-xs font-medium",
+        colors.chip
+      )}
+    >
+      {label}
+    </span>
+  );
 }

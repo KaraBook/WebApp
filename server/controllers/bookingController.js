@@ -427,10 +427,30 @@ export const getUserBookings = async (req, res) => {
     const userId = req.user.id;
 
     const bookings = await Booking.find({ userId })
-      .populate(
-        "propertyId",
-        "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
-      )
+      .populate({
+        path: "propertyId",
+        select: `
+    propertyName
+    city
+    state
+    coverImage
+    contactNumber
+    isRefundable
+    cancellationPolicy
+    refundNotes
+    addressLine1
+    area
+    pinCode
+    locationLink
+    resortOwner
+    ownerUserId
+  `,
+        populate: {
+          path: "ownerUserId",
+          model: "User",
+          select: "firstName lastName email mobile"
+        }
+      })
       .populate("userId", "firstName lastName email mobile")
       .sort({ createdAt: -1 })
       .lean();
@@ -545,13 +565,15 @@ export const getBookingById = async (req, res) => {
   try {
     const { bookingId } = req.params;
     const booking = await Booking.findById(bookingId)
-      .populate(
-        "propertyId",
-        `
+      .populate({
+        path: "propertyId",
+        select: `
     propertyName
+    addressLine1
+    area
     city
     state
-    addressLine1
+    pinCode
     coverImage
     contactNumber
     checkInTime
@@ -559,8 +581,16 @@ export const getBookingById = async (req, res) => {
     isRefundable
     cancellationPolicy
     refundNotes
-    `
-      )
+    locationLink
+    resortOwner
+    ownerUserId
+  `,
+        populate: {
+          path: "ownerUserId",
+          model: "User",
+          select: "firstName lastName email mobile"
+        }
+      })
       .populate("userId", "firstName lastName email mobile");
 
     if (!booking) {
@@ -570,7 +600,13 @@ export const getBookingById = async (req, res) => {
       });
     }
 
-    res.json({ success: true, data: booking });
+    const formatted = {
+      ...booking.toObject(),
+      property: booking.propertyId,
+      user: booking.userId
+    };
+
+    res.json({ success: true, data: formatted });
 
   } catch (err) {
     console.error("getBookingById error:", err);
@@ -692,6 +728,33 @@ export const cancelBooking = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Booking not found or already cancelled"
+      });
+    }
+
+    if (
+      booking.paymentStatus !== "paid" ||
+      booking.status !== "confirmed"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Pending bookings cannot be cancelled."
+      });
+    }
+
+    const now = new Date();
+    const checkInDate = new Date(booking.checkIn);
+
+    if (checkInDate <= now) {
+      return res.status(400).json({
+        success: false,
+        message: "Booking cannot be cancelled after check-in."
+      });
+    }
+
+    if (booking.refundStatus === "completed") {
+      return res.status(400).json({
+        success: false,
+        message: "Booking already refunded."
       });
     }
 

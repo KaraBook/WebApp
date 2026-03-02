@@ -25,9 +25,24 @@ export const addReview = async (req, res) => {
       });
     }
 
+    const now = new Date();
+    const checkoutDate = new Date(booking.checkOut);
+
+    if (booking.cancelled) {
+      return res.status(403).json({
+        message: "Cancelled bookings cannot be reviewed.",
+      });
+    }
+
     if (booking.paymentStatus !== "paid") {
       return res.status(403).json({
-        message: "You can review this property only after completing the payment.",
+        message: "Only paid bookings can be reviewed.",
+      });
+    }
+
+    if (now < checkoutDate) {
+      return res.status(403).json({
+        message: "You can review only after completing your stay.",
       });
     }
 

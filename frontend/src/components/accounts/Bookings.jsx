@@ -12,7 +12,8 @@ import BookingDetailsDrawer from "../BookingDetailsDrawer";
 import MobileBookingCard from "../MobileBookingCard";
 import RateBookingDialog from "../RateBookingDialog";
 import CancelBookingDialog from "../CancelBookingModal";
-import { canViewInvoice, canRate } from "@/utils/bookingPermissions";
+import { canViewInvoice, canRate, canCancel, isCancelled } from "@/utils/bookingPermissions";
+import { getBookingStatus, getStatusColors } from "@/utils/bookingStatus";
 
 
 function resolveBookingStatus(b) {
@@ -127,11 +128,7 @@ export default function Bookings() {
   }, []);
 
 
-  const statusDot = (b) => {
-    if (b.cancelled) return "bg-red-400";
-    if (b.paymentStatus === "paid") return "bg-green-500";
-    return "bg-yellow-500";
-  };
+  const statusDot = (b) => getStatusColors(getBookingStatus(b)).dot;
 
   return (
     <div className="w-full px-0 md:px-4 min-h-[calc(100vh-160px)]">
@@ -364,30 +361,26 @@ export default function Bookings() {
                               </DropdownMenuItem>
                             )}
                             {b.hasReview ? (
-                              <DropdownMenuItem disabled className="text-green-600">
-                                <div onClick={(e) => {
-                                  e.stopPropagation();
-                                }} className="flex items-center gap-2">
-                                  <Star size={16} className="fill-green-600 text-green-600" />
-                                  Review submitted
-                                </div>
+                              <DropdownMenuItem
+                                disabled
+                                className="py-3 gap-3 text-green-600 cursor-not-allowed"
+                              >
+                                <Star className="w-4 h-4 fill-green-600 text-green-600" />
+                                Review Submitted
                               </DropdownMenuItem>
                             ) : (
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (!canRate(b)) {
-                                    toast.error("You can rate only after completing your stay.");
-                                    return;
-                                  }
-                                  setRatingBooking(b);
-                                }}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <Star size={16} className="text-yellow-500 fill-yellow-500" />
+                              canRate(b) && (
+                                <DropdownMenuItem
+                                  className="py-3 gap-3"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onRate(b);
+                                  }}
+                                >
+                                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                                   Rate this Resort
-                                </div>
-                              </DropdownMenuItem>
+                                </DropdownMenuItem>
+                              )
                             )}
                             <DropdownMenuItem
                               onClick={(e) => {
@@ -400,7 +393,7 @@ export default function Bookings() {
                               </div>
                             </DropdownMenuItem>
 
-                            {!b.cancelled && new Date(b.checkIn) > new Date() ? (
+                            {canCancel(b) ? (
                               <DropdownMenuItem
                                 className="text-red-600"
                                 onClick={(e) => {
@@ -411,7 +404,7 @@ export default function Bookings() {
                                 <XCircle size={16} />
                                 Cancel Booking
                               </DropdownMenuItem>
-                            ) : b.cancelled ? (
+                            ) : isCancelled(b) ? (
                               <DropdownMenuItem disabled className="text-gray-400 cursor-not-allowed">
                                 <XCircle size={16} />
                                 Cancelled
