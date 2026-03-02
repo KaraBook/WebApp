@@ -154,7 +154,7 @@ If you need help completing your booking or payment, please reply here 😊`;
 
     if (statusFilter !== "all") {
       data = data.filter(
-        (b) => getBookingStatus(b) === statusFilter.toUpperCase()
+       (b) => getBookingStatus(b) === statusFilter
       );
     }
 
