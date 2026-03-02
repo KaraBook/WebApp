@@ -60,7 +60,13 @@ export const getOwnerDashboard = async (req, res) => {
     const propertyIds = properties.map((p) => p._id);
 
     const bookings = await Booking.find({
-      propertyId: { $in: propertyIds }
+      propertyId: { $in: propertyIds },
+      $or: [
+        { paymentStatus: "paid" },
+        { status: "confirmed" },
+        { paymentId: { $exists: true, $ne: null } },
+        { cancelled: true }
+      ]
     })
       .populate("userId", "firstName lastName email mobile roles primaryRole")
       .populate("propertyId", "propertyName ownerUserId isRefundable cancellationPolicy coverImage")
@@ -120,24 +126,16 @@ export const getOwnerDashboard = async (req, res) => {
     const isCancelled = (b) =>
       b.status === "cancelled" || b.cancelled === true;
 
+    const revenueBookings = bookings.filter(b => isCompleted(b));
+
+    const grossRevenue = revenueBookings.reduce(
+      (sum, b) => sum + Number(b.grandTotal ?? b.totalAmount ?? 0),
+      0
+    );
+
     const totalRefunds = bookings
       .filter(b => b.cancelled === true && b.refundAmount && isCompleted(b))
       .reduce((sum, b) => sum + Number(b.refundAmount || 0), 0);
-
-    /* ------------------ REAL OWNER REVENUE ------------------ */
-
-    const paidRevenue = bookings
-      .filter(b =>
-        b.cancelled !== true &&
-        (
-          b.paymentStatus === "paid" ||
-          b.status === "confirmed" ||
-          Boolean(b.paymentId)
-        )
-      )
-      .reduce((sum, b) => {
-        return sum + Number(b.grandTotal ?? b.totalAmount ?? 0);
-      }, 0);
 
     const cancellationRevenue = bookings
       .filter(b => b.cancelled === true && b.refundAmount !== undefined)
@@ -148,7 +146,8 @@ export const getOwnerDashboard = async (req, res) => {
         return sum + retained;
       }, 0);
 
-    const netRevenue = paidRevenue + cancellationRevenue;
+
+    const netRevenue = grossRevenue + cancellationRevenue;
 
     const now = new Date();
     const currentYear = now.getFullYear();
