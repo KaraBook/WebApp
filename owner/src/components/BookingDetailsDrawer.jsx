@@ -280,7 +280,7 @@ function Header({ userName, createdAt, statusMeta, bookingId, formatDate, onClos
             {/* META LINE */}
             <div className="flex items-center justify-between mt-1 text-xs text-muted-foreground">
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                     <Clock size={14} />
                     <span>
                         Booking created on <b>{formatDate(createdAt)}</b>
