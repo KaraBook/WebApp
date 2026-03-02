@@ -26,6 +26,22 @@ const formatCurrency = (value) => {
 };
 
 
+function normalizeBooking(booking = {}) {
+  return {
+    ...booking,
+    guests: booking.guests || { adults: 0, children: 0, infants: 0 },
+    meals: booking.meals || { veg: 0, nonVeg: 0 },
+    totalAmount: Number(booking.totalAmount) || 0,
+    taxAmount: Number(booking.taxAmount) || 0,
+    grandTotal: Number(booking.grandTotal) || 0,
+    refundAmount: Number(booking.refundAmount) || 0,
+    ownerRefundPercent: Number(booking.ownerRefundPercent) || 0,
+    userId: booking.userId || {},
+    propertyId: booking.propertyId || {},
+  };
+}
+
+
 export default function BookingDetailsDrawer({ open, booking, onClose }) {
     const [isMobile, setIsMobile] = useState(
         window.matchMedia("(max-width: 767px)").matches
@@ -49,14 +65,7 @@ export default function BookingDetailsDrawer({ open, booking, onClose }) {
         return isNaN(n) ? 0 : n;
     };
 
-    const safeBooking = {
-        ...booking,
-        totalAmount: cleanNumber(booking?.totalAmount),
-        taxAmount: cleanNumber(booking?.taxAmount),
-        grandTotal: cleanNumber(booking?.grandTotal),
-        refundAmount: cleanNumber(booking?.refundAmount),
-        ownerRefundPercent: cleanNumber(booking?.ownerRefundPercent),
-    };
+    const safeBooking = normalizeBooking(booking);
 
     const {
         createdAt,

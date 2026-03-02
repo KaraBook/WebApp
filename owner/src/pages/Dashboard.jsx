@@ -651,7 +651,7 @@ export default function Dashboard() {
               if (!prev) return prev;
               const updatedBookings = prev.bookings.map((b) =>
                 b._id === updatedBooking._id
-                  ? { ...b, ...updatedBooking }
+                 ? { ...b, ...updatedBooking, userId: b.userId, propertyId: b.propertyId, guests: b.guests, meals: b.meals }
                   : b
               );
 
