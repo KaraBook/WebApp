@@ -51,6 +51,7 @@ export function propertyCreatedTemplate({
 export function bookingConfirmationTemplate({
   travellerName,
   propertyName,
+  propertyAddress,
   checkIn,
   checkOut,
   bookingId,
@@ -62,74 +63,186 @@ export function bookingConfirmationTemplate({
   grandTotal,
   paymentMethod,
   orderId,
-  taxRate = 18,
+  hostName,
+  hostPhone,
+  hostEmail,
   portalUrl = process.env.TRAVELLER_PORTAL_URL,
 }) {
   const formatIndiaDate = (date) =>
     new Date(date).toLocaleDateString("en-IN", {
       timeZone: "Asia/Kolkata",
-      day: "numeric",
+      day: "2-digit",
       month: "short",
       year: "numeric",
     });
 
   const money = (v) => `₹${Number(v || 0).toLocaleString("en-IN")}`;
 
-  const formattedCheckIn = formatIndiaDate(checkIn);
-  const formattedCheckOut = formatIndiaDate(checkOut);
-  const formattedSubtotal = money(subtotal);
-  const formattedCGST = money(cgst);
-  const formattedSGST = money(sgst);
-  const formattedTotal = money(grandTotal);
-
   return {
     subject: `Booking Confirmed – ${propertyName}`,
     html: `
-      <div style="font-family: Inter, Arial, sans-serif; line-height:1.6; color:#111; padding:20px; background:#f9f9f9;">
-        <div style="max-width:600px;margin:auto;background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,0.08)">
-          <div style="background:#00919e;color:white;padding:16px 24px;">
-            <h2 style="margin:0;font-weight:600;">Booking Confirmation</h2>
-          </div>
-          <div style="padding:24px;">
-            <p>Hi <strong>${travellerName}</strong>,</p>
-            <p>Your booking at <strong>${propertyName}</strong> has been confirmed successfully!</p>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Booking Confirmation</title>
+</head>
+<body style="margin:0;padding:0;background:#f2f4f5;font-family:Inter,Arial,sans-serif;">
 
-            <table style="width:100%;border-collapse:collapse;margin-top:16px;">
-              <tr><td style="padding:6px 0;"><strong>Check-in:</strong></td><td>${formattedCheckIn}</td></tr>
-              <tr><td style="padding:6px 0;"><strong>Check-out:</strong></td><td>${formattedCheckOut}</td></tr>
-              <tr><td style="padding:6px 0;"><strong>Nights:</strong></td><td>${nights}</td></tr>
-              <tr><td style="padding:6px 0;"><strong>Guests:</strong></td><td>${guests}</td></tr>
-              <tr>
-  <td style="padding:6px 0;"><strong>Room Charges:</strong></td>
-  <td>${formattedSubtotal}</td>
-</tr>
-
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f2f4f5;padding:20px 0;">
 <tr>
-  <td style="border-top:1px solid #eee;padding-top:10px">
-    <strong>Total Paid</strong>
-  </td>
-  <td style="border-top:1px solid #eee;padding-top:10px">
-    <strong>${formattedTotal}</strong>
-  </td>
+<td align="center">
+
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;">
+
+<!-- HEADER -->
+<tr>
+<td align="center" style="background:#2e9c8f;padding:32px 20px;color:#ffffff;">
+  <h2 style="margin:0;font-weight:600;">KisanBooking</h2>
+  <div style="font-size:38px;margin:16px 0;">✓</div>
+  <h3 style="margin:0;font-weight:600;">Booking Confirmed!</h3>
+  <p style="margin:6px 0 0 0;font-size:14px;">Booking ID: <strong>#${bookingId}</strong></p>
+  <div style="margin-top:10px;">
+    <span style="background:#ffffff33;padding:6px 14px;border-radius:20px;font-size:12px;">
+      CONFIRMED
+    </span>
+  </div>
+</td>
 </tr>
 
-<tr><td><strong>Payment Method:</strong></td><td>${paymentMethod}</td></tr>
-<tr><td><strong>Order ID:</strong></td><td>${orderId}</td></tr>
-              <tr><td style="padding:6px 0;"><strong>Booking ID:</strong></td><td>${bookingId}</td></tr>
-            </table>
+<!-- BODY -->
+<tr>
+<td style="padding:28px;">
 
-            <p style="margin-top:16px;">You can view your booking details anytime in your dashboard.</p>
+<p style="margin-top:0;">Dear <strong>${travellerName}</strong>,</p>
+<p style="color:#555;font-size:14px;">
+Thank you for your booking! Your reservation has been confirmed.
+Below are the details of your stay.
+</p>
 
-            <div style="text-align:center;margin-top:24px;">
-              <a href="${portalUrl}" style="background:#00919e;color:white;text-decoration:none;padding:12px 20px;border-radius:6px;display:inline-block;">View Booking</a>
-            </div>
+<hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
 
-            <p style="margin-top:24px;">We look forward to hosting you. Have a great stay!</p>
-            <p style="margin-top:16px;font-size:13px;color:#666;">Need help? Contact us anytime at web.karabook@gmail.com</p>
-          </div>
-        </div>
-      </div>
-    `
+<!-- PROPERTY -->
+<h4 style="margin-bottom:8px;color:#2e9c8f;">PROPERTY</h4>
+<div style="background:#f6f8f9;padding:16px;border-radius:10px;margin-bottom:20px;">
+  <strong>${propertyName}</strong><br/>
+  <span style="font-size:13px;color:#666;">${propertyAddress || ""}</span>
+</div>
+
+<!-- STAY DETAILS -->
+<h4 style="margin-bottom:8px;color:#2e9c8f;">STAY DETAILS</h4>
+<table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom:20px;">
+<tr>
+  <td width="50%" style="background:#f6f8f9;border-radius:8px;">
+    <strong>Check-in</strong><br/>
+    ${formatIndiaDate(checkIn)}
+  </td>
+  <td width="50%" style="background:#f6f8f9;border-radius:8px;">
+    <strong>Check-out</strong><br/>
+    ${formatIndiaDate(checkOut)}
+  </td>
+</tr>
+<tr>
+  <td width="50%" style="background:#f6f8f9;border-radius:8px;">
+    <strong>Nights</strong><br/>
+    ${nights}
+  </td>
+  <td width="50%" style="background:#f6f8f9;border-radius:8px;">
+    <strong>Guests</strong><br/>
+    ${guests}
+  </td>
+</tr>
+</table>
+
+<!-- HOST -->
+${
+  hostName
+    ? `
+<h4 style="margin-bottom:8px;color:#2e9c8f;">HOST CONTACT</h4>
+<div style="background:#f6f8f9;padding:16px;border-radius:10px;margin-bottom:20px;">
+  <strong>${hostName}</strong><br/>
+  ${hostPhone ? `📞 ${hostPhone}<br/>` : ""}
+  ${hostEmail ? `✉ ${hostEmail}` : ""}
+</div>
+`
+    : ""
+}
+
+<!-- PAYMENT -->
+<h4 style="margin-bottom:8px;color:#2e9c8f;">PAYMENT INFORMATION</h4>
+<table width="100%" cellpadding="6" cellspacing="0" style="background:#f6f8f9;border-radius:10px;padding:16px;">
+<tr>
+  <td>Payment Method</td>
+  <td align="right">${paymentMethod}</td>
+</tr>
+<tr>
+  <td>Room Charges (${nights} nights)</td>
+  <td align="right">${money(subtotal)}</td>
+</tr>
+<tr>
+  <td>CGST</td>
+  <td align="right">${money(cgst)}</td>
+</tr>
+<tr>
+  <td>SGST</td>
+  <td align="right">${money(sgst)}</td>
+</tr>
+<tr>
+  <td style="border-top:1px solid #ddd;padding-top:10px;">
+    <strong>Grand Total</strong>
+  </td>
+  <td align="right" style="border-top:1px solid #ddd;padding-top:10px;">
+    <strong>${money(grandTotal)}</strong>
+  </td>
+</tr>
+<tr>
+  <td style="font-size:12px;color:#777;">Order ID</td>
+  <td align="right" style="font-size:12px;color:#777;">${orderId}</td>
+</tr>
+</table>
+
+<!-- IMPORTANT INFO -->
+<h4 style="margin:24px 0 8px;color:#2e9c8f;">IMPORTANT INFORMATION</h4>
+<div style="background:#f6f8f9;padding:16px;border-radius:10px;font-size:14px;">
+  <strong>Check-in / Check-out Time</strong><br/>
+  Check-in: 2:00 PM onwards · Check-out: 11:00 AM
+</div>
+
+<div style="margin-top:12px;background:#f6f8f9;padding:16px;border-radius:10px;font-size:14px;">
+  <strong>Cancellation Policy</strong><br/>
+  Free cancellation up to 48 hours before check-in.
+</div>
+
+<!-- BUTTON -->
+<div style="text-align:center;margin-top:28px;">
+  <a href="${portalUrl}"
+     style="background:#2e9c8f;color:#ffffff;text-decoration:none;
+     padding:12px 22px;border-radius:8px;display:inline-block;">
+     View Booking
+  </a>
+</div>
+
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td align="center" style="padding:20px;color:#777;font-size:13px;background:#fafafa;">
+  Need help?<br/>
+  Contact us at support@kisanbooking.com<br/><br/>
+  © ${new Date().getFullYear()} KisanBooking. All rights reserved.
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+`
   };
 }
 

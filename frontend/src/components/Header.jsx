@@ -82,7 +82,7 @@ export default function Header({ onLoginClick }) {
               <DropdownMenuTrigger asChild>
                 <button>
                   <Avatar className="h-9 w-9 shadow-sm">
-                    <AvatarImage src={user?.avatarUrl} />
+                    <AvatarImage src={user?.avatarUrl}  className="object-cover"/>
                     <AvatarFallback>{(user?.name?.[0] || "U").toUpperCase()}</AvatarFallback>
                   </Avatar>
                 </button>
