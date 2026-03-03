@@ -379,7 +379,7 @@ const runBookingBackgroundTasks = async (bookingId) => {
         propertyCheckInTime: property.checkInTime,
         propertyCheckOutTime: property.checkOutTime,
 
-        portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
+        portalUrl: process.env.PORTAL_URL,
       });
 
       await sendMail({
