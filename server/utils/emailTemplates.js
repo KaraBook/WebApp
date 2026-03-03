@@ -66,6 +66,8 @@ export function bookingConfirmationTemplate({
   hostName,
   hostPhone,
   hostEmail,
+  propertyCheckInTime,
+  propertyCheckOutTime,
   portalUrl = process.env.TRAVELLER_PORTAL_URL,
 }) {
   const formatIndiaDate = (date) =>
@@ -104,7 +106,7 @@ export function bookingConfirmationTemplate({
 <tr>
 <td style="background:#2f9c8f;padding:22px 24px;text-align:center;color:#ffffff;">
 
-  <div style="font-size:18px;font-weight:600;letter-spacing:0.3px;">
+  <div style="font-size:26px;font-weight:700;letter-spacing:0.3px;">
     Karabook
   </div>
 
@@ -131,7 +133,7 @@ export function bookingConfirmationTemplate({
 
 <!-- ================= BODY ================= -->
 <tr>
-<td style="padding:28px 32px;">
+<td style="padding:20px 20px;">
 
 <p style="margin:0 0 6px 0;font-size:14px;">
 Dear <strong>${travellerName}</strong>,
@@ -145,11 +147,11 @@ Below are the details of your stay.
 <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;" />
 
 <!-- ===== PROPERTY ===== -->
-<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+<div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
 PROPERTY
 </div>
 
-<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:18px;margin-bottom:22px;">
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;margin-bottom:22px;">
 
   <div style="font-size:15px;font-weight:600;color:#1f2937;margin-bottom:6px;">
     ${propertyName}
@@ -162,14 +164,14 @@ PROPERTY
 </div>
 
 <!-- ===== STAY DETAILS ===== -->
-<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+<div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
 STAY DETAILS
 </div>
 
 <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;">
 <tr>
 <td width="48%" valign="top">
-  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:12px;">
+  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;margin-bottom:12px;">
     <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">Check-in</div>
     <div style="font-size:14px;font-weight:600;color:#1f2937;">
       ${formatIndiaDate(checkIn)}
@@ -177,10 +179,10 @@ STAY DETAILS
   </div>
 </td>
 
-<td width="4%"></td>
+<td width="2%"></td>
 
 <td width="48%" valign="top">
-  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:12px;">
+  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;margin-bottom:12px;">
     <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">Check-out</div>
     <div style="font-size:14px;font-weight:600;color:#1f2937;">
       ${formatIndiaDate(checkOut)}
@@ -191,7 +193,7 @@ STAY DETAILS
 
 <tr>
 <td width="48%" valign="top">
-  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;">
+  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;">
     <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">Nights</div>
     <div style="font-size:14px;font-weight:600;color:#1f2937;">
       ${nights}
@@ -199,10 +201,10 @@ STAY DETAILS
   </div>
 </td>
 
-<td width="4%"></td>
+<td width="2%"></td>
 
 <td width="48%" valign="top">
-  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;">
+  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;">
     <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">Guests</div>
     <div style="font-size:14px;font-weight:600;color:#1f2937;">
       ${guests}
@@ -215,11 +217,11 @@ STAY DETAILS
 <!-- ===== HOST CONTACT ===== -->
 ${hostName
         ? `
-<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+<div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
 HOST CONTACT
 </div>
 
-<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:22px;">
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;margin-bottom:22px;">
   <div style="font-size:14px;font-weight:600;margin-bottom:6px;">
     ${hostName}
   </div>
@@ -231,11 +233,11 @@ HOST CONTACT
       }
 
 <!-- ===== PAYMENT ===== -->
-<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+<div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
 PAYMENT INFORMATION
 </div>
 
-<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:22px;">
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;margin-bottom:22px;">
 
 <table width="100%" cellpadding="4" cellspacing="0">
 <tr>
@@ -276,28 +278,18 @@ Order ID: ${orderId}
 IMPORTANT INFORMATION
 </div>
 
-<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:12px;">
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;">
 <strong style="font-size:13px;">Check-in / Check-out Time</strong>
 <div style="font-size:12px;color:#5f6b6a;margin-top:4px;">
-Check-in: 2:00 PM onwards · Check-out: 11:00 AM
+Check-in: ${propertyCheckInTime || "2:00 PM"} onwards · Check-out: ${propertyCheckOutTime || "11:00 AM"}
 </div>
 </div>
-
-<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;">
-<strong style="font-size:13px;">Cancellation Policy</strong>
-<div style="font-size:12px;color:#5f6b6a;margin-top:4px;">
-Free cancellation up to 48 hours before check-in.
-</div>
-</div>
-
-</td>
-</tr>
 
 <!-- ================= FOOTER ================= -->
 <tr>
 <td style="text-align:center;padding:24px;background:#f9fafb;font-size:12px;color:#6b7c7b;">
 Need help?<br/>
-Contact us at <strong>support@karabook.com</strong><br/><br/>
+Contact us at <strong>web.karabook@gmail.com</strong><br/>
 © ${new Date().getFullYear()} Karabook. All rights reserved.
 </td>
 </tr>

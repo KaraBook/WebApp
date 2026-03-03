@@ -330,20 +330,55 @@ const runBookingBackgroundTasks = async (bookingId) => {
     );
 
     if (booking.userId?.email) {
+      const property = booking.propertyId;
+      const owner = property.ownerUserId;
+
       const mailData = bookingConfirmationTemplate({
         travellerName: `${booking.userId.firstName} ${booking.userId.lastName}`,
-        propertyName: booking.propertyId.propertyName,
+
+        propertyName: property.propertyName,
+
+        propertyAddress: [
+          property.addressLine1,
+          property.area,
+          property.city,
+          property.state,
+          property.pinCode,
+        ].filter(Boolean).join(", "),
+
         checkIn: booking.checkIn,
         checkOut: booking.checkOut,
         nights: booking.totalNights,
         guests: `${booking.guests.adults} Adults, ${booking.guests.children} Children`,
+
         subtotal: booking.totalAmount,
         cgst: booking.cgstAmount,
         sgst: booking.sgstAmount,
         grandTotal: booking.grandTotal,
+
         paymentMethod: booking.paymentMethod,
         orderId: booking.orderId,
         bookingId: booking._id,
+
+        hostName: owner
+          ? `${owner.firstName || ""} ${owner.lastName || ""}`.trim()
+          : property.resortOwner?.firstName
+            ? `${property.resortOwner.firstName} ${property.resortOwner.lastName}`
+            : null,
+
+        hostPhone:
+          owner?.mobile ||
+          property.resortOwner?.resortMobile ||
+          null,
+
+        hostEmail:
+          owner?.email ||
+          property.resortOwner?.resortEmail ||
+          null,
+
+        propertyCheckInTime: property.checkInTime,
+        propertyCheckOutTime: property.checkOutTime,
+
         portalUrl: `${process.env.PORTAL_URL}/traveller/bookings/${booking._id}`,
       });
 
