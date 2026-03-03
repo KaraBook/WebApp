@@ -7,26 +7,32 @@ import "swiper/css/free-mode";
 
 const destinations = [
   {
-    title: "Goa",
-    count: 245,
-    img: "/goa.jpg",
+    title: "Mulshi",
+    description:
+      "Serene lakeside retreat with misty hills and peaceful sunsets",
+    img: "/Mulshi.webp",
   },
   {
-    title: "Kerala",
-    count: 189,
-    img: "/kerala.jpg",
+    title: "Tamhini Ghat",
+    description:
+      "Lush green mountain pass with waterfalls and scenic drives",
+    img: "/TamhiniGhat.webp",
   },
   {
-    title: "Rajasthan",
-    count: 312,
-    img: "/rajasthan.jpg",
+    title: "Panchgani",
+    description:
+      "Cool-climate hill town famous for viewpoints and strawberries",
+    img: "/Panchgani.webp",
   },
   {
-    title: "Himalayas",
-    count: 156,
-    img: "/himalayas.jpg",
+    title: "Lonavala",
+    description:
+      "Popular weekend getaway with valleys, forts, and misty views",
+    img: "/Lonavala.webp",
   },
 ];
+
+
 
 export default function TopDestinations() {
   const navigate = useNavigate();
@@ -91,7 +97,7 @@ export default function TopDestinations() {
 
 /* ================= DESTINATION CARD ================= */
 
-function DestinationCard({ title, count, img }) {
+function DestinationCard({ title, description, img }) {
   return (
     <div
       className="
@@ -128,9 +134,8 @@ function DestinationCard({ title, count, img }) {
           <MapPin className="w-4 h-4 text-primary" />
           <h3 className="text-lg font-bold">{title}</h3>
         </div>
-
-        <p className="text-sm text-white/90">
-          {count} properties available
+        <p className="text-sm text-white/90 leading-relaxed line-clamp-2">
+          {description}
         </p>
       </div>
     </div>
