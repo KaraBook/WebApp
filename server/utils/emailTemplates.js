@@ -153,7 +153,7 @@ PROPERTY
 
 <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:12px;margin-bottom:22px;">
 
-  <div style="font-size:15px;font-weight:600;color:#1f2937;margin-bottom:6px;">
+  <div style="font-size:15px;font-weight:600;color:#1f2937;">
     ${propertyName}
   </div>
 
@@ -283,6 +283,23 @@ IMPORTANT INFORMATION
 <div style="font-size:12px;color:#5f6b6a;margin-top:4px;">
 Check-in: ${propertyCheckInTime || "2:00 PM"} onwards · Check-out: ${propertyCheckOutTime || "11:00 AM"}
 </div>
+</div>
+
+<!-- ===== VIEW BOOKING BUTTON ===== -->
+<div style="text-align:center;margin-top:20px;margin-bottom:10px;">
+  <a href="${portalUrl}/account/bookings"
+     style="
+       display:inline-block;
+       background:#2f9c8f;
+       color:#ffffff;
+       padding:14px 24px;
+       font-size:14px;
+       font-weight:600;
+       border-radius:10px;
+       text-decoration:none;
+     ">
+     View Booking
+  </a>
 </div>
 
 <!-- ================= FOOTER ================= -->
