@@ -77,7 +77,8 @@ export function bookingConfirmationTemplate({
     });
 
   const money = (v) => `₹${Number(v || 0).toLocaleString("en-IN")}`;
-  const formattedBookingId = bookingId.startsWith("KB-")
+
+  const formattedBookingId = bookingId?.startsWith("KB-")
     ? `#${bookingId}`
     : `#KB-${bookingId}`;
 
@@ -90,266 +91,214 @@ export function bookingConfirmationTemplate({
 <meta charset="UTF-8" />
 <title>Booking Confirmation</title>
 </head>
-<body style="margin:0;padding:0;background:#f2f4f5;font-family:Inter,Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f2f4f5;padding:20px 0;">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:30px 0;background:#f3f4f6;">
 <tr>
 <td align="center">
 
-<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
 
-<!-- HEADER -->
+<!-- ================= HEADER ================= -->
 <tr>
-<td align="center" style="background:#2e9c8f;padding:20px 20px 18px;color:#ffffff;">
+<td style="background:#2f9c8f;padding:22px 24px;text-align:center;color:#ffffff;">
 
-  <div style="font-size:20px;font-weight:600;letter-spacing:0.5px;">
+  <div style="font-size:18px;font-weight:600;letter-spacing:0.3px;">
     Karabook
   </div>
 
-  <div style="margin-top:14px;font-size:18px;font-weight:600;">
+  <div style="margin-top:12px;font-size:16px;font-weight:600;">
     ✓ Booking Confirmed
     <span style="
       display:inline-block;
-      background:#ffffff33;
+      background:rgba(255,255,255,0.2);
       padding:4px 10px;
       border-radius:14px;
       font-size:11px;
-      margin-left:8px;">
+      margin-left:8px;
+      letter-spacing:0.5px;">
       CONFIRMED
     </span>
   </div>
 
-  <div style="margin-top:6px;font-size:13px;opacity:0.9;">
+  <div style="margin-top:6px;font-size:12px;opacity:0.9;">
     Booking ID: <strong>${formattedBookingId}</strong>
   </div>
 
 </td>
 </tr>
 
-<!-- BODY -->
+<!-- ================= BODY ================= -->
 <tr>
-<td style="padding:28px;">
+<td style="padding:28px 32px;">
 
-<p style="margin-top:0;">Dear <strong>${travellerName}</strong>,</p>
-<p style="color:#555;font-size:14px;">
+<p style="margin:0 0 6px 0;font-size:14px;">
+Dear <strong>${travellerName}</strong>,
+</p>
+
+<p style="margin:0 0 18px 0;font-size:13px;color:#5f6b6a;line-height:1.6;">
 Thank you for your booking! Your reservation has been confirmed.
 Below are the details of your stay.
 </p>
 
-<hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
+<hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;" />
 
-<!-- PROPERTY -->
-<tr>
-<td style="padding-top:10px;">
-
-  <!-- Section Label -->
-  <div style="
-    font-size:12px;
-    letter-spacing:1px;
-    font-weight:600;
-    color:#5f7f7b;
-    margin-bottom:12px;">
-    PROPERTY
-  </div>
-
-  <!-- Card -->
-  <div style="
-    background:#eef3f2;
-    border-radius:12px;
-    padding:18px 18px;
-    border:1px solid #e2e8e7;
-    margin-bottom:24px;">
-
-      <div style="font-size:16px;font-weight:600;color:#1f2937;margin-bottom:6px;">
-        ${propertyName}
-      </div>
-
-      <div style="font-size:13px;color:#5f6b6a;line-height:1.5;">
-        ${propertyAddress || ""}
-      </div>
-
-  </div>
-
-</td>
-</tr>
-
-<!-- STAY DETAILS -->
-<tr>
-<td>
-
-  <!-- Section Label -->
-  <div style="
-    font-size:12px;
-    letter-spacing:1px;
-    font-weight:600;
-    color:#5f7f7b;
-    margin-bottom:12px;">
-    STAY DETAILS
-  </div>
-
-  <table width="100%" cellpadding="0" cellspacing="0">
-    <tr>
-      <td width="48%" valign="top">
-        <div style="
-          background:#eef3f2;
-          border-radius:12px;
-          padding:16px;
-          border:1px solid #e2e8e7;
-          margin-bottom:12px;">
-
-          <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">
-            Check-in
-          </div>
-
-          <div style="font-size:15px;font-weight:600;color:#1f2937;">
-            ${formatIndiaDate(checkIn)}
-          </div>
-
-        </div>
-      </td>
-
-      <td width="4%"></td>
-
-      <td width="48%" valign="top">
-        <div style="
-          background:#eef3f2;
-          border-radius:12px;
-          padding:16px;
-          border:1px solid #e2e8e7;
-          margin-bottom:12px;">
-
-          <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">
-            Check-out
-          </div>
-
-          <div style="font-size:15px;font-weight:600;color:#1f2937;">
-            ${formatIndiaDate(checkOut)}
-          </div>
-
-        </div>
-      </td>
-    </tr>
-
-    <tr>
-      <td width="48%" valign="top">
-        <div style="
-          background:#eef3f2;
-          border-radius:12px;
-          padding:16px;
-          border:1px solid #e2e8e7;">
-
-          <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">
-            Nights
-          </div>
-
-          <div style="font-size:15px;font-weight:600;color:#1f2937;">
-            ${nights}
-          </div>
-
-        </div>
-      </td>
-
-      <td width="4%"></td>
-
-      <td width="48%" valign="top">
-        <div style="
-          background:#eef3f2;
-          border-radius:12px;
-          padding:16px;
-          border:1px solid #e2e8e7;">
-
-          <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">
-            Guests
-          </div>
-
-          <div style="font-size:15px;font-weight:600;color:#1f2937;">
-            ${guests}
-          </div>
-
-        </div>
-      </td>
-    </tr>
-  </table>
-
-</td>
-</tr>
-
-<!-- HOST -->
-${hostName
-        ? `
-<h4 style="margin-bottom:8px;color:#2e9c8f;">HOST CONTACT</h4>
-<div style="background:#f6f8f9;padding:16px;border-radius:10px;margin-bottom:20px;">
-  <strong>${hostName}</strong><br/>
-  ${hostPhone ? `📞 ${hostPhone}<br/>` : ""}
-  ${hostEmail ? `✉ ${hostEmail}` : ""}
+<!-- ===== PROPERTY ===== -->
+<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+PROPERTY
 </div>
-`
-        : ""
-      }
 
-<!-- PAYMENT -->
-<h4 style="margin-bottom:8px;color:#2e9c8f;">PAYMENT INFORMATION</h4>
-<table width="100%" cellpadding="6" cellspacing="0" style="background:#f6f8f9;border-radius:10px;padding:16px;">
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:18px;margin-bottom:22px;">
+
+  <div style="font-size:15px;font-weight:600;color:#1f2937;margin-bottom:6px;">
+    ${propertyName}
+  </div>
+
+  <div style="font-size:13px;color:#5f6b6a;line-height:1.5;">
+    ${propertyAddress || ""}
+  </div>
+
+</div>
+
+<!-- ===== STAY DETAILS ===== -->
+<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+STAY DETAILS
+</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;">
 <tr>
-  <td>Payment Method</td>
-  <td align="right">${paymentMethod}</td>
+<td width="48%" valign="top">
+  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:12px;">
+    <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">Check-in</div>
+    <div style="font-size:14px;font-weight:600;color:#1f2937;">
+      ${formatIndiaDate(checkIn)}
+    </div>
+  </div>
+</td>
+
+<td width="4%"></td>
+
+<td width="48%" valign="top">
+  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:12px;">
+    <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">Check-out</div>
+    <div style="font-size:14px;font-weight:600;color:#1f2937;">
+      ${formatIndiaDate(checkOut)}
+    </div>
+  </div>
+</td>
 </tr>
+
 <tr>
-  <td>Room Charges (${nights} nights)</td>
-  <td align="right">${money(subtotal)}</td>
-</tr>
-<tr>
-  <td>CGST</td>
-  <td align="right">${money(cgst)}</td>
-</tr>
-<tr>
-  <td>SGST</td>
-  <td align="right">${money(sgst)}</td>
-</tr>
-<tr>
-  <td style="border-top:1px solid #ddd;padding-top:10px;">
-    <strong>Grand Total</strong>
-  </td>
-  <td align="right" style="border-top:1px solid #ddd;padding-top:10px;">
-    <strong>${money(grandTotal)}</strong>
-  </td>
-</tr>
-<tr>
-  <td style="font-size:12px;color:#777;">Order ID</td>
-  <td align="right" style="font-size:12px;color:#777;">${orderId}</td>
+<td width="48%" valign="top">
+  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;">
+    <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">Nights</div>
+    <div style="font-size:14px;font-weight:600;color:#1f2937;">
+      ${nights}
+    </div>
+  </div>
+</td>
+
+<td width="4%"></td>
+
+<td width="48%" valign="top">
+  <div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;">
+    <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">Guests</div>
+    <div style="font-size:14px;font-weight:600;color:#1f2937;">
+      ${guests}
+    </div>
+  </div>
+</td>
 </tr>
 </table>
 
-<!-- IMPORTANT INFO -->
-<h4 style="margin:24px 0 8px;color:#2e9c8f;">IMPORTANT INFORMATION</h4>
-<div style="background:#f6f8f9;padding:16px;border-radius:10px;font-size:14px;">
-  <strong>Check-in / Check-out Time</strong><br/>
-  Check-in: 2:00 PM onwards · Check-out: 11:00 AM
+<!-- ===== HOST CONTACT ===== -->
+${
+  hostName
+    ? `
+<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+HOST CONTACT
 </div>
 
-<div style="margin-top:12px;background:#f6f8f9;padding:16px;border-radius:10px;font-size:14px;">
-  <strong>Cancellation Policy</strong><br/>
-  Free cancellation up to 48 hours before check-in.
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:22px;">
+  <div style="font-size:14px;font-weight:600;margin-bottom:6px;">
+    ${hostName}
+  </div>
+  ${hostPhone ? `<div style="font-size:13px;color:#5f6b6a;margin-bottom:4px;">${hostPhone}</div>` : ""}
+  ${hostEmail ? `<div style="font-size:13px;color:#5f6b6a;">${hostEmail}</div>` : ""}
+</div>
+`
+    : ""
+}
+
+<!-- ===== PAYMENT ===== -->
+<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+PAYMENT INFORMATION
 </div>
 
-<!-- BUTTON -->
-<div style="text-align:center;margin-top:28px;">
-  <a href="${portalUrl}"
-     style="background:#2e9c8f;color:#ffffff;text-decoration:none;
-     padding:12px 22px;border-radius:8px;display:inline-block;">
-     View Booking
-  </a>
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:22px;">
+
+<table width="100%" cellpadding="4" cellspacing="0">
+<tr>
+<td style="font-size:13px;color:#5f6b6a;">Payment Method</td>
+<td align="right" style="font-size:13px;">${paymentMethod}</td>
+</tr>
+
+<tr>
+<td style="font-size:13px;color:#5f6b6a;">Room Charges (${nights} Nights)</td>
+<td align="right" style="font-size:13px;">${money(subtotal)}</td>
+</tr>
+
+<tr>
+<td style="font-size:13px;color:#5f6b6a;">Tax (GST)</td>
+<td align="right" style="font-size:13px;">${money(cgst + sgst)}</td>
+</tr>
+
+<tr>
+<td style="border-top:1px solid #d1d5db;padding-top:10px;font-size:14px;font-weight:600;">
+Grand Total
+</td>
+<td align="right" style="border-top:1px solid #d1d5db;padding-top:10px;font-size:14px;font-weight:600;">
+${money(grandTotal)}
+</td>
+</tr>
+
+<tr>
+<td colspan="2" style="padding-top:8px;font-size:11px;color:#6b7c7b;">
+Order ID: ${orderId}
+</td>
+</tr>
+</table>
+
+</div>
+
+<!-- ===== IMPORTANT INFO ===== -->
+<div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
+IMPORTANT INFORMATION
+</div>
+
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;margin-bottom:12px;">
+<strong style="font-size:13px;">Check-in / Check-out Time</strong>
+<div style="font-size:12px;color:#5f6b6a;margin-top:4px;">
+Check-in: 2:00 PM onwards · Check-out: 11:00 AM
+</div>
+</div>
+
+<div style="background:#eef3f2;border:1px solid #e2e8e7;border-radius:12px;padding:16px;">
+<strong style="font-size:13px;">Cancellation Policy</strong>
+<div style="font-size:12px;color:#5f6b6a;margin-top:4px;">
+Free cancellation up to 48 hours before check-in.
+</div>
 </div>
 
 </td>
 </tr>
 
-<!-- FOOTER -->
+<!-- ================= FOOTER ================= -->
 <tr>
-<td align="center" style="padding:20px;color:#777;font-size:13px;background:#fafafa;">
-  Need help?<br/>
-  Contact us at support@kisanbooking.com<br/><br/>
-  © ${new Date().getFullYear()} KisanBooking. All rights reserved.
+<td style="text-align:center;padding:24px;background:#f9fafb;font-size:12px;color:#6b7c7b;">
+Need help?<br/>
+Contact us at <strong>support@karabook.com</strong><br/><br/>
+© ${new Date().getFullYear()} Karabook. All rights reserved.
 </td>
 </tr>
 
@@ -361,10 +310,9 @@ ${hostName
 
 </body>
 </html>
-`
+`,
   };
 }
-
 
 export function propertyPublishedTemplate({
   ownerFirstName,
