@@ -78,9 +78,10 @@ export function bookingConfirmationTemplate({
 
   const money = (v) => `₹${Number(v || 0).toLocaleString("en-IN")}`;
 
-  const formattedBookingId = bookingId?.startsWith("KB-")
-    ? `#${bookingId}`
-    : `#KB-${bookingId}`;
+  const safeBookingId = String(bookingId || "");
+  const formattedBookingId = safeBookingId.startsWith("KB-")
+    ? `#${safeBookingId}`
+    : `#KB-${safeBookingId}`;
 
   return {
     subject: `Booking Confirmed – ${propertyName}`,
@@ -212,9 +213,8 @@ STAY DETAILS
 </table>
 
 <!-- ===== HOST CONTACT ===== -->
-${
-  hostName
-    ? `
+${hostName
+        ? `
 <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
 HOST CONTACT
 </div>
@@ -227,8 +227,8 @@ HOST CONTACT
   ${hostEmail ? `<div style="font-size:13px;color:#5f6b6a;">${hostEmail}</div>` : ""}
 </div>
 `
-    : ""
-}
+        : ""
+      }
 
 <!-- ===== PAYMENT ===== -->
 <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#6b7c7b;margin-bottom:10px;">
