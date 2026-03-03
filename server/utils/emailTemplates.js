@@ -77,6 +77,9 @@ export function bookingConfirmationTemplate({
     });
 
   const money = (v) => `₹${Number(v || 0).toLocaleString("en-IN")}`;
+  const formattedBookingId = bookingId.startsWith("KB-")
+    ? `#${bookingId}`
+    : `#KB-${bookingId}`;
 
   return {
     subject: `Booking Confirmed – ${propertyName}`,
@@ -97,16 +100,29 @@ export function bookingConfirmationTemplate({
 
 <!-- HEADER -->
 <tr>
-<td align="center" style="background:#2e9c8f;padding:32px 20px;color:#ffffff;">
-  <h2 style="margin:0;font-weight:600;">KisanBooking</h2>
-  <div style="font-size:38px;margin:16px 0;">✓</div>
-  <h3 style="margin:0;font-weight:600;">Booking Confirmed!</h3>
-  <p style="margin:6px 0 0 0;font-size:14px;">Booking ID: <strong>#${bookingId}</strong></p>
-  <div style="margin-top:10px;">
-    <span style="background:#ffffff33;padding:6px 14px;border-radius:20px;font-size:12px;">
+<td align="center" style="background:#2e9c8f;padding:20px 20px 18px;color:#ffffff;">
+
+  <div style="font-size:20px;font-weight:600;letter-spacing:0.5px;">
+    Karabook
+  </div>
+
+  <div style="margin-top:14px;font-size:18px;font-weight:600;">
+    ✓ Booking Confirmed
+    <span style="
+      display:inline-block;
+      background:#ffffff33;
+      padding:4px 10px;
+      border-radius:14px;
+      font-size:11px;
+      margin-left:8px;">
       CONFIRMED
     </span>
   </div>
+
+  <div style="margin-top:6px;font-size:13px;opacity:0.9;">
+    Booking ID: <strong>${formattedBookingId}</strong>
+  </div>
+
 </td>
 </tr>
 
@@ -123,41 +139,144 @@ Below are the details of your stay.
 <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
 
 <!-- PROPERTY -->
-<h4 style="margin-bottom:8px;color:#2e9c8f;">PROPERTY</h4>
-<div style="background:#f6f8f9;padding:16px;border-radius:10px;margin-bottom:20px;">
-  <strong>${propertyName}</strong><br/>
-  <span style="font-size:13px;color:#666;">${propertyAddress || ""}</span>
-</div>
+<tr>
+<td style="padding-top:10px;">
+
+  <!-- Section Label -->
+  <div style="
+    font-size:12px;
+    letter-spacing:1px;
+    font-weight:600;
+    color:#5f7f7b;
+    margin-bottom:12px;">
+    PROPERTY
+  </div>
+
+  <!-- Card -->
+  <div style="
+    background:#eef3f2;
+    border-radius:12px;
+    padding:18px 18px;
+    border:1px solid #e2e8e7;
+    margin-bottom:24px;">
+
+      <div style="font-size:16px;font-weight:600;color:#1f2937;margin-bottom:6px;">
+        ${propertyName}
+      </div>
+
+      <div style="font-size:13px;color:#5f6b6a;line-height:1.5;">
+        ${propertyAddress || ""}
+      </div>
+
+  </div>
+
+</td>
+</tr>
 
 <!-- STAY DETAILS -->
-<h4 style="margin-bottom:8px;color:#2e9c8f;">STAY DETAILS</h4>
-<table width="100%" cellpadding="8" cellspacing="0" style="margin-bottom:20px;">
 <tr>
-  <td width="50%" style="background:#f6f8f9;border-radius:8px;">
-    <strong>Check-in</strong><br/>
-    ${formatIndiaDate(checkIn)}
-  </td>
-  <td width="50%" style="background:#f6f8f9;border-radius:8px;">
-    <strong>Check-out</strong><br/>
-    ${formatIndiaDate(checkOut)}
-  </td>
+<td>
+
+  <!-- Section Label -->
+  <div style="
+    font-size:12px;
+    letter-spacing:1px;
+    font-weight:600;
+    color:#5f7f7b;
+    margin-bottom:12px;">
+    STAY DETAILS
+  </div>
+
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td width="48%" valign="top">
+        <div style="
+          background:#eef3f2;
+          border-radius:12px;
+          padding:16px;
+          border:1px solid #e2e8e7;
+          margin-bottom:12px;">
+
+          <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">
+            Check-in
+          </div>
+
+          <div style="font-size:15px;font-weight:600;color:#1f2937;">
+            ${formatIndiaDate(checkIn)}
+          </div>
+
+        </div>
+      </td>
+
+      <td width="4%"></td>
+
+      <td width="48%" valign="top">
+        <div style="
+          background:#eef3f2;
+          border-radius:12px;
+          padding:16px;
+          border:1px solid #e2e8e7;
+          margin-bottom:12px;">
+
+          <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">
+            Check-out
+          </div>
+
+          <div style="font-size:15px;font-weight:600;color:#1f2937;">
+            ${formatIndiaDate(checkOut)}
+          </div>
+
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td width="48%" valign="top">
+        <div style="
+          background:#eef3f2;
+          border-radius:12px;
+          padding:16px;
+          border:1px solid #e2e8e7;">
+
+          <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">
+            Nights
+          </div>
+
+          <div style="font-size:15px;font-weight:600;color:#1f2937;">
+            ${nights}
+          </div>
+
+        </div>
+      </td>
+
+      <td width="4%"></td>
+
+      <td width="48%" valign="top">
+        <div style="
+          background:#eef3f2;
+          border-radius:12px;
+          padding:16px;
+          border:1px solid #e2e8e7;">
+
+          <div style="font-size:12px;color:#6b7c7b;margin-bottom:4px;">
+            Guests
+          </div>
+
+          <div style="font-size:15px;font-weight:600;color:#1f2937;">
+            ${guests}
+          </div>
+
+        </div>
+      </td>
+    </tr>
+  </table>
+
+</td>
 </tr>
-<tr>
-  <td width="50%" style="background:#f6f8f9;border-radius:8px;">
-    <strong>Nights</strong><br/>
-    ${nights}
-  </td>
-  <td width="50%" style="background:#f6f8f9;border-radius:8px;">
-    <strong>Guests</strong><br/>
-    ${guests}
-  </td>
-</tr>
-</table>
 
 <!-- HOST -->
-${
-  hostName
-    ? `
+${hostName
+        ? `
 <h4 style="margin-bottom:8px;color:#2e9c8f;">HOST CONTACT</h4>
 <div style="background:#f6f8f9;padding:16px;border-radius:10px;margin-bottom:20px;">
   <strong>${hostName}</strong><br/>
@@ -165,8 +284,8 @@ ${
   ${hostEmail ? `✉ ${hostEmail}` : ""}
 </div>
 `
-    : ""
-}
+        : ""
+      }
 
 <!-- PAYMENT -->
 <h4 style="margin-bottom:8px;color:#2e9c8f;">PAYMENT INFORMATION</h4>
@@ -288,7 +407,7 @@ export function ownerBookingNotificationTemplate({
   nights,
   guests,
   grandTotal,
- portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
+  portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
 }) {
   const formatDate = (d) =>
     new Date(d).toLocaleDateString("en-IN", {
