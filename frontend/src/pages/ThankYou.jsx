@@ -225,7 +225,7 @@ export default function ThankYou() {
                 <div className="text-center mt-12 text-sm text-gray-500">
                     Need assistance with your booking?
                     <br />
-                    Call us: <b>+91 98765 43210</b> | Email: <b>support@karabook.com</b>
+                    Call us: <b>+91 91564 80600</b> | Email: <b>web.karabook@gmail.com</b>
                 </div>
             </div>
         </div>
