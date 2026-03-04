@@ -104,7 +104,7 @@ export function bookingConfirmationTemplate({
 
 <!-- ================= HEADER ================= -->
 <tr>
-<td style="background:#2f9c8f;padding:22px 24px;text-align:center;color:#ffffff;">
+<td style="background:#038ba0;padding:22px 24px;text-align:center;color:#ffffff;">
 
   <div style="font-size:26px;font-weight:700;letter-spacing:0.3px;">
     Karabook
@@ -290,7 +290,7 @@ Check-in: ${propertyCheckInTime || "2:00 PM"} onwards · Check-out: ${propertyCh
   <a href="${portalUrl}/account/bookings"
      style="
        display:inline-block;
-       background:#2f9c8f;
+       background:#038ba0;
        color:#ffffff;
        padding:14px 24px;
        font-size:14px;
