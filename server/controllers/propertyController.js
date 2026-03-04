@@ -30,8 +30,10 @@ async function sendOwnerCreationEmail(prop, { password = null } = {}) {
       ownerEmail: owner.email,
       ownerPassword: password,
       propertyName: prop.propertyName,
+      propertyType: prop.propertyType,
+      propertyAddress: `${prop.addressLine1}, ${prop.area || "—"}, ${prop.city}, ${prop.state}`,
       createdNewUser: !!password,
-      portalUrl: `${process.env.PORTAL_URL}/owner/login`,
+      portalUrl: `${process.env.OWNER_PORTAL_URL}`,
     });
 
     await sendMail({
@@ -55,7 +57,14 @@ async function sendPropertyPublishedEmail(prop) {
     const mailData = propertyPublishedTemplate({
       ownerFirstName: owner.firstName,
       propertyName: prop.propertyName,
-      portalUrl: `${process.env.PORTAL_URL}/owner/dashboard`,
+      propertyType: prop.propertyType,
+      propertyAddress: [
+        prop.addressLine1,
+        prop.area,
+        prop.city,
+        prop.state
+      ].filter(Boolean).join(", "),
+      portalUrl: `${process.env.OWNER_PORTAL_URL}`,
     });
 
     await sendMail({
@@ -70,7 +79,6 @@ async function sendPropertyPublishedEmail(prop) {
     console.error("❌ Publish email failed:", err);
   }
 }
-
 
 function parseResortOwner(body) {
   if (body.resortOwner) {

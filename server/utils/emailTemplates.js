@@ -3,41 +3,156 @@ export function propertyCreatedTemplate({
   ownerEmail,
   ownerPassword,
   propertyName,
+  propertyAddress,
+  propertyType,
   createdNewUser,
-  portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
+  portalUrl = `${process.env.OWNER_PORTAL_URL}`,
 }) {
-  const greeting = ownerFirstName ? `Hi ${ownerFirstName},` : "Hi,";
+  const primary = "#038ba0";
+  const greeting = ownerFirstName
+    ? `Welcome to Karabook, ${ownerFirstName}!`
+    : "Welcome to Karabook!";
 
   const credentialsBlock = createdNewUser
     ? `
-      <p><strong>Your owner account has been created.</strong></p>
-      <ul>
-        <li><strong>Username:</strong> ${ownerEmail}</li>
-        <li><strong>Password:</strong> ${ownerPassword}</li>
-      </ul>
-      <p>Please login and change your password after first login.</p>
+      <tr>
+        <td style="padding:10px 30px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;">
+            <tr>
+              <td style="font-weight:600;font-size:14px;color:#374151;padding-bottom:10px;">
+                🔐 Your Login Credentials
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size:14px;color:#6b7280;padding-bottom:8px;">
+                <strong>USERNAME</strong><br/>
+                ${ownerEmail}
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size:14px;color:#6b7280;">
+                <strong>PASSWORD</strong><br/>
+                ${ownerPassword}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
     `
-    : `<p>Your owner account is already active.</p>`;
+    : "";
 
   return {
     subject: `Your property "${propertyName}" has been added`,
+
     html: `
-      <div style="font-family: Inter, Arial, sans-serif; line-height:1.6; color:#111">
-        <h2>Property added successfully</h2>
-        <p>${greeting}</p>
-        <p>Your property <strong>${propertyName}</strong> has been created in Karabook.</p>
-        ${credentialsBlock}
-        <p>
-          <a href="${portalUrl}" 
-             style="display:inline-block;background:#0694a0;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">
-            Login to Owner Dashboard
-          </a>
-        </p>
-      </div>
-    `,
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:40px 0;font-family:Inter,Arial,sans-serif;">
+<tr>
+<td align="center">
+
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+
+<!-- HEADER -->
+<tr>
+<td style="background:${primary};padding:20px 24px;color:white;font-size:18px;font-weight:600;">
+Karabook
+</td>
+</tr>
+
+<!-- BODY -->
+<tr>
+<td style="padding:10px 30px;">
+
+<!-- OWNER ACCOUNT CREATED TAG -->
+<div style="background:#edfdf3;color:#21c45d;font-size:13px;padding:8px 12px;border-radius:6px;display:inline-block;margin-bottom:10px; margin-top:10px;">
+Owner account created
+</div>
+
+<h2 style="margin:0 0 10px 0;font-size:22px;color:#111827;">
+${greeting}
+</h2>
+
+<p style="font-size:14px;color:#6b7280;margin-bottom:20px;">
+Your owner account has been created and your property 
+<strong>${propertyName}</strong> has been added in 
+<strong>draft</strong> mode. Once reviewed, it will go live and start receiving bookings.
+</p>
+
+<!-- PROPERTY CARD -->
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:0px;">
+<tr>
+<td style="font-size:16px;font-weight:600;color:#111827;">
+${propertyName}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:13px;color:#6b7280;padding-top:4px;">
+${propertyAddress || "—"}
+</td>
+</tr>
+
+<tr>
+<td style="padding-top:10px;font-size:13px;color:#6b7280;">
+Property Type: <strong>${propertyType || "—"}</strong>
+</td>
+</tr>
+
+<tr>
+<td style="padding-top:6px;font-size:13px;color:#6b7280;">
+Status: <span style="background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:6px;font-size:12px;">Draft</span>
+</td>
+</tr>
+
+</table>
+
+${credentialsBlock}
+
+<!-- BUTTON -->
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" style="padding-top:10px;">
+<a href="${portalUrl}" 
+style="
+display:inline-block;
+background:${primary};
+color:white;
+text-decoration:none;
+padding:14px 26px;
+border-radius:8px;
+font-size:15px;
+font-weight:600;
+">
+Login to Owner Dashboard →
+</a>
+</td>
+</tr>
+</table>
+
+<p style="font-size:12px;color:#9ca3af;margin-top:25px;text-align:center;">
+If you didn't request this account, please contact our support team immediately.
+</p>
+
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td style="text-align:center;font-size:12px;color:#9ca3af;padding:20px;">
+© 2026 Karabook. All rights reserved.<br/>
+You received this email because you're registered on Karabook.<br/><br/>
+Help Center · Privacy Policy · Unsubscribe
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+`,
+
     text:
       `Property added successfully\n\n` +
-      `${greeting}\n\n` +
       `Property: ${propertyName}\n\n` +
       (createdNewUser
         ? `Username: ${ownerEmail}\nPassword: ${ownerPassword}\n\n`
@@ -45,7 +160,6 @@ export function propertyCreatedTemplate({
       `Login: ${portalUrl}`,
   };
 }
-
 
 
 export function bookingConfirmationTemplate({
@@ -323,33 +437,134 @@ Contact us at <strong>web.karabook@gmail.com</strong><br/>
   };
 }
 
+
+
 export function propertyPublishedTemplate({
   ownerFirstName,
   propertyName,
-  portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
+  propertyAddress,
+  propertyType,
+  portalUrl = `${process.env.OWNER_PORTAL_URL}`,
 }) {
-  const greeting = ownerFirstName ? `Hi ${ownerFirstName},` : "Hi,";
+  const primary = "#038ba0";
+
+  const greeting = ownerFirstName
+    ? `Hi ${ownerFirstName}, great news!`
+    : "Great news!";
 
   return {
     subject: `Your property "${propertyName}" is now live! 🎉`,
+
     html: `
-      <div style="font-family: Inter, Arial, sans-serif; line-height:1.6; color:#111">
-        <h2>Property Published Successfully</h2>
-        <p>${greeting}</p>
-        <p>Great news! Your property <strong>${propertyName}</strong> has now been published and is live on Karabook.</p>
-        <p>You can now start receiving bookings from travellers.</p>
-        <p>
-          <a href="${portalUrl}" 
-             style="display:inline-block;background:#0694a0;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">
-            Go to Owner Dashboard
-          </a>
-        </p>
-      </div>
-    `,
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:40px 0;font-family:Inter,Arial,sans-serif;">
+<tr>
+<td align="center">
+
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+
+<!-- HEADER -->
+<tr>
+<td style="background:${primary};padding:20px 24px;color:white;font-size:18px;font-weight:600;">
+Karabook
+</td>
+</tr>
+
+<!-- BODY -->
+<tr>
+<td style="padding:30px 30px;">
+
+<!-- SUCCESS BADGE -->
+<div style="background:#e8f5ef;color:#0f8a5f;font-size:13px;padding:10px 14px;border-radius:8px;display:inline-block;margin-bottom:20px;">
+✔ Property added successfully
+</div>
+
+<h2 style="margin:0 0 10px 0;font-size:22px;color:#111827;">
+Your property is now live! 🎉
+</h2>
+
+<p style="font-size:14px;color:#6b7280;margin-bottom:20px;">
+${greeting} Your property has been reviewed and is now live on Karabook.
+Travellers can start booking it right away.
+</p>
+
+<!-- PROPERTY CARD -->
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:20px;">
+<tr>
+<td style="font-size:16px;font-weight:600;color:#111827;">
+${propertyName}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:13px;color:#6b7280;padding-top:4px;">
+${propertyAddress || "—"}
+</td>
+</tr>
+
+<tr>
+<td style="padding-top:10px;font-size:13px;color:#6b7280;">
+Property Type: <strong>${propertyType || "—"}</strong>
+</td>
+</tr>
+
+<tr>
+<td style="padding-top:6px;font-size:13px;color:#6b7280;">
+Status:
+<span style="background:#dcfce7;color:#166534;padding:3px 8px;border-radius:6px;font-size:12px;">
+Active
+</span>
+</td>
+</tr>
+</table>
+
+<!-- BUTTON -->
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" style="padding-top:10px;">
+<a href="${portalUrl}" 
+style="
+display:inline-block;
+background:${primary};
+color:white;
+text-decoration:none;
+padding:14px 26px;
+border-radius:8px;
+font-size:15px;
+font-weight:600;
+">
+View Property Dashboard →
+</a>
+</td>
+</tr>
+</table>
+
+<p style="font-size:12px;color:#9ca3af;margin-top:25px;text-align:center;">
+You can manage your property settings, pricing, and availability from the dashboard.
+</p>
+
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td style="text-align:center;font-size:12px;color:#9ca3af;padding:20px;">
+© 2026 Karabook. All rights reserved.<br/>
+You received this email because you're registered on Karabook.<br/><br/>
+Help Center · Privacy Policy · Unsubscribe
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+`,
+
     text:
       `Hi,\n\n` +
-      `Your property "${propertyName}" is now live on Karabook.\n\n` +
-      `You can start receiving bookings.\n\n` +
+      `Great news! Your property "${propertyName}" is now live on Karabook.\n\n` +
+      `Travellers can now start booking it.\n\n` +
       `Dashboard: ${portalUrl}`,
   };
 }
@@ -358,14 +573,17 @@ export function propertyPublishedTemplate({
 export function ownerBookingNotificationTemplate({
   ownerName,
   propertyName,
+  propertyAddress,
   travellerName,
   checkIn,
   checkOut,
   nights,
   guests,
   grandTotal,
-  portalUrl = `${process.env.OWNER_PORTAL_URL}/login`,
+  portalUrl = `${process.env.OWNER_PORTAL_URL}/owner/dashboard`,
 }) {
+  const primary = "#038ba0";
+
   const formatDate = (d) =>
     new Date(d).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -377,31 +595,134 @@ export function ownerBookingNotificationTemplate({
 
   return {
     subject: `New Booking Received – ${propertyName}`,
+
     html: `
-      <div style="font-family:Inter,Arial,sans-serif;line-height:1.6">
-        <h2>New Booking Alert 🎉</h2>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:40px 0;font-family:Inter,Arial,sans-serif;">
+<tr>
+<td align="center">
 
-        <p>Hi ${ownerName},</p>
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:14px;border:1px solid #e5e7eb;overflow:hidden;">
 
-        <p>You have received a new booking for <strong>${propertyName}</strong>.</p>
+<!-- HEADER -->
+<tr>
+<td style="background:${primary};padding:20px 24px;color:white;font-size:18px;font-weight:600;">
+Karabook
+</td>
+</tr>
 
-        <table style="margin-top:15px">
-          <tr><td><strong>Traveller:</strong></td><td>${travellerName}</td></tr>
-          <tr><td><strong>Check-in:</strong></td><td>${formatDate(checkIn)}</td></tr>
-          <tr><td><strong>Check-out:</strong></td><td>${formatDate(checkOut)}</td></tr>
-          <tr><td><strong>Nights:</strong></td><td>${nights}</td></tr>
-          <tr><td><strong>Guests:</strong></td><td>${guests}</td></tr>
-          <tr><td><strong>Total Paid:</strong></td><td>${money(grandTotal)}</td></tr>
-        </table>
+<tr>
+<td style="padding:30px;">
 
-        <div style="margin-top:20px;">
-          <a href="${portalUrl}"
-            style="background:#00919e;color:#fff;padding:10px 16px;border-radius:6px;text-decoration:none">
-            View Booking in Dashboard
-          </a>
-        </div>
-      </div>
-    `
+<!-- BADGE -->
+<div style="background:#eaf2ff;color:#2b6cb0;font-size:13px;padding:8px 12px;border-radius:8px;display:inline-block;margin-bottom:15px;">
+📅 New booking received
+</div>
+
+<h2 style="margin:0 0 10px 0;font-size:22px;color:#111827;">
+New Booking Alert 🎉
+</h2>
+
+<p style="font-size:14px;color:#6b7280;margin-bottom:20px;">
+Hi ${ownerName}, you have received a new booking for <strong>${propertyName}</strong>.
+</p>
+
+<!-- PROPERTY CARD -->
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:16px;">
+<tr>
+<td style="font-size:16px;font-weight:600;color:#111827;">
+${propertyName}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:13px;color:#6b7280;padding-top:4px;">
+${propertyAddress || "—"}
+</td>
+</tr>
+</table>
+
+<!-- BOOKING DETAILS CARD -->
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:16px;">
+<tr>
+<td style="font-weight:600;color:#111827;padding-bottom:10px;">
+Booking Details
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;padding-bottom:8px;">
+<strong>Traveller:</strong> ${travellerName}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;padding-bottom:8px;">
+<strong>Check-in / Check-out:</strong> ${formatDate(checkIn)} → ${formatDate(checkOut)}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;padding-bottom:8px;">
+<strong>Nights:</strong> ${nights}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;">
+<strong>Guests:</strong> ${guests}
+</td>
+</tr>
+</table>
+
+<!-- PAYMENT CARD -->
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #cfe0ff;background:#f5f9ff;border-radius:10px;padding:16px;margin-bottom:20px;">
+<tr>
+<td style="font-size:13px;color:#6b7280;">
+TOTAL PAID
+</td>
+<td align="right">
+<span style="background:#dcfce7;color:#166534;font-size:12px;padding:4px 8px;border-radius:6px;">
+Paid
+</span>
+</td>
+</tr>
+
+<tr>
+<td colspan="2" style="font-size:22px;font-weight:600;color:#111827;padding-top:6px;">
+${money(grandTotal)}
+</td>
+</tr>
+</table>
+
+<!-- BUTTON -->
+<table width="100%">
+<tr>
+<td align="center">
+<a href="${portalUrl}" style="display:inline-block;background:${primary};color:#fff;text-decoration:none;padding:14px 26px;border-radius:8px;font-size:15px;font-weight:600;">
+View Booking in Dashboard →
+</a>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td style="text-align:center;font-size:12px;color:#9ca3af;padding:20px;">
+© 2026 Karabook. All rights reserved.<br/>
+You received this email because you're registered on Karabook.<br/><br/>
+Help Center · Privacy Policy · Unsubscribe
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+`,
   };
 }
 
