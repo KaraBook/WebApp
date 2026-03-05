@@ -414,6 +414,12 @@ Amount Paid: ₹${booking.grandTotal}`;
         checkIn: booking.checkIn,
         checkOut: booking.checkOut,
         nights: booking.totalNights,
+        propertyAddress: [
+          booking.propertyId.addressLine1,
+          booking.propertyId.area,
+          booking.propertyId.city,
+          booking.propertyId.state,
+        ].filter(Boolean).join(", "),
         guests: `${booking.guests.adults} Adults, ${booking.guests.children} Children`,
         grandTotal: booking.grandTotal,
         portalUrl: `${process.env.OWNER_PORTAL_URL}/bookings/${booking._id}`,
