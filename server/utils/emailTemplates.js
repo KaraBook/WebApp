@@ -474,7 +474,7 @@ Karabook
 <td style="padding:10px 30px;">
 
 <!-- SUCCESS BADGE -->
-<div style="background:#e8f5ef;color:#0f8a5f;font-size:13px;padding:10px 14px;border-radius:8px;display:inline-block;margin-bottom:20px; margin-top:20px;">
+<div style="background:#e8f5ef;color:#0f8a5f;font-size:13px;padding:8px 12px;border-radius:6px;display:inline-block;margin-bottom:10px;margin-top:10px;">
 ✔ Property added successfully
 </div>
 
