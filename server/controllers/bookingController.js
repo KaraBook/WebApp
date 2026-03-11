@@ -2,7 +2,11 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import Booking from "../models/Booking.js";
 import { sendMail } from "../utils/mailer.js";
-import { bookingConfirmationTemplate, ownerBookingNotificationTemplate } from "../utils/emailTemplates.js";
+import {
+  bookingConfirmationTemplate,
+  ownerBookingNotificationTemplate,
+  ownerBookingCancellationTemplate,
+} from "../utils/emailTemplates.js";
 import Property from "../models/Property.js";
 import User from "../models/User.js";
 import { sendWhatsAppText } from "../utils/whatsapp.js";
@@ -729,7 +733,10 @@ export const previewCancellation = async (req, res) => {
       });
     }
 
-    const property = await Property.findById(booking.propertyId);
+    const property = await Property.findById(booking.propertyId).populate(
+      "ownerUserId",
+      "firstName lastName email"
+    );
 
     if (!property) {
       return res.status(404).json({
@@ -818,6 +825,42 @@ export const cancelBooking = async (req, res) => {
     booking.cancelledAt = new Date();
 
     await booking.save();
+
+    const traveller = await User.findById(userId).select("firstName lastName").lean();
+    const ownerRecipient =
+      property?.ownerUserId?.email ||
+      property?.resortOwner?.resortEmail ||
+      property?.resortOwner?.email ||
+      null;
+
+    if (ownerRecipient) {
+      const ownerMail = ownerBookingCancellationTemplate({
+        ownerName: property?.ownerUserId?.firstName || "Owner",
+        propertyName: property?.propertyName || booking.propertyName,
+        propertyAddress: [
+          property?.addressLine1,
+          property?.area,
+          property?.city,
+          property?.state,
+        ].filter(Boolean).join(", "),
+        travellerName:
+          `${traveller?.firstName || ""} ${traveller?.lastName || ""}`.trim() || "Traveller",
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        nights: booking.totalNights,
+        guests: `${booking.guests?.adults || 0} Adults, ${booking.guests?.children || 0} Children`,
+        grandTotal: booking.grandTotal,
+        cancelledBy: "traveller",
+        cancelReason: reason,
+        portalUrl: `${process.env.OWNER_PORTAL_URL}/bookings/${booking._id}`,
+      });
+
+      await sendMail({
+        to: ownerRecipient,
+        subject: ownerMail.subject,
+        html: ownerMail.html,
+      });
+    }
 
     res.json({
       success: true,

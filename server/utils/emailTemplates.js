@@ -728,6 +728,178 @@ Help Center · Privacy Policy · Unsubscribe
 }
 
 
+export function ownerBookingCancellationTemplate({
+  ownerName,
+  propertyName,
+  propertyAddress,
+  travellerName,
+  checkIn,
+  checkOut,
+  nights,
+  guests,
+  grandTotal,
+  cancelledBy,
+  cancelReason,
+  portalUrl = `${process.env.OWNER_PORTAL_URL}`,
+}) {
+  const primary = "#038ba0";
+
+  const formatDate = (d) =>
+    new Date(d).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+  const money = (v) => `â‚¹${Number(v || 0).toLocaleString("en-IN")}`;
+  const cancelledByLabel = cancelledBy === "owner" ? "Owner" : "Traveller";
+
+  return {
+    subject: `Booking Cancelled â€“ ${propertyName}`,
+
+    html: `
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:40px 0;font-family:Inter,Arial,sans-serif;">
+<tr>
+<td align="center">
+
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:14px;border:1px solid #e5e7eb;overflow:hidden;">
+
+<!-- HEADER -->
+<tr>
+<td style="background:${primary};padding:20px 24px;color:white;font-size:18px;font-weight:600;">
+Karabook
+</td>
+</tr>
+
+<tr>
+<td style="padding:30px;">
+
+<!-- BADGE -->
+<div style="background:#fef2f2;color:#dc2626;font-size:13px;padding:8px 12px;border-radius:8px;display:inline-block;margin-bottom:15px;">
+Booking cancelled
+</div>
+
+<h2 style="margin:0 0 10px 0;font-size:22px;color:#111827;">
+Booking Cancellation Alert
+</h2>
+
+<p style="font-size:14px;color:#6b7280;margin-bottom:20px;">
+Hi ${ownerName}, a booking for <strong>${propertyName}</strong> has been cancelled.
+</p>
+
+<!-- PROPERTY CARD -->
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:16px;">
+<tr>
+<td style="font-size:16px;font-weight:600;color:#111827;">
+${propertyName}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:13px;color:#6b7280;padding-top:4px;">
+${propertyAddress || "â€”"}
+</td>
+</tr>
+</table>
+
+<!-- BOOKING DETAILS CARD -->
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:16px;">
+<tr>
+<td style="font-weight:600;color:#111827;padding-bottom:10px;">
+Cancellation Details
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;padding-bottom:8px;">
+<strong>Traveller:</strong> ${travellerName}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;padding-bottom:8px;">
+<strong>Check-in / Check-out:</strong> ${formatDate(checkIn)} â†’ ${formatDate(checkOut)}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;padding-bottom:8px;">
+<strong>Nights:</strong> ${nights}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;padding-bottom:8px;">
+<strong>Guests:</strong> ${guests}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;padding-bottom:8px;">
+<strong>Cancelled By:</strong> ${cancelledByLabel}
+</td>
+</tr>
+
+<tr>
+<td style="font-size:14px;color:#374151;">
+<strong>Reason:</strong> ${cancelReason || "Not specified"}
+</td>
+</tr>
+</table>
+
+<!-- PAYMENT CARD -->
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #fee2e2;background:#fff7f7;border-radius:10px;padding:16px;margin-bottom:20px;">
+<tr>
+<td style="font-size:13px;color:#6b7280;">
+BOOKING VALUE
+</td>
+<td align="right">
+<span style="background:#fee2e2;color:#b91c1c;font-size:12px;padding:4px 8px;border-radius:6px;">
+Cancelled
+</span>
+</td>
+</tr>
+
+<tr>
+<td colspan="2" style="font-size:22px;font-weight:600;color:#111827;padding-top:6px;">
+${money(grandTotal)}
+</td>
+</tr>
+</table>
+
+<!-- BUTTON -->
+<table width="100%">
+<tr>
+<td align="center">
+<a href="${portalUrl}" style="display:inline-block;background:${primary};color:#fff;text-decoration:none;padding:14px 26px;border-radius:8px;font-size:15px;font-weight:600;">
+View Booking in Dashboard â†’
+</a>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+
+<!-- FOOTER -->
+<tr>
+<td style="text-align:center;font-size:12px;color:#9ca3af;padding:20px;">
+Â© 2026 Karabook. All rights reserved.<br/>
+You received this email because you're registered on Karabook.<br/><br/>
+Help Center Â· Privacy Policy Â· Unsubscribe
+</td>
+</tr>
+
+</table>
+
+</td>
+</tr>
+</table>
+`,
+  };
+}
+
+
 export function managerAccountCreatedTemplate({
   managerName,
   managerEmail,
