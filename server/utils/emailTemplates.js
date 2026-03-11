@@ -473,9 +473,9 @@ Karabook
 <tr>
 <td style="padding:10px 30px;">
 
-<!-- SUCCESS BADGE -->
-<div style="background:#e8f5ef;color:#0f8a5f;font-size:13px;padding:8px 12px;border-radius:6px;display:inline-block;margin-bottom:10px;margin-top:10px;">
-✔ Property is now live
+<!-- PROPERTY ADDED TAG -->
+<div style="background:#edfdf3;color:#21c45d;font-size:13px;padding:8px 12px;border-radius:6px;display:inline-block;margin-bottom:10px; margin-top:10px;">
+Property added successfully
 </div>
 
 <h2 style="margin:0 0 10px 0;font-size:22px;color:#111827;">
@@ -488,7 +488,7 @@ Travellers can start booking it right away.
 </p>
 
 <!-- PROPERTY CARD -->
-<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:20px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:0px;">
 <tr>
 <td style="font-size:16px;font-weight:600;color:#111827;">
 ${propertyName}
@@ -513,15 +513,6 @@ Status:
 <span style="background:#dcfce7;color:#166534;padding:3px 8px;border-radius:6px;font-size:12px;">
 Active
 </span>
-</td>
-</tr>
-</table>
-
-<!-- EXTRA INFO BLOCK (prevents Gmail auto zoom) -->
-<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-<tr>
-<td style="font-size:13px;color:#6b7280;">
-You can manage your property pricing, availability, and bookings from your owner dashboard.
 </td>
 </tr>
 </table>

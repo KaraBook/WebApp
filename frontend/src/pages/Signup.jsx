@@ -92,6 +92,7 @@ export default function Signup() {
     handleSubmit,
     control,
     setValue,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
@@ -188,7 +189,11 @@ export default function Signup() {
 
 
     } catch (err) {
-      alert(err?.response?.data?.message || "Signup failed");
+      const message = err?.response?.data?.message || "Signup failed";
+      if (err?.response?.data?.field === "mobile") {
+        setError("mobile", { type: "server", message });
+      }
+      toast.error(message);
     }
   };
 

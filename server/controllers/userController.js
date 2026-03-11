@@ -245,9 +245,36 @@ export const travellerSignup = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
     const emailLower = email.toLowerCase().trim();
-    let user = await User.findOne({
-      $or: [{ mobile: mobile.trim() }, { email: emailLower }],
-    });
+    const normalizedMobile = mobile.trim();
+
+    const getMobileConflictMessage = (roles = []) => {
+      if (roles.includes("traveller")) {
+        return "This mobile number is already registered with a different Traveller account.";
+      }
+      if (roles.includes("resortOwner")) {
+        return "This mobile number is already registered with a different Resort Owner account.";
+      }
+      if (roles.includes("manager")) {
+        return "This mobile number is already registered with a different Manager account.";
+      }
+      if (roles.includes("admin")) {
+        return "This mobile number is already registered with an Admin account.";
+      }
+      return "This mobile number is already registered with a different account.";
+    };
+
+    const emailUser = await User.findOne({ email: emailLower });
+    const mobileUser = await User.findOne({ mobile: normalizedMobile });
+
+    if (mobileUser && String(mobileUser._id) !== String(emailUser?._id || "")) {
+      return res.status(409).json({
+        code: "MOBILE_ALREADY_REGISTERED",
+        field: "mobile",
+        message: getMobileConflictMessage(mobileUser.roles || []),
+      });
+    }
+
+    let user = emailUser || mobileUser;
     if (user) {
       const roles = user.roles || [];
 
@@ -260,6 +287,8 @@ export const travellerSignup = async (req, res) => {
       user.dateOfBirth = new Date(dateOfBirth);
       user.address = address;
       user.pinCode = pinCode;
+      user.mobile = normalizedMobile;
+      user.email = emailLower;
 
       await user.save();
 
@@ -277,7 +306,7 @@ export const travellerSignup = async (req, res) => {
       email: emailLower,
       state,
       city,
-      mobile: mobile.trim(),
+      mobile: normalizedMobile,
       roles: ["traveller"],
       primaryRole: "traveller",
       dateOfBirth: new Date(dateOfBirth),
