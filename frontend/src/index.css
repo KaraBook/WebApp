@@ -113,6 +113,23 @@
   background: rgba(4, 146, 159, 0.18) !important;
 }
 
+.property-filters-calendar--cleared .rdrInRange,
+.property-filters-calendar--cleared .rdrStartEdge,
+.property-filters-calendar--cleared .rdrEndEdge,
+.property-filters-calendar--cleared .rdrSelected,
+.property-filters-calendar--cleared .rdrDayStartPreview,
+.property-filters-calendar--cleared .rdrDayInPreview,
+.property-filters-calendar--cleared .rdrDayEndPreview {
+  background: transparent !important;
+}
+
+.property-filters-calendar--cleared .rdrDay:not(.rdrDayPassive) .rdrInRange ~ .rdrDayNumber span,
+.property-filters-calendar--cleared .rdrDay:not(.rdrDayPassive) .rdrStartEdge ~ .rdrDayNumber span,
+.property-filters-calendar--cleared .rdrDay:not(.rdrDayPassive) .rdrEndEdge ~ .rdrDayNumber span,
+.property-filters-calendar--cleared .rdrDay:not(.rdrDayPassive) .rdrSelected ~ .rdrDayNumber span {
+  color: inherit !important;
+}
+
 .rdrMonths {
   margin-left: -32px;
 }

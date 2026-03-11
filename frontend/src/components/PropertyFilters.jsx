@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { DateRange } from "react-date-range";
 import Select from "react-select";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { Calendar, CalendarRange, Map, MapPin, Navigation, Users, Search } from "lucide-react";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
@@ -86,6 +86,7 @@ export default function PropertyFilters({
             key: "selection",
         },
     ]);
+    const [isDateCleared, setIsDateCleared] = useState(false);
     useEffect(() => {
         async function loadLocations() {
             try {
@@ -160,47 +161,14 @@ export default function PropertyFilters({
     }, [selectedCity, selectedState, locationTree]);
 
     useEffect(() => {
-        if (!locationTree.length || !defaultValues || !defaultValues.state) return;
+        if (!defaultValues) return;
 
         const { state, city, area, guests: g, checkIn, checkOut } = defaultValues;
-
-        const foundState = locationTree.find((s) => s.state === state);
-        if (foundState) {
-            const stObj = {
-                value: foundState.state,
-                label: STATE_CODE_TO_NAME[foundState.state] || foundState.state,
-            };
-            setSelectedState(stObj);
-
-            const cityOptions = foundState.cities.map((c) => ({
-                value: c.city,
-                label: c.city,
-            }));
-            setCities(cityOptions);
-
-            if (city) {
-                const cityObj = { value: city, label: city };
-                setSelectedCity(cityObj);
-
-                const foundCity = foundState.cities.find((c) => c.city === city);
-
-                if (foundCity) {
-                    const areaOptions = foundCity.areas.map((a) => ({
-                        value: a,
-                        label: a,
-                    }));
-                    setAreas(areaOptions);
-
-                    if (area) {
-                        setSelectedArea({ value: area, label: area });
-                    }
-                }
-            }
-        }
 
         if (g) setGuests(g);
 
         if (checkIn && checkOut) {
+            setIsDateCleared(false);
             setDateRange([
                 {
                     startDate: new Date(checkIn),
@@ -208,6 +176,41 @@ export default function PropertyFilters({
                     key: "selection",
                 },
             ]);
+        }
+
+        if (!locationTree.length || !state) return;
+
+        const foundState = locationTree.find((s) => s.state === state);
+        if (!foundState) return;
+
+        const stObj = {
+            value: foundState.state,
+            label: STATE_CODE_TO_NAME[foundState.state] || foundState.state,
+        };
+        setSelectedState(stObj);
+
+        const cityOptions = foundState.cities.map((c) => ({
+            value: c.city,
+            label: c.city,
+        }));
+        setCities(cityOptions);
+
+        if (!city) return;
+
+        const cityObj = { value: city, label: city };
+        setSelectedCity(cityObj);
+
+        const foundCity = foundState.cities.find((c) => c.city === city);
+        if (!foundCity) return;
+
+        const areaOptions = foundCity.areas.map((a) => ({
+            value: a,
+            label: a,
+        }));
+        setAreas(areaOptions);
+
+        if (area) {
+            setSelectedArea({ value: area, label: area });
         }
     }, [defaultValues, locationTree]);
 
@@ -236,8 +239,8 @@ export default function PropertyFilters({
             state: selectedState?.value || "",
             city: selectedCity?.value || "",
             area: selectedArea?.value || "",
-            checkIn: dateRange[0].startDate,
-            checkOut: dateRange[0].endDate,
+            checkIn: isDateCleared ? null : dateRange[0].startDate,
+            checkOut: isDateCleared ? null : dateRange[0].endDate,
             guests,
         });
     };
@@ -264,6 +267,7 @@ export default function PropertyFilters({
                 key: "selection",
             },
         ]);
+        setIsDateCleared(false);
 
         setShowGuestBox(false);
         setShowCalendar(false);
@@ -318,7 +322,30 @@ export default function PropertyFilters({
         }),
     };
 
+    const handleDateRangeChange = (item) => {
+        const nextSelection = item.selection;
+        const currentStart = dateRange[0].startDate;
+        const currentEnd = dateRange[0].endDate;
+        const nextStart = nextSelection.startDate;
+        const nextEnd = nextSelection.endDate;
 
+        const shouldClearSelection =
+            currentStart &&
+            currentEnd &&
+            nextStart &&
+            nextEnd &&
+            isSameDay(currentStart, currentEnd) &&
+            isSameDay(nextStart, nextEnd) &&
+            isSameDay(currentStart, nextStart);
+
+        if (shouldClearSelection) {
+            setIsDateCleared(true);
+            return;
+        }
+
+        setIsDateCleared(false);
+        setDateRange([nextSelection]);
+    };
 
     return (
         <div
@@ -415,16 +442,18 @@ export default function PropertyFilters({
                     onClick={() => setShowCalendar(!showCalendar)}
                 >
                     <span className="text-gray-700 text-sm font-medium">
-                        {`${format(dateRange[0].startDate, "MMM d")} - ${format(
-                            dateRange[0].endDate,
-                            "MMM d"
-                        )}`}
+                        {isDateCleared
+                            ? "Check in - Check out"
+                            : `${format(dateRange[0].startDate, "MMM d")} - ${format(
+                                dateRange[0].endDate,
+                                "MMM d"
+                            )}`}
                     </span>
                     <Calendar className="w-4 h-4 text-gray-500" />
                 </div>
                 {showCalendar && (
                     <div
-                        className="
+                        className={`
     absolute top-[71px]
     left-1/2 -translate-x-1/2
     md:left-0 md:translate-x-0
@@ -435,12 +464,13 @@ export default function PropertyFilters({
     border border-gray-100
     pl-[16px] md:pl-[16px]
     z-[999999]
-  "
+    ${isDateCleared ? "property-filters-calendar--cleared" : ""}
+  `}
                     >
 
                         <DateRange
                             ranges={dateRange}
-                            onChange={(item) => setDateRange([item.selection])}
+                            onChange={handleDateRangeChange}
                             minDate={tomorrow}
                             moveRangeOnFirstSelection={false}
                             showSelectionPreview={false}
@@ -472,6 +502,8 @@ export default function PropertyFilters({
                                     endDate &&
                                     date.toDateString() === endDate.toDateString();
 
+                                const showActiveSelection = !isDateCleared;
+
                                 return (
                                     <div
                                         className={`
@@ -482,15 +514,15 @@ export default function PropertyFilters({
                                                 ? "bg-[#1297a317] text-gray-400 cursor-not-allowed"
                                                 : ""}
 
-        ${isSelected && !isStart && !isEnd
+        ${showActiveSelection && isSelected && !isStart && !isEnd
                                                 ? "text-black"
                                                 : ""}
 
-        ${isStart || isEnd
+        ${showActiveSelection && (isStart || isEnd)
                                                 ? "text-white font-semibold"
                                                 : ""}
 
-        ${!isPast && !isSelected
+        ${!isPast && (!showActiveSelection || !isSelected)
                                                 ? "hover:bg-primary hover:text-white cursor-pointer"
                                                 : ""}
       `}
