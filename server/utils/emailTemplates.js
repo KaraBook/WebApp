@@ -751,11 +751,11 @@ export function ownerBookingCancellationTemplate({
       year: "numeric",
     });
 
-  const money = (v) => `â‚¹${Number(v || 0).toLocaleString("en-IN")}`;
+  const money = (v) => `₹ ${Number(v || 0).toLocaleString("en-IN")}`;
   const cancelledByLabel = cancelledBy === "owner" ? "Owner" : "Traveller";
 
   return {
-    subject: `Booking Cancelled â€“ ${propertyName}`,
+    subject: `Booking Cancelled - ${propertyName}`,
 
     html: `
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:40px 0;font-family:Inter,Arial,sans-serif;">
@@ -797,7 +797,7 @@ ${propertyName}
 
 <tr>
 <td style="font-size:13px;color:#6b7280;padding-top:4px;">
-${propertyAddress || "â€”"}
+${propertyAddress || "-"}
 </td>
 </tr>
 </table>
@@ -872,7 +872,7 @@ ${money(grandTotal)}
 <tr>
 <td align="center">
 <a href="${portalUrl}" style="display:inline-block;background:${primary};color:#fff;text-decoration:none;padding:14px 26px;border-radius:8px;font-size:15px;font-weight:600;">
-View Booking in Dashboard â†’
+View Booking in Dashboard →
 </a>
 </td>
 </tr>
