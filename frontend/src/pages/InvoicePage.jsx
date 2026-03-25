@@ -93,6 +93,8 @@ export default function InvoicePage() {
   const fmtDate = (d) => format(new Date(d), "dd MMM yyyy");
   const fmtTime = (d) => format(new Date(d), "hh:mm a");
   const bookingDate = fmtDate(invoice.bookingDate);
+  const checkInTime = invoice.propertyCheckInTime || fmtTime(invoice.checkIn);
+  const checkOutTime = invoice.propertyCheckOutTime || fmtTime(invoice.checkOut);
 
   /* ── PDF download ── */
   const downloadPDF = async () => {
@@ -136,7 +138,7 @@ export default function InvoicePage() {
     <div style={{ minHeight: "100vh", padding: "32px 16px", fontFamily: "'Inter', system-ui, sans-serif" }}>
 
       {/* ── ACTION BAR ── */}
-      <div style={{ maxWidth: "820px",  display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ maxWidth: "820px",  display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px",  }}>
         <Link
           to="/account/bookings"
           style={{
@@ -290,12 +292,12 @@ export default function InvoicePage() {
           <StayRow label="Property"  value={invoice.propertyName} />
           <StayRow
             label="Check-in"
-            value={`${fmtDate(invoice.checkIn)} • ${fmtTime(invoice.checkIn)}`}
+            value={`${fmtDate(invoice.checkIn)} • ${checkInTime}`}
             right={<span style={{ fontSize: "13px", color: BODY }}>Nights:&nbsp;<strong style={{ color: DARK }}>{invoice.nights}</strong></span>}
           />
           <StayRow
             label="Check-out"
-            value={`${fmtDate(invoice.checkOut)} • ${fmtTime(invoice.checkOut)}`}
+            value={`${fmtDate(invoice.checkOut)} • ${checkOutTime}`}
             right={
               <span style={{ fontSize: "13px", color: BODY }}>
                 Guests:&nbsp;

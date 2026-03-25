@@ -539,7 +539,7 @@ export const getBookingInvoice = async (req, res) => {
       .populate("userId", "firstName lastName email mobile")
       .populate(
         "propertyId",
-        "propertyName city state coverImage contactNumber isRefundable cancellationPolicy refundNotes"
+        "propertyName propertyType city state address addressLine1 area pinCode coverImage contactNumber checkInTime checkOutTime isRefundable cancellationPolicy refundNotes"
       )
 
     if (!booking) {
@@ -558,10 +558,18 @@ export const getBookingInvoice = async (req, res) => {
       propertyType: booking.propertyId.propertyType || "Accommodation",
 
       propertyAddress: [
-        booking.propertyId.address,
+        booking.propertyId.address ||
+          [
+            booking.propertyId.addressLine1,
+            booking.propertyId.area,
+            booking.propertyId.pinCode,
+          ].filter(Boolean).join(", "),
         booking.propertyId.city,
         booking.propertyId.state,
       ].filter(Boolean).join(", "),
+
+      propertyCheckInTime: booking.propertyId.checkInTime,
+      propertyCheckOutTime: booking.propertyId.checkOutTime,
 
       checkIn: booking.checkIn,
       checkOut: booking.checkOut,
