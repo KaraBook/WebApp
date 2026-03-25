@@ -138,7 +138,7 @@ export default function InvoicePage() {
     <div style={{ minHeight: "100vh", padding: "32px 16px", fontFamily: "'Inter', system-ui, sans-serif" }}>
 
       {/* ── ACTION BAR ── */}
-      <div style={{ maxWidth: "820px",  display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px",  }}>
+      <div style={{ maxWidth: "820px",  display: "flex", justifyContent: "space-between", alignItems: "center"  }}>
         <Link
           to="/account/bookings"
           style={{
@@ -181,7 +181,7 @@ export default function InvoicePage() {
       <div
         ref={invoiceRef}
         style={{
-          maxWidth: "820px", background: "white",
+          maxWidth: "820px", background: "white", marginTop: "20px",
           borderRadius: "16px", border: `1px solid ${BORDER}`,
           overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,.06)",
         }}
