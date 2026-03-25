@@ -133,10 +133,10 @@ export default function InvoicePage() {
      RENDER
   ──────────────────────────────────────── */
   return (
-    <div style={{ minHeight: "100vh", background: "#EEF6F5", padding: "32px 16px", fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div style={{ minHeight: "100vh", padding: "32px 16px", fontFamily: "'Inter', system-ui, sans-serif" }}>
 
       {/* ── ACTION BAR ── */}
-      <div style={{ maxWidth: "820px", margin: "0 auto 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ maxWidth: "820px",  display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Link
           to="/account/bookings"
           style={{
@@ -179,7 +179,7 @@ export default function InvoicePage() {
       <div
         ref={invoiceRef}
         style={{
-          maxWidth: "820px", margin: "0 auto", background: "white",
+          maxWidth: "820px", background: "white",
           borderRadius: "16px", border: `1px solid ${BORDER}`,
           overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,.06)",
         }}
@@ -456,21 +456,18 @@ export default function InvoicePage() {
   );
 }
 
-/* ─────────────────────────────────────────
-   Helper sub-components
-───────────────────────────────────────── */
+
 
 /** Icon + content row */
 function Row({ icon, children }) {
   return (
-    <div style={{ display: "flex", gap: "7px", alignItems: "flex-start", marginBottom: "7px" }}>
+    <div style={{ display: "flex", gap: "7px", alignItems: "center", marginBottom: "7px" }}>
       {icon}
       {children}
     </div>
   );
 }
 
-/** Stay-details table row */
 function StayRow({ label, value, right, last }) {
   return (
     <div style={{
