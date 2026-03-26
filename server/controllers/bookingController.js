@@ -585,6 +585,8 @@ export const getBookingInvoice = async (req, res) => {
 
       orderId: booking.orderId,
       bookingDate: booking.createdAt,
+      paymentMethod: booking.paymentMethod,
+      transactionId: booking.paymentId || booking.orderId,
       paymentStatus: booking.paymentStatus,
 
       user: {

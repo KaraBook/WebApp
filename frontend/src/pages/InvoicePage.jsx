@@ -93,8 +93,12 @@ export default function InvoicePage() {
   const fmtDate = (d) => format(new Date(d), "dd MMM yyyy");
   const fmtTime = (d) => format(new Date(d), "hh:mm a");
   const bookingDate = fmtDate(invoice.bookingDate);
+  const paymentMethod = invoice.paymentMethod || "Razorpay";
+  const transactionId = invoice.transactionId || invoice.orderId || "—";
   const checkInTime = invoice.propertyCheckInTime || fmtTime(invoice.checkIn);
   const checkOutTime = invoice.propertyCheckOutTime || fmtTime(invoice.checkOut);
+  invoice.paymentMethod = paymentMethod;
+  invoice.transactionId = transactionId;
 
   /* ── PDF download ── */
   const downloadPDF = async () => {
@@ -498,9 +502,10 @@ function TotalRow({ label, value }) {
 
 /** Payment key-value row */
 function PayRow({ label, value }) {
+  const displayLabel = label === "Mode" ? "Method" : label;
   return (
     <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "9px" }}>
-      <span style={{ color: MUTED }}>{label}:</span>
+      <span style={{ color: MUTED }}>{displayLabel}:</span>
       <span style={{ fontWeight: "600", color: DARK }}>{value}</span>
     </div>
   );
