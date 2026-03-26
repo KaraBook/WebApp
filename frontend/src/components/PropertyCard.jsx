@@ -8,12 +8,13 @@ import { toast } from "sonner";
 import { useMemo } from "react";
 import { Link, useSearchParams  } from "react-router-dom";
 import { State } from "country-state-city";
+import { getPropertyPath } from "@/utils/propertySeo";
 
 export default function PropertyCard({ property }) {
   const { user, showAuthModal, wishlist, setWishlist, accessToken } =
     useAuthStore();
   const [searchParams] = useSearchParams();
-  const detailsUrl = `/properties/${property._id}?${searchParams.toString()}`;
+  const detailsUrl = getPropertyPath(property, searchParams.toString());
 
   const inWishlist = useMemo(
     () => wishlist.includes(property._id),

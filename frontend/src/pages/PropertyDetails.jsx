@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import { State } from "country-state-city";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
@@ -22,6 +22,13 @@ import "react-date-range/dist/theme/default.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import PropertyMap from "../components/PropertyMap";
+import SeoMeta from "@/components/SeoMeta";
+import {
+  buildPropertyMetaDescription,
+  extractPropertyId,
+  getPropertyAbsoluteUrl,
+  getPropertyPath,
+} from "@/utils/propertySeo";
 
 
 const amenitiesMap = amenitiesCategories
@@ -61,7 +68,9 @@ export default function PropertyDetails() {
   const [loading, setLoading] = useState(true);
   const { wishlist, setWishlist, user, showAuthModal, accessToken } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+  const propertyId = extractPropertyId(id);
 
   const urlCheckIn = searchParams.get("checkIn");
   const urlCheckOut = searchParams.get("checkOut");
@@ -188,7 +197,7 @@ export default function PropertyDetails() {
   useEffect(() => {
     const fetchProperty = async () => {
       try {
-        const res = await Axios.get(SummaryApi.getSingleProperty.url(id));
+        const res = await Axios.get(SummaryApi.getSingleProperty.url(propertyId));
         setProperty(res.data.data);
       } catch (err) {
         console.error("Failed to load property", err);
@@ -197,7 +206,16 @@ export default function PropertyDetails() {
       }
     };
     fetchProperty();
-  }, [id]);
+  }, [propertyId]);
+
+  useEffect(() => {
+    if (!property) return;
+
+    const canonicalPath = getPropertyPath(property, location.search);
+    if (`/properties/${id}${location.search}` !== canonicalPath) {
+      navigate(canonicalPath, { replace: true });
+    }
+  }, [id, location.search, navigate, property]);
 
 
 
@@ -434,6 +452,56 @@ export default function PropertyDetails() {
 
   if (!property) return <div className="text-center py-20">Property not found.</div>;
 
+  const stateName = getStateName(property.state);
+  const propertyTitle = `${property.propertyName}${property.city ? `, ${property.city}` : ""} | Book Direct on Karabook`;
+  const propertyDescription = buildPropertyMetaDescription(property);
+  const canonicalUrl = getPropertyAbsoluteUrl(property);
+  const propertyImage = property.coverImage;
+  const propertyAddress = [
+    property.addressLine1,
+    property.area,
+    property.city,
+    stateName,
+    property.pinCode,
+  ].filter(Boolean).join(", ");
+  const propertySchema = {
+    "@context": "https://schema.org",
+    "@type": "VacationRental",
+    name: property.propertyName,
+    description: property.description,
+    url: canonicalUrl,
+    image: [property.coverImage, ...(property.galleryPhotos || [])].filter(Boolean),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: [property.addressLine1, property.area].filter(Boolean).join(", "),
+      addressLocality: property.city,
+      addressRegion: stateName,
+      postalCode: property.pinCode,
+      addressCountry: "IN",
+    },
+    petsAllowed: false,
+    numberOfBathroomsTotal: property.bathrooms,
+    numberOfBedrooms: property.bedrooms,
+    occupancy: {
+      "@type": "QuantitativeValue",
+      maxValue: property.maxGuests,
+    },
+    checkinTime: property.checkInTime,
+    checkoutTime: property.checkOutTime,
+    amenityFeature: (property.amenities || []).map((amenity) => ({
+      "@type": "LocationFeatureSpecification",
+      name: amenity,
+      value: true,
+    })),
+    aggregateRating: property.reviewCount
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: Number(property.averageRating || 0).toFixed(1),
+          reviewCount: property.reviewCount,
+        }
+      : undefined,
+  };
+
 
   const extraAdultTotal = extraAdults * extraAdultCharge * nights;
   const extraChildTotal = extraChildren * extraChildCharge * nights;
@@ -444,6 +512,13 @@ export default function PropertyDetails() {
 
   return (
     <div className="w-full bg-[#fff5f529]">
+      <SeoMeta
+        title={propertyTitle}
+        description={propertyDescription}
+        canonical={canonicalUrl}
+        image={propertyImage}
+        jsonLd={propertySchema}
+      />
       <motion.div
         className="max-w-7xl mx-auto px-4 py-10"
         initial={{ opacity: 0 }}
@@ -485,7 +560,7 @@ export default function PropertyDetails() {
                   href={property.locationLink || "#"}
                   className="flex items-center text-gray-800 hover:text-black"
                 >
-                  <Map className="w-4 h-4 mr-1" /> {property.city}, {getStateName(property.state)}
+                  <Map className="w-4 h-4 mr-1" /> {property.city}, {stateName}
                 </a>
               )}
             </div>
@@ -630,14 +705,7 @@ export default function PropertyDetails() {
                 <MapPin className="w-5 h-5" /> Location
               </h2>
               <p className="text-gray-700 mb-2 leading-relaxed">
-                {[
-                  property.addressLine1,
-                  property.city,
-                  getStateName(property.state),
-                ]
-                  .filter(Boolean)
-                  .join(", ")}
-                {property.pincode ? ` - ${property.pincode}` : ""}
+                {propertyAddress}
               </p>
               <div className="w-full h-64 mt-3 overflow-hidden">
                 <div className="w-full h-full">

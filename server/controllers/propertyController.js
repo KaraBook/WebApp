@@ -10,6 +10,23 @@ import { propertyCreatedTemplate, propertyPublishedTemplate } from "../utils/ema
 import get from "lodash.get";
 import Booking from "../models/Booking.js";
 
+const FALLBACK_PORTAL_URL = "https://karabook.in";
+
+const slugifyPropertyName = (value = "") =>
+  String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+
+const buildPropertySlug = (property) =>
+  `${slugifyPropertyName(property?.propertyName || "property")}-${property?._id}`;
+
+const getTravellerPortalUrl = () =>
+  (process.env.TRAVELLER_PORTAL_URL || FALLBACK_PORTAL_URL).replace(/\/+$/, "");
+
 
 const toPublicPath = (filePath) => {
   if (!filePath) return null;
@@ -995,6 +1012,7 @@ export const getPublishedProperties = async (req, res) => {
     const filter = {
       isDraft: false,
       publishNow: true,
+      isBlocked: { $ne: true },
     };
 
     if (amenity) {
@@ -1087,6 +1105,61 @@ export const getPublishedProperties = async (req, res) => {
   } catch (err) {
     console.error("getPublishedProperties error:", err);
     res.status(500).json({ success: false });
+  }
+};
+
+export const getSitemapXml = async (_req, res) => {
+  try {
+    const siteUrl = getTravellerPortalUrl();
+    const staticPages = [
+      "",
+      "/properties",
+      "/about-us",
+      "/contact",
+      "/faq",
+      "/terms-and-conditions",
+      "/privacy-policy",
+      "/payment-policy",
+      "/list-your-property",
+    ];
+
+    const properties = await Property.find({
+      isDraft: false,
+      publishNow: true,
+      isBlocked: { $ne: true },
+    })
+      .select("propertyName updatedAt")
+      .sort({ updatedAt: -1 })
+      .lean();
+
+    const staticUrls = staticPages
+      .map(
+        (path) => `<url><loc>${siteUrl}${path}</loc><changefreq>weekly</changefreq><priority>${
+          path === "" ? "1.0" : "0.8"
+        }</priority></url>`
+      )
+      .join("");
+
+    const propertyUrls = properties
+      .map((property) => {
+        const slug = buildPropertySlug(property);
+        const lastmod = property.updatedAt ? new Date(property.updatedAt).toISOString() : null;
+        return `<url><loc>${siteUrl}/properties/${slug}</loc>${
+          lastmod ? `<lastmod>${lastmod}</lastmod>` : ""
+        }<changefreq>daily</changefreq><priority>0.9</priority></url>`;
+      })
+      .join("");
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticUrls}${propertyUrls}
+</urlset>`;
+
+    res.header("Content-Type", "application/xml");
+    return res.status(200).send(xml);
+  } catch (err) {
+    console.error("getSitemapXml error:", err);
+    return res.status(500).send("Failed to generate sitemap");
   }
 };
 

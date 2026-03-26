@@ -13,6 +13,7 @@ import adminRoutes from "./routes/admin.js";
 import ownerRoutes from "./routes/owner.routes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import { getSitemapXml } from "./controllers/propertyController.js";
 
 dotenv.config();
 const app = express();
@@ -68,6 +69,7 @@ app.use(
 console.log("Serving uploads from:", UPLOADS_PATH);
 
 app.get("/", (_req, res) => res.send("API is up"));
+app.get("/sitemap.xml", getSitemapXml);
 
 app.use("/api/auth", userRoutes);
 app.use("/api/properties", propertyRoutes);

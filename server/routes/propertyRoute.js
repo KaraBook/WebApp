@@ -10,6 +10,7 @@ import {
   toggleFeaturedProperty,
   togglePublishProperty,
   getPublishedProperties,
+  getSitemapXml,
   getPropertyBlockedDatesPublic,
   deleteProperty,
   getDraftProperties,
@@ -34,6 +35,7 @@ router.post(
   createPropertyDraft
 );
 
+router.get("/sitemap.xml", getSitemapXml);
 router.post(
   "/:id/media",
   requireAuth,
